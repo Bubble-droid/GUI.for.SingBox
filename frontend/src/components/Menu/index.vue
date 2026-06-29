@@ -2,15 +2,17 @@
 import { onMounted, onUnmounted, ref, watch, nextTick, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import type { Menu } from '@/types'
+
 interface Props {
   position: { x: number; y: number }
-  menuList: App.Menu[]
+  menuList: Menu[]
 }
 
 const model = defineModel<boolean>({ default: false })
 const props = defineProps<Props>()
 
-const secondaryMenu = ref<App.Menu[] | undefined>()
+const secondaryMenu = ref<Menu[] | undefined>()
 
 const menuRef = useTemplateRef('menuRef')
 const secondaryMenuRef = useTemplateRef('secondaryMenuRef')
@@ -20,7 +22,7 @@ const secondaryMenuPosition = ref({ left: '', top: '' })
 
 const { t } = useI18n()
 
-const handleClick = (fn: App.Menu) => {
+const handleClick = (fn: Menu) => {
   fn.handler?.()
   model.value = false
   secondaryMenu.value = undefined

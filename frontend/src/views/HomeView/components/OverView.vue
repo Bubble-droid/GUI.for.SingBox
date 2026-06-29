@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { ProcessMemory } from '@/bridge'
-import { ModeOptions } from '@/constant/kernel'
 import { useEnvStore, useAppStore, useKernelApiStore, useAppSettingsStore } from '@/stores'
 import { formatBytes, handleChangeMode, message, modal } from '@/utils'
 
@@ -27,6 +26,13 @@ const appStore = useAppStore()
 const envStore = useEnvStore()
 const appSettings = useAppSettingsStore()
 const kernelApiStore = useKernelApiStore()
+
+const modeOptions = computed(() =>
+  kernelApiStore.config['mode-list'].map((v) => ({
+    label: t(`kernel.rules.clash_mode.${v}`, v),
+    value: v,
+  })),
+)
 
 const handleRestartKernel = async () => {
   try {
@@ -248,14 +254,13 @@ onUnmounted(() => {
         </div>
         <div class="flex flex-col gap-12">
           <Card
-            v-for="mode in ModeOptions"
+            v-for="mode in modeOptions"
             :key="mode.value"
             :selected="kernelApiStore.config.mode === mode.value"
             :title="t(mode.label)"
             class="cursor-pointer"
-            @click="handleChangeMode(mode.value as any)"
+            @click="handleChangeMode(mode.value)"
           >
-            <div class="text-12 py-2">{{ t(mode.desc) }}</div>
           </Card>
         </div>
       </div>

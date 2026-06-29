@@ -1,6 +1,8 @@
 import { deleteConnection, getConnections, useProxy } from '@/api/kernel'
 import {
   AbsolutePath,
+  CreateSymlink,
+  Download,
   Exec,
   ExitApp,
   FileExists,
@@ -13,9 +15,16 @@ import {
 } from '@/bridge'
 import { CoreWorkingDirectory } from '@/constant/kernel'
 import { OS, RequestProxyMode } from '@/enums/app'
-import { RulesetFormat } from '@/enums/kernel'
+import { RuleSetFormat } from '@/enums/kernel'
 import i18n from '@/lang'
-import { useAppSettingsStore, useAppStore, useEnvStore, useKernelApiStore, usePluginsStore, useRulesetsStore } from '@/stores'
+import {
+  useAppSettingsStore,
+  useAppStore,
+  useEnvStore,
+  useKernelApiStore,
+  usePluginsStore,
+  useRulesetsStore,
+} from '@/stores'
 import {
   formatProxyHost,
   ignoredError,
@@ -24,7 +33,11 @@ import {
   confirm,
   APP_TITLE,
   getAutoStartConfiguration,
+  generateDesktopEntry,
+  APP_IDENTIFIER,
 } from '@/utils'
+
+import type { Recordable } from '@/types'
 
 // Permissions Helper
 export const SwitchPermissions = async (enable: boolean) => {
@@ -79,11 +92,7 @@ export const GrantTUNPermission = async (path: string) => {
     const command = `chown root:admin "${absPath}"; chmod +sx "${absPath}"`
     await RunWithOsaScript(command, [], { admin: true, wait: true })
   } else if (os === OS.Linux) {
-    await Exec('pkexec', [
-      'setcap',
-      'cap_net_bind_service,cap_net_admin,cap_dac_override=+ep',
-      absPath,
-    ])
+    await Exec('pkexec', ['setcap', 'cap_net_admin,cap_net_raw,cap_net_bind_service+ep', absPath])
   }
 }
 
@@ -137,7 +146,7 @@ const requestProxyCache: { proxyPromise: Promise<string> | null; lastAccessTime:
   lastAccessTime: 0,
 }
 
-export const GetRequestProxy = async (mode?: App.RequestProxyMode, customProxy?: string) => {
+export const GetRequestProxy = async (mode?: RequestProxyMode, customProxy?: string) => {
   const appSettings = useAppSettingsStore()
   const requestProxyMode = mode ?? appSettings.app.requestProxyMode
 
@@ -177,9 +186,12 @@ const getPlistPath = async () => {
   return `${home}/Library/LaunchAgents/${APP_TITLE}.plist`
 }
 
-const getDesktopPath = async () => {
+export const getDesktopEntryPaths = async () => {
   const home = await GetEnv('HOME')
-  return `${home}/.config/autostart/${APP_TITLE}.desktop`
+  const systemPath = `/usr/share/applications/${APP_IDENTIFIER}.desktop`
+  const userPath = `${home}/.local/share/applications/${APP_IDENTIFIER}.desktop`
+  const autoStartPath = `${home}/.config/autostart/${APP_IDENTIFIER}.desktop`
+  return { systemPath, userPath, autoStartPath }
 }
 
 export const IsAutoStartEnabled = async () => {
@@ -193,8 +205,8 @@ export const IsAutoStartEnabled = async () => {
     const plistPath = await getPlistPath()
     isAutoStart = await FileExists(plistPath)
   } else if (os === OS.Linux) {
-    const desktopPath = await getDesktopPath()
-    isAutoStart = await FileExists(desktopPath)
+    const { autoStartPath } = await getDesktopEntryPaths()
+    isAutoStart = await FileExists(autoStartPath)
   }
   return isAutoStart
 }
@@ -215,8 +227,8 @@ export const EnableAutoStart = async (delay = 10) => {
     await WriteFile(plistPath, configuration)
     await Exec('launchctl', ['load', plistPath])
   } else if (os === OS.Linux) {
-    const desktopPath = await getDesktopPath()
-    await WriteFile(desktopPath, configuration)
+    const { autoStartPath } = await getDesktopEntryPaths()
+    await WriteFile(autoStartPath, configuration)
   }
 }
 
@@ -230,8 +242,8 @@ export const DisableAutoStart = async () => {
     await Exec('launchctl', ['unload', plistPath])
     await RemoveFile(plistPath)
   } else if (os === OS.Linux) {
-    const desktopPath = await getDesktopPath()
-    await RemoveFile(desktopPath)
+    const { autoStartPath } = await getDesktopEntryPaths()
+    await RemoveFile(autoStartPath)
   }
 }
 
@@ -254,7 +266,7 @@ export const handleUseProxy = async (group: any, proxy: any) => {
   await kernelApiStore.refreshProviderProxies()
 }
 
-export const handleChangeMode = async (mode: 'direct' | 'global' | 'rule') => {
+export const handleChangeMode = async (mode: string) => {
   const kernelApiStore = useKernelApiStore()
 
   if (mode === kernelApiStore.config.mode) return
@@ -280,7 +292,7 @@ export const addToRuleSet = async (
       name: id,
       updateTime: 0,
       type: 'Manual',
-      format: RulesetFormat.Source,
+      format: RuleSetFormat.Source,
       url: '',
       path,
       count: 0,
@@ -384,6 +396,56 @@ export const exitApp = async () => {
   destroy()
 }
 
+export const createDesktopEntry = async () => {
+  const { systemPath, userPath } = await getDesktopEntryPaths()
+  if (!(await FileExists(systemPath)) && !(await FileExists(userPath))) {
+    const desktopEntryContent = generateDesktopEntry('%U')
+    await WriteFile(userPath, desktopEntryContent)
+  }
+}
+
+export const downloadAppIcon = async () => {
+  const home = await GetEnv('HOME')
+  const iconUrl =
+    'https://raw.githubusercontent.com/Bubble-droid/GUI.for.SingBox/feat/xdg-base-directory/build/appicon.png'
+  const iconPath = `icons/hicolor/512x512/apps/${APP_IDENTIFIER}.png`
+  const systemPath = `/usr/share/${iconPath}`
+  const userPath = `${home}/.local/share/${iconPath}`
+  try {
+    if (!(await FileExists(systemPath)) && !(await FileExists(userPath))) {
+      await Download(iconUrl, userPath, undefined, undefined, {
+        Sha256: '08257d0d21c76a56e48e38105460927293a452ddc6b0b62db401bf5b5b9b7adf',
+      })
+    }
+  } catch (error) {
+    console.error('Application icon download failed:', error)
+  }
+}
+
+export const createCoreSymlinks = async () => {
+  const bundledCoresPath = `/usr/lib/${APP_IDENTIFIER}/cores`
+  const baseBinName = 'sing-box'
+  const symlinkMappings = [
+    [baseBinName, baseBinName],
+    [`${baseBinName}-alpha`, `${baseBinName}-latest`],
+  ] as const
+
+  await Promise.all(
+    symlinkMappings.map(async ([srcFile, linkName]) => {
+      const target = `${bundledCoresPath}/${srcFile}`
+      const linkPath = `${CoreWorkingDirectory}/${linkName}`
+
+      if (!(await FileExists(target))) {
+        return
+      }
+
+      if (!(await FileExists(linkPath))) {
+        await CreateSymlink(target, linkPath)
+      }
+    }),
+  )
+}
+
 export const getKernelFileName = (isAlpha = false) => {
   const envStore = useEnvStore()
   const { os } = envStore.env
@@ -403,8 +465,7 @@ export const processMagicVariables = (str: string) => {
   const { env } = useEnvStore()
   let result = str
   Object.entries({
-    $APP_BASE_PATH: env.basePath,
-    $CORE_BASE_PATH: CoreWorkingDirectory,
+    $CORE_BASE_PATH: env.appCorePath,
   }).forEach(([source, target]) => {
     result = result.replaceAll(source, target)
   })

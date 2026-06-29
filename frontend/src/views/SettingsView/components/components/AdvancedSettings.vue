@@ -8,7 +8,7 @@ const appSettings = useAppSettingsStore()
 const envStore = useEnvStore()
 
 const handleOpenFolder = async () => {
-  await OpenDir(envStore.env.basePath)
+  await OpenDir(envStore.env.appDataPath)
 }
 
 const handleOpenRollingReleaseFolder = async () => {
@@ -30,11 +30,17 @@ const handleOpenRollingReleaseFolder = async () => {
     <div class="px-8 py-12 flex items-center justify-between">
       <div class="text-16 font-bold">
         {{ $t('settings.rollingRelease') }}
-        <span class="font-normal text-12">({{ $t('settings.needRestart') }})</span>
+        <span class="font-normal text-12">({{ $t('common.unavailable') }})</span>
       </div>
       <div class="flex items-center gap-4">
-        <Button type="primary" icon="folder" size="small" @click="handleOpenRollingReleaseFolder" />
-        <Switch v-model="appSettings.app.rollingRelease" />
+        <Button
+          type="primary"
+          icon="folder"
+          size="small"
+          disabled
+          @click="handleOpenRollingReleaseFolder"
+        />
+        <Switch v-model="appSettings.app.rollingRelease" disabled />
       </div>
     </div>
     <div class="px-8 py-12 flex items-center justify-between">

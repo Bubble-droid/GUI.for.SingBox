@@ -8,8 +8,10 @@ import { deepClone, ignoredError, message, omitArray, sampleID } from '@/utils'
 
 import Button from '@/components/Button/index.vue'
 
+import type { Subscription } from '@/types'
+
 interface Props {
-  sub: App.Subscription
+  sub: Subscription
 }
 
 const props = defineProps<Props>()
@@ -47,7 +49,7 @@ const handleSave = async () => {
 
 const initProxiesText = async () => {
   const content = (await ignoredError(ReadFile, sub.value.path)) || '[]'
-  const proxies: App.Subscription['proxies'] = JSON.parse(content)
+  const proxies: Subscription['proxies'] = JSON.parse(content)
   const proxiesWithId = proxies.map((proxy) => {
     return {
       __id_in_gui: sub.value.proxies.find((v) => v.tag === proxy.tag)?.id || sampleID(),

@@ -13,11 +13,18 @@ import (
 
 	sysruntime "runtime"
 
+	"github.com/adrg/xdg"
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gopkg.in/yaml.v3"
+)
+
+var (
+	AppVersion          = "dev"
+	SingBoxVersion      = "unknown"
+	SingBoxAlphaVersion = "unknown"
 )
 
 var Config = &AppConfig{}
@@ -33,6 +40,13 @@ var Env = &EnvResult{
 	OS:           sysruntime.GOOS,
 	ARCH:         sysruntime.GOARCH,
 	IsPrivileged: false,
+
+	AppDataPath:     "",
+	AppConfigPath:   "",
+	AppCachePath:    "",
+	AppCorePath:     "",
+	IsSystemPackage: false,
+	IsBundled:       false,
 }
 
 // NewApp creates a new App application struct
@@ -48,8 +62,8 @@ func CreateApp(fs embed.FS) *App {
 		panic(err)
 	}
 
-	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
 	Env.AppName = filepath.Base(exePath)
+	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
 
 	if slices.Contains(os.Args, "tasksch") {
 		Env.FromTaskSch = true
@@ -60,6 +74,58 @@ func CreateApp(fs embed.FS) *App {
 	}
 
 	app := NewApp()
+
+	if strings.Contains(Env.AppName, "wailsbindings") {
+		return app
+	}
+
+	if AppVersion != "" {
+		Env.AppVersion = AppVersion
+	}
+	log.Printf("Build Version: %s", Env.AppVersion)
+
+	Env.IsSystemPackage = isSystemPackage(exePath)
+	log.Printf("Install as a System Package: %t", Env.IsSystemPackage)
+
+	Env.IsBundled = IsBundled()
+	log.Printf("Bundled Package: %t", Env.IsBundled)
+
+	if Env.IsBundled {
+		log.Printf("Bundled Sing-Box Core (Stable): v%s", SingBoxVersion)
+		log.Printf("Bundled Sing-Box Core (Alpha) : v%s", SingBoxAlphaVersion)
+	}
+
+	isXDGMode := Env.OS == "linux" && Env.AppVersion != "dev"
+
+	if isXDGMode {
+		appNameNormal := normalizeDirName(Env.AppName)
+		Env.AppDataPath = filepath.Join(xdg.DataHome, appNameNormal)
+		Env.AppConfigPath = filepath.Join(xdg.ConfigHome, appNameNormal)
+		Env.AppCachePath = filepath.Join(xdg.CacheHome, appNameNormal)
+		Env.AppCorePath = filepath.Join(Env.AppCachePath, "sing-box")
+
+		globalPathResolver = &XDGResolver{
+			dataDir:   Env.AppDataPath,
+			configDir: Env.AppConfigPath,
+			cacheDir:  Env.AppCachePath,
+		}
+		log.Println("Storage Mode: XDG Base Directory")
+	} else {
+		baseDataDir := filepath.Join(Env.BasePath, "data")
+		Env.AppDataPath = baseDataDir
+		Env.AppConfigPath = baseDataDir
+		Env.AppCachePath = filepath.Join(baseDataDir, ".cache")
+		Env.AppCorePath = filepath.Join(Env.AppDataPath, "sing-box")
+
+		globalPathResolver = &PortableResolver{
+			basePath: Env.BasePath,
+		}
+		log.Println("Storage Mode: Portable (Relative to BasePath)")
+	}
+
+	log.Printf("App Data Path: %s", Env.AppDataPath)
+	log.Printf("App Config Path: %s", Env.AppConfigPath)
+	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
 	if Env.OS == "darwin" {
 		createMacOSSymlink()
@@ -119,6 +185,13 @@ func (a *App) GetEnv(key string) any {
 		OS:           Env.OS,
 		ARCH:         Env.ARCH,
 		IsPrivileged: Env.IsPrivileged,
+
+		AppDataPath:     Env.AppDataPath,
+		AppConfigPath:   Env.AppConfigPath,
+		AppCachePath:    Env.AppCachePath,
+		AppCorePath:     Env.AppCorePath,
+		IsSystemPackage: Env.IsSystemPackage,
+		IsBundled:       Env.IsBundled,
 	}
 }
 
@@ -182,7 +255,7 @@ func createMacOSMenus(app *App) {
 }
 
 func processFixedWebView2Runtime() {
-	webviewDir := filepath.Join(Env.BasePath, "data", "WebView2")
+	webviewDir := resolvePath("data/WebView2")
 
 	err := filepath.Walk(webviewDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {

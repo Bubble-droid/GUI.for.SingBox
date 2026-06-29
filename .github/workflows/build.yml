@@ -1,0 +1,192 @@
+name: Build GUI.for.SingBox
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  Build-Frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "latest"
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: make build-frontend APP_VERSION=${{ github.ref_name }}
+      - uses: actions/upload-artifact@v6
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+  Build-Windows:
+    needs: Build-Frontend
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - uses: actions/download-artifact@v8
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+      - name: Ensure make is available
+        shell: pwsh
+        run: |
+          if (-not (Get-Command make -ErrorAction SilentlyContinue)) {
+            choco install make -y --no-progress
+          }
+
+      - name: Build Windows
+        shell: pwsh
+        run: |
+          $arches = @("amd64","arm64","386")
+          foreach ($arch in $arches) {
+            make build-windows ARCH=$arch APP_VERSION=${{ github.ref_name }}
+          }
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: windows-builds
+          path: build/bin/*.zip
+
+  Build-macOS:
+    needs: Build-Frontend
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - uses: actions/download-artifact@v8
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+      - name: Build macOS
+        run: |
+          for arch in amd64 arm64; do
+            make build-macos ARCH=$arch APP_VERSION=${{ github.ref_name }}
+          done
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: macos-builds
+          path: build/bin/*.tar.gz
+
+  Build-Linux:
+    needs: Build-Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - uses: actions/download-artifact@v8
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+      - name: Install System Dependencies & fpm
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget libgtk-3-dev libwebkit2gtk-4.1-dev ruby squashfs-tools ruby-dev rubygems build-essential rpm bsdtar
+          sudo gem install fpm
+
+      - name: Build & Package Linux
+        run: |
+          for arch in amd64 arm64; do
+            make build-linux package-linux ARCH=$arch APP_VERSION=${{ github.ref_name }}
+            make clean-cores
+          done
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: linux-builds
+          path: |
+            build/bin/*.tar.gz
+            packaging/pkgs/*.deb
+            packaging/pkgs/*.rpm
+            packaging/pkgs/*.pkg.tar.zst
+
+  Generate-Release-Notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Generate Notes
+        run: |
+          TAG="${{ github.ref_name }}"
+          PREV_TAG=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || echo "")
+
+          mkdir -p release-notes
+
+          TAG_MSG=$(git tag -l --format='%(contents)' "$TAG" 2>/dev/null | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$$//')
+          if [ -z "$TAG_MSG" ]; then
+            TAG_MSG=$(git log -1 --format='%B' "$TAG" 2>/dev/null)
+          fi
+
+          {
+            if [ -n "$TAG_MSG" ]; then
+              echo "## 📝 Release Notes"
+              echo ""
+              echo "$TAG_MSG"
+              echo ""
+              echo "---"
+            fi
+
+            if [ -n "$PREV_TAG" ]; then
+              echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$PREV_TAG...$TAG"
+            else
+              echo "**Full Changelog**: First Release"
+            fi
+          } > release-notes/release_notes.md
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: release-notes
+          path: release-notes/release_notes.md
+
+  Release:
+    needs: [Build-Windows, Build-macOS, Build-Linux, Generate-Release-Notes]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all builds
+        uses: actions/download-artifact@v8
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          files: |
+            release-assets/*.zip
+            release-assets/*.tar.gz
+            release-assets/*.deb
+            release-assets/*.rpm
+            release-assets/*.pkg.tar.zst
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'dev') }}
+          body_path: release-assets/release_notes.md

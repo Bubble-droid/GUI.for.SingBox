@@ -11,6 +11,7 @@ import {
   DefaultTestTimeout,
   DefaultTestURL,
 } from '@/constant/app'
+import { Outbound } from '@/enums'
 import { ControllerCloseMode } from '@/enums/app'
 import { useBool } from '@/hooks'
 import { useAppSettingsStore, useKernelApiStore, useProfilesStore } from '@/stores'
@@ -22,6 +23,8 @@ import {
   createAsyncPool,
   buildSmartRegExp,
 } from '@/utils'
+
+import type { Recordable } from '@/types'
 
 const expandedSet = ref<Set<string>>(new Set())
 const loadingSet = ref<Set<string>>(new Set())
@@ -38,12 +41,15 @@ const profilesStore = useProfilesStore()
 const groups = computed(() => {
   const { proxies } = kernelApiStore
   const iconMapping = (profilesStore.currentProfile?.outbounds || []).reduce((p, c) => {
-    p[c.tag] = c.icon
+    if (c.type === Outbound.Selector || c.type === Outbound.Urltest) {
+      p[c.tag] = c.icon
+    }
     return p
   }, {} as Recordable<string>)
-  const hiddenList = (profilesStore.currentProfile?.outbounds || []).flatMap((v) =>
-    v.hidden ? v.tag : [],
-  )
+  const hiddenList = (profilesStore.currentProfile?.outbounds || []).flatMap((v) => {
+    if (v.type !== Outbound.Selector && v.type !== Outbound.Urltest) return []
+    return v.hidden ? v.tag : []
+  })
   return Object.values(proxies)
     .filter(
       (v) =>

@@ -8,6 +8,8 @@ export function CloseMMDB(arg1:string,arg2:string):Promise<bridge.FlagResult>;
 
 export function CopyFile(arg1:string,arg2:string):Promise<bridge.FlagResult>;
 
+export function CreateSymlink(arg1:string,arg2:string):Promise<bridge.FlagResult>;
+
 export function Download(arg1:string,arg2:string,arg3:string,arg4:Record<string, string>,arg5:string,arg6:bridge.RequestOptions):Promise<bridge.HTTPResult>;
 
 export function Exec(arg1:string,arg2:Array<string>,arg3:bridge.ExecOptions):Promise<bridge.FlagResult>;

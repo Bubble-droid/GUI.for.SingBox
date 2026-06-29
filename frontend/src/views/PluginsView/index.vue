@@ -5,10 +5,12 @@ import { useI18n, I18nT } from 'vue-i18n'
 import { OpenURI } from '@/bridge'
 import { DraggableOptions, ViewOptions } from '@/constant/app'
 import { PluginTriggerEvent, PluginTrigger, View } from '@/enums/app'
-import { usePluginsStore, useAppSettingsStore, useEnvStore } from '@/stores'
+import { usePluginsStore, useAppSettingsStore } from '@/stores'
 import { debounce, message, deepClone, modal } from '@/utils'
 
 import Button from '@/components/Button/index.vue'
+
+import type { Menu, AppPlugin } from '@/types/app.ts'
 
 import PluginChangelog from './components/PluginChangelog.vue'
 import PluginConfigurator from './components/PluginConfigurator.vue'
@@ -16,7 +18,7 @@ import PluginForm from './components/PluginForm.vue'
 import PluginHub from './components/PluginHub.vue'
 import PluginView from './components/PluginView.vue'
 
-const menuList: App.Menu[] = [
+const menuList: Menu[] = [
   {
     label: 'plugins.reload',
     handler: async (id: string) => {
@@ -34,14 +36,13 @@ const menuList: App.Menu[] = [
     label: 'common.openFile',
     handler: async (id: string) => {
       const plugin = pluginsStore.getPluginById(id)
-      await OpenURI(envStore.env.basePath + '/' + plugin!.path)
+      await OpenURI(plugin!.path)
     },
   },
 ]
 
 const { t } = useI18n()
 
-const envStore = useEnvStore()
 const pluginsStore = usePluginsStore()
 const appSettingsStore = useAppSettingsStore()
 
@@ -102,7 +103,7 @@ const handleUpdatePlugins = async () => {
   }
 }
 
-const handleUpdatePlugin = async (s: App.Plugin) => {
+const handleUpdatePlugin = async (s: AppPlugin) => {
   try {
     await pluginsStore.updatePlugin(s.id)
     message.success('common.success')
@@ -112,7 +113,7 @@ const handleUpdatePlugin = async (s: App.Plugin) => {
   }
 }
 
-const handleDeletePlugin = async (p: App.Plugin) => {
+const handleDeletePlugin = async (p: AppPlugin) => {
   try {
     await pluginsStore.deletePlugin(p.id)
   } catch (error: any) {
@@ -121,7 +122,7 @@ const handleDeletePlugin = async (p: App.Plugin) => {
   }
 }
 
-const handleDisablePlugin = async (p: App.Plugin) => {
+const handleDisablePlugin = async (p: AppPlugin) => {
   const nextPlugin = deepClone(p)
   nextPlugin.disabled = !nextPlugin.disabled
 
@@ -138,7 +139,7 @@ const handleEditPluginCode = (id: string, title: string) => {
   m.setContent(PluginView, { id }).open()
 }
 
-const handleOnRun = async (p: App.Plugin) => {
+const handleOnRun = async (p: AppPlugin) => {
   p.running = true
   try {
     await pluginsStore.manualTrigger(p.id, PluginTriggerEvent.OnManual)
@@ -148,8 +149,8 @@ const handleOnRun = async (p: App.Plugin) => {
   p.running = false
 }
 
-const generateMenus = (p: App.Plugin) => {
-  const builtInMenus: App.Menu[] = menuList.map((v) => ({ ...v, handler: () => v.handler?.(p.id) }))
+const generateMenus = (p: AppPlugin) => {
+  const builtInMenus: Menu[] = menuList.map((v) => ({ ...v, handler: () => v.handler?.(p.id) }))
 
   if (p.configuration.length) {
     builtInMenus.push({
@@ -168,7 +169,7 @@ const generateMenus = (p: App.Plugin) => {
     })
   }
 
-  const pluginMenus: App.Menu[] = Object.entries(p.menus).map(([title, fn]) => ({
+  const pluginMenus: Menu[] = Object.entries(p.menus).map(([title, fn]) => ({
     label: title,
     handler: async () => {
       try {

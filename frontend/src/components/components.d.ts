@@ -1,40 +1,73 @@
-export {}
+import type Button from './Button/index.vue'
+import type Card from './Card/index.vue'
+import type CheckBox from './CheckBox/index.vue'
+import type CodeEditor from './CodeEditor/index.vue'
+import type CodeViewer from './CodeViewer/index.vue'
+import type ColorPicker from './ColorPicker/index.vue'
+import type Confirm from './Confirm/index.vue'
+import type CustomAction from './CustomAction/index.vue'
+import type Divider from './Divider/index.vue'
+import type Dropdown from './Dropdown/index.vue'
+import type Empty from './Empty/index.vue'
+import type Icon from './Icon/index.vue'
+import type Input from './Input/index.vue'
+import type InputList from './InputList/index.vue'
+import type InterfaceSelect from './InterfaceSelect/index.vue'
+import type KeyValueEditor from './KeyValueEditor/index.vue'
+import type MarkdownViewer from './MarkdownViewer/index.vue'
+import type Menu from './Menu/index.vue'
+import type Message from './Message/index.vue'
+import type Modal from './Modal/index.vue'
+import type Pagination from './Pagination/index.vue'
+import type Picker from './Picker/index.vue'
+import type Progress from './Progress/index.vue'
+import type Prompt from './Prompt/index.vue'
+import type Radio from './Radio/index.vue'
+import type ResourceSelect from './ResourceSelect/index.vue'
+import type MultipleSelect from './Select/index.vue'
+import type Select from './Select/index.vue'
+import type Switch from './Switch/index.vue'
+import type Table from './Table/index.vue'
+import type Tabs from './Tabs/index.vue'
+import type Tag from './Tag/index.vue'
+import type Tips from './Tips/index.vue'
+import type TrafficChart from './TrafficChart/index.vue'
 
 declare module 'vue' {
   export interface GlobalComponents {
-    Button: (typeof import('./Button/index.vue'))['default']
-    Card: (typeof import('./Card/index.vue'))['default']
-    CheckBox: (typeof import('./CheckBox/index.vue'))['default']
-    CodeViewer: (typeof import('./CodeViewer/index.vue'))['default']
-    CodeEditor: (typeof import('./CodeEditor/index.vue'))['default']
-    ColorPicker: (typeof import('./ColorPicker/index.vue'))['default']
-    Confirm: (typeof import('./Confirm/index.vue'))['default']
-    CustomAction: (typeof import('./CustomAction/index.vue'))['default']
-    Divider: (typeof import('./Divider/index.vue'))['default']
-    Dropdown: (typeof import('./Dropdown/index.vue'))['default']
-    Empty: (typeof import('./Empty/index.vue'))['default']
-    Icon: (typeof import('./Icon/index.vue'))['default']
-    Input: (typeof import('./Input/index.vue'))['default']
-    InputList: (typeof import('./InputList/index.vue'))['default']
-    InterfaceSelect: (typeof import('./InterfaceSelect/index.vue'))['default']
-    KeyValueEditor: (typeof import('./KeyValueEditor/index.vue'))['default']
-    Menu: (typeof import('./Menu/index.vue'))['default']
-    Message: (typeof import('./Message/index.vue'))['default']
-    MarkdownViewer: (typeof import('./MarkdownViewer/index.vue'))['default']
-    Modal: (typeof import('./Modal/index.vue'))['default']
-    MultipleSelect: (typeof import('./Select/index.vue'))['default']
-    Pagination: (typeof import('./Pagination/index.vue'))['default']
-    Picker: (typeof import('./Picker/index.vue'))['default']
-    Progress: (typeof import('./Progress/index.vue'))['default']
-    Prompt: (typeof import('./Prompt/index.vue'))['default']
-    Radio: (typeof import('./Radio/index.vue'))['default']
-    ResourceSelect: (typeof import('./ResourceSelect/index.vue'))['default']
-    Select: (typeof import('./Select/index.vue'))['default']
-    Switch: (typeof import('./Switch/index.vue'))['default']
-    Table: (typeof import('./Table/index.vue'))['default']
-    Tabs: (typeof import('./Tabs/index.vue'))['default']
-    Tag: (typeof import('./Tag/index.vue'))['default']
-    Tips: (typeof import('./Tips/index.vue'))['default']
-    TrafficChart: (typeof import('./TrafficChart/index.vue'))['default']
+    Button: typeof Button
+    Card: typeof Card
+    CheckBox: typeof CheckBox
+    CodeViewer: typeof CodeViewer
+    CodeEditor: typeof CodeEditor
+    ColorPicker: typeof ColorPicker
+    Confirm: typeof Confirm
+    CustomAction: typeof CustomAction
+    Divider: typeof Divider
+    Dropdown: typeof Dropdown
+    Empty: typeof Empty
+    Icon: typeof Icon
+    Input: typeof Input
+    InputList: typeof InputList
+    InterfaceSelect: typeof InterfaceSelect
+    KeyValueEditor: typeof KeyValueEditor
+    Menu: typeof Menu
+    Message: typeof Message
+    MarkdownViewer: typeof MarkdownViewer
+    Modal: typeof Modal
+    MultipleSelect: typeof MultipleSelect
+    Pagination: typeof Pagination
+    Picker: typeof Picker
+    Progress: typeof Progress
+    Prompt: typeof Prompt
+    Radio: typeof Radio
+    ResourceSelect: typeof ResourceSelect
+    Select: typeof Select
+    Switch: typeof Switch
+    Table: typeof Table
+    Tabs: typeof Tabs
+    Tag: typeof Tag
+    Tips: typeof Tips
+    TrafficChart: typeof TrafficChart
   }
 }

@@ -14,6 +14,10 @@ import {
 } from '@/stores'
 import { debounce, deepClone, generateConfig, message, sampleID, alert, modal } from '@/utils'
 
+import CodeViewer from '@/components/CodeViewer/index.vue'
+
+import type { Profile, Menu } from '@/types'
+
 import ProfileEditor from './components/ProfileEditor.vue'
 import ProfileForm from './components/ProfileForm.vue'
 
@@ -25,9 +29,14 @@ const appSettingsStore = useAppSettingsStore()
 const kernelApiStore = useKernelApiStore()
 const pluginsStore = usePluginsStore()
 
-const menuList: App.Menu[] = [
+const menuList: Menu[] = [
   'profile.step.name',
-  'profile.step.general',
+  'profile.step.log',
+  'profile.step.ntp',
+  'profile.step.experimental',
+  'profile.step.endpoints',
+  'profile.step.services',
+  'profile.step.http_clients',
   'profile.step.inbounds',
   'profile.step.outbounds',
   'profile.step.route',
@@ -43,7 +52,7 @@ const menuList: App.Menu[] = [
   }
 })
 
-const secondaryMenusList: App.Menu[] = [
+const secondaryMenusList: Menu[] = [
   {
     label: 'profiles.start',
     handler: async (id: string) => {
@@ -91,7 +100,11 @@ const secondaryMenusList: App.Menu[] = [
       const p = profilesStore.getProfileById(id)!
       try {
         const config = await generateConfig(p)
-        alert(p.name, JSON.stringify(config, null, 2))
+        const m = modal({ title: p.name, width: '90', height: '90' })
+        m.setContent(CodeViewer, {
+          modelValue: JSON.stringify(config, null, 2),
+          lang: 'json',
+        }).open()
       } catch (error: any) {
         message.error(error.message || error)
       }
@@ -107,12 +120,12 @@ const secondaryMenusList: App.Menu[] = [
   },
 ]
 
-const generateMenus = (profile: App.Profile) => {
-  const moreMenus: App.Menu[] = secondaryMenusList.map((v) => ({
+const generateMenus = (profile: Profile) => {
+  const moreMenus: Menu[] = secondaryMenusList.map((v) => ({
     ...v,
     handler: () => v.handler?.(profile.id),
   }))
-  const builtInMenus: App.Menu[] = [
+  const builtInMenus: Menu[] = [
     ...menuList.map((v) => ({ ...v, handler: () => v.handler?.(profile.id) })),
     {
       label: '',
@@ -134,7 +147,7 @@ const generateMenus = (profile: App.Profile) => {
         label: '',
         separator: true,
       },
-      ...contextMenus.reduce((prev, plugin) => {
+      ...contextMenus.reduce<Menu[]>((prev, plugin) => {
         const menus = Object.entries(plugin.context.profiles)
         return prev.concat(
           menus.map(([title, fn]) => {
@@ -153,7 +166,7 @@ const generateMenus = (profile: App.Profile) => {
             }
           }),
         )
-      }, [] as App.Menu[]),
+      }, []),
     )
   }
 
@@ -165,7 +178,7 @@ const handleShowProfileForm = (id?: string, step = 0) => {
   m.setContent(ProfileForm, { id, step }).open()
 }
 
-const handleDeleteProfile = async (p: App.Profile) => {
+const handleDeleteProfile = async (p: Profile) => {
   const { profile } = appSettingsStore.app.kernel
   if (profile === p.id && kernelApiStore.running) {
     message.warn('profiles.shouldStop')
@@ -180,7 +193,7 @@ const handleDeleteProfile = async (p: App.Profile) => {
   }
 }
 
-const handleUseProfile = async (p: App.Profile) => {
+const handleUseProfile = async (p: Profile) => {
   if (appSettingsStore.app.kernel.profile === p.id) return
 
   appSettingsStore.app.kernel.profile = p.id

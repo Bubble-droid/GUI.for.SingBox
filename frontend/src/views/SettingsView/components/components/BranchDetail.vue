@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { RemoveFile } from '@/bridge'
 import { CoreCacheFilePath } from '@/constant/kernel'
 import { useCoreBranch } from '@/hooks/useCoreBranch'
-import { useKernelApiStore } from '@/stores'
+import { useEnvStore, useKernelApiStore } from '@/stores'
 import { message } from '@/utils'
 
 interface Props {
@@ -17,6 +17,7 @@ const emit = defineEmits(['config'])
 
 const { t } = useI18n()
 const kernelApiStore = useKernelApiStore()
+const { env } = useEnvStore()
 
 const {
   restartable,
@@ -64,6 +65,7 @@ const handleClearCoreCache = async () => {
     <Button
       v-if="rollbackable"
       v-tips="'settings.kernel.rollbackTip'"
+      :disabled="env.isBundled"
       icon="rollback"
       type="text"
       size="small"
@@ -79,6 +81,7 @@ const handleClearCoreCache = async () => {
     <Button
       v-if="grantable"
       v-tips="'settings.kernel.grant'"
+      :disabled="env.isBundled"
       type="text"
       size="small"
       icon="grant"
@@ -123,7 +126,9 @@ const handleClearCoreCache = async () => {
       <Tag
         :color="updatable ? 'purple' : 'default'"
         class="cursor-pointer"
-        @click="refreshRemoteVersion(true)"
+        @click="
+          env.isBundled ? message.info('about.updatesManagedByOS') : refreshRemoteVersion(true)
+        "
       >
         {{ t('settings.kernel.remote') }}
         :

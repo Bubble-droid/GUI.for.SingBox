@@ -16,13 +16,13 @@ import {
 } from '@/utils'
 
 const { t } = useI18n()
-const envStore = useEnvStore()
+const { env } = useEnvStore()
 const appStore = useAppStore()
 
 const handleRestartApp = async () => {
   try {
-    if (envStore.env.os === OS.Darwin) {
-      RunWithOsaScript('open', [envStore.env.appPath], {
+    if (env.os === OS.Darwin) {
+      RunWithOsaScript('open', [env.appPath], {
         wait: false,
       })
       await ExitApp()
@@ -34,8 +34,10 @@ const handleRestartApp = async () => {
   }
 }
 
-if (Date.now() - appStore.lastCheckTime > 60_000) {
-  appStore.checkForUpdates()
+if (!env.isSystemPackage) {
+  if (Date.now() - appStore.lastCheckTime > 60_000) {
+    appStore.checkForUpdates()
+  }
 }
 </script>
 
@@ -58,9 +60,13 @@ if (Date.now() - appStore.lastCheckTime > 60_000) {
           :loading="appStore.checkForUpdatesLoading"
           type="link"
           size="small"
-          @click="appStore.checkForUpdates(true)"
+          @click="
+            env.isSystemPackage
+              ? message.info('about.updatesManagedByOS')
+              : appStore.checkForUpdates(true)
+          "
         >
-          Bridge: {{ envStore.env.appVersion }} - UI: {{ APP_VERSION }}
+          Bridge: {{ env.appVersion }} - UI: {{ APP_VERSION }}
         </Button>
         <Button
           v-if="appStore.updatable"

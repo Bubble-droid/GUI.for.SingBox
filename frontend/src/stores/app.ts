@@ -6,11 +6,12 @@ import {
   Download,
   HttpGet,
   MoveFile,
-  UnzipZIPFile,
   RemoveFile,
   HttpCancel,
   ReadDir,
   Exec,
+  UnzipTarGZFile,
+  UnzipZIPFile,
 } from '@/bridge'
 import { LanguageOptions, LocalesFilePath, RollingReleaseDirectory } from '@/constant/app'
 import { OS } from '@/enums/app'
@@ -24,12 +25,29 @@ import {
   message,
   sampleID,
   sleep,
+  APP_IDENTIFIER,
   modal,
 } from '@/utils'
 
 import { AboutView } from '@/components'
 
+import type { Menu, CustomAction, CustomActionFn } from '@/types'
+
 import { useEnvStore } from './env'
+
+export interface GitHubApiRelease {
+  message?: string
+  tag_name: string
+  prerelease: boolean
+  assets: {
+    name: string
+    browser_download_url: string
+    digest: string
+    uploader: {
+      login: string
+    }
+  }[]
+}
 
 export const useAppStore = defineStore('app', () => {
   const isAppExiting = ref(false)
@@ -37,7 +55,7 @@ export const useAppStore = defineStore('app', () => {
 
   /* Global Menu */
   const menuShow = ref(false)
-  const menuList = ref<App.Menu[]>([])
+  const menuList = ref<Menu[]>([])
   const menuPosition = ref({
     x: 0,
     y: 0,
@@ -83,14 +101,14 @@ export const useAppStore = defineStore('app', () => {
 
   /* Actions */
   const customActions = ref({
-    core_state: [] as (App.CustomAction | App.CustomActionFn)[],
-    title_bar: [] as (App.CustomAction | App.CustomActionFn)[],
-    profiles_header: [] as (App.CustomAction | App.CustomActionFn)[],
-    subscriptions_header: [] as (App.CustomAction | App.CustomActionFn)[],
+    core_state: [] as (CustomAction | CustomActionFn)[],
+    title_bar: [] as (CustomAction | CustomActionFn)[],
+    profiles_header: [] as (CustomAction | CustomActionFn)[],
+    subscriptions_header: [] as (CustomAction | CustomActionFn)[],
   })
   const addCustomActions = (
     target: keyof typeof customActions.value,
-    actions: App.CustomAction | App.CustomAction[] | App.CustomActionFn | App.CustomActionFn[],
+    actions: CustomAction | CustomAction[] | CustomActionFn | CustomActionFn[],
   ) => {
     if (!customActions.value[target]) throw new Error('Target does not exist: ' + target)
     const _actions = Array.isArray(actions) ? actions : [actions]
@@ -125,8 +143,9 @@ export const useAppStore = defineStore('app', () => {
 
   const downloadApp = async () => {
     downloading.value = true
+    const { appName, os, appPath } = envStore.env
     try {
-      const downloadCacheFile = 'data/.cache/gui.zip'
+      const downloadCacheFile = `data/.cache/gui${os === OS.Windows ? '.zip' : '.tar.gz'}`
 
       const { update, destroy } = message.info('common.downloading', 10 * 60 * 1_000, () => {
         HttpCancel(downloadCacheFile)
@@ -146,11 +165,12 @@ export const useAppStore = defineStore('app', () => {
         },
       ).finally(destroy)
 
-      const { appName, os, appPath } = envStore.env
+      os === OS.Windows
+        ? await UnzipZIPFile(downloadCacheFile, 'data/.cache')
+        : await UnzipTarGZFile(downloadCacheFile, 'data/.cache')
 
       if (os === OS.Darwin) {
         const cur_pkg_bak = appPath + '.bak'
-        await UnzipZIPFile(downloadCacheFile, 'data/.cache')
         await RemoveFile(downloadCacheFile)
         await MoveFile(appPath, cur_pkg_bak)
         await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_TITLE}.app`, appPath)
@@ -159,17 +179,16 @@ export const useAppStore = defineStore('app', () => {
         await RemoveFile(cur_pkg_bak)
       } else {
         const suffix = { [OS.Windows]: '.exe', [OS.Linux]: '' }[os]
-        await MoveFile(appName, appName + '.bak')
-        await UnzipZIPFile(downloadCacheFile, '.')
-        await MoveFile(APP_TITLE + suffix, appName)
+        await MoveFile(appName, `data/.cache/${APP_IDENTIFIER}.bak`)
+        await MoveFile(`data/.cache/${APP_IDENTIFIER}${suffix}`, appName)
         await RemoveFile(downloadCacheFile)
         await RemoveFile(RollingReleaseDirectory)
       }
       message.success('about.updateSuccessfulRestart')
       restartable.value = true
-    } catch (error: any) {
+    } catch (error) {
       console.log(error)
-      message.error(error.message || error, 5_000)
+      message.error(error, 5_000)
     }
     downloading.value = false
   }
@@ -180,7 +199,7 @@ export const useAppStore = defineStore('app', () => {
     remoteVersion.value = APP_VERSION
     downloadDigest.value = ''
     try {
-      const { body } = await HttpGet<Record<string, any>>(APP_VERSION_API, {
+      const { body } = await HttpGet<GitHubApiRelease>(APP_VERSION_API, {
         Authorization: getGitHubApiAuthorization(),
       })
       if (body.message) throw body.message
@@ -188,7 +207,7 @@ export const useAppStore = defineStore('app', () => {
       const { tag_name, assets } = body
 
       const { os, arch } = envStore.env
-      const assetName = `${APP_TITLE}-${os}-${arch}.zip`
+      const assetName = `${APP_IDENTIFIER}-${tag_name.replace(/^v/, '')}-${os}-${arch}${os === OS.Windows ? '.zip' : '.tar.gz'}`
 
       const asset = assets.find((v: any) => v.name === assetName)
       if (!asset) throw 'Asset Not Found:' + assetName

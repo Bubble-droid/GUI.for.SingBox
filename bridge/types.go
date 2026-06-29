@@ -24,6 +24,14 @@ type EnvResult struct {
 	OS           string `json:"os"`
 	ARCH         string `json:"arch"`
 	IsPrivileged bool   `json:"isPrivileged"`
+
+	// Additional fields
+	AppDataPath     string `json:"appDataPath"`
+	AppConfigPath   string `json:"appConfigPath"`
+	AppCachePath    string `json:"appCachePath"`
+	AppCorePath     string `json:"appCorePath"`
+	IsSystemPackage bool   `json:"isSystemPackage"`
+	IsBundled       bool   `json:"isBundled"`
 }
 
 type RequestOptions struct {
@@ -94,6 +102,8 @@ type AppConfig struct {
 	MultipleInstance  bool `yaml:"multipleInstance"`
 	RollingRelease    bool `yaml:"rollingRelease" default:"true"`
 	StartHidden       bool
+
+	SystemTitleBar bool `yaml:"systemTitleBar"`
 }
 
 type TrayContent struct {

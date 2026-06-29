@@ -2,12 +2,14 @@
 import { ref, inject, watch, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { RulesetFormatOptions } from '@/constant/kernel'
-import { RulesetFormat } from '@/enums/kernel'
+import { RuleSetFormatOptions } from '@/constant'
+import { RuleSetFormat } from '@/enums'
 import { useRulesetsStore } from '@/stores'
 import { deepClone, message, sampleID } from '@/utils'
 
 import Button from '@/components/Button/index.vue'
+
+import type { RuleSet } from '@/types'
 
 interface Props {
   id?: string
@@ -21,11 +23,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const loading = ref(false)
 
-const ruleset = ref<App.RuleSet>({
+const ruleset = ref<RuleSet>({
   id: sampleID(),
   name: '',
   updateTime: 0,
-  format: RulesetFormat.Binary,
+  format: RuleSetFormat.Binary,
   type: 'Http',
   url: '',
   count: 0,
@@ -77,7 +79,7 @@ watch(
   () => ruleset.value.type,
   (v) => {
     if (v === 'Manual') {
-      ruleset.value.format = RulesetFormat.Source
+      ruleset.value.format = RuleSetFormat.Source
     }
   },
 )
@@ -85,7 +87,7 @@ watch(
 watch(
   () => ruleset.value.format,
   (v, old) => {
-    const isJson = v === RulesetFormat.Source
+    const isJson = v === RuleSetFormat.Source
     if (!isJson && ruleset.value.type === 'Manual') {
       ruleset.value.format = old
       message.error('Not support')
@@ -146,7 +148,7 @@ defineExpose({ modalSlots })
     </div>
     <div v-show="ruleset.type !== 'Manual'" class="form-item">
       {{ t('ruleset.format.name') }}
-      <Radio v-model="ruleset.format" :options="RulesetFormatOptions" />
+      <Radio v-model="ruleset.format" :options="RuleSetFormatOptions" />
     </div>
     <div class="form-item">
       {{ t('ruleset.name') }} *
@@ -164,7 +166,7 @@ defineExpose({ modalSlots })
             ruleset.type === 'Http'
               ? 'http(s)://'
               : 'data/local/{filename}.' +
-                (ruleset.format === RulesetFormat.Binary ? 'srs' : 'json')
+                (ruleset.format === RuleSetFormat.Binary ? 'srs' : 'json')
           "
           class="w-full"
         />
@@ -175,7 +177,7 @@ defineExpose({ modalSlots })
       <div class="min-w-[75%]">
         <Input
           v-model="ruleset.path"
-          :placeholder="`data/rulesets/{filename}.${ruleset.format === RulesetFormat.Binary ? 'srs' : 'json'}`"
+          :placeholder="`data/rulesets/{filename}.${ruleset.format === RuleSetFormat.Binary ? 'srs' : 'json'}`"
           class="w-full"
         />
       </div>

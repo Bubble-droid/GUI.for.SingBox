@@ -7,17 +7,16 @@ import { Lang } from '@/enums/app'
 import en from './locale/en'
 import zh from './locale/zh'
 
-const messages: Recordable = {
-  zh,
-  en,
-}
-
 const i18n = createI18n({
   legacy: false,
-  locale: 'en',
+  locale: 'zh',
+  fallbackLocale: 'zh',
   fallbackWarn: false,
   missingWarn: false,
-  messages,
+  messages: {
+    zh,
+    en,
+  },
 })
 
 export const loadLocale = async (locale = i18n.global.locale.value) => {

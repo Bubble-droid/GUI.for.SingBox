@@ -1,4 +1,4 @@
-import { type RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 
 import HomeView from '@/views/HomeView/index.vue'
 import PluginsView from '@/views/PluginsView/index.vue'

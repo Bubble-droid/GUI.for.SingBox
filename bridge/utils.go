@@ -21,13 +21,145 @@ type requestTransportKey struct {
 	Insecure bool
 }
 
+type PathResolver interface {
+	Resolve(cleanPath string) string
+}
+
 var requestTransportCache sync.Map
 
-func resolvePath(path string) string {
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(Env.BasePath, path)
+var globalPathResolver PathResolver
+
+func resolvePath(rawPath string) string {
+	if rawPath == "" {
+		return ""
 	}
-	return filepath.ToSlash(filepath.Clean(path))
+
+	cleanPath := filepath.Clean(rawPath)
+	if filepath.IsAbs(cleanPath) {
+		return cleanPath
+	}
+
+	if globalPathResolver != nil {
+		return globalPathResolver.Resolve(cleanPath)
+	}
+
+	return cleanPath // Fallback
+}
+
+type PortableResolver struct {
+	basePath string
+}
+
+func (r *PortableResolver) Resolve(cleanPath string) string {
+	return filepath.Join(r.basePath, cleanPath)
+}
+
+type XDGResolver struct {
+	dataDir   string
+	configDir string
+	cacheDir  string
+}
+
+func (r *XDGResolver) Resolve(cleanPath string) string {
+	normalized := filepath.ToSlash(cleanPath)
+
+	var relPath string
+	if normalized == "data" || normalized == "./data" {
+		relPath = ""
+	} else if after, ok := strings.CutPrefix(normalized, "data/"); ok {
+		relPath = after
+	} else if after, ok := strings.CutPrefix(normalized, "./data/"); ok {
+		relPath = after
+	} else {
+		return filepath.Join(r.dataDir, cleanPath)
+	}
+
+	if relPath == "" {
+		return r.dataDir
+	}
+
+	if strings.HasSuffix(relPath, ".yaml") && !strings.Contains(relPath, "/") {
+		return filepath.Join(r.configDir, filepath.FromSlash(relPath))
+	}
+
+	if relPath == "sing-box" || strings.HasPrefix(relPath, "sing-box/") {
+		return filepath.Join(r.cacheDir, filepath.FromSlash(relPath))
+	}
+	if relPath == ".cache" {
+		return r.cacheDir
+	}
+	if after, ok := strings.CutPrefix(relPath, ".cache/"); ok {
+		return filepath.Join(r.cacheDir, filepath.FromSlash(after))
+	}
+
+	return filepath.Join(r.dataDir, filepath.FromSlash(relPath))
+}
+
+func normalizeDirName(name string) string {
+	return strings.ReplaceAll(strings.ToLower(name), ".", "-")
+}
+
+func isSystemPackage(exePath string) bool {
+	if Env.OS != "linux" || Env.AppVersion == "dev" {
+		return false
+	}
+
+	if os.Getenv("SNAP") != "" && os.Getenv("SNAP_NAME") != "" {
+		return true
+	}
+	if os.Getenv("container") == "flatpak" {
+		return true
+	}
+	if _, err := os.Stat("/.flatpak-info"); err == nil {
+		return true
+	}
+
+	systemPrefixes := []string{
+		"/usr/bin/",
+		"/usr/sbin/",
+		"/usr/local/bin/",
+		"/usr/local/sbin/",
+		"/usr/lib/",
+		"/opt/",
+		"/nix/store/",
+	}
+
+	for _, prefix := range systemPrefixes {
+		if strings.HasPrefix(exePath, prefix) {
+			return true
+		}
+	}
+
+	exeDir := filepath.Dir(exePath)
+	if !isWritable(exeDir) {
+		return true
+	}
+
+	return false
+}
+
+func IsBundled() bool {
+	if Env.OS != "linux" || Env.AppVersion == "dev" {
+		return false
+	}
+	_, err := os.Stat("/usr/lib/gui-for-singbox/cores/sing-box")
+	return err == nil
+}
+
+func isWritable(dir string) bool {
+
+	testFile := filepath.Join(dir, ".wails_write_test")
+	file, err := os.OpenFile(testFile, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		if os.IsPermission(err) {
+			return false
+		}
+
+		return false
+	}
+	file.Close()
+	os.Remove(testFile)
+	return true
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {

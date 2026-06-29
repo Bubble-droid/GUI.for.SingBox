@@ -3,6 +3,7 @@ import { WebSockets } from '@/api/websocket'
 import { useProfilesStore } from '@/stores'
 import { formatProxyHost, normalizeProxyHost } from '@/utils'
 
+import type { Recordable } from '@/types'
 import type {
   CoreApiConfig,
   CoreApiProxies,

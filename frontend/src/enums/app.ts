@@ -1,116 +1,161 @@
-export enum OS {
-  Windows = 'windows',
-  Linux = 'linux',
-  Darwin = 'darwin',
-}
+import type { ValueOf } from '@/types/utils'
 
-export enum WindowStartState {
-  Normal = 0,
-  Minimised = 2,
-}
+export const OS = {
+  Windows: 'windows',
+  Linux: 'linux',
+  Darwin: 'darwin',
+} as const
 
-export enum WebviewGpuPolicy {
-  Always = 0,
-  OnDemand = 1,
-  Never = 2,
-}
+export type OS = ValueOf<typeof OS>
 
-export enum Theme {
-  Auto = 'auto',
-  Light = 'light',
-  Dark = 'dark',
-}
+export const WindowStartState = {
+  Normal: 0,
+  Minimised: 2,
+} as const
 
-export enum Lang {
-  EN = 'en',
-  ZH = 'zh',
-}
+export type WindowStartState = ValueOf<typeof WindowStartState>
 
-export enum View {
-  Grid = 'grid',
-  List = 'list',
-}
+export const WebviewGpuPolicy = {
+  Always: 0,
+  OnDemand: 1,
+  Never: 2,
+} as const
 
-export enum ControllerCloseMode {
-  All = 'all',
-  Button = 'button',
-}
+export type WebviewGpuPolicy = ValueOf<typeof WebviewGpuPolicy>
 
-export enum Color {
-  Default = 'default',
-  Green = 'green',
-  Purple = 'purple',
-  Custom = 'custom',
-}
+export const Theme = {
+  Auto: 'auto',
+  Light: 'light',
+  Dark: 'dark',
+} as const
 
-export enum Branch {
-  Main = 'main',
-  Alpha = 'alpha',
-}
+export type Theme = ValueOf<typeof Theme>
 
-export enum RequestProxyMode {
-  Global = 'global',
-  None = 'none',
-  System = 'system',
-  Kernel = 'kernel',
-  Custom = 'custom',
-}
+export const Lang = {
+  EN: 'en',
+  ZH: 'zh',
+} as const
 
-export enum ScheduledTasksType {
-  UpdateSubscription = 'update::subscription',
-  UpdateRuleset = 'update::ruleset',
-  UpdatePlugin = 'update::plugin',
-  UpdateAllSubscription = 'update::all::subscription',
-  UpdateAllRuleset = 'update::all::ruleset',
-  UpdateAllPlugin = 'update::all::plugin',
-  RunPlugin = 'run::plugin',
-  RunScript = 'run::script',
-}
+export type Lang = ValueOf<typeof Lang>
 
-export enum PluginTrigger {
-  OnEnabled = 'on::enabled',
-  OnDisabled = 'on::disabled',
-  OnManual = 'on::manual',
-  OnSubscribe = 'on::subscribe',
-  OnGenerate = 'on::generate',
-  OnStartup = 'on::startup',
-  OnShutdown = 'on::shutdown',
-  OnReady = 'on::ready',
-  OnReload = 'on::reload',
-  OnCoreStarted = 'on::core::started',
-  OnCoreStopped = 'on::core::stopped',
-  OnBeforeCoreStart = 'on::before::core::start',
-  OnBeforeCoreStop = 'on::before::core::stop',
-  OnTrayUpdate = 'on::tray::update',
-}
+export const View = {
+  Grid: 'grid',
+  List: 'list',
+} as const
 
-export enum PluginTriggerEvent {
-  OnEnabled = 'onEnabled',
-  OnDisabled = 'onDisabled',
-  OnDispose = 'onDispose',
-  OnInstall = 'onInstall',
-  OnUninstall = 'onUninstall',
-  OnManual = 'onRun',
-  OnTrayUpdate = 'onTrayUpdate',
-  OnSubscribe = 'onSubscribe',
-  OnGenerate = 'onGenerate',
-  OnStartup = 'onStartup',
-  OnShutdown = 'onShutdown',
-  OnReady = 'onReady',
-  OnReload = 'onReload',
-  OnTask = 'onTask',
-  OnConfigure = 'onConfigure',
-  OnCoreStarted = 'onCoreStarted',
-  OnCoreStopped = 'onCoreStopped',
-  OnBeforeCoreStart = 'onBeforeCoreStart',
-  OnBeforeCoreStop = 'onBeforeCoreStop',
-}
+export type View = ValueOf<typeof View>
 
-export enum RequestMethod {
-  Get = 'GET',
-  Post = 'POST',
-  Delete = 'DELETE',
-  Put = 'PUT',
-  Head = 'HEAD',
-  Patch = 'PATCH',
-}
+export const ControllerCloseMode = {
+  All: 'all',
+  Button: 'button',
+} as const
+
+export type ControllerCloseMode = ValueOf<typeof ControllerCloseMode>
+
+export const Color = {
+  Default: 'default',
+  Green: 'green',
+  Purple: 'purple',
+  Custom: 'custom',
+} as const
+
+export type Color = ValueOf<typeof Color>
+
+export const Branch = {
+  Main: 'main',
+  Alpha: 'alpha',
+} as const
+
+export type Branch = ValueOf<typeof Branch>
+
+export const RequestProxyMode = {
+  Global: 'global',
+  None: 'none',
+  System: 'system',
+  Kernel: 'kernel',
+  Custom: 'custom',
+} as const
+
+export type RequestProxyMode = ValueOf<typeof RequestProxyMode>
+
+export const ScheduledTasksType = {
+  UpdateSubscription: 'update::subscription',
+  UpdateRuleset: 'update::ruleset',
+  UpdatePlugin: 'update::plugin',
+  UpdateAllSubscription: 'update::all::subscription',
+  UpdateAllRuleset: 'update::all::ruleset',
+  UpdateAllPlugin: 'update::all::plugin',
+  RunPlugin: 'run::plugin',
+  RunScript: 'run::script',
+} as const
+
+export type ScheduledTasksType = ValueOf<typeof ScheduledTasksType>
+
+export const PluginTrigger = {
+  OnEnabled: 'on::enabled',
+  OnDisabled: 'on::disabled',
+  OnManual: 'on::manual',
+  OnSubscribe: 'on::subscribe',
+  OnGenerate: 'on::generate',
+  OnStartup: 'on::startup',
+  OnShutdown: 'on::shutdown',
+  OnReady: 'on::ready',
+  OnReload: 'on::reload',
+  OnCoreStarted: 'on::core::started',
+  OnCoreStopped: 'on::core::stopped',
+  OnBeforeCoreStart: 'on::before::core::start',
+  OnBeforeCoreStop: 'on::before::core::stop',
+  OnTrayUpdate: 'on::tray::update',
+} as const
+
+export type PluginTrigger = ValueOf<typeof PluginTrigger>
+
+export const PluginTriggerEvent = {
+  OnEnabled: 'onEnabled',
+  OnDisabled: 'onDisabled',
+  OnDispose: 'onDispose',
+  OnInstall: 'onInstall',
+  OnUninstall: 'onUninstall',
+  OnManual: 'onRun',
+  OnTrayUpdate: 'onTrayUpdate',
+  OnSubscribe: 'onSubscribe',
+  OnGenerate: 'onGenerate',
+  OnStartup: 'onStartup',
+  OnShutdown: 'onShutdown',
+  OnReady: 'onReady',
+  OnReload: 'onReload',
+  OnTask: 'onTask',
+  OnConfigure: 'onConfigure',
+  OnCoreStarted: 'onCoreStarted',
+  OnCoreStopped: 'onCoreStopped',
+  OnBeforeCoreStart: 'onBeforeCoreStart',
+  OnBeforeCoreStop: 'onBeforeCoreStop',
+} as const
+
+export type PluginTriggerEvent = ValueOf<typeof PluginTriggerEvent>
+
+export const RequestMethod = {
+  Get: 'GET',
+  Post: 'POST',
+  Delete: 'DELETE',
+  Put: 'PUT',
+  Head: 'HEAD',
+  Patch: 'PATCH',
+} as const
+
+export type RequestMethod = ValueOf<typeof RequestMethod>
+
+export const Step = {
+  Name: 0,
+  Log: 1,
+  Ntp: 2,
+  experimental: 3,
+  Endpoints: 4,
+  Services: 5,
+  HttpClients: 6,
+  Inbounds: 7,
+  Outbounds: 8,
+  Route: 9,
+  Dns: 10,
+  MixinScript: 11,
+} as const

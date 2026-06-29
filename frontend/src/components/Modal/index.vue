@@ -9,6 +9,8 @@ import { useBool } from '@/hooks'
 import { useAppStore } from '@/stores'
 import { message, sampleID } from '@/utils'
 
+import type { MaybePromise } from '@/types'
+
 export interface Props {
   title?: string
   footer?: boolean

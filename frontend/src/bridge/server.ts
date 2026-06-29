@@ -1,6 +1,8 @@
 import * as Bridge from '@wails/go/bridge/App'
 import { EventsOn, EventsEmit, EventsOff } from '@wails/runtime/runtime'
 
+import type { Recordable } from '@/types'
+
 interface Request {
   id: string
   method: string

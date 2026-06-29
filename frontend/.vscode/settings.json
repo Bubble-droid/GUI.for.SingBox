@@ -2,11 +2,21 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
     "tsconfig.json": "tsconfig.*.json, env.d.ts",
-    "package.json": "package-lock.json, pnpm*, .oxlint*, eslint*, .oxfmtrc*, .editorconfig"
+    "package.json": "package-lock.json, pnpm*, .oxlint*, eslint*, .oxfmtrc*, .editorconfig, skills-lock.json"
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit"
+    "source.fixAll": "explicit",
+    "source.fixAll.ts": "never",
+    "source.removeUnused.ts": "never",
+    "source.removeUnusedImports": "explicit",
+    "source.addMissingImports.ts": "explicit"
+  },
+  "search.exclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "*-lock.*": true
   },
   "editor.formatOnSave": true,
+  "editor.formatOnType": true,
   "editor.defaultFormatter": "oxc.oxc-vscode"
 }

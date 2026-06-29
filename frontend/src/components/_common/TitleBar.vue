@@ -15,6 +15,8 @@ import { OS } from '@/enums/app'
 import { useAppSettingsStore, useKernelApiStore, useEnvStore, useAppStore } from '@/stores'
 import { APP_TITLE, APP_VERSION, debounce, exitApp, reloadApp } from '@/utils'
 
+import type { Menu } from '@/types'
+
 const isPinned = ref(false)
 const isMaximised = ref(false)
 
@@ -38,7 +40,7 @@ const closeWindow = async () => {
   }
 }
 
-const menus: App.Menu[] = [
+const menus: Menu[] = [
   {
     label: 'titlebar.resetSize',
     handler: () => WindowSetSize(800, 540),

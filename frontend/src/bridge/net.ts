@@ -32,7 +32,7 @@ type StreamEvent =
     }
 
 interface Request {
-  method: App.RequestMethod
+  method: RequestMethod
   url: string
   headers?: {
     'Content-Type'?: 'application/json' | 'application/x-www-form-urlencoded' | 'text/plain'
@@ -174,7 +174,7 @@ const requestWithProgress = (fnName: 'Download' | 'Upload') => {
   }
 }
 
-const requestWithBody = (method: Extract<App.RequestMethod, 'PUT' | 'POST' | 'PATCH'>) => {
+const requestWithBody = (method: Extract<RequestMethod, 'PUT' | 'POST' | 'PATCH'>) => {
   return async <T = any>(
     url: string,
     headers: Request['headers'] = {},
@@ -196,7 +196,7 @@ const requestWithBody = (method: Extract<App.RequestMethod, 'PUT' | 'POST' | 'PA
   }
 }
 
-const requestWithoutBody = (methd: Extract<App.RequestMethod, 'GET' | 'HEAD' | 'DELETE'>) => {
+const requestWithoutBody = (method: Extract<RequestMethod, 'GET' | 'HEAD' | 'DELETE'>) => {
   return async <T = any>(
     url: string,
     headers: Request['headers'] = {},
@@ -209,7 +209,7 @@ const requestWithoutBody = (methd: Extract<App.RequestMethod, 'GET' | 'HEAD' | '
       status,
       headers: respHeaders,
       body,
-    } = await Bridge.Requests(methd, transformRequestUrl(url), _headers, '', _options)
+    } = await Bridge.Requests(method, transformRequestUrl(url), _headers, '', _options)
 
     if (!flag) throw body
 
