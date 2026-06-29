@@ -1,6 +1,7 @@
 import { deleteConnection, getConnections, useProxy } from '@/api/kernel'
 import {
   AbsolutePath,
+  CreateSymlink,
   Exec,
   ExitApp,
   FileExists,
@@ -31,6 +32,8 @@ import {
   confirm,
   APP_TITLE,
   getAutoStartConfiguration,
+  generateDesktopEntry,
+  APP_IDENTIFIER,
 } from '@/utils'
 
 // Permissions Helper
@@ -184,9 +187,12 @@ const getPlistPath = async () => {
   return `${home}/Library/LaunchAgents/${APP_TITLE}.plist`
 }
 
-const getDesktopPath = async () => {
+export const getDesktopEntryPaths = async () => {
+  const { env } = useEnvStore()
   const home = await GetEnv('HOME')
-  return `${home}/.config/autostart/${APP_TITLE}.desktop`
+  const userPath = `${home}/.local/share/applications/${env.appName}.desktop`
+  const autoStartPath = `${home}/.config/autostart/${env.appName}.desktop`
+  return { userPath, autoStartPath }
 }
 
 export const IsAutoStartEnabled = async () => {
@@ -200,8 +206,8 @@ export const IsAutoStartEnabled = async () => {
     const plistPath = await getPlistPath()
     isAutoStart = await FileExists(plistPath)
   } else if (os === OS.Linux) {
-    const desktopPath = await getDesktopPath()
-    isAutoStart = await FileExists(desktopPath)
+    const { autoStartPath } = await getDesktopEntryPaths()
+    isAutoStart = await FileExists(autoStartPath)
   }
   return isAutoStart
 }
@@ -222,8 +228,8 @@ export const EnableAutoStart = async (delay = 10) => {
     await WriteFile(plistPath, configuration)
     await Exec('launchctl', ['load', plistPath])
   } else if (os === OS.Linux) {
-    const desktopPath = await getDesktopPath()
-    await WriteFile(desktopPath, configuration)
+    const { autoStartPath } = await getDesktopEntryPaths()
+    await WriteFile(autoStartPath, configuration)
   }
 }
 
@@ -237,8 +243,8 @@ export const DisableAutoStart = async () => {
     await Exec('launchctl', ['unload', plistPath])
     await RemoveFile(plistPath)
   } else if (os === OS.Linux) {
-    const desktopPath = await getDesktopPath()
-    await RemoveFile(desktopPath)
+    const { autoStartPath } = await getDesktopEntryPaths()
+    await RemoveFile(autoStartPath)
   }
 }
 

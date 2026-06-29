@@ -8,7 +8,7 @@ import { BuiltInOutbound, EmptyRuleSet } from '@/constant/kernel'
 import { DefaultRouteRule, DefaultRouteRuleset } from '@/constant/profile'
 import { View } from '@/enums/app'
 import { RulesetFormat, RulesetType, RuleType } from '@/enums/kernel'
-import { useRulesetsStore, useAppSettingsStore, useEnvStore, useProfilesStore } from '@/stores'
+import { useRulesetsStore, useAppSettingsStore, useProfilesStore } from '@/stores'
 import {
   debounce,
   formatRelativeTime,
@@ -43,7 +43,6 @@ const sourceMenuList: App.Menu[] = [
 ]
 
 const { t } = useI18n()
-const envStore = useEnvStore()
 const rulesetsStore = useRulesetsStore()
 const appSettingsStore = useAppSettingsStore()
 const profilesStore = useProfilesStore()

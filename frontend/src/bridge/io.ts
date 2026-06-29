@@ -6,7 +6,11 @@ interface IOOptions {
 }
 
 export const WriteFile = async (path: string, content: string, options: IOOptions = {}) => {
-  const { flag, data } = await Bridge.WriteFile(path, content, { Mode: 'Text', Range: '', ...options })
+  const { flag, data } = await Bridge.WriteFile(path, content, {
+    Mode: 'Text',
+    Range: '',
+    ...options,
+  })
   if (!flag) {
     throw data
   }
@@ -39,6 +43,14 @@ export const RemoveFile = async (path: string) => {
 
 export const CopyFile = async (source: string, target: string) => {
   const { flag, data } = await Bridge.CopyFile(source, target)
+  if (!flag) {
+    throw data
+  }
+  return data
+}
+
+export const CreateSymlink = async (target: string, symlink: string) => {
+  const { flag, data } = await Bridge.CreateSymlink(target, symlink)
   if (!flag) {
     throw data
   }

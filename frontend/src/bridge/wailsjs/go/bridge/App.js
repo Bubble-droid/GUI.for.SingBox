@@ -14,6 +14,10 @@ export function CopyFile(arg1, arg2) {
   return window['go']['bridge']['App']['CopyFile'](arg1, arg2);
 }
 
+export function CreateSymlink(arg1, arg2) {
+  return window['go']['bridge']['App']['CreateSymlink'](arg1, arg2);
+}
+
 export function Download(arg1, arg2, arg3, arg4, arg5, arg6) {
   return window['go']['bridge']['App']['Download'](arg1, arg2, arg3, arg4, arg5, arg6);
 }

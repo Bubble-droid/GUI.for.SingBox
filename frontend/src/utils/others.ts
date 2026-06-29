@@ -1,9 +1,9 @@
 import { stringify } from 'yaml'
 
 import { OS } from '@/enums/app'
-import { useAppSettingsStore } from '@/stores'
+import { useAppSettingsStore, useEnvStore } from '@/stores'
 import appDts from '@/types/app.d.ts?raw'
-import { APP_TITLE, APP_VERSION, isValidIPv4, isValidIPv6 } from '@/utils'
+import { APP_IDENTIFIER, APP_TITLE, APP_VERSION, isValidIPv4, isValidIPv6 } from '@/utils'
 
 export const getAppDts = () => appDts
 
@@ -315,13 +315,6 @@ export const getAutoStartConfiguration = (os: App.OS, appPath: string, delay = 3
 </Task>`
     return xml
   }
-  if (os === OS.Linux) {
-    const desktop = `[Desktop Entry]
-Type=Application
-Exec=${appPath} tasksch
-Name=${APP_TITLE}`
-    return desktop
-  }
   if (os === OS.Darwin) {
     const plist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
@@ -343,7 +336,40 @@ Name=${APP_TITLE}`
 </plist>`
     return plist
   }
+  if (os === OS.Linux) {
+    return generateDesktopEntry('tasksch')
+  }
   throw new Error('Not Implemented')
+}
+
+export const generateDesktopEntry = (execArg: string) => {
+  const { env } = useEnvStore()
+  return `
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=${APP_TITLE}
+Name[zh_CN]=GUI for SingBox
+Comment=A GUI client application for sing-box
+Comment[zh_CN]=适用于 sing-box 的图形客户端
+TryExec=${env.appPath}
+Exec=${env.appPath} ${execArg}
+Icon=${APP_IDENTIFIER}
+Terminal=false
+StartupNotify=true
+StartupWMClass=${env.appName}
+Categories=Network;Utility;
+MimeType=x-scheme-handler/sing-box;
+Keywords=gfs;gui;sb;singbox;
+SingleMainWindow=true
+Actions=quit;
+
+[Desktop Action quit]
+Exec=${env.appPath} --quit
+Name=Quit
+Name[zh_CN]=退出应用
+Icon=application-exit
+`.trim()
 }
 
 export const setIntervalImmediately = (func: () => void, interval: number) => {
