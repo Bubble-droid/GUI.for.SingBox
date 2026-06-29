@@ -94,6 +94,8 @@ type AppConfig struct {
 	MultipleInstance  bool `yaml:"multipleInstance"`
 	RollingRelease    bool `yaml:"rollingRelease" default:"true"`
 	StartHidden       bool
+
+	SystemTitleBar bool `yaml:"systemTitleBar"`
 }
 
 type TrayContent struct {

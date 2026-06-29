@@ -9,28 +9,35 @@ export const useAppLifecycle = () => {
   const appSettings = Stores.useAppSettingsStore()
   const subscribesStore = Stores.useSubscribesStore()
 
-  const offLaunchApp = EventsOn('onLaunchApp', async ([arg]: string[]) => {
-    if (!arg) return
+  const offLaunchApp = EventsOn('onLaunchApp', async (args: string[]) => {
+    const firstArg = args[0]?.trim()
+    if (!firstArg) return
 
-    let _url
-    let _name = sampleID()
-
-    const url = new URL(arg)
-    if (url.pathname === '//install-config/') {
-      _url = url.searchParams.get('url')
-      _name = url.searchParams.get('name') || sampleID()
-    } else if (url.pathname.startsWith('//import-remote-profile')) {
-      _url = url.searchParams.get('url')
-      _name = decodeURIComponent(url.hash).slice(1) || sampleID()
-    }
-
-    if (!_url) {
-      message.error('URL missing')
+    if (['quit', '--quit', '-q'].includes(firstArg.toLowerCase())) {
+      exitApp()
       return
     }
 
     try {
-      await subscribesStore.importSubscribe(_name, _url)
+      const url = new URL(firstArg)
+
+      const isProfileImport =
+        url.hostname === 'import-remote-profile' ||
+        url.pathname === '//install-config/' ||
+        url.pathname.startsWith('//import-remote-profile')
+
+      if (!isProfileImport) return
+
+      const subUrl = url.searchParams.get('url')
+      if (!subUrl) {
+        message.error('Subscription URL missing')
+        return
+      }
+
+      const subName =
+        url.searchParams.get('name') || decodeURIComponent(url.hash).slice(1) || sampleID()
+
+      await subscribesStore.importSubscribe(subName, subUrl)
       message.success('common.success')
     } catch (error) {
       message.error(error)

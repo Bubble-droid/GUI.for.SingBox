@@ -50,6 +50,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     primaryColor: '#000',
     secondaryColor: '#545454',
     fontFamily: DefaultFontFamily,
+    systemTitleBar: false,
     profilesView: View.Grid,
     subscribesView: View.Grid,
     rulesetsView: View.Grid,

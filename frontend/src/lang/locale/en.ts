@@ -642,6 +642,7 @@ export default {
     },
     fontFamily: 'Font-Family',
     resetFont: 'Reset Font-Family',
+    systemTitleBar: 'System Title Bar',
     appFolder: {
       name: 'App Folder',
       open: 'Open application folder',
