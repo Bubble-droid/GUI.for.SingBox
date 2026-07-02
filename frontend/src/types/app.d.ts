@@ -18,6 +18,9 @@ declare namespace App {
     appVersion: string
     basePath: string
     appPath: string
+    appDataPath: string
+    appConfigPath: string
+    appCachePath: string
     os: OS
     arch: string
     isPrivileged: boolean

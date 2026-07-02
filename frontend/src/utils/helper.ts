@@ -15,7 +15,14 @@ import { CoreWorkingDirectory } from '@/constant/kernel'
 import { OS, RequestProxyMode } from '@/enums/app'
 import { RulesetFormat } from '@/enums/kernel'
 import i18n from '@/lang'
-import { useAppSettingsStore, useAppStore, useEnvStore, useKernelApiStore, usePluginsStore, useRulesetsStore } from '@/stores'
+import {
+  useAppSettingsStore,
+  useAppStore,
+  useEnvStore,
+  useKernelApiStore,
+  usePluginsStore,
+  useRulesetsStore,
+} from '@/stores'
 import {
   formatProxyHost,
   ignoredError,
@@ -384,6 +391,34 @@ export const exitApp = async () => {
   destroy()
 }
 
+export const createDesktopEntry = async () => {
+  const { userPath } = await getDesktopEntryPaths()
+  if (!(await FileExists(userPath))) {
+    const desktopEntryContent = generateDesktopEntry('%U')
+    await WriteFile(userPath, desktopEntryContent)
+  }
+}
+
+export const createCoreSymlinks = async () => {
+  const bundledCoresPath = `/usr/lib/${APP_IDENTIFIER}/cores`
+  const baseBinName = 'sing-box'
+  const symlinkMappings = [
+    [baseBinName, baseBinName],
+    [`${baseBinName}-alpha`, `${baseBinName}-latest`],
+  ] as const
+
+  await Promise.all(
+    symlinkMappings.map(async ([srcFile, linkName]) => {
+      const target = `${bundledCoresPath}/${srcFile}`
+      const linkPath = `${CoreWorkingDirectory}/${linkName}`
+
+      if (!(await FileExists(linkPath))) {
+        await CreateSymlink(target, linkPath)
+      }
+    }),
+  )
+}
+
 export const getKernelFileName = (isAlpha = false) => {
   const envStore = useEnvStore()
   const { os } = envStore.env
@@ -403,8 +438,7 @@ export const processMagicVariables = (str: string) => {
   const { env } = useEnvStore()
   let result = str
   Object.entries({
-    $APP_BASE_PATH: env.basePath,
-    $CORE_BASE_PATH: CoreWorkingDirectory,
+    $CORE_BASE_PATH: `${env.appCachePath}/${CoreWorkingDirectory.split('/')[1]}`,
   }).forEach(([source, target]) => {
     result = result.replaceAll(source, target)
   })

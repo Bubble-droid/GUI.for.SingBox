@@ -15,6 +15,7 @@ export default {
     prevStep: 'Back',
     disabled: 'Disabled',
     enabled: 'Enabled',
+    unAvailable: 'Unavailable',
     preview: 'Preview',
     warning: 'Warning',
     disable: 'Disable',

@@ -22,8 +22,11 @@ var assets embed.FS
 //go:embed frontend/dist/favicon.ico
 var icon []byte
 
+//go:embed build/version.txt
+var buildVersion string
+
 func main() {
-	app := bridge.CreateApp(assets)
+	app := bridge.CreateApp(assets, buildVersion)
 
 	trayStart, trayEnd := bridge.CreateTray(app, icon)
 

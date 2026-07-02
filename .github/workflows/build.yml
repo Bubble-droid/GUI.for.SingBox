@@ -1,0 +1,284 @@
+name: Build GUI.for.SingBox
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  APP_NAME: gui-for-singbox
+
+jobs:
+  # ==================== 1. Tag 意图解析 ====================
+  Analyze-Tag:
+    runs-on: ubuntu-latest
+    outputs:
+      is_full_build: ${{ steps.check.outputs.is_full_build }}
+      base_tag_prefix: ${{ steps.check.outputs.base_tag_prefix }}
+    steps:
+      - id: check
+        run: |
+          TAG="${{ github.ref_name }}"
+          # 正则解析 v[上游]-xdg.[修补].[核心同步]
+          if [[ "$TAG" =~ ^v([0-9\.]+)-xdg\.([0-9]+)\.([0-9]+)$ ]]; then
+            UPSTREAM="${BASH_REMATCH[1]}"
+            BRANCH="${BASH_REMATCH[2]}"
+            SYNC="${BASH_REMATCH[3]}"
+
+            # 记录当前修补大版前缀，如 v1.25.3-xdg.1
+            echo "base_tag_prefix=v${UPSTREAM}-xdg.${BRANCH}" >> "$GITHUB_OUTPUT"
+
+            # 核心同步号为 0 时全量构建，不为 0 时只更新内核跳过二进制
+            if [ "$SYNC" -eq 0 ]; then
+              echo "is_full_build=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "is_full_build=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            # 未匹配正则兜底全量构建
+            echo "is_full_build=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ==================== 2. 全量构建分支 ====================
+  Build-Frontend:
+    needs: Analyze-Tag
+    if: needs.Analyze-Tag.outputs.is_full_build == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VITE_APP_VERSION: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "latest"
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: |
+          cd frontend
+          pnpm install --frozen-lockfile
+          pnpm build-only
+      - uses: actions/upload-artifact@v6
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+  Build-New-Binary:
+    needs: [Analyze-Tag, Build-Frontend]
+    if: needs.Analyze-Tag.outputs.is_full_build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Inject Version
+        run: echo -n "${{ github.ref_name }}" > build/version.txt
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - uses: actions/download-artifact@v8
+        with:
+          name: frontend-dist
+          path: frontend/dist
+      - run: |
+          sudo apt-get update
+          sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev
+      - name: Build Go Binary
+        run: |
+          export GOOS=linux GOARCH=amd64
+          ~/go/bin/wails build -m -s -trimpath -skipbindings -devtools -tags webkit2_41 -o $APP_NAME
+
+          cd build/bin
+          # 统一命名，便于 Arch 复用
+          tar -czf gui-for-singbox-linux-amd64.tar.gz $APP_NAME
+      - uses: actions/upload-artifact@v6
+        with:
+          name: linux-binary-artifact
+          path: build/bin/gui-for-singbox-linux-amd64.tar.gz
+
+  # ==================== 3. 差分构建分支 (复用二进制) ====================
+  Fetch-Old-Binary:
+    needs: Analyze-Tag
+    if: needs.Analyze-Tag.outputs.is_full_build == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download Latest Binary from previous Release
+        run: |
+          PREFIX="${{ needs.Analyze-Tag.outputs.base_tag_prefix }}"
+          # 查找属于该分支修补版本的最新 Release Tag
+          LATEST_TAG=$(gh release list --exclude-drafts --limit 50 | awk '{print $1}' | grep "^${PREFIX}" | head -n 1)
+
+          echo "==> Fetching binary from Release: $LATEST_TAG"
+          mkdir -p build/bin
+          # 下载该 Tag 中的 .tar.gz 文件并统一重命名
+          gh release download "$LATEST_TAG" -p "*.tar.gz" -D build/bin
+          cd build/bin
+          mv *.tar.gz gui-for-singbox-linux-amd64.tar.gz
+      - uses: actions/upload-artifact@v6
+        with:
+          name: linux-binary-artifact
+          path: build/bin/gui-for-singbox-linux-amd64.tar.gz
+
+  # ==================== 4. Arch 打包 (必定执行) ====================
+  Build-Arch:
+    # 等待前置步骤结束，无论走全量还是差分，只要没报错就执行打包
+    needs: [Analyze-Tag, Build-New-Binary, Fetch-Old-Binary]
+    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Download Prepared Binary
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-binary-artifact
+          path: build/bin
+
+      - name: Configure PKGBUILD & Core Versions
+        run: |
+          # 1. 转换标签格式 (去除连字符, 不要下划线: v1.25.3-xdg.1.0 -> 1.25.3xdg.1.0)
+          TAG="${{ github.ref_name }}"
+          ARCH_PKG_VER=$(echo "$TAG" | sed 's/^v//; s/-//g')
+
+          # 2. 通过 GitHub 官方 Pre-release 标记精准获取版本
+          STABLE_VER=$(gh release list --repo SagerNet/sing-box --limit 15 --json tagName,isPrerelease --jq '.[] | select(.isPrerelease == false) | .tagName' | head -n 1 | sed 's/^v//')
+          ALPHA_VER=$(gh release list --repo SagerNet/sing-box --limit 15 --json tagName,isPrerelease --jq '.[] | select(.isPrerelease == true) | .tagName' | head -n 1 | sed 's/^v//')
+
+          echo "CORE_STABLE_VER=$STABLE_VER" >> $GITHUB_ENV
+          echo "CORE_ALPHA_VER=$ALPHA_VER" >> $GITHUB_ENV
+          echo "ARCH_PKG_VER=$ARCH_PKG_VER" >> $GITHUB_ENV
+
+          echo "==> Packaging Version: $ARCH_PKG_VER"
+          echo "==> Injecting Cores -> Stable: $STABLE_VER | Alpha: $ALPHA_VER"
+
+          # 3. 动态注入信息到 PKGBUILD
+          sed -i "s/^pkgver=.*/pkgver=$ARCH_PKG_VER/" build/linux/PKGBUILD
+          sed -i "s/STABLE_VER_PLACEHOLDER/$STABLE_VER/" build/linux/PKGBUILD
+          sed -i "s/ALPHA_VER_PLACEHOLDER/$ALPHA_VER/" build/linux/PKGBUILD
+
+          # 4. 拷贝通用压缩包与资源文件到 PKGBUILD 同级，供 makepkg 识别
+          cp build/bin/gui-for-singbox-linux-amd64.tar.gz build/linux/
+          cp build/appicon.png build/linux/$APP_NAME.png
+
+      - name: Build Arch Linux Package
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            -w /workspace/build/linux \
+            archlinux:latest \
+            bash -c "
+              pacman -Sy --noconfirm archlinux-keyring && \
+              pacman -Syu --noconfirm --needed base-devel pacman-contrib && \
+              useradd -m builder && echo 'builder ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
+              chown -R builder:builder /workspace/build/linux && \
+              sudo -u builder bash -c '
+                cd /workspace/build/linux && \
+                updpkgsums && \
+                makepkg -csf --noconfirm
+              '
+              chown -R \$(stat -c '%u:%g' /workspace) /workspace/build/linux
+            "
+          mv build/linux/*.pkg.tar.zst build/bin/
+
+      - name: Generate Release Notes
+        run: |
+          TAG="${{ github.ref_name }}"
+          UPSTREAM_VER=$(echo "$TAG" | sed -E 's/-xdg.*//' | sed 's/^v//')
+          IS_FULL_BUILD="${{ needs.Analyze-Tag.outputs.is_full_build }}"
+
+          # 1. 计算 Git 变更差异链接 (防止复杂的嵌套转义，提前用变量存储)
+          git fetch --tags --force >/dev/null 2>&1
+          PREV_TAG=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            COMPARE_URL="https://github.com/${{ github.repository }}/compare/$PREV_TAG...$TAG"
+            COMPARE_TEXT="- **开发日志与代码差异**: [$PREV_TAG...$TAG]($COMPARE_URL)"
+          else
+            COMPARE_TEXT="- **开发日志与代码差异**: 这是此 Linux XDG 分支的首次发布版本。"
+          fi
+
+          # 2. 根据不同的构建场景，使用 Here-Doc 动态写入更相关的 markdown 模板
+          if [ "$IS_FULL_BUILD" = "true" ]; then
+            # ===== 场景 A: 全量构建版本 =====
+            cat << EOF > build/bin/release_notes.md
+          ## 🚀 GUI.for.SingBox - Linux XDG Fork (完整构建版本)
+
+          这是一个**全量更新版本**。包含了全新的 GUI 主程序代码、应用级功能更新、代码修复、分支特有修补（Patch）或上游重大版本同步。
+
+          ### 📦 软件版本与环境信息
+          - **当前发布版本 (Tag)**: \`${TAG}\`
+          - **上游 GUI 基准版本**: \`${UPSTREAM_VER}\`
+          - **🛡️ 捆绑封装的 Sing-Box 核心**:
+            - 稳定版 (Stable): \`v${CORE_STABLE_VER}\`
+            - 开发版 (Alpha): \`v${CORE_ALPHA_VER}\`
+
+          ### 🔄 变更差异
+          ${COMPARE_TEXT}
+
+          ---
+
+          ⚠️ **注意**: 本包中已禁用滚动更新（Rolling Release）功能，以彻底保护您的 **XDG 目录规范 (XDG Base Directory Specification)** 免受非规范读写破坏。
+          EOF
+
+          else
+            # ===== 场景 B: 内核同步更新 =====
+            cat << EOF > build/bin/release_notes.md
+          ## 🔄 GUI.for.SingBox - Linux XDG Fork (内核同步更新)
+
+          这是一个**内核同步更新包**。
+
+          在本版本中，**GUI 主程序未作任何修改**，但打包工具**已将内置的 Sing-Box 核心更新至上游最新版本**。
+
+          ### 📦 软件版本与环境信息
+          - **当前发布版本 (Tag)**: \`${TAG}\`
+          - **上游 GUI 基准版本**: \`${UPSTREAM_VER}\`
+          - **✨ 更新后的内置内核**:
+            - 稳定版 (Stable): \`v${CORE_STABLE_VER}\` 🟢 *已同步至最新*
+            - 开发版 (Alpha): \`v${CORE_ALPHA_VER}\` 🟠 *已同步至最新*
+            - *您可以前往 [SagerNet/sing-box](https://github.com/SagerNet/sing-box/releases) 查看内核官方详细发布日志。*
+
+          ### 🔄 变更差异
+          ${COMPARE_TEXT}
+
+          ---
+
+          ⚠️ **注意**: 本包中已禁用滚动更新（Rolling Release）功能，以彻底保护您的 **XDG 目录规范 (XDG Base Directory Specification)** 免受非规范读写破坏。
+          EOF
+          fi
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: final-release-assets
+          path: |
+            build/bin/*.tar.gz
+            build/bin/*.pkg.tar.zst
+            build/bin/release_notes.md
+
+  # ==================== 5. Release 发布 ====================
+  Release:
+    needs: Build-Arch
+    if: always() && needs.Build-Arch.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: final-release-assets
+          path: release-assets
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          files: |
+            release-assets/*.tar.gz
+            release-assets/*.pkg.tar.zst
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'dev')  }}
+          body_path: release-assets/release_notes.md

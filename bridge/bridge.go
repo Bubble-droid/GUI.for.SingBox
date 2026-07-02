@@ -33,6 +33,11 @@ var Env = &EnvResult{
 	OS:           sysruntime.GOOS,
 	ARCH:         sysruntime.GOARCH,
 	IsPrivileged: false,
+
+	AppDataPath:     "",
+	AppConfigPath:   "",
+	AppCachePath:    "",
+	IsSystemPackage: false,
 }
 
 // NewApp creates a new App application struct
@@ -42,14 +47,14 @@ func NewApp() *App {
 	}
 }
 
-func CreateApp(fs embed.FS) *App {
+func CreateApp(fs embed.FS, buildVersion string) *App {
 	exePath, err := os.Executable()
 	if err != nil {
 		panic(err)
 	}
 
-	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
 	Env.AppName = filepath.Base(exePath)
+	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
 
 	if slices.Contains(os.Args, "tasksch") {
 		Env.FromTaskSch = true
@@ -60,6 +65,27 @@ func CreateApp(fs embed.FS) *App {
 	}
 
 	app := NewApp()
+
+	if strings.Contains(Env.AppName, "wailsbindings") {
+		return app
+	}
+
+	if version := strings.TrimSpace(buildVersion); version != "" && version != "dev" {
+		Env.AppVersion = version
+	}
+	log.Printf("Build Version: %s", Env.AppVersion)
+
+	Env.IsSystemPackage = strings.HasPrefix(exePath, "/usr/bin/")
+	log.Printf("Install as a System Package: %t", Env.IsSystemPackage)
+
+	Env.AppDataPath = GetDataDir(Env.AppName)
+	log.Printf("App Data Path: %s", Env.AppDataPath)
+
+	Env.AppConfigPath = GetConfigDir(Env.AppName)
+	log.Printf("App Config Path: %s", Env.AppConfigPath)
+
+	Env.AppCachePath = GetCacheDir(Env.AppName)
+	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
 	if Env.OS == "darwin" {
 		createMacOSSymlink()
@@ -119,6 +145,11 @@ func (a *App) GetEnv(key string) any {
 		OS:           Env.OS,
 		ARCH:         Env.ARCH,
 		IsPrivileged: Env.IsPrivileged,
+
+		AppDataPath:     Env.AppDataPath,
+		AppConfigPath:   Env.AppConfigPath,
+		AppCachePath:    Env.AppCachePath,
+		IsSystemPackage: Env.IsSystemPackage,
 	}
 }
 
@@ -182,7 +213,7 @@ func createMacOSMenus(app *App) {
 }
 
 func processFixedWebView2Runtime() {
-	webviewDir := filepath.Join(Env.BasePath, "data", "WebView2")
+	webviewDir := resolvePath("data/WebView2")
 
 	err := filepath.Walk(webviewDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {

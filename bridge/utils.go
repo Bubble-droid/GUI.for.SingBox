@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/adrg/xdg"
 	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
@@ -23,11 +24,70 @@ type requestTransportKey struct {
 
 var requestTransportCache sync.Map
 
-func resolvePath(path string) string {
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(Env.BasePath, path)
+func GetDataDir(appName string) string {
+	return filepath.Join(xdg.DataHome, normalizeDirName(appName))
+}
+
+func GetConfigDir(appName string) string {
+	return filepath.Join(xdg.ConfigHome, normalizeDirName(appName))
+}
+
+func GetCacheDir(appName string) string {
+	return filepath.Join(xdg.CacheHome, normalizeDirName(appName))
+}
+
+func normalizeDirName(name string) string {
+	return strings.ReplaceAll(strings.ToLower(name), ".", "-")
+}
+
+func resolvePath(rawPath string) string {
+	if rawPath == "" {
+		return ""
 	}
-	return filepath.ToSlash(filepath.Clean(path))
+
+	cleanPath := filepath.Clean(rawPath)
+	if filepath.IsAbs(cleanPath) {
+		return cleanPath
+	}
+
+	appDataDir := Env.AppDataPath
+	appConfigDir := Env.AppConfigPath
+	appCacheDir := Env.AppCachePath
+
+	normalized := filepath.ToSlash(cleanPath)
+
+	var relPath string
+	if normalized == "data" || normalized == "./data" {
+		relPath = ""
+	} else if after, ok := strings.CutPrefix(normalized, "data/"); ok {
+		relPath = after
+	} else if after0, ok0 := strings.CutPrefix(normalized, "./data/"); ok0 {
+		relPath = after0
+	} else {
+		return filepath.Join(Env.BasePath, cleanPath)
+	}
+
+	if relPath == "" {
+		return appDataDir
+	}
+
+	if relPath == "sing-box" || strings.HasPrefix(relPath, "sing-box/") {
+		return filepath.Join(appCacheDir, filepath.FromSlash(relPath))
+	}
+
+	if after, ok := strings.CutPrefix(relPath, ".cache/"); ok {
+		cacheRel := after
+		return filepath.Join(appCacheDir, filepath.FromSlash(cacheRel))
+	}
+	if relPath == ".cache" {
+		return appCacheDir
+	}
+
+	if strings.HasSuffix(relPath, ".yaml") && !strings.Contains(relPath, "/") {
+		return filepath.Join(appConfigDir, filepath.FromSlash(relPath))
+	}
+
+	return filepath.Join(appDataDir, filepath.FromSlash(relPath))
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {

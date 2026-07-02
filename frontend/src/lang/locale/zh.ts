@@ -15,6 +15,7 @@ export default {
     prevStep: '上一步',
     disabled: '已禁用',
     enabled: '已启用',
+    unAvailable: '不可用',
     preview: '预览',
     warning: '警告',
     disable: '禁用',
