@@ -6,10 +6,20 @@ import {
   RulesetType,
   RuleType as RouteRuleType,
   DnsServer,
+  Network,
 } from '@/enums/kernel'
 import { useProfilesStore, useRulesetsStore, useSubscribesStore } from '@/stores'
 
-import { createTextMatcher, deepAssign, sampleID } from './others'
+import type { CoreConfigInbound } from '@/types/kernel'
+
+import {
+  createTextMatcher,
+  deepAssign,
+  ensureArray,
+  filterByTemplate,
+  getValues,
+  sampleID,
+} from './others'
 
 const supportedRuleTypes = [
   RouteRuleType.Inbound,
@@ -63,7 +73,7 @@ export const restoreProfile = (
     name,
     log: deepAssign(Defaults.DefaultLog(), config.log),
     experimental: restoreExperimental(config.experimental, OutboundsIds),
-    inbounds: restoreInbounds(config.inbounds || [], InboundsIds),
+    inbounds: restoreInbounds(config.inbounds || [], InboundsIds, RouteRuleSetIds),
     outbounds: restoreOutbounds(
       config.outbounds || [],
       OutboundsIds,
@@ -116,15 +126,17 @@ const restoreExperimental = (raw: Recordable, OutboundsIds: Recordable): App.Exp
   return experimental
 }
 
-const restoreInbounds = (inbounds: Recordable[], InboundsIds: Recordable): App.Inbound[] => {
+const restoreInbounds = (
+  inbounds: CoreConfigInbound[],
+  InboundsIds: Recordable<string>,
+  ruleSetIds: Recordable<string>,
+): App.Inbound[] => {
   return inbounds.flatMap((raw) => {
-    if (
-      ![Inbound.Mixed, Inbound.Http, Inbound.Socks, Inbound.Tun, Inbound.Direct].includes(raw.type)
-    ) {
+    if (!getValues(Inbound).includes(raw.type)) {
       return []
     }
     const inbound: App.Inbound = {
-      id: InboundsIds[raw.tag],
+      id: InboundsIds[raw.tag]!,
       tag: raw.tag,
       type: raw.type,
       enable: true,
@@ -133,17 +145,27 @@ const restoreInbounds = (inbounds: Recordable[], InboundsIds: Recordable): App.I
       const template = Defaults.DefaultInboundTun()
       inbound.tun = {
         interface_name: raw.interface_name ?? template.interface_name,
-        address: raw.address ?? template.address,
+        address: ensureArray(raw.address) ?? template.address,
         mtu: raw.mtu ?? template.mtu,
         auto_route: raw.auto_route ?? template.auto_route,
+        auto_redirect: raw.auto_redirect ?? template.auto_redirect,
         strict_route: raw.strict_route ?? template.strict_route,
-        route_address: raw.route_address ?? template.route_address,
-        route_exclude_address: raw.route_exclude_address ?? template.route_exclude_address,
+        route_address: ensureArray(raw.route_address) ?? template.route_address,
+        route_exclude_address:
+          ensureArray(raw.route_exclude_address) ?? template.route_exclude_address,
+        route_address_set:
+          ensureArray(raw.route_address_set)?.map((tag) => ruleSetIds[tag]!) ??
+          template.route_address_set,
+        route_exclude_address_set:
+          ensureArray(raw.route_exclude_address_set)?.map((tag) => ruleSetIds[tag]!) ??
+          template.route_exclude_address_set,
         endpoint_independent_nat: raw.endpoint_independent_nat ?? template.endpoint_independent_nat,
         stack: raw.stack ?? template.stack,
+        include_interface: ensureArray(raw.include_interface) ?? template.include_interface,
+        exclude_interface: ensureArray(raw.exclude_interface) ?? template.exclude_interface,
+        otherFields: JSON.stringify(filterByTemplate(raw, template, 'exclude'), null, 2),
       }
-    }
-    if (raw.type === Inbound.Direct) {
+    } else if (raw.type === Inbound.Direct) {
       const template = Defaults.DefaultInboundDirect()
       inbound.direct = {
         listen: {
@@ -153,12 +175,11 @@ const restoreInbounds = (inbounds: Recordable[], InboundsIds: Recordable): App.I
           tcp_multi_path: raw.tcp_multi_path ?? template.listen.tcp_multi_path,
           udp_fragment: raw.udp_fragment ?? template.listen.udp_fragment,
         },
-        network: raw.network ?? template.network,
+        network: (raw.network as Network) ?? template.network,
       }
-    }
-    if ([Inbound.Mixed, Inbound.Http, Inbound.Socks].includes(raw.type)) {
+    } else if ([Inbound.Mixed, Inbound.Http, Inbound.Socks].includes(raw.type)) {
       const template = Defaults.DefaultInboundMixed()
-      inbound[raw.type as Exclude<Inbound, Inbound.Tun | Inbound.Direct>] = {
+      inbound[raw.type] = {
         listen: {
           listen: raw.listen ?? template.listen.listen,
           listen_port: raw.listen_port ?? template.listen.listen_port,
@@ -166,7 +187,7 @@ const restoreInbounds = (inbounds: Recordable[], InboundsIds: Recordable): App.I
           tcp_multi_path: raw.tcp_multi_path ?? template.listen.tcp_multi_path,
           udp_fragment: raw.udp_fragment ?? template.listen.udp_fragment,
         },
-        users: raw.users?.map((user: any) => user.username + ':' + user.password) ?? template.users,
+        users: raw.users?.map((user) => user.username + ':' + user.password) ?? template.users,
       }
     }
     return inbound
@@ -217,7 +238,9 @@ const restoreOutbounds = (
     let newOutbounds: App.Proxy[] = []
 
     raw.outbounds?.forEach((tag: string) => {
-      const isBuiltIn = [Outbound.Direct, Outbound.Block].includes(tag as Outbound)
+      const isBuiltIn = [Outbound.Direct, Outbound.Block].includes(
+        tag as Extract<Outbound, 'direct' | 'block'>,
+      )
       if (isBuiltIn) {
         newOutbounds.push({ id: tag, type: 'Built-in', tag })
       } else if (groupTags.has(tag)) {

@@ -14,20 +14,24 @@ export enum ClashMode {
   Direct = 'direct',
 }
 
-export enum Inbound {
-  Direct = 'direct',
-  Mixed = 'mixed',
-  Socks = 'socks',
-  Http = 'http',
-  Tun = 'tun',
-}
+export const Inbound = {
+  Direct: 'direct',
+  Mixed: 'mixed',
+  Socks: 'socks',
+  Http: 'http',
+  Tun: 'tun',
+} as const
 
-export enum Outbound {
-  Direct = 'direct',
-  Block = 'block',
-  Selector = 'selector',
-  Urltest = 'urltest',
-}
+export type Inbound = ValueOf<typeof Inbound>
+
+export const Outbound = {
+  Direct: 'direct',
+  Block: 'block',
+  Selector: 'selector',
+  Urltest: 'urltest',
+} as const
+
+export type Outbound = ValueOf<typeof Outbound>
 
 export enum TunStack {
   System = 'system',
@@ -35,10 +39,12 @@ export enum TunStack {
   Mixed = 'mixed',
 }
 
-export enum Network {
-  Tcp = 'tcp',
-  Udp = 'udp',
-}
+export const Network = {
+  Tcp: 'tcp',
+  Udp: 'udp',
+} as const
+
+export type Network = ValueOf<typeof Network>
 
 export enum RulesetType {
   Inline = 'inline',
@@ -85,18 +91,20 @@ export enum Strategy {
   IPv6Only = 'ipv6_only',
 }
 
-export enum DnsServer {
-  Local = 'local',
-  Hosts = 'hosts',
-  Tcp = 'tcp',
-  Udp = 'udp',
-  Tls = 'tls',
-  Https = 'https',
-  Quic = 'quic',
-  H3 = 'h3',
-  Dhcp = 'dhcp',
-  FakeIP = 'fakeip',
-}
+export const DnsServer = {
+  Local: 'local',
+  Hosts: 'hosts',
+  Tcp: 'tcp',
+  Udp: 'udp',
+  Tls: 'tls',
+  Https: 'https',
+  Quic: 'quic',
+  H3: 'h3',
+  Dhcp: 'dhcp',
+  FakeIP: 'fakeip',
+} as const
+
+export type DnsServer = ValueOf<typeof DnsServer>
 
 export enum RuleAction {
   Route = 'route',

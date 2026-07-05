@@ -432,11 +432,17 @@ declare namespace App {
       address: string[]
       mtu: number
       auto_route: boolean
+      auto_redirect: boolean
       strict_route: boolean
       route_address: string[]
       route_exclude_address: string[]
+      route_address_set: string[]
+      route_exclude_address_set: string[]
       endpoint_independent_nat: boolean
       stack: TunStack
+      include_interface: string[]
+      exclude_interface: string[]
+      otherFields: string
     }
   }
 

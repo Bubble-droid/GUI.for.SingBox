@@ -1,3 +1,4 @@
+import type { auth } from '@zhexin/typebox/inbound'
 import { parse } from 'yaml'
 
 import { ReadFile, WriteFile } from '@/bridge'
@@ -18,7 +19,9 @@ import {
   useRulesetsStore,
   useSubscribesStore,
 } from '@/stores'
-import { deepAssign, deepClone, APP_TITLE, createTextMatcher } from '@/utils'
+import { deepAssign, deepClone, APP_TITLE, createTextMatcher, filterInvalidProps } from '@/utils'
+
+import type { CoreConfigInbound } from '@/types/kernel'
 
 const _generateRule = (
   rule: App.Rule | App.DnsRule,
@@ -69,39 +72,48 @@ const generateExperimental = (experimental: App.Experimental, outbounds: App.Out
   }
 }
 
-const generateInbounds = (inbounds: App.Inbound[]) => {
-  return inbounds.flatMap((inbound) => {
+const generateInbounds = (inbounds: App.Inbound[], ruleSets: App.ProfileRuleSet[]) => {
+  const getRuleSet = (id: string) => ruleSets.find((v) => v.id === id)?.tag
+  return inbounds.flatMap((inbound): CoreConfigInbound[] => {
     if (!inbound.enable) return []
-    if (inbound.type !== Inbound.Tun && inbound.type !== Inbound.Direct) {
-      const users = inbound[inbound.type]!.users.map((user) => ({
-        username: user.split(':')[0],
-        password: user.split(':')[1],
-      }))
-      return {
-        type: inbound.type,
-        tag: inbound.tag,
-        ...inbound[inbound.type]!.listen,
-        users: users.length > 0 ? users : undefined,
-      }
-    }
-    if (inbound.type === Inbound.Direct) {
-      return {
-        type: inbound.type,
-        tag: inbound.tag,
-        ...inbound[inbound.type]!.listen,
-        network: inbound.direct!.network || undefined,
-      }
-    }
+
     if (inbound.type === Inbound.Tun) {
-      return {
-        type: inbound.type,
-        tag: inbound.tag,
-        ...inbound.tun!,
-        route_address: inbound.tun!.route_address?.length ? inbound.tun!.route_address : undefined,
-        route_exclude_address: inbound.tun!.route_exclude_address?.length
-          ? inbound.tun!.route_exclude_address
-          : undefined,
-      }
+      const { otherFields, ...rest } = inbound.tun!
+      return [
+        filterInvalidProps({
+          ...rest,
+          ...(deepAssign(rest, JSON.parse(otherFields)) as App.Inbound['tun']),
+          type: inbound.type,
+          tag: inbound.tag,
+          route_address_set: inbound.tun!.route_address_set.map((id) => getRuleSet(id)!),
+          route_exclude_address_set: inbound.tun!.route_exclude_address_set.map(
+            (id) => getRuleSet(id)!,
+          ),
+        }),
+      ]
+    } else if (inbound.type === Inbound.Direct) {
+      return [
+        filterInvalidProps({
+          type: inbound.type,
+          tag: inbound.tag,
+          ...inbound[inbound.type]!.listen,
+          network: inbound.direct!.network || undefined,
+        }),
+      ]
+    } else {
+      const users = inbound[inbound.type]?.users.flatMap((user): auth[] => {
+        const [username, password] = user.split(':')
+        if (!username || !password) return []
+        return [{ username, password }]
+      })
+      return [
+        filterInvalidProps({
+          type: inbound.type,
+          tag: inbound.tag,
+          ...inbound[inbound.type]!.listen,
+          users,
+        }),
+      ]
     }
   })
 }
@@ -411,7 +423,7 @@ export const generateConfig = async (
   let config: Recordable = {
     log: profile.log,
     experimental: generateExperimental(profile.experimental, profile.outbounds),
-    inbounds: generateInbounds(profile.inbounds),
+    inbounds: generateInbounds(profile.inbounds, profile.route.rule_set),
     outbounds: await generateOutbounds(profile.outbounds),
     route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns),
     dns: generateDns(profile.dns, profile.route.rule_set, profile.inbounds, profile.outbounds),

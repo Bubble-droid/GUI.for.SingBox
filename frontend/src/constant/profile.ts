@@ -77,6 +77,17 @@ export const DefaultExperimental = (): App.Experimental => ({
   },
 })
 
+export const DefaultInboundDirect = (): NonNullable<App.Inbound['direct']> => ({
+  listen: {
+    listen: '127.0.0.1',
+    listen_port: 20119,
+    tcp_fast_open: false,
+    tcp_multi_path: false,
+    udp_fragment: false,
+  },
+  network: '',
+})
+
 export const DefaultInboundSocks = (): NonNullable<App.Inbound['socks']> => ({
   listen: {
     listen: '127.0.0.1',
@@ -110,27 +121,22 @@ export const DefaultInboundMixed = (): NonNullable<App.Inbound['mixed']> => ({
   users: [],
 })
 
-export const DefaultInboundDirect = (): NonNullable<App.Inbound['direct']> => ({
-  listen: {
-    listen: '127.0.0.1',
-    listen_port: 20119,
-    tcp_fast_open: false,
-    tcp_multi_path: false,
-    udp_fragment: false,
-  },
-  network: '',
-})
-
 export const DefaultInboundTun = (): NonNullable<App.Inbound['tun']> => ({
   interface_name: '',
   address: ['172.18.0.1/30', 'fdfe:dcba:9876::1/126'],
   mtu: 0,
   auto_route: true,
-  strict_route: true,
+  auto_redirect: false,
+  strict_route: false,
   route_address: [],
   route_exclude_address: [],
+  route_address_set: [],
+  route_exclude_address_set: [],
   endpoint_independent_nat: false,
   stack: TunStack.Mixed,
+  include_interface: [],
+  exclude_interface: [],
+  otherFields: '{}',
 })
 
 export const DefaultInbounds = (): App.Inbound[] => [

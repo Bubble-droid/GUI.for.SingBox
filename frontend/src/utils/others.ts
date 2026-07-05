@@ -31,6 +31,53 @@ export const omitArray = <T, K extends keyof T>(arr: T[], fields: K[]): Omit<T, 
     return item as Omit<T, K>
   })
 }
+
+export const ensureArray = <T>(value: T | T[] | null | undefined): T[] => {
+  return value == null ? [] : Array.isArray(value) ? value : [value]
+}
+
+export const filterInvalidProps = <T extends object>(obj: T) => {
+  const result: Recordable<unknown> = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (!value) continue
+    if (Array.isArray(value) && value.length === 0) continue
+    if (isPlainObject(value) && Object.keys(value as object).length === 0) continue
+    result[key] = value
+  }
+
+  return result as StrictRequired<T>
+}
+
+export const filterByTemplate = <
+  O extends object,
+  T extends object,
+  M extends 'include' | 'exclude',
+>(
+  obj: O,
+  template: T,
+  mode: M,
+) => {
+  const result: Recordable<unknown> = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    const hasKey = Object.prototype.hasOwnProperty.call(template, key)
+    if (hasKey === (mode === 'include')) {
+      result[key] = value
+    }
+  }
+
+  return result as M extends 'include' ? Pick<O, Extract<keyof O, keyof T>> : Omit<O, keyof T>
+}
+
+export const getKeys = <T extends object>(obj: T): (keyof T)[] => {
+  return Object.keys(obj) as (keyof T)[]
+}
+
+export const getValues = <T extends object>(obj: T): T[keyof T][] => {
+  return Object.values(obj) as T[keyof T][]
+}
+
 export const debounce = (fn: (...args: any) => any, wait: number) => {
   let timer: null | number = null
   const _debuonce = function (...args: any) {

@@ -70,6 +70,10 @@ const serverOptions = computed(() =>
   profile.value.dns.servers.map((v) => ({ label: v.tag, value: v.id })),
 )
 
+const ruleSetOptions = computed(() =>
+  profile.value.route.rule_set.map((v) => ({ label: v.tag, value: v.id })),
+)
+
 const generalConfig = computed({
   get() {
     return { log: profile.value.log, experimental: profile.value.experimental }
@@ -248,7 +252,11 @@ defineExpose({ modalSlots })
       <GeneralConfig v-model="generalConfig" :outbound-options="outboundOptions" />
     </div>
     <div v-if="currentStep === Step.Inbounds">
-      <InboundsConfig ref="inboundsRef" v-model="profile.inbounds" />
+      <InboundsConfig
+        ref="inboundsRef"
+        v-model="profile.inbounds"
+        :rule-set-options="ruleSetOptions"
+      />
     </div>
     <div v-if="currentStep === Step.Outbounds">
       <OutboundsConfig ref="outboundsRef" v-model="profile.outbounds" />

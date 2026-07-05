@@ -90,6 +90,9 @@ importers:
       '@vue/tsconfig':
         specifier: ^0.9.1
         version: 0.9.1(typescript@6.0.3)(vue@3.5.39(typescript@6.0.3))
+      '@zhexin/typebox':
+        specifier: ^1.13.36
+        version: 1.13.36
       eslint:
         specifier: ^10.6.0
         version: 10.6.0
@@ -861,6 +864,9 @@ packages:
         optional: true
       vue:
         optional: true
+
+  '@zhexin/typebox@1.13.36':
+    resolution: {integrity: sha512-eZgTfYIEB6Y5H3Nq/NdAMb3fgNnwSnUevYY1QeTBIJr5bLx9ZISEOoSLm5dhCPurx59n9Vp447W1747Mk5hVIQ==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -2462,6 +2468,8 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
       vue: 3.5.39(typescript@6.0.3)
+
+  '@zhexin/typebox@1.13.36': {}
 
   acorn-jsx@5.3.2(acorn@8.17.0):
     dependencies:

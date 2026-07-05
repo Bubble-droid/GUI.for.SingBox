@@ -13,6 +13,7 @@ This fork introduces the following enhancements:
 - Enhanced Linux desktop user experience
 - Native package support for Arch Linux
 - XDG Base Directory Specification compliance for application data
+- Extended configuration fields for Linux only
 
 ## Document
 

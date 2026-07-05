@@ -1,6 +1,8 @@
 <script lang="ts" setup>
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { GetInterfaces } from '@/bridge'
 import { DraggableOptions } from '@/constant/app'
 import { NetworkOptions, TunStackOptions } from '@/constant/kernel'
 import {
@@ -12,6 +14,12 @@ import {
 } from '@/constant/profile'
 import { Inbound } from '@/enums/kernel'
 import { picker, sampleID } from '@/utils'
+
+interface Props {
+  ruleSetOptions: { label: string; value: string }[]
+}
+
+defineProps<Props>()
 
 const model = defineModel<App.Profile['inbounds']>({ required: true })
 
@@ -88,6 +96,21 @@ const handleAdd = async () => {
   const fns = await picker.multi('common.add', inbounds)
   fns.forEach((fn) => fn())
 }
+
+const handleAutoRouteChange = (val: boolean, tun: App.Profile['inbounds'][number]['tun']) => {
+  if (!val) {
+    tun!.auto_redirect = false
+    tun!.strict_route = false
+    tun!.include_interface.length = 0
+    tun!.exclude_interface.length = 0
+  }
+}
+
+const interfacesOptions = ref<any>([])
+
+GetInterfaces().then((res) => {
+  interfacesOptions.value = res.map((v) => ({ label: v, value: v }))
+})
 
 defineExpose({ handleAdd })
 </script>
@@ -168,9 +191,16 @@ defineExpose({ handleAdd })
         </div>
         <div class="form-item">
           {{ t('kernel.inbounds.tun.auto_route') }}
-          <Switch v-model="inbound.tun.auto_route" />
+          <Switch
+            v-model="inbound.tun.auto_route"
+            @change="handleAutoRouteChange($event, inbound.tun)"
+          />
         </div>
-        <div class="form-item">
+        <div v-if="inbound.tun.auto_route" class="form-item">
+          {{ t('kernel.inbounds.tun.auto_redirect') }}
+          <Switch v-model="inbound.tun.auto_redirect" />
+        </div>
+        <div v-if="inbound.tun.auto_route" class="form-item">
           {{ t('kernel.inbounds.tun.strict_route') }}
           <Switch v-model="inbound.tun.strict_route" />
         </div>
@@ -195,6 +225,59 @@ defineExpose({ handleAdd })
           <InputList
             v-model="inbound.tun.route_exclude_address"
             placeholder="192.168.0.0/16 fc00::/7"
+          />
+        </div>
+        <div class="form-item">
+          {{ t('kernel.inbounds.tun.route_address_set') }}
+          <MultipleSelect
+            v-model="inbound.tun.route_address_set"
+            :options="ruleSetOptions"
+            clearable
+            auto-size
+          />
+        </div>
+        <div class="form-item">
+          {{ t('kernel.inbounds.tun.route_exclude_address_set') }}
+          <MultipleSelect
+            v-model="inbound.tun.route_exclude_address_set"
+            :options="ruleSetOptions"
+            clearable
+            auto-size
+          />
+        </div>
+        <div
+          v-if="inbound.tun.auto_route"
+          :class="{ 'items-start': inbound.tun.include_interface.length }"
+          class="form-item"
+        >
+          {{ t('kernel.inbounds.tun.include_interface') }}
+          <MultipleSelect
+            v-model="inbound.tun.include_interface"
+            :options="interfacesOptions"
+            clearable
+            auto-size
+          />
+        </div>
+        <div
+          v-if="inbound.tun.auto_route"
+          :class="{ 'items-start': inbound.tun.exclude_interface.length }"
+          class="form-item"
+        >
+          {{ t('kernel.inbounds.tun.exclude_interface') }}
+          <MultipleSelect
+            v-model="inbound.tun.exclude_interface"
+            :options="interfacesOptions"
+            clearable
+            auto-size
+          />
+        </div>
+        <div class="form-item items-start">
+          {{ t('kernel.otherFields') }}
+          <CodeEditor
+            v-model="inbound.tun.otherFields"
+            editable
+            lang="json"
+            style="min-width: 320px"
           />
         </div>
       </div>
