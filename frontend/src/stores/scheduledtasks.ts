@@ -9,8 +9,10 @@ import { ScheduledTasksType, PluginTriggerEvent } from '@/enums/app'
 import { useSubscribesStore, useRulesetsStore, usePluginsStore, useLogsStore } from '@/stores'
 import { ignoredError, stringifyNoFolding } from '@/utils'
 
+import type { ScheduledTask, Recordable } from '@/types'
+
 export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
-  const scheduledtasks = ref<App.ScheduledTask[]>([])
+  const scheduledtasks = ref<ScheduledTask[]>([])
   const cronJobsMap: Recordable<Cron> = {}
 
   const setupScheduledTasks = async () => {
@@ -72,7 +74,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
     }
   }
 
-  const getTaskFn = (task: App.ScheduledTask) => {
+  const getTaskFn = (task: ScheduledTask) => {
     switch (task.type) {
       case ScheduledTasksType.UpdateSubscription: {
         const subscribesStore = useSubscribesStore()
@@ -116,7 +118,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
     return WriteFile(ScheduledTasksFilePath, stringifyNoFolding(scheduledtasks.value))
   }
 
-  const addScheduledTask = async (s: App.ScheduledTask) => {
+  const addScheduledTask = async (s: ScheduledTask) => {
     scheduledtasks.value.push(s)
     try {
       cronJobsMap[s.id] = new Cron(s.cron, () => runScheduledTask(s.id))
@@ -146,7 +148,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
     }
   }
 
-  const editScheduledTask = async (id: string, s: App.ScheduledTask) => {
+  const editScheduledTask = async (id: string, s: ScheduledTask) => {
     const idx = scheduledtasks.value.findIndex((v) => v.id === id)
     if (idx === -1) return
     const backup = scheduledtasks.value.splice(idx, 1, s)[0]!

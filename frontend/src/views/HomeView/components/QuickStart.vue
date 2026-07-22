@@ -2,6 +2,7 @@
 import { h, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { Outbound, OutboundMember } from '@/enums'
 import { useProfilesStore, useAppSettingsStore, useSubscribesStore } from '@/stores'
 import { message, sampleID } from '@/utils'
 
@@ -41,10 +42,11 @@ const handleSave = async () => {
 
   const profile = profilesStore.getProfileTemplate(name.value)
 
-  if (profile.outbounds[0] && profile.outbounds[1]) {
-    profile.outbounds[0].outbounds.push({ id: sub.id, tag: sub.id, type: 'Subscription' })
-    profile.outbounds[1].outbounds.push({ id: sub.id, tag: sub.id, type: 'Subscription' })
-  }
+  const group = profile.outbounds.find(
+    (v) => v.type === Outbound.Selector || v.type === Outbound.Urltest,
+  )
+
+  group?.outbounds.push({ id: sub.id, tag: sub.name, type: OutboundMember.Subscription })
 
   await profilesStore.addProfile(profile)
 

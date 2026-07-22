@@ -1,10 +1,19 @@
 import { RestartApp } from '@/bridge'
 import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { ModeOptions } from '@/constant/kernel'
 import { PluginTrigger, PluginTriggerEvent } from '@/enums/app'
 import useI18n from '@/lang'
-import { useAppSettingsStore, useAppStore, useEnvStore, useKernelApiStore, usePluginsStore, useRulesetsStore, useSubscribesStore } from '@/stores'
+import {
+  useAppSettingsStore,
+  useAppStore,
+  useEnvStore,
+  useKernelApiStore,
+  usePluginsStore,
+  useRulesetsStore,
+  useSubscribesStore,
+} from '@/stores'
 import { exitApp, handleChangeMode, message, reloadApp } from '@/utils'
+
+import type { Lang } from '@/enums/app'
 
 type Command = {
   label: string
@@ -41,6 +50,8 @@ export const getCommands = () => {
   const subscriptionsStore = useSubscribesStore()
   const rulesetsStore = useRulesetsStore()
   const pluginsStore = usePluginsStore()
+
+  const { t } = useI18n.global
 
   const rawCommands: Command[] = [
     {
@@ -85,10 +96,10 @@ export const getCommands = () => {
         {
           label: 'kernel.mode',
           cmd: 'Core Mode',
-          children: ModeOptions.map((mode) => ({
-            label: mode.label,
-            cmd: mode.value,
-            handler: () => handleChangeMode(mode.value),
+          children: kernelStore.config['mode-list'].map((mode) => ({
+            label: t(`kernel.rules.clash_mode.${mode}`, mode),
+            cmd: mode,
+            handler: () => handleChangeMode(mode),
           })),
         },
       ],
@@ -128,7 +139,7 @@ export const getCommands = () => {
             ...appStore.locales.map((v) => ({
               label: v.label,
               cmd: v.value,
-              handler: () => (appSettings.app.lang = v.value),
+              handler: () => (appSettings.app.lang = v.value as Lang),
             })),
           ],
         },

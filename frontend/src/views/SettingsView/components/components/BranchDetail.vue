@@ -65,7 +65,7 @@ const handleClearCoreCache = async () => {
     <Button
       v-if="rollbackable"
       v-tips="'settings.kernel.rollbackTip'"
-      :disabled="env.isSystemPackage"
+      :disabled="env.isBundled"
       icon="rollback"
       type="text"
       size="small"
@@ -81,7 +81,7 @@ const handleClearCoreCache = async () => {
     <Button
       v-if="grantable"
       v-tips="'settings.kernel.grant'"
-      :disabled="env.isSystemPackage"
+      :disabled="env.isBundled"
       type="text"
       size="small"
       icon="grant"
@@ -127,9 +127,7 @@ const handleClearCoreCache = async () => {
         :color="updatable ? 'purple' : 'default'"
         class="cursor-pointer"
         @click="
-          env.isSystemPackage
-            ? message.info('about.updatesManagedByOS')
-            : refreshRemoteVersion(true)
+          env.isBundled ? message.info('about.updatesManagedByOS') : refreshRemoteVersion(true)
         "
       >
         {{ t('settings.kernel.remote') }}

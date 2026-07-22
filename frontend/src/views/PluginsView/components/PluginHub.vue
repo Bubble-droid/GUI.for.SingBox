@@ -7,6 +7,8 @@ import { useBool } from '@/hooks'
 import { useAppSettingsStore, usePluginsStore } from '@/stores'
 import { APP_TITLE, createTextMatcher, deepClone, message } from '@/utils'
 
+import type { AppPlugin } from '@/types'
+
 const keywords = ref('')
 
 const { t } = useI18n()
@@ -18,7 +20,7 @@ const loadingSet = ref(new Set<string>())
 const groupOrders = ['Recommended', 'Extensions', 'Tools', 'Fun', 'Examples', 'Development']
 
 const groups = computed(() => {
-  const map: Record<string, App.Plugin[]> = {}
+  const map: Record<string, AppPlugin[]> = {}
   pluginsStore.pluginHub.forEach((plugin) => {
     const group = plugin.group || 'Others'
     if (!map[group]) {
@@ -57,7 +59,7 @@ const filteredPlugins = computed(() => {
     .filter((group) => group.plugins.length)
 })
 
-const handleAddPlugin = async (plugin: App.Plugin) => {
+const handleAddPlugin = async (plugin: AppPlugin) => {
   loadingSet.value.add(plugin.id)
   try {
     await pluginsStore.addPlugin(deepClone(plugin))

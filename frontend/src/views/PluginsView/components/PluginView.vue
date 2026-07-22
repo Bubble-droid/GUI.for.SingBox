@@ -10,6 +10,8 @@ import { deepClone, ignoredError, message } from '@/utils'
 import Button from '@/components/Button/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'
 
+import type { AppPlugin } from '@/types'
+
 interface Props {
   id: string
 }
@@ -17,7 +19,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const loading = ref(false)
-const plugin = ref<App.Plugin>()
+const plugin = ref<AppPlugin>()
 const metadata = ref<Record<string, any>>()
 const code = ref('')
 
@@ -72,7 +74,7 @@ const handleTest = async (event: PluginTriggerEvent, arg1?: any, arg2?: any) => 
   testing.value = false
 }
 
-const initPluginCode = async (p: App.Plugin) => {
+const initPluginCode = async (p: AppPlugin) => {
   const _code = pluginsStore.getPluginCodefromCache(p.id)
   if (_code) {
     code.value = _code

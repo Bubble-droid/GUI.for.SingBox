@@ -6,11 +6,17 @@ import {
   ShowMainWindow,
   UpdateTrayAndMenus,
 } from '@/bridge'
-import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { ModeOptions } from '@/constant/kernel'
-import { OS } from '@/enums/app'
+import { ThemeOptions, ColorOptions } from '@/constant'
+import { Outbound, OS } from '@/enums'
 import i18n from '@/lang'
-import { useAppSettingsStore, useKernelApiStore, useEnvStore, usePluginsStore, useAppStore, useProfilesStore } from '@/stores'
+import {
+  useAppSettingsStore,
+  useKernelApiStore,
+  useEnvStore,
+  usePluginsStore,
+  useAppStore,
+  useProfilesStore,
+} from '@/stores'
 import {
   debounce,
   exitApp,
@@ -19,6 +25,9 @@ import {
   APP_VERSION,
   handleUseProxy,
 } from '@/utils'
+
+import type { Lang } from '@/enums'
+import type { MenuItem, Recordable } from '@/types'
 
 const getTrayIcons = () => {
   const envStore = useEnvStore()
@@ -40,7 +49,7 @@ const getTrayIcons = () => {
   return icon
 }
 
-const generateUniqueEventsForMenu = (menus: App.MenuItem[]) => {
+const generateUniqueEventsForMenu = (menus: MenuItem[]) => {
   const { t } = i18n.global
   const MenuItemHandlerMap: Recordable<() => void> = {}
 
@@ -48,7 +57,7 @@ const generateUniqueEventsForMenu = (menus: App.MenuItem[]) => {
   EventsOn('onMenuItemClick', (id) => MenuItemHandlerMap[id]?.())
 
   let index = 0
-  function processMenu(menu: App.MenuItem) {
+  function processMenu(menu: MenuItem) {
     const _menu = { ...menu, text: t(menu.text || ''), tooltip: t(menu.tooltip || '') }
     const { event, children } = menu
 
@@ -76,18 +85,21 @@ const getTrayMenus = () => {
   const pluginsStore = usePluginsStore()
   const profilesStore = useProfilesStore()
 
-  let pluginMenus: App.MenuItem[] = []
+  const { t } = i18n.global
+
+  let pluginMenus: MenuItem[] = []
   let pluginMenusHidden = !appSettings.app.addPluginToMenu
 
-  let groupMenus: App.MenuItem[] = []
+  let groupMenus: MenuItem[] = []
   const groupMenusHidden = !appSettings.app.addGroupToMenu
 
   if (!groupMenusHidden) {
     const { proxies } = kernelApiStore
     if (!proxies) return []
-    const hiddenList = (profilesStore.currentProfile?.outbounds || []).flatMap((v) =>
-      v.hidden ? v.tag : [],
-    )
+    const hiddenList = (profilesStore.currentProfile?.outbounds || []).flatMap((v) => {
+      if (v.type !== Outbound.Urltest && v.type !== Outbound.Selector) return []
+      return v.hidden ? v.tag : []
+    })
     groupMenus = Object.values(proxies)
       .filter(
         (v) =>
@@ -166,7 +178,7 @@ const getTrayMenus = () => {
     })
   }
 
-  const trayMenus: App.MenuItem[] = [
+  const trayMenus: MenuItem[] = [
     {
       type: 'item',
       text: 'tray.showMainWindow',
@@ -181,12 +193,12 @@ const getTrayMenus = () => {
       type: 'item',
       text: 'kernel.mode',
       hidden: !kernelApiStore.running,
-      children: ModeOptions.map((mode) => ({
+      children: kernelApiStore.config['mode-list'].map((mode) => ({
         type: 'item',
-        text: mode.label,
+        text: t(`kernel.rules.clash_mode.${mode}`, mode),
         checkable: true,
-        checked: kernelApiStore.config.mode === mode.value,
-        event: () => handleChangeMode(mode.value),
+        checked: kernelApiStore.config.mode === mode,
+        event: () => handleChangeMode(mode),
       })),
     },
     {
@@ -295,7 +307,7 @@ const getTrayMenus = () => {
             text: v.label,
             checkable: true,
             checked: appSettings.app.lang === v.value,
-            event: () => (appSettings.app.lang = v.value),
+            event: () => (appSettings.app.lang = v.value as Lang),
           })),
         },
       ],

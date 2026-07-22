@@ -1,215 +1,469 @@
-import * as Defaults from '@/constant/profile'
 import {
+  getDefaultDialer,
+  getDefaultDns,
+  getDefaultDnsRouteOptions,
+  getDefaultDnsServer,
+  getDefaultDomainResolver,
+  getDefaultEndpoint,
+  getDefaultExperimental,
+  getDefaultHttpClient,
+  getDefaultInbound,
+  getDefaultListen,
+  getDefaultLog,
+  getDefaultMixin,
+  getDefaultNtp,
+  getDefaultOutbound,
+  getDefaultRoute,
+  getDefaultRouteOptions,
+  getDefaultRuleSet,
+  getDefaultScript,
+  getDefaultService,
+} from '@/constant'
+import {
+  CommonRuleType,
+  DnsRcode,
+  DnsRejectMethod,
+  DnsRuleAction,
+  DnsRuleType,
+  DnsServer,
+  Endpoint,
   Inbound,
   Outbound,
-  RuleAction,
-  RulesetType,
-  RuleType as RouteRuleType,
-  DnsServer,
-  Network,
-} from '@/enums/kernel'
-import { useProfilesStore, useRulesetsStore, useSubscribesStore } from '@/stores'
-
-import type { CoreConfigInbound } from '@/types/kernel'
-
+  OutboundMember,
+  RouteRejectMethod,
+  RouteRuleAction,
+  RouteRuleType,
+  RuleSetFormat,
+  RuleSetType,
+  RuleType,
+  Service,
+} from '@/enums'
+import { useEnvStore, useRulesetsStore, useSubscribesStore } from '@/stores'
 import {
   createTextMatcher,
-  deepAssign,
   ensureArray,
-  filterByTemplate,
+  extractProps,
   getValues,
   sampleID,
-} from './others'
+  strictEntries,
+} from '@/utils'
 
-const supportedRuleTypes = [
-  RouteRuleType.Inbound,
-  RouteRuleType.Network,
-  RouteRuleType.Protocol,
-  RouteRuleType.Domain,
-  RouteRuleType.DomainSuffix,
-  RouteRuleType.DomainKeyword,
-  RouteRuleType.DomainRegex,
-  RouteRuleType.SourceIPCidr,
-  RouteRuleType.IPCidr,
-  RouteRuleType.SourcePort,
-  RouteRuleType.SourcePortRange,
-  RouteRuleType.Port,
-  RouteRuleType.PortRange,
-  RouteRuleType.ProcessName,
-  RouteRuleType.ProcessPath,
-  RouteRuleType.ProcessPathRegex,
-  RouteRuleType.RuleSet,
-  RouteRuleType.IpIsPrivate,
-  RouteRuleType.IpAcceptAny,
-  RouteRuleType.ClashMode,
-]
+import type {
+  CoreConfig,
+  CoreDnsConfig,
+  CoreDnsDefaultRule,
+  CoreDnsLogicalRule,
+  CoreDnsRuleConfig,
+  CoreDnsServerConfig,
+  CoreDnsServerOf,
+  CoreDomainResolver,
+  CoreEndpointConfig,
+  CoreExperimentalConfig,
+  CoreHttpClientConfig,
+  CoreInboundConfig,
+  CoreInboundOf,
+  CoreOutboundConfig,
+  CoreOutboundOf,
+  CoreRouteConfig,
+  CoreRouteRuleConfig,
+  CoreRuleSetConfig,
+  CoreServiceConfig,
+  CoreServiceOf,
+  Dialer,
+  DnsProfile,
+  DnsRuleConditionUnion,
+  DnsRuleItem,
+  DnsRuleProfile,
+  DnsServerProfile,
+  DomainResolver,
+  EndpointProfile,
+  ExperimentalProfile,
+  HttpClientProfile,
+  InboundAuthProfile,
+  InboundNetworkProfile,
+  InboundProfile,
+  InboundTunProfile,
+  Listen,
+  LogProfile,
+  OutboundGroupProfile,
+  OutboundProfile,
+  Profile,
+  Recordable,
+  RouteProfile,
+  RouteRuleProfile,
+  RuleSetProfile,
+  RuleSetRemoteProfile,
+  ServiceProfile,
+  Subscription,
+} from '@/types'
 
-const buildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<string> => {
-  if (!arr) return {}
-  return arr.reduce((p, c, i) => ((p[c.tag] = prefix + i), p), {})
-}
-
-type RestoreProfileOptions = {
-  profile?: App.Profile
+interface RestoreProfileOptions {
+  profile?: Profile
   subscriptionIds?: string[]
 }
 
-export const restoreProfile = (
-  config: Recordable,
-  name = sampleID(),
-  options: RestoreProfileOptions = {},
-): App.Profile => {
-  const template = useProfilesStore().getProfileTemplate()
+interface IdMaps {
+  endPoints: Map<string, string>
+  inbounds: Map<string, string>
+  outbounds: Map<string, string>
+  ruleSets: Map<string, string>
+  dnsServers: Map<string, string>
+  httpClients: Map<string, string>
+}
 
-  const { profile, subscriptionIds } = options
+const buildTagIdMapping = (prefix: string, arr: { tag?: string }[] = []): Map<string, string> => {
+  return new Map(
+    arr.flatMap((v, i) => {
+      if (!v.tag) return []
+      return [[v.tag, `${prefix}${i}`]]
+    }),
+  )
+}
 
-  const InboundsIds = buildTagIdMapping('in-', config.inbounds)
-  const OutboundsIds = buildTagIdMapping('out-', config.outbounds)
-  const RouteRuleSetIds = buildTagIdMapping('ruleset-', config.route?.rule_set)
-  const DnsServersIds = buildTagIdMapping('dns-', config.dns?.servers)
+const buildRuleSetMapping = (
+  prefix: string,
+  arr: CoreRuleSetConfig[] = [],
+): Map<string, string> => {
+  return new Map(
+    arr.flatMap((v, i) => {
+      if (v.type !== RuleSetType.Remote) return [[ensureArray(v.tag)[0]!, `${prefix}${i}`]]
+      return ensureArray(v.tag).map((tag, subIndex) => {
+        return [tag, `${prefix}${i}_${subIndex}`]
+      })
+    }),
+  )
+}
 
+const restoreListen = <T extends object>(
+  raw: T,
+  maps: IdMaps,
+): {
+  listen: Listen
+  rest: Omit<T, keyof Listen>
+} => {
+  const template = getDefaultListen()
+  const result = extractProps(raw, template)
+  const owned = result.owned as unknown as CoreInboundOf<'mixed'>
+  const listen: Listen = {
+    ...template,
+    ...owned,
+    detour: maps.inbounds.get(owned.detour ?? '') ?? '',
+  }
+  return { listen, rest: result.rest }
+}
+
+const restoreDomainResolver = (raw: CoreDomainResolver, maps: IdMaps): DomainResolver => {
+  const template = getDefaultDomainResolver()
+  const normalizedResolver = !raw
+    ? template
+    : typeof raw === 'string'
+      ? { ...template, server: raw }
+      : extractProps(raw, template).owned
+  const resolver: DomainResolver = {
+    ...template,
+    ...normalizedResolver,
+    server: maps.dnsServers.get(normalizedResolver.server) ?? '',
+  }
+  return resolver
+}
+
+const restoreDialer = <T extends object>(
+  raw: T,
+  maps: IdMaps,
+): {
+  dialer: Dialer
+  rest: Omit<T, keyof Dialer>
+} => {
+  const template = getDefaultDialer()
+  const result = extractProps(raw, template)
+  const owned = result.owned as unknown as CoreOutboundOf<'direct'>
+  const resolver = restoreDomainResolver(owned.domain_resolver as CoreDomainResolver, maps)
+  const dialer: Dialer = {
+    ...template,
+    ...owned,
+    network_type: ensureArray(owned.network_type),
+    fallback_network_type: ensureArray(owned.fallback_network_type),
+    detour: maps.outbounds.get(owned.detour!) ?? '',
+    domain_resolver: resolver,
+  }
+  return { dialer, rest: result.rest }
+}
+
+const restoreFields = (obj: Recordable) => {
+  return Object.keys(obj).length > 0 ? JSON.stringify(obj, null, 2) : '{}'
+}
+
+const restoreNtp = (raw: CoreConfig['ntp'], maps: IdMaps): Profile['ntp'] => {
+  const template = getDefaultNtp()
+  const { dialer, rest } = restoreDialer(raw ?? {}, maps)
   return {
-    id: profile?.id || sampleID(),
-    name,
-    log: deepAssign(Defaults.DefaultLog(), config.log),
-    experimental: restoreExperimental(config.experimental, OutboundsIds),
-    inbounds: restoreInbounds(config.inbounds || [], InboundsIds, RouteRuleSetIds),
-    outbounds: restoreOutbounds(
-      config.outbounds || [],
-      OutboundsIds,
-      profile?.outbounds || [],
-      subscriptionIds || [],
-    ),
-    route: {
-      rule_set: restoreRouteRuleset(config.route?.rule_set || [], RouteRuleSetIds, OutboundsIds),
-      rules: restoreRouteRules(
-        config.route?.rules || [],
-        InboundsIds,
-        OutboundsIds,
-        RouteRuleSetIds,
-        DnsServersIds,
-      ),
-      auto_detect_interface:
-        config.route?.auto_detect_interface ?? template.route.auto_detect_interface,
-      find_process: config.route?.find_process ?? template.route.find_process,
-      default_interface: config.route?.default_interface ?? template.route.default_interface,
-      final: OutboundsIds[config.route?.final] ?? template.route.final,
-      default_domain_resolver: {
-        server:
-          DnsServersIds[config.route?.default_domain_resolver?.server] ??
-          template.route.default_domain_resolver.server,
-        client_subnet:
-          config.route?.default_domain_resolver?.client_subnet ??
-          template.route.default_domain_resolver.client_subnet,
-      },
-    },
-    dns: {
-      disable_cache: config.dns?.disable_cache ?? template.dns.disable_cache,
-      disable_expire: config.dns?.disable_expire ?? template.dns.disable_expire,
-      independent_cache: config.dns?.independent_cache ?? template.dns.independent_cache,
-      final: DnsServersIds[config.dns?.final] ?? template.dns.final,
-      strategy: config.dns?.strategy ?? template.dns.strategy,
-      client_subnet: config.dns?.client_subnet ?? template.dns.client_subnet,
-      servers: restoreDnsServers(config.dns?.servers || [], DnsServersIds, OutboundsIds),
-      rules: restoreDnsRules(config.dns?.rules || [], InboundsIds, RouteRuleSetIds, DnsServersIds),
-    },
-    mixin: profile?.mixin || Defaults.DefaultMixin(),
-    script: profile?.script || Defaults.DefaultScript(),
+    ...template,
+    ...rest,
+    dialer,
   }
 }
 
-const restoreExperimental = (raw: Recordable, OutboundsIds: Recordable): App.Experimental => {
-  const template = Defaults.DefaultExperimental()
-  const experimental = deepAssign(template, raw)
-  experimental.clash_api.external_ui_download_detour =
-    OutboundsIds[raw.clash_api?.external_ui_download_detour] || ''
-  return experimental
+const restoreExperimental = (
+  raw: CoreExperimentalConfig = {},
+  maps: IdMaps,
+): ExperimentalProfile => {
+  const template = getDefaultExperimental()
+  const { clash_api, cache_file } = raw
+
+  return {
+    clash_api: {
+      ...template.clash_api,
+      ...clash_api,
+      access_control_allow_origin: ensureArray(clash_api?.access_control_allow_origin),
+      external_ui_download_detour:
+        maps.outbounds.get(clash_api?.external_ui_download_detour ?? '') ?? '',
+    },
+    cache_file: {
+      ...template.cache_file,
+      ...cache_file,
+    },
+  }
 }
 
-const restoreInbounds = (
-  inbounds: CoreConfigInbound[],
-  InboundsIds: Recordable<string>,
-  ruleSetIds: Recordable<string>,
-): App.Inbound[] => {
-  return inbounds.flatMap((raw) => {
-    if (!getValues(Inbound).includes(raw.type)) {
-      return []
+const restoreEndpoints = (
+  endpoints: CoreEndpointConfig[] = [],
+  maps: IdMaps,
+): EndpointProfile[] => {
+  return endpoints.map((raw): EndpointProfile => {
+    const { type, tag, ...rest } = raw
+    const id = maps.endPoints.get(tag) ?? sampleID()
+    const base = {
+      id,
+      tag,
     }
-    const inbound: App.Inbound = {
-      id: InboundsIds[raw.tag]!,
-      tag: raw.tag,
-      type: raw.type,
-      enable: true,
-    }
-    if (raw.type === Inbound.Tun) {
-      const template = Defaults.DefaultInboundTun()
-      inbound.tun = {
-        interface_name: raw.interface_name ?? template.interface_name,
-        address: ensureArray(raw.address) ?? template.address,
-        mtu: raw.mtu ?? template.mtu,
-        auto_route: raw.auto_route ?? template.auto_route,
-        auto_redirect: raw.auto_redirect ?? template.auto_redirect,
-        strict_route: raw.strict_route ?? template.strict_route,
-        route_address: ensureArray(raw.route_address) ?? template.route_address,
-        route_exclude_address:
-          ensureArray(raw.route_exclude_address) ?? template.route_exclude_address,
-        route_address_set:
-          ensureArray(raw.route_address_set)?.map((tag) => ruleSetIds[tag]!) ??
-          template.route_address_set,
-        route_exclude_address_set:
-          ensureArray(raw.route_exclude_address_set)?.map((tag) => ruleSetIds[tag]!) ??
-          template.route_exclude_address_set,
-        endpoint_independent_nat: raw.endpoint_independent_nat ?? template.endpoint_independent_nat,
-        stack: raw.stack ?? template.stack,
-        include_interface: ensureArray(raw.include_interface) ?? template.include_interface,
-        exclude_interface: ensureArray(raw.exclude_interface) ?? template.exclude_interface,
-        otherFields: JSON.stringify(filterByTemplate(raw, template, 'exclude'), null, 2),
+    const template = getDefaultEndpoint(type)
+    if (type === Endpoint.OpenvpnServer) {
+      const { listen, rest: fields } = restoreListen(rest, maps)
+      return {
+        ...template,
+        ...base,
+        type,
+        config: { listen },
+        fields: restoreFields(fields),
       }
-    } else if (raw.type === Inbound.Direct) {
-      const template = Defaults.DefaultInboundDirect()
-      inbound.direct = {
-        listen: {
-          listen: raw.listen ?? template.listen.listen,
-          listen_port: raw.listen_port ?? template.listen.listen_port,
-          tcp_fast_open: raw.tcp_fast_open ?? template.listen.tcp_fast_open,
-          tcp_multi_path: raw.tcp_multi_path ?? template.listen.tcp_multi_path,
-          udp_fragment: raw.udp_fragment ?? template.listen.udp_fragment,
-        },
-        network: (raw.network as Network) ?? template.network,
-      }
-    } else if ([Inbound.Mixed, Inbound.Http, Inbound.Socks].includes(raw.type)) {
-      const template = Defaults.DefaultInboundMixed()
-      inbound[raw.type] = {
-        listen: {
-          listen: raw.listen ?? template.listen.listen,
-          listen_port: raw.listen_port ?? template.listen.listen_port,
-          tcp_fast_open: raw.tcp_fast_open ?? template.listen.tcp_fast_open,
-          tcp_multi_path: raw.tcp_multi_path ?? template.listen.tcp_multi_path,
-          udp_fragment: raw.udp_fragment ?? template.listen.udp_fragment,
-        },
-        users: raw.users?.map((user) => user.username + ':' + user.password) ?? template.users,
+    } else {
+      const { dialer, rest: fields } = restoreDialer(rest, maps)
+
+      return {
+        ...template,
+        ...base,
+        type,
+        config: { dialer },
+        fields: restoreFields(fields),
       }
     }
-    return inbound
+  })
+}
+
+const restoreServices = (services: CoreServiceConfig[] = [], maps: IdMaps): ServiceProfile[] => {
+  return services.map((raw): ServiceProfile => {
+    const { type, tag, ...rest } = raw
+    const id = sampleID()
+
+    const base = {
+      id,
+      tag,
+    }
+
+    switch (type) {
+      case Service.Api: {
+        const template = getDefaultService(type)
+        const { config } = template
+        const { listen, rest: fields } = restoreListen(rest, maps)
+        const result = extractProps(fields, config)
+        const owned = result.owned as CoreServiceOf<typeof Service.Api>
+        const dashboard =
+          typeof owned.dashboard === 'boolean'
+            ? { ...config.dashboard, enabled: owned.dashboard }
+            : typeof owned.dashboard === 'string'
+              ? {
+                  ...config.dashboard,
+                  path: owned.dashboard,
+                }
+              : { ...config.dashboard, ...owned.dashboard }
+
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {
+            ...config,
+            ...owned,
+            access_control_allow_origin: ensureArray(owned.access_control_allow_origin),
+            listen,
+            dashboard: {
+              ...dashboard,
+              http_client: maps.httpClients.get(dashboard.http_client as string) ?? '',
+            },
+          },
+          fields: restoreFields(result.rest),
+        }
+      }
+
+      case Service.UsbipClient: {
+        const template = getDefaultService(type)
+        const { dialer, rest: fields } = restoreDialer(rest, maps)
+        return {
+          ...template,
+          ...base,
+          type,
+          config: { dialer },
+          fields: restoreFields(fields),
+        }
+      }
+
+      default: {
+        const template = getDefaultService(type)
+        const { listen, rest: fields } = restoreListen(rest, maps)
+        return {
+          ...template,
+          ...base,
+          type,
+          config: { listen },
+          fields: restoreFields(fields),
+        }
+      }
+    }
+  })
+}
+
+const restoreHttpClients = (
+  httpClients: CoreHttpClientConfig[] = [],
+  maps: IdMaps,
+): HttpClientProfile[] => {
+  return httpClients.map((raw): HttpClientProfile => {
+    const { tag, ...rest } = raw
+    const id = maps.httpClients.get(tag) ?? sampleID()
+
+    const { dialer, rest: fields } = restoreDialer(rest, maps)
+    const template = getDefaultHttpClient()
+
+    return {
+      ...template,
+      id,
+      tag,
+      config: {
+        dialer,
+      },
+      fields: restoreFields(fields),
+    }
+  })
+}
+
+const restoreInbounds = (inbounds: CoreInboundConfig[] = [], maps: IdMaps): InboundProfile[] => {
+  return inbounds.map((raw): InboundProfile => {
+    const { type, tag, ...rest } = raw
+    const id = maps.inbounds.get(tag) ?? sampleID()
+    const base = {
+      id,
+      tag,
+    }
+    const template = getDefaultInbound(type)
+    switch (type) {
+      case Inbound.Tun: {
+        const result = extractProps(rest, template.config)
+        const owned = result.owned as InboundTunProfile['config']
+
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {
+            ...template.config,
+            ...owned,
+            address: ensureArray(owned.address),
+            dns_address: ensureArray(owned.dns_address),
+            route_address: ensureArray(owned.route_address),
+            route_exclude_address: ensureArray(owned.route_exclude_address),
+            route_address_set: ensureArray(owned.route_address_set).map(
+              (v) => maps.ruleSets.get(v) ?? '',
+            ),
+            route_exclude_address_set: ensureArray(owned.route_exclude_address_set).map(
+              (v) => maps.ruleSets.get(v) ?? '',
+            ),
+            include_interface: ensureArray(owned.include_interface),
+            exclude_interface: ensureArray(owned.exclude_interface),
+          },
+          fields: restoreFields(result.rest),
+        }
+      }
+
+      case Inbound.Mixed:
+      case Inbound.Socks:
+      case Inbound.Http: {
+        const result = restoreListen(rest, maps)
+        const { users, ...fields } = result.rest as CoreInboundOf<InboundAuthProfile['type']>
+
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {
+            listen: result.listen,
+            users: ensureArray(users).reduce<Recordable<string>>((p, c) => {
+              p[c.username] = c.password
+              return p
+            }, {}),
+          },
+          fields: restoreFields(fields),
+        }
+      }
+
+      case Inbound.Direct:
+      case Inbound.Tproxy: {
+        const result = restoreListen(rest, maps)
+        const { network = '', ...fields } = result.rest as CoreInboundOf<
+          InboundNetworkProfile['type']
+        >
+
+        return {
+          ...template,
+          id,
+          type,
+          tag,
+          config: {
+            listen: result.listen,
+            network: network as InboundNetworkProfile['config']['network'],
+          },
+          fields: restoreFields(fields),
+        }
+      }
+
+      default: {
+        const { listen, rest: fields } = restoreListen(rest, maps)
+        return {
+          ...template,
+          ...base,
+          type,
+          config: { listen },
+          fields: restoreFields(fields),
+        }
+      }
+    }
   })
 }
 
 const restoreOutbounds = (
-  outbounds: Recordable[],
-  OutboundsIds: Recordable,
-  originalOutbounds: App.Outbound[],
+  outbounds: CoreOutboundConfig[] = [],
+  maps: IdMaps,
+  originalOutbounds: OutboundProfile[] = [],
   subscriptionIds: string[],
-): App.Outbound[] => {
+): OutboundProfile[] => {
   const subscribesStore = useSubscribesStore()
 
-  const subscriptionCache = new Map<string, App.Subscription>()
-  const proxyToSubMap = new Map<string, { sub: string; id: string }>()
-  const originalOutboundMap = new Map<string, App.Outbound>()
+  const subscriptionCache = new Map<string, Subscription>()
+  const proxyToSubMap = new Map<string, { subId: string; proxyId: string }>()
+  const originalOutboundMap = new Map<string, OutboundProfile>(
+    originalOutbounds.map((v) => [v.tag, v]),
+  )
 
-  const groupTags = new Set(
-    outbounds
-      .filter((o: Recordable) => [Outbound.Selector, Outbound.Urltest].includes(o.type))
-      .map((o: Recordable) => o.tag),
+  const builtInTags = new Set(
+    outbounds.filter((o) => getValues(Outbound).includes(o.type as Outbound)).map((v) => v.tag),
   )
 
   subscriptionIds.forEach((id) => {
@@ -217,387 +471,621 @@ const restoreOutbounds = (
     if (sub) {
       subscriptionCache.set(id, sub)
       sub.proxies.forEach((proxy) => {
-        proxyToSubMap.set(proxy.tag, { sub: id, id: proxy.id })
+        proxyToSubMap.set(proxy.tag, { subId: sub.id, proxyId: proxy.id })
       })
     }
   })
 
-  originalOutbounds.forEach((outbound) => {
-    originalOutboundMap.set(outbound.tag, outbound)
-  })
+  return outbounds.flatMap((raw): OutboundProfile[] => {
+    const { type, tag, ...rest } = raw
+    const id = maps.outbounds.get(tag) ?? sampleID()
 
-  return outbounds.flatMap((raw) => {
-    if (![Outbound.Selector, Outbound.Urltest].includes(raw.type)) {
+    const base = {
+      id,
+      tag,
+    }
+
+    if (!builtInTags.has(tag)) {
       return []
     }
-    const outbound = Defaults.DefaultOutbound()
-    outbound.id = OutboundsIds[raw.tag]
-    outbound.tag = raw.tag
-    outbound.type = raw.type
 
-    let newOutbounds: App.Proxy[] = []
+    const template = getDefaultOutbound(type as Outbound)
 
-    raw.outbounds?.forEach((tag: string) => {
-      const isBuiltIn = [Outbound.Direct, Outbound.Block].includes(
-        tag as Extract<Outbound, 'direct' | 'block'>,
-      )
-      if (isBuiltIn) {
-        newOutbounds.push({ id: tag, type: 'Built-in', tag })
-      } else if (groupTags.has(tag)) {
-        const id = OutboundsIds[tag]
-        if (id) {
-          newOutbounds.push({ id, type: 'Built-in', tag })
-        }
-      } else {
-        const proxy = proxyToSubMap.get(tag)
-        if (proxy) {
-          newOutbounds.push({ id: proxy.id, type: proxy.sub, tag })
-        }
-      }
-    })
-
-    const originalGroup = originalOutboundMap.get(outbound.tag)
-    if (originalGroup) {
-      outbound.icon = originalGroup.icon
-      outbound.hidden = originalGroup.hidden
-      outbound.include = originalGroup.include
-      outbound.exclude = originalGroup.exclude
-
-      const currentNonBuiltInIds = new Set(
-        newOutbounds.filter((v) => v.type !== 'Built-in').map((v) => v.id),
-      )
-
-      subscriptionIds.forEach((id) => {
-        const sub = subscriptionCache.get(id)
-        if (sub) {
-          const isTagMatching = createTextMatcher(originalGroup.include, originalGroup.exclude)
-          const matchedProxies = sub.proxies.filter((proxy) => isTagMatching(proxy.tag))
-
-          const isAllMatched =
-            matchedProxies.length > 0 &&
-            matchedProxies.every((proxy) => currentNonBuiltInIds.has(proxy.id))
-
-          if (isAllMatched) {
-            const matchedIds = new Set(matchedProxies.map((p) => p.id))
-            newOutbounds = newOutbounds.filter(
-              (v) => v.type === 'Built-in' || !matchedIds.has(v.id),
-            )
-            newOutbounds.push({ id: sub.id, type: 'Subscription', tag: sub.name })
-
-            matchedIds.forEach((matchedId) => currentNonBuiltInIds.delete(matchedId))
+    switch (type) {
+      case Outbound.Urltest:
+      case Outbound.Selector: {
+        let newMembers: OutboundGroupProfile['outbounds'] = []
+        raw.outbounds.forEach((t) => {
+          const epId = maps.endPoints.get(t)
+          const proxy = proxyToSubMap.get(t)
+          if (builtInTags.has(t)) {
+            newMembers.push({
+              id: maps.outbounds.get(t) ?? t,
+              type: OutboundMember.BuiltIn,
+              tag: t,
+            })
+          } else if (epId) {
+            newMembers.push({
+              id: epId,
+              type: OutboundMember.Endpoint,
+              tag: t,
+            })
+          } else if (proxy) {
+            newMembers.push({
+              id: proxy.proxyId,
+              subId: proxy.subId,
+              type: OutboundMember.Proxy,
+              tag: t,
+            })
           }
+        })
+
+        const originalGroup = originalOutboundMap.get(tag) as OutboundGroupProfile | undefined
+        const groupFields: OutboundGroupProfile = {
+          outbounds: [],
+          include: originalGroup?.include ?? '',
+          exclude: originalGroup?.exclude ?? '',
+          icon: originalGroup?.icon ?? '',
+          hidden: originalGroup?.hidden ?? false,
         }
-      })
-    }
 
-    outbound.outbounds = newOutbounds
-
-    if ('interrupt_exist_connections' in raw) {
-      outbound.interrupt_exist_connections = raw.interrupt_exist_connections
-    }
-    if (Outbound.Urltest === raw.type) {
-      if ('url' in raw) {
-        outbound.url = raw.url
-      }
-      if ('interval' in raw) {
-        outbound.interval = raw.interval
-      }
-      if ('tolerance' in raw) {
-        outbound.tolerance = raw.tolerance
-      }
-    }
-    return outbound
-  })
-}
-
-const restoreRouteRuleset = (
-  rulesets: Recordable[],
-  RouteRuleSetIds: Recordable,
-  OutboundsIds: Recordable,
-): App.ProfileRuleSet[] => {
-  const rulesetsStore = useRulesetsStore()
-  return rulesets.flatMap((raw) => {
-    const ruleset = Defaults.DefaultRouteRuleset()
-    ruleset.id = RouteRuleSetIds[raw.tag]
-    ruleset.type = raw.type
-    ruleset.tag = raw.tag
-
-    if (raw.type === RulesetType.Inline) {
-      if ('rules' in raw) {
-        ruleset.rules = JSON.stringify(raw.rules, null, 2)
-      }
-    } else if (raw.type === RulesetType.Local) {
-      if ('path' in raw) {
-        const r = rulesetsStore.rulesets.find((v) => v.path === raw.path.replace('../', 'data/'))
-        if (r) {
-          ruleset.path = r.id
-        } else {
-          ruleset.path = raw.path
-        }
-      }
-      if ('format' in raw) {
-        ruleset.format = raw.format
-      }
-    } else if (raw.type === RulesetType.Remote) {
-      if ('format' in raw) {
-        ruleset.format = raw.format
-      }
-      if ('url' in raw) {
-        ruleset.url = raw.url
-      }
-      if ('download_detour' in raw) {
-        ruleset.download_detour = OutboundsIds[raw.download_detour]
-      }
-      if ('update_interval' in raw) {
-        ruleset.update_interval = raw.update_interval
-      }
-    }
-    return ruleset
-  })
-}
-
-const restoreRouteRules = (
-  rules: Recordable[],
-  InboundsIds: Recordable,
-  OutboundsIds: Recordable,
-  RouteRuleSetIds: Recordable,
-  DnsServersIds: Recordable,
-): App.Rule[] => {
-  return rules.flatMap((raw, i) => {
-    const rule = Defaults.DefaultRouteRule()
-
-    rule.id = 'rule-' + i
-    rule.action = raw.action || RuleAction.Route
-
-    const hits = supportedRuleTypes.filter((key) => key in raw)
-    if (hits.length === 1) {
-      rule.type = hits[0] as any
-    } else {
-      rule.type = RouteRuleType.Inline
-    }
-
-    if (rule.type === RouteRuleType.Inline) {
-      rule.payload = JSON.stringify(
-        {
-          ...raw,
-          action: undefined,
-          invert: undefined,
-          outbound: undefined,
-          sniffer: undefined,
-          strategy: undefined,
-          server: undefined,
-        },
-        null,
-        2,
-      )
-    } else if (rule.type === RouteRuleType.Inbound) {
-      rule.payload = InboundsIds[raw[rule.type]]
-    } else if (rule.type === RouteRuleType.RuleSet) {
-      const rs = Array.isArray(raw[rule.type]) ? raw[rule.type] : [raw[rule.type]]
-      rule.payload = rs.map((tag: string) => RouteRuleSetIds[tag]).join(',')
-    } else {
-      rule.payload = Array.isArray(raw[rule.type])
-        ? raw[rule.type].join(',')
-        : String(raw[rule.type])
-    }
-
-    if (RuleAction.Route === raw.action) {
-      rule.outbound = OutboundsIds[raw.outbound]
-    } else if (RuleAction.Reject === raw.action) {
-      if ('method' in raw) {
-        rule.outbound = raw.method
-      }
-    } else if (RuleAction.RouteOptions === raw.action) {
-      rule.outbound = JSON.stringify(
-        {
-          ...raw,
-          action: undefined,
-          invert: undefined,
-          ...supportedRuleTypes.reduce((p, c) => ((p[c] = undefined), p), {} as Recordable),
-        },
-        null,
-        2,
-      )
-    } else if (RuleAction.Sniff === raw.action) {
-      if ('sniffer' in raw) {
-        rule.sniffer = Array.isArray(raw.sniffer) ? raw.sniffer : [raw.sniffer]
-      }
-    } else if (RuleAction.Resolve === raw.action) {
-      if ('strategy' in raw) {
-        rule.strategy = raw.strategy
-      }
-      if ('server' in raw) {
-        rule.server = DnsServersIds[raw.server]
-      }
-    }
-    if ('invert' in raw) {
-      rule.invert = raw.invert
-    }
-    return rule
-  })
-}
-
-const restoreDnsServers = (
-  servers: Recordable[],
-  DnsServersIds: Recordable,
-  OutboundsIds: Recordable,
-): App.DnsServerConfig[] => {
-  return servers.flatMap((raw) => {
-    if (!raw.type) return []
-    const server = Defaults.DefaultDnsServer()
-    server.id = DnsServersIds[raw.tag]
-    server.tag = raw.tag
-    server.type = raw.type
-    if (
-      [
-        DnsServer.Local,
-        DnsServer.Tcp,
-        DnsServer.Udp,
-        DnsServer.Tls,
-        DnsServer.Quic,
-        DnsServer.Https,
-        DnsServer.H3,
-        DnsServer.Dhcp,
-      ].includes(raw.type)
-    ) {
-      if ('detour' in raw) {
-        server.detour = OutboundsIds[raw.detour]
-      }
-      if ('domain_resolver' in raw) {
-        server.domain_resolver = DnsServersIds[raw.domain_resolver]
-      }
-      if (
-        [
-          DnsServer.Tcp,
-          DnsServer.Udp,
-          DnsServer.Tls,
-          DnsServer.Quic,
-          DnsServer.Https,
-          DnsServer.H3,
-        ].includes(raw.type)
-      ) {
-        if ('server' in raw) {
-          server.server = raw.server
-        }
-        if ('server_port' in raw) {
-          server.server_port = raw.server_port
-        }
-        if ([DnsServer.Https, DnsServer.H3].includes(raw.type)) {
-          if ('path' in raw) {
-            server.path = raw.path
-          }
-        }
-      }
-    } else if (DnsServer.Hosts === server.type) {
-      if ('path' in raw) {
-        server.hosts_path = raw.path
-      }
-      if ('predefined' in raw) {
-        server.predefined = Object.entries<string[] | string>(raw.predefined).reduce(
-          (p, [key, value]) => {
-            p[key] = Array.isArray(value) ? value.join(',') : value
-            return p
-          },
-          {} as Recordable,
+        const currentNonBuiltInIds = new Set(
+          newMembers.filter((v) => v.type !== OutboundMember.BuiltIn).map((v) => v.id),
         )
+
+        subscriptionIds.forEach((id) => {
+          const sub = subscriptionCache.get(id)
+          if (sub) {
+            const isTagMatching = createTextMatcher(groupFields.include, groupFields.exclude)
+            const matchedProxies = sub.proxies.filter((proxy) => isTagMatching(proxy.tag))
+
+            const isAllMatched =
+              matchedProxies.length > 0 &&
+              matchedProxies.every((proxy) => currentNonBuiltInIds.has(proxy.id))
+
+            if (isAllMatched) {
+              const matchedIds = new Set(matchedProxies.map((p) => p.id))
+              newMembers = newMembers.filter(
+                (v) => v.type === OutboundMember.BuiltIn || !matchedIds.has(v.id),
+              )
+              newMembers.push({ id: sub.id, type: OutboundMember.Subscription, tag: sub.name })
+
+              matchedIds.forEach((matchedId) => currentNonBuiltInIds.delete(matchedId))
+            }
+          }
+        })
+
+        const result = extractProps(rest, template.config)
+
+        return [
+          {
+            ...template,
+            ...groupFields,
+            ...base,
+            type,
+            outbounds: newMembers,
+            config: {
+              ...(template.config as any),
+              ...result.owned,
+            },
+          },
+        ]
       }
-    } else if (DnsServer.Dhcp === server.type) {
-      if ('interface' in raw) {
-        server.interface = raw.interface
+
+      case Outbound.Direct: {
+        const { dialer } = restoreDialer(rest, maps)
+        return [
+          {
+            ...template,
+            ...base,
+            type,
+            config: {
+              dialer,
+            },
+          },
+        ]
       }
-    } else if (DnsServer.FakeIP === server.type) {
-      if ('inet4_range' in raw) {
-        server.inet4_range = raw.inet4_range
+
+      case Outbound.Bridge: {
+        const result = extractProps(rest, template.config)
+
+        return [
+          {
+            ...template,
+            ...base,
+            type,
+            config: {
+              ...template.config,
+              ...(result.owned as any),
+            },
+          },
+        ]
       }
-      if ('inet6_range' in raw) {
-        server.inet6_range = raw.inet6_range
+
+      case Outbound.Block: {
+        return [
+          {
+            ...template,
+            ...base,
+            type,
+          },
+        ]
+      }
+
+      default: {
+        return []
       }
     }
-    return server
   })
 }
 
-const restoreDnsRules = (
-  rules: Recordable[],
-  InboundsIds: Recordable,
-  RouteRuleSetIds: Recordable,
-  DnsServersIds: Recordable,
-): App.DnsRule[] => {
-  return rules.flatMap((raw: Recordable, i) => {
-    const rule = Defaults.DefaultDnsRule()
-    rule.id = 'rule-' + i
-    rule.action = raw.action || RuleAction.Route
+const restoreRuleSets = (rulesets: CoreRuleSetConfig[], maps: IdMaps): RuleSetProfile[] => {
+  const { env } = useEnvStore()
+  const rulesetsStore = useRulesetsStore()
 
-    const hits = supportedRuleTypes.filter((key) => key in raw)
-    if (hits.length === 1) {
-      rule.type = hits[0] as any
-    } else {
-      rule.type = RouteRuleType.Inline
+  return rulesets.map((raw): RuleSetProfile => {
+    const { type, tag, ...rest } = raw
+    const id = maps.ruleSets.get(tag as string) ?? sampleID()
+    const base = {
+      id,
+      tag: tag as string,
     }
+    const template = getDefaultRuleSet(type)
 
-    if (rule.type === RouteRuleType.Inline) {
-      rule.payload = JSON.stringify(
-        {
-          ...raw,
-          action: undefined,
-          invert: undefined,
-          client_subnet: undefined,
-          disable_cache: undefined,
-          strategy: undefined,
-          server: undefined,
-        },
-        null,
-        2,
-      )
-    } else if (rule.type === RouteRuleType.Inbound) {
-      rule.payload = InboundsIds[raw[rule.type]]
-    } else if (rule.type === RouteRuleType.RuleSet) {
-      const rs = Array.isArray(raw[rule.type]) ? raw[rule.type] : [raw[rule.type]]
-      rule.payload = rs.map((tag: string) => RouteRuleSetIds[tag]).join(',')
-    } else {
-      rule.payload = Array.isArray(raw[rule.type])
-        ? raw[rule.type].join(',')
-        : String(raw[rule.type])
-    }
+    switch (type) {
+      case RuleSetType.Inline: {
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {
+            rules: JSON.stringify(raw.rules ?? [], null, 2),
+          },
+        }
+      }
 
-    if (RuleAction.Route === raw.action) {
-      if ('server' in raw) {
-        rule.server = DnsServersIds[raw.server]
+      case RuleSetType.Local: {
+        const ruleset = rulesetsStore.rulesets.find(
+          (r) => r.path === raw.path.replace(`${env.appDataPath}/`, 'data/'),
+        )
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {
+            path: ruleset?.id ?? raw.path,
+            format: raw.format ?? RuleSetFormat.Binary,
+          },
+        }
       }
-      if ('strategy' in raw) {
-        rule.strategy = raw.strategy
+
+      default: {
+        const result = extractProps(rest, template.config)
+        const owned = result.owned as RuleSetRemoteProfile['config']
+        const tags = ensureArray(tag)
+        const mainId = maps.ruleSets.get(tags[0]!)!.split('_')[0]!
+        return {
+          ...template,
+          ...base,
+          id: mainId,
+          tag: tags,
+          type,
+          config: {
+            ...template.config,
+            ...owned,
+            http_client: maps.httpClients.get(owned.http_client) ?? '',
+          },
+        }
       }
-    } else if (RuleAction.Reject === raw.action) {
-      if ('method' in raw) {
-        rule.server = raw.method
-      }
-    } else if ([RuleAction.RouteOptions, RuleAction.Predefined].includes(raw.action)) {
-      rule.server = JSON.stringify(
-        {
-          ...raw,
-          action: undefined,
-          invert: undefined,
-          disable_cache: undefined,
-          client_subnet: undefined,
-          strategy: undefined,
-          server: undefined,
-          ...supportedRuleTypes.reduce((p, c) => ((p[c] = undefined), p), {} as Recordable),
-        },
-        null,
-        2,
-      )
     }
-    if ([RuleAction.Route, RuleAction.RouteOptions].includes(raw.action)) {
-      if ('disable_cache' in raw) {
-        rule.disable_cache = raw.disable_cache
-      }
-      if ('client_subnet' in raw) {
-        rule.client_subnet = raw.client_subnet
-      }
-    }
-    if ('invert' in raw) {
-      rule.invert = raw.invert
-    }
-    return rule
   })
+}
+
+const SupportedRules = new Set([...Object.values(RouteRuleType), ...Object.values(DnsRuleType)])
+
+const restoreRuleConditions = (
+  rule: CoreDnsDefaultRule | CoreDnsLogicalRule,
+  maps: IdMaps,
+): Omit<DnsRuleConditionUnion, 'id' | 'enable' | 'fields'> => {
+  if (rule.type === 'logical') {
+    const rules = ensureArray(rule.rules).map((r) => restoreRuleConditions(r, maps))
+    return {
+      type: RuleType.Logical,
+      ruleConditions: {
+        mode: rule.mode,
+        rules: rules.map((r) => ({
+          conditions: r.ruleConditions as DnsRuleItem[],
+        })),
+      },
+    }
+  }
+
+  const items: DnsRuleItem[] = []
+
+  for (const [k, v] of strictEntries(rule)) {
+    if (!SupportedRules.has(k as any)) continue
+
+    let mappedValue: any
+    switch (k) {
+      case DnsRuleType.Inbound: {
+        mappedValue = ensureArray(v).map((t) => maps.inbounds.get(t))
+        break
+      }
+
+      case DnsRuleType.RuleSet: {
+        mappedValue = ensureArray(v).map((t) => maps.ruleSets.get(t))
+        break
+      }
+
+      case CommonRuleType.InterfaceAddress:
+      case CommonRuleType.NetworkInterfaceAddress: {
+        const rec: Recordable<string> = {}
+        for (const [key, val] of Object.entries(v!)) {
+          rec[key] = ensureArray(val).join(',')
+        }
+        mappedValue = rec
+        break
+      }
+
+      case CommonRuleType.IpVersion: {
+        mappedValue = String(v)
+        break
+      }
+
+      case CommonRuleType.UserId:
+      case CommonRuleType.SourcePort:
+      case CommonRuleType.Port: {
+        mappedValue = ensureArray(v).map(String)
+        break
+      }
+
+      default: {
+        if (typeof v === 'string' || typeof v === 'boolean') {
+          mappedValue = v
+        } else {
+          mappedValue = ensureArray(v).map(String)
+        }
+      }
+    }
+
+    items.push({ type: k as any, value: mappedValue })
+  }
+
+  return {
+    type: RuleType.Default,
+    ruleConditions: items,
+  }
+}
+
+const restoreRouteRules = (rules: CoreRouteRuleConfig[], maps: IdMaps): RouteRuleProfile[] => {
+  return rules.map((raw): RouteRuleProfile => {
+    const { action } = raw
+
+    const { type, ruleConditions } = restoreRuleConditions(raw as CoreDnsDefaultRule, maps)
+    const options = getDefaultRouteOptions()
+    let actionParams: Recordable = {}
+
+    switch (action) {
+      case RouteRuleAction.Route:
+      case RouteRuleAction.Bypass: {
+        const { owned: optArgs } = extractProps(raw, options)
+        actionParams = {
+          outbound: maps.outbounds.get(raw.outbound) ?? '',
+          options: {
+            ...options,
+            ...optArgs,
+          },
+        }
+        break
+      }
+      case RouteRuleAction.RouteOptions: {
+        const { owned: optArgs } = extractProps(raw, options)
+        actionParams = {
+          ...options,
+          ...optArgs,
+        }
+        break
+      }
+      case RouteRuleAction.Reject:
+        actionParams = {
+          method: raw.method ?? RouteRejectMethod.Default,
+          no_drop: raw.no_drop ?? false,
+        }
+        break
+      case RouteRuleAction.Sniff:
+        actionParams = {
+          sniffer: ensureArray(raw.sniffer),
+        }
+        break
+      case RouteRuleAction.Resolve: {
+        actionParams = restoreDomainResolver(raw as CoreDomainResolver, maps)
+        break
+      }
+      case RouteRuleAction.HijackDns:
+        actionParams = {}
+        break
+    }
+
+    return {
+      id: sampleID(),
+      enable: true,
+      fields: '{}',
+      type,
+      ruleConditions,
+      action,
+      actionParams,
+    } as RouteRuleProfile
+  })
+}
+
+const restoreRoute = (rawRoute: CoreRouteConfig | undefined, maps: IdMaps): RouteProfile => {
+  const routeBase = getDefaultRoute()
+  if (!rawRoute) return routeBase
+
+  const defaultDomainResolver = restoreDomainResolver(
+    rawRoute.default_domain_resolver as CoreDomainResolver,
+    maps,
+  )
+
+  const { owned, rest: routeFields } = extractProps(rawRoute, routeBase)
+
+  return {
+    ...routeBase,
+    ...owned,
+    default_domain_resolver: defaultDomainResolver,
+    final: maps.outbounds.get(rawRoute.final ?? '') ?? '',
+    default_http_client: maps.httpClients.get(rawRoute.default_http_client ?? '') ?? '',
+
+    rule_set: restoreRuleSets(rawRoute.rule_set ?? [], maps),
+    rules: restoreRouteRules(rawRoute.rules ?? [], maps),
+    fields: restoreFields(routeFields),
+  }
+}
+
+const restoreDnsServers = (servers: CoreDnsServerConfig[], maps: IdMaps): DnsServerProfile[] => {
+  return servers.map((raw): DnsServerProfile => {
+    const { type, tag, ...rest } = raw
+    const id = maps.dnsServers.get(tag) ?? sampleID()
+
+    const base = {
+      id,
+      tag,
+    }
+
+    switch (type) {
+      case DnsServer.Local: {
+        const { dialer, rest: fields } = restoreDialer(rest as CoreDnsServerOf<'local'>, maps)
+        const template = getDefaultDnsServer(type)
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {
+            dialer,
+            prefer_go: !!fields.prefer_go,
+            neighbor_domain: ensureArray(fields.neighbor_domain),
+          },
+        }
+      }
+
+      case DnsServer.Hosts: {
+        const template = getDefaultDnsServer(type)
+
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {
+            path: ensureArray(raw.path),
+            predefined: Object.entries(raw.predefined ?? {}).reduce<Recordable<string>>(
+              (acc, [k, v]) => {
+                acc[k] = ensureArray(v).join(',')
+                return acc
+              },
+              {},
+            ),
+          },
+        }
+      }
+
+      case DnsServer.Tcp:
+      case DnsServer.Udp:
+      case DnsServer.Tls:
+      case DnsServer.Quic:
+      case DnsServer.Https:
+      case DnsServer.H3: {
+        const template = getDefaultDnsServer(type)
+        const { dialer, rest: nonDialer } = restoreDialer(rest, maps)
+        const { rest: fields } = extractProps(nonDialer, template.config)
+        const serverConfig = {
+          dialer,
+          server: raw.server ?? '',
+          server_port: raw.server_port ?? 0,
+        }
+        if (type === DnsServer.Https || type === DnsServer.H3) {
+          return {
+            ...template,
+            ...base,
+            type,
+            config: {
+              ...serverConfig,
+              path: raw.path ?? '',
+            },
+            fields: restoreFields(fields),
+          }
+        }
+        return {
+          ...template,
+          ...base,
+          type,
+          config: serverConfig,
+          fields: restoreFields(fields),
+        } as DnsServerProfile
+      }
+
+      case DnsServer.Dhcp: {
+        const { dialer, rest: fields } = restoreDialer(rest as CoreDnsServerOf<'dhcp'>, maps)
+
+        return {
+          ...base,
+          type,
+          config: {
+            dialer,
+            interface: fields.interface ?? '',
+          },
+          fields: restoreFields(fields),
+        }
+      }
+
+      case DnsServer.FakeIp: {
+        const template = getDefaultDnsServer(type)
+
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {
+            inet4_range: raw.inet4_range ?? template.config.inet4_range,
+            inet6_range: raw.inet6_range ?? template.config.inet6_range,
+          },
+        }
+      }
+
+      case DnsServer.Mdns: {
+        const { dialer, rest: fields } = restoreDialer(rest as CoreDnsServerOf<'mdns'>, maps)
+        const template = getDefaultDnsServer(type)
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {
+            dialer,
+          },
+          fields: restoreFields(fields),
+        }
+      }
+
+      default: {
+        const template = getDefaultDnsServer(type)
+        return {
+          ...template,
+          ...base,
+          type,
+          config: {},
+          fields: restoreFields(rest),
+        }
+      }
+    }
+  })
+}
+
+const restoreDnsRules = (rules: CoreDnsRuleConfig[], maps: IdMaps): DnsRuleProfile[] => {
+  return rules.map((raw) => {
+    const { action } = raw
+
+    const { type, ruleConditions } = restoreRuleConditions(raw, maps)
+
+    let actionParams: Recordable = {}
+
+    switch (action) {
+      case DnsRuleAction.Route:
+      case DnsRuleAction.Evaluate: {
+        actionParams = restoreDomainResolver(raw, maps)
+        break
+      }
+      case DnsRuleAction.RouteOptions: {
+        const options = getDefaultDnsRouteOptions()
+        const { owned: optArgs } = extractProps(raw, options)
+        actionParams = {
+          ...options,
+          ...optArgs,
+        }
+        break
+      }
+      case DnsRuleAction.Reject:
+        actionParams = {
+          method: raw.method ?? DnsRejectMethod.Default,
+          no_drop: !!raw.no_drop,
+        }
+        break
+      case DnsRuleAction.Predefined:
+        actionParams = {
+          rcode: raw.rcode ?? DnsRcode.NOERROR,
+          answer: ensureArray(raw.answer),
+        }
+        break
+      case DnsRuleAction.Respond:
+        actionParams = {}
+        break
+    }
+
+    return {
+      id: sampleID(),
+      enable: true,
+      fields: '{}',
+      type,
+      ruleConditions,
+      action,
+      actionParams,
+    } as DnsRuleProfile
+  })
+}
+
+const restoreDns = (rawDns: CoreDnsConfig | undefined, maps: IdMaps): DnsProfile => {
+  const dnsBase = getDefaultDns()
+  if (!rawDns) return dnsBase
+
+  const { owned, rest: dnsFields } = extractProps(rawDns, dnsBase)
+
+  return {
+    ...dnsBase,
+    ...owned,
+    final: maps.dnsServers.get(rawDns.final ?? '') ?? '',
+    servers: restoreDnsServers((rawDns.servers ?? []) as CoreDnsServerConfig[], maps),
+    rules: restoreDnsRules(rawDns.rules ?? [], maps),
+    fields: restoreFields(dnsFields),
+  } as DnsProfile
+}
+
+export const restoreProfile = (
+  config: CoreConfig,
+  name = sampleID(),
+  options: RestoreProfileOptions = {},
+): Profile => {
+  const { profile, subscriptionIds = [] } = options
+
+  const endPointIds = buildTagIdMapping('ep-', config.endpoints)
+  const inboundIds = buildTagIdMapping('in-', config.inbounds)
+  const outboundIds = buildTagIdMapping('out-', config.outbounds)
+
+  const maps: IdMaps = {
+    endPoints: endPointIds,
+    httpClients: buildTagIdMapping('http-', config.http_clients),
+    inbounds: new Map([...endPointIds, ...inboundIds]),
+    outbounds: new Map([...endPointIds, ...outboundIds]),
+    ruleSets: buildRuleSetMapping('ruleset-', config.route?.rule_set),
+    dnsServers: buildTagIdMapping('dns-', config.dns?.servers),
+  }
+
+  return {
+    id: profile?.id ?? sampleID(),
+    name,
+    log: { ...getDefaultLog(), ...(config.log as LogProfile) },
+    ntp: restoreNtp(config.ntp, maps),
+    experimental: restoreExperimental(config.experimental, maps),
+    endpoints: restoreEndpoints(config.endpoints as any, maps),
+    services: restoreServices(config.services, maps),
+    http_clients: restoreHttpClients(config.http_clients, maps),
+    inbounds: restoreInbounds(config.inbounds, maps),
+    outbounds: restoreOutbounds(
+      config.outbounds as CoreOutboundConfig[],
+      maps,
+      profile?.outbounds,
+      subscriptionIds,
+    ),
+    route: restoreRoute(config.route, maps),
+    dns: restoreDns(config.dns, maps),
+    mixin: profile?.mixin ?? getDefaultMixin(),
+    script: profile?.script ?? getDefaultScript(),
+  }
 }

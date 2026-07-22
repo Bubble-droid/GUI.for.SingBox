@@ -5,7 +5,7 @@ import { parse } from 'yaml'
 import { ReadFile, WriteFile, CopyFile, Download, HttpGet } from '@/bridge'
 import { RulesetHubFilePath, RulesetsFilePath } from '@/constant/app'
 import { EmptyRuleSet } from '@/constant/kernel'
-import { RulesetFormat } from '@/enums/kernel'
+import { RuleSetFormat } from '@/enums'
 import {
   asyncPool,
   stringifyNoFolding,
@@ -16,9 +16,11 @@ import {
   omitArray,
 } from '@/utils'
 
+import type { RuleSet, RuleSetHub } from '@/types'
+
 export const useRulesetsStore = defineStore('rulesets', () => {
-  const rulesets = ref<App.RuleSet[]>([])
-  const rulesetHub = ref<App.RulesetHub>({ geosite: '', geoip: '', list: [] })
+  const rulesets = ref<RuleSet[]>([])
+  const rulesetHub = ref<RuleSetHub>({ geosite: '', geoip: '', list: [] })
 
   const setupRulesets = async () => {
     const data = await ignoredError(ReadFile, RulesetsFilePath)
@@ -35,7 +37,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
     return WriteFile(RulesetsFilePath, stringifyNoFolding(r))
   }
 
-  const addRuleset = async (r: App.RuleSet) => {
+  const addRuleset = async (r: RuleSet) => {
     rulesets.value.push(r)
     try {
       await saveRulesets()
@@ -62,7 +64,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
     eventBus.emit('rulesetChange', { id })
   }
 
-  const editRuleset = async (id: string, r: App.RuleSet) => {
+  const editRuleset = async (id: string, r: RuleSet) => {
     const idx = rulesets.value.findIndex((v) => v.id === id)
     if (idx === -1) return
     const backup = rulesets.value.splice(idx, 1, r)[0]!
@@ -76,8 +78,8 @@ export const useRulesetsStore = defineStore('rulesets', () => {
     eventBus.emit('rulesetChange', { id })
   }
 
-  const _doUpdateRuleset = async (r: App.RuleSet) => {
-    if (r.format === RulesetFormat.Source) {
+  const _doUpdateRuleset = async (r: RuleSet) => {
+    if (r.format === RuleSetFormat.Source) {
       let body = ''
       let isExist = true
 
@@ -120,7 +122,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
       }
     }
 
-    if (r.format === RulesetFormat.Binary) {
+    if (r.format === RuleSetFormat.Binary) {
       if (r.type === 'File' && r.url !== r.path) {
         await CopyFile(r.url, r.path)
       } else if (r.type === 'Http') {
@@ -151,7 +153,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
   const updateRulesets = async () => {
     let needSave = false
 
-    const update = async (r: App.RuleSet) => {
+    const update = async (r: RuleSet) => {
       const result = { ok: true, id: r.id, name: r.name, result: '' }
       try {
         r.updating = true

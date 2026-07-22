@@ -16,6 +16,8 @@ import { deepClone, GetRequestProxy, message } from '@/utils'
 
 import Button from '@/components/Button/index.vue'
 
+import type { Subscription } from '@/types'
+
 interface Props {
   id?: string
 }
@@ -29,7 +31,7 @@ const appSettingsStore = useAppSettingsStore()
 
 const loading = ref(false)
 const proxyTesting = ref(false)
-const sub = ref<App.Subscription>(subscribeStore.getSubscribeTemplate())
+const sub = ref<Subscription>(subscribeStore.getSubscribeTemplate())
 
 const isManual = computed(() => sub.value.type === 'Manual')
 const isRemote = computed(() => sub.value.type === 'Http')

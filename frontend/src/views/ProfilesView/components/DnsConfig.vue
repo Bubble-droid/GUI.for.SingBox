@@ -4,18 +4,21 @@ import { useI18n } from 'vue-i18n'
 
 import { DomainStrategyOptions } from '@/constant/kernel'
 
+import type { DnsProfile } from '@/types'
+
 import DnsRulesConfig from './DnsRulesConfig.vue'
 import DnsServersConfig from './DnsServersConfig.vue'
+import RawFieldsConfig from './Shared/RawFieldsConfig.vue'
 
 interface Props {
   inboundOptions: { label: string; value: string }[]
   outboundOptions: { label: string; value: string }[]
-  ruleSet: App.ProfileRuleSet[]
+  ruleSetOptions: { label: string; value: string }[]
 }
 
 defineProps<Props>()
 
-const model = defineModel<App.Dns>({ required: true })
+const model = defineModel<DnsProfile>({ required: true })
 
 const serversOptions = computed(() =>
   model.value.servers.map((v) => ({ label: v.tag, value: v.id })),
@@ -48,6 +51,22 @@ defineExpose({ handleAdd })
   <Tabs v-model:active-key="activeKey" :items="tabs" tab-position="top">
     <template #common>
       <div class="form-item">
+        {{ t('kernel.dns.final') }}
+        <Select v-model="model.final" :options="serversOptions" clearable />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.dns.optimistic') }}
+        <Switch v-model="model.optimistic" />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.dns.reverse_mapping') }}
+        <Switch v-model="model.reverse_mapping" />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.dns.strategy') }}
+        <Select v-model="model.strategy" :options="DomainStrategyOptions" clearable />
+      </div>
+      <div class="form-item">
         {{ t('kernel.dns.disable_cache') }}
         <Switch v-model="model.disable_cache" />
       </div>
@@ -55,22 +74,12 @@ defineExpose({ handleAdd })
         {{ t('kernel.dns.disable_expire') }}
         <Switch v-model="model.disable_expire" />
       </div>
-      <div class="form-item">
-        {{ t('kernel.dns.independent_cache') }}
-        <Switch v-model="model.independent_cache" />
-      </div>
-      <div class="form-item">
-        {{ t('kernel.dns.final') }}
-        <Select v-model="model.final" :options="serversOptions" />
-      </div>
-      <div class="form-item">
-        {{ t('kernel.dns.strategy') }}
-        <Select v-model="model.strategy" :options="DomainStrategyOptions" />
-      </div>
+
       <div class="form-item">
         {{ t('kernel.dns.client_subnet') }}
-        <Input v-model="model.client_subnet" editable />
+        <Input v-model="model.client_subnet" editable clearable />
       </div>
+      <RawFieldsConfig v-model="model.fields" />
     </template>
     <template #servers>
       <DnsServersConfig
@@ -86,8 +95,8 @@ defineExpose({ handleAdd })
         v-model="model.rules"
         :inbound-options="inboundOptions"
         :outbound-options="outboundOptions"
-        :servers-options="serversOptions"
-        :rule-set="ruleSet"
+        :server-options="serversOptions"
+        :rule-set-options="ruleSetOptions"
       />
     </template>
   </Tabs>

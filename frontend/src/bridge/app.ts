@@ -7,6 +7,8 @@ import {
 
 import { sampleID } from '@/utils'
 
+import type { AppEnv } from '@/types'
+
 export const RestartApp = Bridge.RestartApp
 
 export const ExitApp = Bridge.ExitApp
@@ -21,7 +23,7 @@ export const UpdateTrayAndMenus = Bridge.UpdateTrayAndMenus
 
 export const GetEnv = <T extends string | undefined = undefined>(
   key?: T,
-): Promise<T extends string ? string : App.AppEnv> => {
+): Promise<T extends string ? string : AppEnv> => {
   return Bridge.GetEnv(key || '')
 }
 

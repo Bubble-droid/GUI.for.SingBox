@@ -5,7 +5,9 @@ import { parse, stringify } from 'yaml'
 
 import { message } from '@/utils'
 
-const model = defineModel<{ mixin: App.Profile['mixin']; script: App.Profile['script'] }>({
+import type { Profile } from '@/types'
+
+const model = defineModel<{ mixin: Profile['mixin']; script: Profile['script'] }>({
   required: true,
 })
 

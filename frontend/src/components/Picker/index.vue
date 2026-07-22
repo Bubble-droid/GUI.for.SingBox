@@ -1,7 +1,6 @@
 <script setup lang="ts" generic="ValueType = any, PickerType extends 'single' | 'multi' = 'single'">
 import { ref, toRaw, type Ref } from 'vue'
-
-import useI18n from '@/lang'
+import { useI18n } from 'vue-i18n'
 
 export type PickerItem<T> = {
   label: string
@@ -40,7 +39,7 @@ const selected = ref(
   ),
 ) as Ref<Set<ValueType>>
 
-const { t } = useI18n.global
+const { t } = useI18n()
 
 const handleConfirm = () => {
   const res: any = Array.from(selected.value).map((v) => toRaw(v))

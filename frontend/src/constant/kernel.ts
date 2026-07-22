@@ -1,19 +1,35 @@
 import {
   ClashMode,
-  Inbound,
-  Outbound,
-  TunStack,
-  LogLevel,
-  RuleType,
-  RulesetFormat,
-  RulesetType,
-  RuleAction,
-  Sniffer,
-  Strategy,
-  RuleActionReject,
+  DnsRcode,
+  DnsRejectMethod,
+  DnsRuleAction,
+  DnsRuleType,
   DnsServer,
+  DomainStrategy,
+  Endpoint,
+  Inbound,
+  IpVersion,
+  LogicalRuleMode,
+  LogLevel,
   Network,
+  NetworkStrategy,
+  NetworkType,
+  Outbound,
+  QuicClient,
+  RouteRejectMethod,
+  RouteRuleAction,
+  RouteRuleType,
+  RuleSetFormat,
+  RuleSetType,
+  RuleType,
+  Service,
+  SniffProtocol,
+  TlsSpoofMethod,
+  TunDnsMode,
+  TunStack,
 } from '@/enums/kernel'
+
+import type { ComponentOption } from '@/types'
 
 export const CoreWorkingDirectory = 'data/sing-box'
 export const CorePidFilePath = CoreWorkingDirectory + '/pid.txt'
@@ -21,242 +37,157 @@ export const CoreLogFilePath = CoreWorkingDirectory + '/sing-box.log'
 export const CoreConfigFilePath = CoreWorkingDirectory + '/config.json'
 export const CoreCacheFilePath = CoreWorkingDirectory + '/cache.db'
 
-export const ModeOptions = [
-  {
-    label: 'kernel.global',
-    value: ClashMode.Global,
-    desc: 'kernel.globalDesc',
-  },
-  {
-    label: 'kernel.rule',
-    value: ClashMode.Rule,
-    desc: 'kernel.ruleDesc',
-  },
-  {
-    label: 'kernel.direct',
-    value: ClashMode.Direct,
-    desc: 'kernel.directDesc',
-  },
-]
+type FormatString<
+  Pattern extends string,
+  Val extends string,
+> = Pattern extends `${infer Start}{{val}}${infer End}` ? `${Start}${Val}${End}` : Pattern
 
-export const LogLevelOptions = [
-  {
-    label: 'kernel.log.trace',
-    value: LogLevel.Trace,
-  },
-  {
-    label: 'kernel.log.debug',
-    value: LogLevel.Debug,
-  },
-  {
-    label: 'kernel.log.info',
-    value: LogLevel.Info,
-  },
-  {
-    label: 'kernel.log.warn',
-    value: LogLevel.Warn,
-  },
-  {
-    label: 'kernel.log.error',
-    value: LogLevel.Error,
-  },
-  {
-    label: 'kernel.log.fatal',
-    value: LogLevel.Fatal,
-  },
-  {
-    label: 'kernel.log.panic',
-    value: LogLevel.Panic,
-  },
-]
+type OptionItem<TValue extends string, TLabelPattern extends string> = TValue extends string
+  ? {
+      value: TValue
+      label: FormatString<TLabelPattern, TValue>
+    }
+  : never
 
-export const InboundOptions = [
-  { label: 'direct', value: Inbound.Direct },
-  { label: 'mixed', value: Inbound.Mixed },
-  { label: 'socks', value: Inbound.Socks },
-  { label: 'http', value: Inbound.Http },
-  { label: 'tun', value: Inbound.Tun },
-]
+export const defineOptions = <
+  const TSource extends Record<string, string>,
+  const TLabelPattern extends string,
+>(
+  source: TSource,
+  pattern: TLabelPattern,
+) => {
+  type TValue = TSource[keyof TSource] & string
 
-export const OutboundOptions = [
-  { label: 'kernel.outbounds.direct', value: Outbound.Direct },
-  { label: 'kernel.outbounds.block', value: Outbound.Block },
-  { label: 'kernel.outbounds.selector', value: Outbound.Selector },
-  { label: 'kernel.outbounds.urltest', value: Outbound.Urltest },
-]
+  return Object.values(source).map((v) => ({
+    value: v,
+    label: pattern.replace('{{val}}', v),
+  })) as OptionItem<TValue, TLabelPattern>[]
+}
 
-export const RulesTypeOptions = [
-  {
-    label: 'kernel.rules.type.inbound',
-    value: RuleType.Inbound,
-  },
-  {
-    label: 'kernel.rules.type.network',
-    value: RuleType.Network,
-  },
-  {
-    label: 'kernel.rules.type.protocol',
-    value: RuleType.Protocol,
-  },
-  {
-    label: 'kernel.rules.type.domain',
-    value: RuleType.Domain,
-  },
-  {
-    label: 'kernel.rules.type.domain_suffix',
-    value: RuleType.DomainSuffix,
-  },
-  {
-    label: 'kernel.rules.type.domain_keyword',
-    value: RuleType.DomainKeyword,
-  },
-  {
-    label: 'kernel.rules.type.domain_regex',
-    value: RuleType.DomainRegex,
-  },
-  {
-    label: 'kernel.rules.type.source_ip_cidr',
-    value: RuleType.SourceIPCidr,
-  },
-  {
-    label: 'kernel.rules.type.ip_cidr',
-    value: RuleType.IPCidr,
-  },
-  {
-    label: 'kernel.rules.type.ip_is_private',
-    value: RuleType.IpIsPrivate,
-  },
-  {
-    label: 'kernel.rules.type.source_port',
-    value: RuleType.SourcePort,
-  },
-  {
-    label: 'kernel.rules.type.source_port_range',
-    value: RuleType.SourcePortRange,
-  },
-  {
-    label: 'kernel.rules.type.port',
-    value: RuleType.Port,
-  },
-  {
-    label: 'kernel.rules.type.port_range',
-    value: RuleType.PortRange,
-  },
-  {
-    label: 'kernel.rules.type.process_name',
-    value: RuleType.ProcessName,
-  },
-  {
-    label: 'kernel.rules.type.process_path',
-    value: RuleType.ProcessPath,
-  },
-  {
-    label: 'kernel.rules.type.process_path_regex',
-    value: RuleType.ProcessPathRegex,
-  },
-  {
-    label: 'kernel.rules.type.clash_mode',
-    value: RuleType.ClashMode,
-  },
-  {
-    label: 'kernel.rules.type.rule_set',
-    value: RuleType.RuleSet,
-  },
-  {
-    label: 'kernel.rules.type.inline',
-    value: RuleType.Inline,
-  },
-]
+export const PredefinedClashModeOptions = defineOptions(
+  ClashMode,
+  'kernel.rules.clash_mode.{{val}}',
+)
 
-export const DnsRuleTypeOptions = RulesTypeOptions.concat([
+export const LogLevelOptions = defineOptions(LogLevel, 'kernel.log.level.{{val}}')
+
+export const PredefinedNtpServerOptions = [
   {
-    label: 'kernel.rules.type.ip_accept_any',
-    value: RuleType.IpAcceptAny,
+    label: 'kernel.ntp.server.aliyun',
+    value: 'ntp.aliyun.com',
   },
-])
+  {
+    label: 'kernel.ntp.server.tencent',
+    value: 'ntp.tencent.com',
+  },
+  {
+    label: 'kernel.ntp.server.tsinghua',
+    value: 'ntp.tuna.tsinghua.edu.cn',
+  },
+  {
+    label: 'kernel.ntp.server.ntsc',
+    value: 'ntp.ntsc.ac.cn',
+  },
+  {
+    label: 'kernel.ntp.server.google',
+    value: 'time.google.com',
+  },
+  {
+    label: 'kernel.ntp.server.cloudflare',
+    value: 'time.cloudflare.com',
+  },
+  {
+    label: 'kernel.ntp.server.apple',
+    value: 'time.apple.com',
+  },
+  {
+    label: 'kernel.ntp.server.microsoft',
+    value: 'time.windows.com',
+  },
+  {
+    label: 'kernel.ntp.server.custom',
+    value: 'custom',
+  },
+] satisfies ComponentOption[]
 
-export const TunStackOptions = [
-  { label: 'kernel.inbounds.tun.system', value: TunStack.System },
-  { label: 'kernel.inbounds.tun.gvisor', value: TunStack.GVisor },
-  { label: 'kernel.inbounds.tun.mixed', value: TunStack.Mixed },
-]
+export const EndpointOptions = defineOptions(Endpoint, 'kernel.endpoints.type.{{val}}')
 
-export const NetworkOptions = [
-  { label: 'TCP', value: Network.Tcp },
-  { label: 'UDP', value: Network.Udp },
-]
+export const ServiceOptions = defineOptions(Service, 'kernel.services.type.{{val}}')
 
-export const RulesetTypeOptions = [
-  { label: 'kernel.route.rule_set.type.inline', value: RulesetType.Inline },
-  { label: 'kernel.route.rule_set.type.local', value: RulesetType.Local },
-  { label: 'kernel.route.rule_set.type.remote', value: RulesetType.Remote },
-]
+export const InboundOptions = defineOptions(Inbound, 'kernel.inbounds.type.{{val}}')
 
-export const RulesetFormatOptions = [
-  { label: 'ruleset.format.source', value: RulesetFormat.Source },
-  { label: 'ruleset.format.binary', value: RulesetFormat.Binary },
-]
+export const TunDnsModeOptions = defineOptions(TunDnsMode, 'kernel.inbounds.tun.dns_mode.{{val}}')
 
-export const DomainStrategyOptions = [
-  { label: 'kernel.strategy.default', value: Strategy.Default },
-  { label: 'kernel.strategy.prefer_ipv4', value: Strategy.PreferIPv4 },
-  { label: 'kernel.strategy.prefer_ipv6', value: Strategy.PreferIPv6 },
-  { label: 'kernel.strategy.ipv4_only', value: Strategy.IPv4Only },
-  { label: 'kernel.strategy.ipv6_only', value: Strategy.IPv6Only },
-]
+export const TunStackOptions = defineOptions(TunStack, 'kernel.inbounds.tun.stack.{{val}}')
 
-export const RuleActionOptions = [
-  { label: 'kernel.route.rules.action.route', value: RuleAction.Route },
-  { label: 'kernel.route.rules.action.route-options', value: RuleAction.RouteOptions },
-  { label: 'kernel.route.rules.action.reject', value: RuleAction.Reject },
-  { label: 'kernel.route.rules.action.hijack-dns', value: RuleAction.HijackDNS },
-  { label: 'kernel.route.rules.action.sniff', value: RuleAction.Sniff },
-  { label: 'kernel.route.rules.action.resolve', value: RuleAction.Resolve },
-]
+export const OutboundOptions = defineOptions(Outbound, 'kernel.outbounds.type.{{val}}')
 
-export const RuleActionRejectOptions = [
-  { label: 'kernel.route.rules.action.rejectDefault', value: RuleActionReject.Default },
-  { label: 'kernel.route.rules.action.rejectDrop', value: RuleActionReject.Drop },
-  { label: 'kernel.route.rules.action.rejectReply', value: RuleActionReject.Reply },
-]
+export const NetworkOptions = defineOptions(Network, 'kernel.rules.network.{{val}}')
 
-export const DnsServerTypeOptions = [
-  { label: 'kernel.dns.type.local', value: DnsServer.Local },
-  { label: 'kernel.dns.type.hosts', value: DnsServer.Hosts },
-  { label: 'kernel.dns.type.tcp', value: DnsServer.Tcp },
-  { label: 'kernel.dns.type.udp', value: DnsServer.Udp },
-  { label: 'kernel.dns.type.tls', value: DnsServer.Tls },
-  { label: 'kernel.dns.type.quic', value: DnsServer.Quic },
-  { label: 'kernel.dns.type.https', value: DnsServer.Https },
-  { label: 'kernel.dns.type.h3', value: DnsServer.H3 },
-  { label: 'kernel.dns.type.dhcp', value: DnsServer.Dhcp },
-  { label: 'kernel.dns.type.fakeip', value: DnsServer.FakeIP },
-]
+export const RuleSetTypeOptions = defineOptions(RuleSetType, 'kernel.route.rule_set.type.{{val}}')
 
-export const DnsRuleActionOptions = [
-  { label: 'kernel.route.rules.action.route', value: RuleAction.Route },
-  { label: 'kernel.route.rules.action.route-options', value: RuleAction.RouteOptions },
-  { label: 'kernel.route.rules.action.reject', value: RuleAction.Reject },
-  { label: 'kernel.route.rules.action.predefined', value: RuleAction.Predefined },
-]
+export const RuleSetFormatOptions = defineOptions(
+  RuleSetFormat,
+  'kernel.route.rule_set.format.{{val}}',
+)
 
-export const DnsRuleActionRejectOptions = [
-  { label: 'kernel.route.rules.action.rejectDefault', value: RuleActionReject.Default },
-  { label: 'kernel.route.rules.action.rejectDrop', value: RuleActionReject.Drop },
-]
+export const RuleTypeOptions = defineOptions(RuleType, 'kernel.rules.type.{{val}}')
 
-export const RuleSnifferOptions = [
-  { label: 'kernel.route.rules.sniffer.http', value: Sniffer.Http },
-  { label: 'kernel.route.rules.sniffer.tls', value: Sniffer.Tls },
-  { label: 'kernel.route.rules.sniffer.quic', value: Sniffer.Quic },
-  { label: 'kernel.route.rules.sniffer.stun', value: Sniffer.Stun },
-  { label: 'kernel.route.rules.sniffer.dns', value: Sniffer.Dns },
-  { label: 'kernel.route.rules.sniffer.bittorrent', value: Sniffer.Bittorrent },
-  { label: 'kernel.route.rules.sniffer.dtls', value: Sniffer.Dtls },
-  { label: 'kernel.route.rules.sniffer.ssh', value: Sniffer.Ssh },
-  { label: 'kernel.route.rules.sniffer.rdp', value: Sniffer.Rdp },
-  { label: 'kernel.route.rules.sniffer.ntp', value: Sniffer.Ntp },
-]
+export const RouteRuleTypeOptions = defineOptions(
+  RouteRuleType,
+  'kernel.rules.condition.type.{{val}}',
+)
+
+export const DnsRuleTypeOptions = defineOptions(DnsRuleType, 'kernel.rules.condition.type.{{val}}')
+
+export const DomainStrategyOptions = defineOptions(
+  DomainStrategy,
+  'kernel.domain_resolver.strategy.{{val}}',
+)
+
+export const LogicalModeOptions = defineOptions(
+  LogicalRuleMode,
+  'kernel.rules.logical.mode.{{val}}',
+)
+
+export const RouteRuleActionOptions = defineOptions(
+  RouteRuleAction,
+  'kernel.rules.action.{{val}}.name',
+)
+
+export const TlsSpoofMethodOptions = defineOptions(
+  TlsSpoofMethod,
+  'kernel.rules.action.route-options.tls_spoof_method.{{val}}',
+)
+
+export const RouteRejectMethodOptions = defineOptions(
+  RouteRejectMethod,
+  'kernel.rules.action.reject.method.{{val}}',
+)
+
+export const DnsRuleActionOptions = defineOptions(DnsRuleAction, 'kernel.rules.action.{{val}}.name')
+
+export const DnsRejectMethodOptions = defineOptions(
+  DnsRejectMethod,
+  'kernel.rules.action.reject.method.{{val}}',
+)
+
+export const DnsRcodeOptions = defineOptions(DnsRcode, 'kernel.rules.action.predefined.rcode.{{val}}')
+
+export const DnsServerOptions = defineOptions(DnsServer, 'kernel.dns.servers.type.{{val}}')
+
+export const SniffProtocolOptions = defineOptions(SniffProtocol, 'kernel.rules.protocol.{{val}}')
+
+export const IpVersionOptions = defineOptions(IpVersion, 'kernel.rules.ip_version.{{val}}')
+
+export const QuicClientOptions = defineOptions(QuicClient, 'kernel.rules.client.{{val}}')
+
+export const NetworkTypeOptions = defineOptions(NetworkType, 'kernel.rules.network_type.{{val}}')
+
+export const NetworkStrategyOptions = defineOptions(
+  NetworkStrategy,
+  'kernel.rules.network_strategy.{{val}}',
+)
 
 export const EmptyRuleSet = {
   version: 1,

@@ -2,13 +2,16 @@
 import { ref, inject, h, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { Outbound, OutboundMember } from '@/enums'
 import { useProfilesStore } from '@/stores'
 import { generateConfig, message, restoreProfile } from '@/utils'
 
 import Button from '@/components/Button/index.vue'
 
+import type { Profile } from '@/types'
+
 interface Props {
-  profile: App.Profile
+  profile: Profile
 }
 
 const props = defineProps<Props>()
@@ -26,12 +29,17 @@ const handleSave = async () => {
   loading.value = true
   try {
     const subscriptions = props.profile.outbounds.reduce((p, c) => {
-      c.outbounds.forEach((outbound) => {
-        if (outbound.type !== 'Built-in') {
-          const id = outbound.type === 'Subscription' ? outbound.id : outbound.type
-          p.add(id)
-        }
-      })
+      if (c.type === Outbound.Urltest || c.type === Outbound.Selector) {
+        c.outbounds.forEach((outbound) => {
+          if (
+            outbound.type !== OutboundMember.BuiltIn &&
+            outbound.type !== OutboundMember.Endpoint
+          ) {
+            const id = outbound.type === OutboundMember.Subscription ? outbound.id : outbound.subId
+            p.add(id)
+          }
+        })
+      }
       return p
     }, new Set<string>())
     const newProfile = restoreProfile(JSON.parse(profileText.value), props.profile.name, {

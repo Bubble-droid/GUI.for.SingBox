@@ -7,10 +7,12 @@ import { View } from '@/enums/app'
 import { useAppSettingsStore, useScheduledTasksStore } from '@/stores'
 import { debounce, formatRelativeTime, formatDate, message, alert, modal } from '@/utils'
 
+import type { Menu, ScheduledTask } from '@/types/app.ts'
+
 import ScheduledTaskForm from './components/ScheduledTaskForm.vue'
 import ScheduledTasksLogs from './components/ScheduledTasksLogs.vue'
 
-const menuList: App.Menu[] = [
+const menuList: Menu[] = [
   {
     label: 'scheduledtasks.run',
     handler: (id: string) => {
@@ -64,7 +66,7 @@ const handleShowTaskForm = (id?: string) => {
   m.setContent(ScheduledTaskForm, { id }).open()
 }
 
-const handleDeleteTask = async (s: App.ScheduledTask) => {
+const handleDeleteTask = async (s: ScheduledTask) => {
   try {
     await scheduledTasksStore.deleteScheduledTask(s.id)
   } catch (error: any) {
@@ -73,7 +75,7 @@ const handleDeleteTask = async (s: App.ScheduledTask) => {
   }
 }
 
-const handleDisableTask = async (s: App.ScheduledTask) => {
+const handleDisableTask = async (s: ScheduledTask) => {
   s.disabled = !s.disabled
   scheduledTasksStore.editScheduledTask(s.id, s)
 }

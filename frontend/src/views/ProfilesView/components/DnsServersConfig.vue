@@ -1,15 +1,19 @@
 <script lang="ts" setup>
-import { computed, h, ref, type VNode } from 'vue'
+import { h, ref, type VNode } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { DraggableOptions } from '@/constant/app'
-import { DnsServerTypeOptions } from '@/constant/kernel'
-import { DefaultDnsServer } from '@/constant/profile'
-import { DnsServer } from '@/enums/kernel'
+import { DraggableOptions, getDefaultDnsServer } from '@/constant'
+import { DnsServerOptions } from '@/constant/kernel'
+import { DnsServer } from '@/enums'
 import { useBool } from '@/hooks'
-import { deepClone, generateDnsServerURL } from '@/utils'
+import { deepClone, generateDnsServerUrl } from '@/utils'
 
 import Tag from '@/components/Tag/index.vue'
+
+import type { Dialer, DnsServerProfile } from '@/types'
+
+import DialerConfig from './Shared/DialerConfig.vue'
+import RawFieldsConfig from './Shared/RawFieldsConfig.vue'
 
 interface Props {
   outboundOptions: { label: string; value: string }[]
@@ -18,45 +22,52 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const model = defineModel<App.DnsServerConfig[]>({ required: true })
+const model = defineModel<DnsServerProfile[]>({ required: true })
 
-let serverId = 0
-const fields = ref<App.DnsServerConfig>(DefaultDnsServer())
+let serverId = -1
+const fields = ref<DnsServerProfile>(getDefaultDnsServer(DnsServer.Local))
 
-const isSupportDetourAndDomainResolver = computed(() => {
-  return [
-    DnsServer.Local,
-    DnsServer.Tcp,
-    DnsServer.Udp,
-    DnsServer.Tls,
-    DnsServer.Quic,
-    DnsServer.Https,
-    DnsServer.H3,
-    DnsServer.Dhcp,
-  ].includes(fields.value.type as any)
-})
+const supportedPath = new Set([DnsServer.Https, DnsServer.H3])
 
-const isSupportServerAndPort = computed(() => {
-  return [
-    DnsServer.Tcp,
-    DnsServer.Udp,
-    DnsServer.Tls,
-    DnsServer.Quic,
-    DnsServer.Https,
-    DnsServer.H3,
-  ].includes(fields.value.type as any)
-})
+const supportedServer = new Set([
+  ...supportedPath,
+  DnsServer.Tcp,
+  DnsServer.Udp,
+  DnsServer.Tls,
+  DnsServer.Quic,
+])
 
-const isSupportPath = computed(() =>
-  [DnsServer.Https, DnsServer.H3].includes(fields.value.type as any),
-)
+const supportedDialer = new Set([
+  ...supportedServer,
+  DnsServer.Local,
+  DnsServer.Dhcp,
+  DnsServer.Mdns,
+])
+
+const isDialerSupported = (
+  server: DnsServerProfile,
+): server is Extract<DnsServerProfile, { config: { dialer: Dialer } }> => {
+  return supportedDialer.has(server.type as any)
+}
+
+const isServerSupported = (
+  server: DnsServerProfile,
+): server is Extract<DnsServerProfile, { config: { server: string } }> => {
+  return supportedServer.has(server.type as any)
+}
+
+const isPathSupported = (
+  server: DnsServerProfile,
+): server is Extract<DnsServerProfile, { config: { path: string } }> => {
+  return supportedPath.has(server.type as any)
+}
 
 const { t } = useI18n()
 const [showEditModal] = useBool(false)
 
 const handleAdd = () => {
   serverId = -1
-  fields.value = DefaultDnsServer()
+  fields.value = getDefaultDnsServer(DnsServer.Local)
   showEditModal.value = true
 }
 
@@ -80,15 +91,23 @@ const handleDeleteRule = (index: number) => {
   model.value.splice(index, 1)
 }
 
-const renderServer = (server: App.DnsServerConfig) => {
-  const { tag, detour } = server
+const onTypeChange = (newType: DnsServer) => {
+  const base = { id: fields.value.id }
+  fields.value = { ...getDefaultDnsServer(newType), ...base } as DnsServerProfile
+}
+
+const renderServer = (server: DnsServerProfile) => {
+  const { tag } = server
   const children: VNode[] = [
     h(Tag, { color: 'cyan' }, () => tag),
-    h(Tag, () => generateDnsServerURL(server)),
+    h(Tag, () => generateDnsServerUrl(server)),
   ]
-  if (detour) {
-    const tag = props.outboundOptions.find((v) => v.value === detour)?.label || detour
-    children.push(h(Tag, { color: 'default' }, () => tag))
+
+  if (isDialerSupported(server)) {
+    const detourTag = props.outboundOptions.find(
+      (v) => v.value === server.config.dialer.detour,
+    )?.label
+    if (detourTag) children.push(h(Tag, { color: 'default' }, () => detourTag))
   }
   return h('div', { class: 'font-bold' }, children)
 }
@@ -106,7 +125,7 @@ const renderServer = (server: App.DnsServerConfig) => {
     <Card v-for="(server, index) in model" :key="server.id" class="mb-2">
       <div class="flex items-center py-2">
         <component :is="renderServer(server)" />
-        <div class="ml-auto">
+        <div class="ml-auto shrink-0">
           <Button icon="edit" type="text" size="small" @click="handleEdit(index)" />
           <Button icon="delete" type="text" size="small" @click="handleDeleteRule(index)" />
         </div>
@@ -121,87 +140,113 @@ const renderServer = (server: App.DnsServerConfig) => {
     max-width="80"
     max-height="80"
   >
-    <div class="flex flex-col">
-      <div class="form-item">
-        {{ t('kernel.dns.type.name') }}
-        <Select v-model="fields.type" :options="DnsServerTypeOptions" />
-      </div>
-      <div class="form-item">
-        {{ t('kernel.dns.tag') }}
-        <Input v-model="fields.tag" autofocus />
-      </div>
-      <template v-if="isSupportDetourAndDomainResolver">
-        <div class="form-item">
-          {{ t('kernel.dns.domain_resolver') }}
-          <Select v-model="fields.domain_resolver" :options="serversOptions" clearable />
-        </div>
-        <div class="form-item">
-          {{ t('kernel.dns.detour') }}
-          <Select v-model="fields.detour" :options="outboundOptions" clearable />
-        </div>
-        <template v-if="isSupportServerAndPort">
-          <div class="form-item">
-            {{ t('kernel.dns.server') }}
-            <Input v-model="fields.server" placeholder="192.168.1.1,223.5.5.5" />
-          </div>
-          <div class="form-item">
-            {{ t('kernel.dns.server_port') }}
-            <Input v-model="fields.server_port" placeholder="53,853,443,784" />
-          </div>
-          <div v-if="isSupportPath" class="form-item">
-            {{ t('kernel.dns.path') }}
-            <Input v-model="fields.path" placeholder="/dns-query" />
-          </div>
-        </template>
-      </template>
-      <template v-if="fields.type === DnsServer.Hosts">
-        <div :class="{ 'items-start': fields.hosts_path.length !== 0 }" class="form-item">
-          {{ t('kernel.dns.hosts_path') }}
-          <InputList v-model="fields.hosts_path" placeholder="/etc/hosts,c:\...\hosts" />
-        </div>
-        <div
-          :class="{ 'items-start': Object.keys(fields.predefined).length !== 0 }"
-          class="form-item"
-        >
-          {{ t('kernel.dns.predefined') }}
-          <KeyValueEditor
-            v-model="fields.predefined"
-            :placeholder="['google.com', '127.0.0.1,::1']"
-          />
-        </div>
-      </template>
-      <div v-else-if="fields.type === DnsServer.Dhcp" class="form-item">
-        {{ t('kernel.dns.interface') }}
-        <Input v-model="fields.interface" placeholder="wlan0,eth0" />
-      </div>
-      <template v-else-if="fields.type === DnsServer.FakeIP">
-        <div class="form-item">
-          {{ t('kernel.dns.inet4_range') }}
-          <Input v-model="fields.inet4_range" placeholder="198.18.0.0/15" clearable>
-            <template #suffix>
-              <Button
-                size="small"
-                type="text"
-                icon="reset"
-                @click="fields.inet4_range = '198.18.0.0/15'"
-              />
-            </template>
-          </Input>
-        </div>
-        <div class="form-item">
-          {{ t('kernel.dns.inet6_range') }}
-          <Input v-model="fields.inet6_range" placeholder="fc00::/18" clearable>
-            <template #suffix>
-              <Button
-                size="small"
-                type="text"
-                icon="reset"
-                @click="fields.inet6_range = 'fc00::/18'"
-              />
-            </template>
-          </Input>
-        </div>
-      </template>
+    <div class="form-item">
+      {{ t('kernel.dns.servers.type.title') }}
+      <Select
+        :model-value="fields.type"
+        :options="DnsServerOptions"
+        @update:model-value="onTypeChange"
+      />
     </div>
+    <div class="form-item">
+      {{ t('kernel.dns.servers.tag') }}
+      <Input v-model="fields.tag" autofocus />
+    </div>
+
+    <template v-if="isServerSupported(fields)">
+      <div class="form-item">
+        {{ t('kernel.dns.servers.server') }}
+        <Input v-model="fields.config.server" placeholder="192.168.1.1,223.5.5.5" />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.dns.servers.server_port') }}
+        <Input
+          v-model="(fields.config as any).server_port"
+          type="number"
+          placeholder="53,853,443"
+          editable
+          clearable
+        />
+      </div>
+    </template>
+
+    <template v-if="isPathSupported(fields)">
+      <div class="form-item">
+        {{ t('kernel.dns.servers.path') }}
+        <Input v-model="fields.config.path" placeholder="/dns-query" editable clearable />
+      </div>
+    </template>
+
+    <template v-if="fields.type === DnsServer.Local">
+      <div class="form-item">
+        {{ t('kernel.dns.servers.local.prefer_go') }}
+        <Switch v-model="fields.config.prefer_go" />
+      </div>
+      <div class="form-item items-start">
+        {{ t('kernel.dns.servers.local.neighbor_domain') }}
+        <InputList v-model="fields.config.neighbor_domain" />
+      </div>
+    </template>
+    <template v-if="fields.type === DnsServer.Hosts">
+      <div :class="{ 'items-start': fields.config.path.length !== 0 }" class="form-item">
+        {{ t('kernel.dns.servers.hosts.path') }}
+        <InputList v-model="fields.config.path" placeholder="/etc/hosts,c:\...\hosts" />
+      </div>
+      <div
+        :class="{ 'items-start': Object.keys(fields.config.predefined).length !== 0 }"
+        class="form-item"
+      >
+        {{ t('kernel.dns.servers.hosts.predefined') }}
+        <KeyValueEditor
+          v-model="fields.config.predefined"
+          :placeholder="['google.com', '127.0.0.1,::1']"
+        />
+      </div>
+    </template>
+
+    <template v-if="fields.type === DnsServer.Dhcp">
+      <div class="form-item">
+        {{ t('kernel.dns.servers.dhcp.interface') }}
+        <Input v-model="fields.config.interface" placeholder="wlan0,eth0" editable clearable />
+      </div>
+    </template>
+
+    <template v-else-if="fields.type === DnsServer.FakeIp">
+      <div class="form-item">
+        {{ t('kernel.dns.servers.fakeip.inet4_range') }}
+        <Input v-model="fields.config.inet4_range" placeholder="198.18.0.0/15" editable clearable>
+          <template #suffix>
+            <Button
+              size="small"
+              type="text"
+              icon="reset"
+              @click="fields.config.inet4_range = '198.18.0.0/15'"
+            />
+          </template>
+        </Input>
+      </div>
+      <div class="form-item">
+        {{ t('kernel.dns.servers.fakeip.inet6_range') }}
+        <Input v-model="fields.config.inet6_range" placeholder="fc00::/18" editable clearable>
+          <template #suffix>
+            <Button
+              size="small"
+              type="text"
+              icon="reset"
+              @click="fields.config.inet6_range = 'fc00::/18'"
+            />
+          </template>
+        </Input>
+      </div>
+    </template>
+
+    <template v-if="isDialerSupported(fields)">
+      <DialerConfig
+        v-model="fields.config.dialer"
+        :outbound-options="outboundOptions"
+        :server-options="serversOptions"
+      />
+    </template>
+    <RawFieldsConfig v-model="fields.fields" />
   </Modal>
 </template>

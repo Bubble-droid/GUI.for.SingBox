@@ -1,5 +1,9 @@
 import i18n from '@/lang'
 
+import type { Recordable } from '@/types'
+
+import { ensureArray } from './others'
+
 export function formatBytes(bytes: number, decimals: number = 1): string {
   if (bytes === 0) return '0 B'
 
@@ -58,4 +62,27 @@ export function formatDate(timestamp: number | string, format: string) {
 
 export function formatProxyHost(host: string) {
   return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host
+}
+
+export const formatRecord = (record: Recordable) => {
+  const children: string[] = []
+  for (const [k, v] of Object.entries(record)) {
+    let normalized = ''
+    if (Array.isArray(v)) {
+      normalized = v.join(', ')
+    } else if (typeof v === 'object' && v !== null) {
+      const inner = Object.entries(v)
+        .map(([vk, vv]) => `${vk}=${ensureArray(vv).join(', ')}`)
+        .join('; ')
+      normalized = `[${inner}]`
+    } else if (typeof v === 'boolean') {
+      normalized = v ? 'True' : 'False'
+    } else {
+      normalized = String(v)
+    }
+
+    const formattedKey = k.charAt(0).toUpperCase() + k.slice(1)
+    children.push(`${formattedKey}: ${normalized}`)
+  }
+  return children.join(' • ')
 }

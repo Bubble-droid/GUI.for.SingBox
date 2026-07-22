@@ -16,24 +16,30 @@ import {
   modal,
 } from '@/utils'
 
+import type { Menu, Subscription } from '@/types/app.ts'
+
 import ProxiesEditor from './components/ProxiesEditor.vue'
 import ProxiesView from './components/ProxiesView.vue'
 import SubscribeForm from './components/SubscribeForm.vue'
 import SubscribeScript from './components/SubscribeScript.vue'
 
-const menuList: App.Menu[] = [
+const menuList: Menu[] = [
   {
     label: 'subscribes.editProxies',
-    handler: (id: string) => handleEditProxies(id),
+    handler: (id: string) => {
+      handleEditProxies(id)
+    },
   },
   {
     label: 'subscribes.editSourceFile',
-    handler: (id: string) => handleEditProxies(id, true),
+    handler: (id: string) => {
+      handleEditProxies(id, true)
+    },
   },
   {
     label: 'subscribes.copySub',
     handler: async (id: string) => {
-      const sub = subscribeStore.getSubscribeById(id)!
+      const sub = subscribeStore.getSubscribeById(id)
       if (sub) {
         await ClipboardSetText(sub.url)
         message.success('common.copied')
@@ -42,7 +48,7 @@ const menuList: App.Menu[] = [
   },
   {
     label: 'subscribes.script',
-    handler: async (id: string) => {
+    handler: (id: string) => {
       const m = modal({ title: 'common.edit', width: '90' })
       m.setContent(SubscribeScript, { id }).open()
     },
@@ -81,8 +87,8 @@ const subscribeStore = useSubscribesStore()
 const appSettingsStore = useAppSettingsStore()
 const pluginsStore = usePluginsStore()
 
-const generateMenus = (subscription: App.Subscription) => {
-  const builtInMenus: App.Menu[] = menuList.map((v) => ({
+const generateMenus = (subscription: Subscription) => {
+  const builtInMenus: Menu[] = menuList.map((v) => ({
     ...v,
     handler: () => v.handler?.(subscription.id),
     children: v.children?.map((child) => ({
@@ -103,7 +109,7 @@ const generateMenus = (subscription: App.Subscription) => {
       },
       {
         label: 'common.more',
-        children: contextMenus.reduce((prev, plugin) => {
+        children: contextMenus.reduce<Menu[]>((prev, plugin) => {
           const menus = Object.entries(plugin.context.subscriptions)
           return prev.concat(
             menus.map(([title, fn]) => {
@@ -122,7 +128,7 @@ const generateMenus = (subscription: App.Subscription) => {
               }
             }),
           )
-        }, [] as App.Menu[]),
+        }, []),
       },
     )
   }
@@ -156,7 +162,7 @@ const handleEditProxies = (id: string, editor = false) => {
   }
 }
 
-const handleUpdateSub = async (s: App.Subscription, options?: Partial<App.Subscription>) => {
+const handleUpdateSub = async (s: Subscription, options?: Partial<Subscription>) => {
   try {
     await subscribeStore.updateSubscribe(s.id, options)
   } catch (error: any) {
@@ -165,7 +171,7 @@ const handleUpdateSub = async (s: App.Subscription, options?: Partial<App.Subscr
   }
 }
 
-const handleDeleteSub = async (s: App.Subscription) => {
+const handleDeleteSub = async (s: Subscription) => {
   try {
     await ignoredError(RemoveFile, s.path)
     await subscribeStore.deleteSubscribe(s.id)
@@ -175,16 +181,16 @@ const handleDeleteSub = async (s: App.Subscription) => {
   }
 }
 
-const handleDisableSub = async (s: App.Subscription) => {
+const handleDisableSub = (s: Subscription) => {
   s.disabled = !s.disabled
   subscribeStore.editSubscribe(s.id, s)
 }
 
 const noUpdateNeeded = computed(() => subscribeStore.subscribes.every((v) => v.disabled))
 
-const clacTrafficPercent = (s: App.Subscription) => ((s.upload + s.download) / s.total) * 100
+const clacTrafficPercent = (s: Subscription) => ((s.upload + s.download) / s.total) * 100
 
-const clacTrafficStatus = (s: App.Subscription) => {
+const clacTrafficStatus = (s: Subscription) => {
   const percent = clacTrafficPercent(s)
   if (percent > 90) return 'danger'
   if (percent > 80) return 'warning'

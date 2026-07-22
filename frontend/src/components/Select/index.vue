@@ -4,6 +4,8 @@ import { useI18n } from 'vue-i18n'
 
 import { deepClone } from '@/utils'
 
+import type { Recordable } from '@/types'
+
 interface Props {
   modelValue?: string | string[]
   options?: { label: string; value: string }[]

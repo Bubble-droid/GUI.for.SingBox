@@ -37,13 +37,15 @@ import i18n, { loadLocale } from '@/lang'
 import { useAppStore, useEnvStore } from '@/stores'
 import { debounce, updateTrayAndMenus, ignoredError, deepClone, message } from '@/utils'
 
+import type { AppSettings } from '@/types'
+
 export const useAppSettingsStore = defineStore('app-settings', () => {
   const appStore = useAppStore()
   const envStore = useEnvStore()
 
   let latestUserSettings: string
 
-  const app = ref<App.AppSettings>({
+  const app = ref<AppSettings>({
     lang: Lang.EN,
     theme: Theme.Auto,
     color: Color.Default,
@@ -118,7 +120,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
 
   const setupAppSettings = async () => {
     const data = await ignoredError(ReadFile, UserFilePath)
-    let settings: App.AppSettings
+    let settings: AppSettings
     if (data) {
       settings = parse(data)
     } else {
@@ -179,12 +181,16 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
       settings.debugUsePointer = false
     }
 
+    settings.systemTitleBar ??= false
+
+    settings.rollingRelease = false
+
     app.value = settings
     latestUserSettings = stringify(app.value)
   }
 
   const applyAppSettings = {
-    theme(theme: App.Theme) {
+    theme(theme: Theme) {
       const isAuto = theme === Theme.Auto
       if (isAuto) {
         themeMode.value = mediaQueryList.matches ? Theme.Dark : Theme.Light
@@ -192,13 +198,13 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
         themeMode.value = theme
       }
     },
-    lang(lang: string) {
+    lang(lang: Lang) {
       i18n.global.locale.value = lang
       if (!i18n.global.availableLocales.includes(lang)) {
         loadLocale(lang)
       }
     },
-    color(color: App.Color, primary: string, secondary: string) {
+    color(color: Color, primary: string, secondary: string) {
       if (color !== Color.Custom) {
         ;({ primary, secondary } = Colors[color] ?? { primary, secondary })
       }
@@ -238,7 +244,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
   }
 
   /* Apply AppSettings */
-  const onAppSettingsChange = (settings: App.AppSettings) => {
+  const onAppSettingsChange = (settings: AppSettings) => {
     applyAppSettings.theme(settings.theme)
     applyAppSettings.color(settings.color, settings.primaryColor, settings.secondaryColor)
     applyAppSettings.lang(settings.lang)
@@ -262,14 +268,14 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
   watch(app, onAppSettingsChange, { deep: true })
 
   /* Apply AppTheme */
-  const themeMode = ref<Extract<App.Theme, 'light' | 'dark'>>(Theme.Light)
+  const themeMode = ref<Extract<Theme, 'light' | 'dark'>>(Theme.Light)
   const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)')
   mediaQueryList.addEventListener('change', ({ matches }) => {
     if (app.value.theme === Theme.Auto) {
       themeMode.value = matches ? Theme.Dark : Theme.Light
     }
   })
-  const setAppTheme = (theme: Extract<App.Theme, 'light' | 'dark'>) => {
+  const setAppTheme = (theme: Extract<Theme, 'light' | 'dark'>) => {
     if (document.startViewTransition) {
       document.startViewTransition(() => {
         document.body.setAttribute('theme-mode', theme)

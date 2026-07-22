@@ -13,11 +13,18 @@ import (
 
 	sysruntime "runtime"
 
+	"github.com/adrg/xdg"
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gopkg.in/yaml.v3"
+)
+
+var (
+	AppVersion          = "dev"
+	SingBoxVersion      = "unknown"
+	SingBoxAlphaVersion = "unknown"
 )
 
 var Config = &AppConfig{}
@@ -37,7 +44,9 @@ var Env = &EnvResult{
 	AppDataPath:     "",
 	AppConfigPath:   "",
 	AppCachePath:    "",
+	AppCorePath:     "",
 	IsSystemPackage: false,
+	IsBundled:       false,
 }
 
 // NewApp creates a new App application struct
@@ -47,7 +56,7 @@ func NewApp() *App {
 	}
 }
 
-func CreateApp(fs embed.FS, buildVersion string) *App {
+func CreateApp(fs embed.FS) *App {
 	exePath, err := os.Executable()
 	if err != nil {
 		panic(err)
@@ -70,21 +79,52 @@ func CreateApp(fs embed.FS, buildVersion string) *App {
 		return app
 	}
 
-	if version := strings.TrimSpace(buildVersion); version != "" && version != "dev" {
-		Env.AppVersion = version
+	if AppVersion != "" {
+		Env.AppVersion = AppVersion
 	}
 	log.Printf("Build Version: %s", Env.AppVersion)
 
-	Env.IsSystemPackage = strings.HasPrefix(exePath, "/usr/bin/")
+	Env.IsSystemPackage = isSystemPackage(exePath)
 	log.Printf("Install as a System Package: %t", Env.IsSystemPackage)
 
-	Env.AppDataPath = GetDataDir(Env.AppName)
+	Env.IsBundled = IsBundled()
+	log.Printf("Bundled Package: %t", Env.IsBundled)
+
+	if Env.IsBundled {
+		log.Printf("Bundled Sing-Box Core (Stable): v%s", SingBoxVersion)
+		log.Printf("Bundled Sing-Box Core (Alpha) : v%s", SingBoxAlphaVersion)
+	}
+
+	isXDGMode := Env.OS == "linux" && Env.AppVersion != "dev"
+
+	if isXDGMode {
+		appNameNormal := normalizeDirName(Env.AppName)
+		Env.AppDataPath = filepath.Join(xdg.DataHome, appNameNormal)
+		Env.AppConfigPath = filepath.Join(xdg.ConfigHome, appNameNormal)
+		Env.AppCachePath = filepath.Join(xdg.CacheHome, appNameNormal)
+		Env.AppCorePath = filepath.Join(Env.AppCachePath, "sing-box")
+
+		globalPathResolver = &XDGResolver{
+			dataDir:   Env.AppDataPath,
+			configDir: Env.AppConfigPath,
+			cacheDir:  Env.AppCachePath,
+		}
+		log.Println("Storage Mode: XDG Base Directory")
+	} else {
+		baseDataDir := filepath.Join(Env.BasePath, "data")
+		Env.AppDataPath = baseDataDir
+		Env.AppConfigPath = baseDataDir
+		Env.AppCachePath = filepath.Join(baseDataDir, ".cache")
+		Env.AppCorePath = filepath.Join(Env.AppDataPath, "sing-box")
+
+		globalPathResolver = &PortableResolver{
+			basePath: Env.BasePath,
+		}
+		log.Println("Storage Mode: Portable (Relative to BasePath)")
+	}
+
 	log.Printf("App Data Path: %s", Env.AppDataPath)
-
-	Env.AppConfigPath = GetConfigDir(Env.AppName)
 	log.Printf("App Config Path: %s", Env.AppConfigPath)
-
-	Env.AppCachePath = GetCacheDir(Env.AppName)
 	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
 	if Env.OS == "darwin" {
@@ -149,7 +189,9 @@ func (a *App) GetEnv(key string) any {
 		AppDataPath:     Env.AppDataPath,
 		AppConfigPath:   Env.AppConfigPath,
 		AppCachePath:    Env.AppCachePath,
+		AppCorePath:     Env.AppCorePath,
 		IsSystemPackage: Env.IsSystemPackage,
+		IsBundled:       Env.IsBundled,
 	}
 }
 

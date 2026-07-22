@@ -1,395 +1,769 @@
-import type { auth } from '@zhexin/typebox/inbound'
 import { parse } from 'yaml'
 
 import { ReadFile, WriteFile } from '@/bridge'
-import { CoreConfigFilePath } from '@/constant/kernel'
-import { Branch } from '@/enums/app'
+import { CoreConfigFilePath } from '@/constant'
 import {
+  Branch,
+  CommonRuleType,
+  DnsRuleAction,
+  DnsRuleType,
   DnsServer,
+  Endpoint,
   Inbound,
   Outbound,
-  RuleAction,
-  RulesetType,
+  OutboundMember,
+  RouteRuleAction,
+  RuleSetType,
   RuleType,
-  Strategy,
-} from '@/enums/kernel'
+  Service,
+} from '@/enums'
 import {
   useAppSettingsStore,
+  useEnvStore,
   usePluginsStore,
   useRulesetsStore,
   useSubscribesStore,
 } from '@/stores'
-import { deepAssign, deepClone, APP_TITLE, createTextMatcher, filterInvalidProps } from '@/utils'
+import { APP_TITLE, createTextMatcher, deepAssign, deepClone, filterInvalidProps } from '@/utils'
 
-import type { CoreConfigInbound } from '@/types/kernel'
+import type {
+  CoreConfig,
+  CoreDialer,
+  CoreDnsConfig,
+  CoreDnsDefaultRule,
+  CoreDnsLogicalRule,
+  CoreDnsRuleConfig,
+  CoreDnsServerConfig,
+  CoreDnsServerOf,
+  CoreDomainResolver,
+  CoreEndpointConfig,
+  CoreEndpointOf,
+  CoreExperimentalConfig,
+  CoreHttpClientConfig,
+  CoreInboundConfig,
+  CoreInboundOf,
+  CoreListen,
+  CoreNtpConfig,
+  CoreOutboundConfig,
+  CoreRouteConfig,
+  CoreRouteDefaultRule,
+  CoreRouteRuleConfig,
+  CoreRuleSetConfig,
+  CoreRuleSetOf,
+  CoreServiceConfig,
+  CoreServiceOf,
+  Dialer,
+  DnsProfile,
+  DnsRuleItem,
+  DnsRuleProfile,
+  DnsServerProfile,
+  EndpointProfile,
+  ExperimentalProfile,
+  HttpClientProfile,
+  InboundProfile,
+  Listen,
+  NormalizeListableProps,
+  NtpProfile,
+  OutboundGroupProfile,
+  OutboundProfile,
+  Profile,
+  Recordable,
+  RouteProfile,
+  RouteRuleProfile,
+  RuleSetProfile,
+  ServiceProfile,
+  StandardDnsServerConfig,
+  TagItem,
+} from '@/types'
 
-const _generateRule = (
-  rule: App.Rule | App.DnsRule,
-  rule_set: App.ProfileRuleSet[],
-  inbounds: App.Inbound[],
-) => {
-  const getInbound = (id: string) => inbounds.find((v) => v.id === id)?.tag
-  const getRuleset = (id: string) => rule_set.find((v) => v.id === id)?.tag
-
-  const extra: Recordable = { action: rule.action, invert: rule.invert ? true : undefined }
-  if (rule.type === RuleType.Inline) {
-    deepAssign(extra, JSON.parse(rule.payload))
-  } else if (rule.type === RuleType.RuleSet) {
-    extra[rule.type] = rule.payload.split(',').map((id) => getRuleset(id))
-  } else if (rule.type === RuleType.Inbound) {
-    extra[rule.type] = getInbound(rule.payload)
-  } else if ([RuleType.IpIsPrivate, RuleType.IpAcceptAny].includes(rule.type as any)) {
-    extra[rule.type] = rule.payload === 'true'
-  } else if (rule.type === RuleType.ClashMode) {
-    extra[rule.type] = rule.payload
-  } else {
-    extra[rule.type] = String(rule.payload)
-      .split(',')
-      .map((val) => {
-        if ([RuleType.Port, RuleType.SourcePort].includes(rule.type as any)) {
-          return Number(val)
-        }
-        return val
-      })
-    if (extra[rule.type].length === 1) {
-      extra[rule.type] = extra[rule.type][0]
-    }
-  }
-  return extra
+interface TagMaps {
+  httpClients: Map<string, string>
+  inbounds: Map<string, string>
+  outbounds: Map<string, string>
+  ruleSets: Map<string, string>
+  dnsServers: Map<string, string>
 }
 
-const generateExperimental = (experimental: App.Experimental, outbounds: App.Outbound[]) => {
-  const getOutbound = (id: string) => outbounds.find((v) => v.id === id)?.tag
+const buildIdTagMapping = (items: TagItem[]): Map<string, string> => {
+  return new Map(items.map((v) => [v.id, v.tag]))
+}
+
+const buildRuleSetMapping = (items: RuleSetProfile[]): Map<string, string> => {
+  return new Map(
+    items.flatMap((v) => {
+      if (v.type !== RuleSetType.Remote) return [[v.id, v.tag]]
+      return v.tag.map((tag, i) => [`${v.id}_${i}`, tag])
+    }),
+  )
+}
+
+const generateListen = (listen: Listen, maps: TagMaps): CoreListen => {
   return {
-    clash_api: {
-      ...experimental.clash_api,
-      external_ui_download_detour: getOutbound(experimental.clash_api.external_ui_download_detour),
-    },
-    cache_file: {
-      ...experimental.cache_file,
-      store_rdrc: undefined,
-    },
+    ...(listen as CoreListen),
+    detour: maps.inbounds.get(listen.detour)!,
   }
 }
 
-const generateInbounds = (inbounds: App.Inbound[], ruleSets: App.ProfileRuleSet[]) => {
-  const getRuleSet = (id: string) => ruleSets.find((v) => v.id === id)?.tag
-  return inbounds.flatMap((inbound): CoreConfigInbound[] => {
-    if (!inbound.enable) return []
+const generateDomainResolver = (
+  resolver: Dialer['domain_resolver'],
+  maps: TagMaps,
+): Extract<CoreDomainResolver, object> => {
+  return filterInvalidProps({
+    ...(resolver as Extract<CoreDomainResolver, object>),
+    server: maps.dnsServers.get(resolver.server)!,
+  })
+}
 
-    if (inbound.type === Inbound.Tun) {
-      const { otherFields, ...rest } = inbound.tun!
+const generateDialer = (dialer: Dialer, maps: TagMaps): CoreDialer => {
+  return {
+    ...(dialer as CoreDialer),
+    detour: maps.outbounds.get(dialer.detour)!,
+    domain_resolver: generateDomainResolver(dialer.domain_resolver, maps),
+  }
+}
+
+const generateNtp = (ntp: NtpProfile, maps: TagMaps): CoreNtpConfig => {
+  if (!ntp.enabled) return {} as CoreNtpConfig
+  const { dialer, ...rest } = ntp
+  return filterInvalidProps({
+    ...(rest as CoreNtpConfig),
+    ...generateDialer(dialer, maps),
+  })
+}
+
+const generateExperimental = (
+  experimental: ExperimentalProfile,
+  maps: TagMaps,
+): CoreExperimentalConfig => {
+  const { clash_api, cache_file } = experimental
+  return filterInvalidProps({
+    clash_api: filterInvalidProps({
+      ...clash_api,
+      external_ui_download_detour: maps.outbounds.get(clash_api.external_ui_download_detour),
+    }),
+    cache_file: cache_file.enabled
+      ? { ...filterInvalidProps(cache_file), enabled: true }
+      : undefined,
+  })
+}
+
+const generateEndpoints = (endpoints: EndpointProfile[], maps: TagMaps) => {
+  return endpoints.flatMap((ep): CoreEndpointConfig[] => {
+    const { enable, type, tag, config, fields } = ep
+    if (!enable) return []
+    if (type === Endpoint.OpenvpnServer) {
       return [
         filterInvalidProps({
-          ...rest,
-          ...(deepAssign(rest, JSON.parse(otherFields)) as App.Inbound['tun']),
-          type: inbound.type,
-          tag: inbound.tag,
-          route_address_set: inbound.tun!.route_address_set.map((id) => getRuleSet(id)!),
-          route_exclude_address_set: inbound.tun!.route_exclude_address_set.map(
-            (id) => getRuleSet(id)!,
-          ),
-        }),
-      ]
-    } else if (inbound.type === Inbound.Direct) {
-      return [
-        filterInvalidProps({
-          type: inbound.type,
-          tag: inbound.tag,
-          ...inbound[inbound.type]!.listen,
-          network: inbound.direct!.network || undefined,
+          ...(JSON.parse(fields) as CoreEndpointOf<typeof Endpoint.OpenvpnServer>),
+          ...generateListen(config.listen, maps),
+          type,
+          tag,
         }),
       ]
     } else {
-      const users = inbound[inbound.type]?.users.flatMap((user): auth[] => {
-        const [username, password] = user.split(':')
-        if (!username || !password) return []
-        return [{ username, password }]
-      })
       return [
         filterInvalidProps({
-          type: inbound.type,
-          tag: inbound.tag,
-          ...inbound[inbound.type]!.listen,
-          users,
-        }),
+          ...JSON.parse(fields),
+          ...generateDialer(config.dialer, maps),
+          type,
+          tag,
+        } as CoreEndpointConfig),
       ]
     }
   })
 }
 
-const generateOutbounds = async (outbounds: App.Outbound[]) => {
-  const result: Recordable[] = []
-  const SubscriptionCache: Recordable<any[]> = {}
-  const proxiesSet = new Set<any>()
-  const builtInProxiesSet = new Set<string>()
+const generateServices = (services: ServiceProfile[], maps: TagMaps) => {
+  return services.flatMap((sr): CoreServiceConfig[] => {
+    const { enable, type, tag, config, fields } = sr
+    if (!enable) return []
+    switch (type) {
+      case Service.Api: {
+        const { listen, dashboard, ...rest } = config
+        return [
+          filterInvalidProps({
+            ...(JSON.parse(fields) as CoreServiceOf<typeof Service.Api>),
+            ...generateListen(listen, maps),
+            ...rest,
+            type,
+            tag,
+            dashboard: dashboard.enabled
+              ? filterInvalidProps({
+                  ...dashboard,
+                  http_client: maps.httpClients.get(dashboard.http_client) ?? '',
+                } )
+              : undefined,
+          } as CoreServiceOf<typeof Service.Api>),
+        ]
+      }
 
+      case Service.UsbipClient: {
+        return [
+          filterInvalidProps({
+            ...(JSON.parse(fields) as CoreServiceOf<typeof Service.UsbipClient>),
+            ...generateDialer(config.dialer, maps),
+            type,
+            tag,
+          }),
+        ]
+      }
+
+      default: {
+        return [
+          filterInvalidProps({
+            ...JSON.parse(fields),
+            ...generateListen(config.listen, maps),
+            type,
+            tag,
+          } as CoreServiceConfig),
+        ]
+      }
+    }
+  })
+}
+
+const generateHttpClients = (httpClients: HttpClientProfile[], maps: TagMaps) => {
+  return httpClients.flatMap((hc): CoreHttpClientConfig[] => {
+    const { enable, tag, config, fields } = hc
+    if (!enable) return []
+    return [
+      filterInvalidProps({
+        ...(JSON.parse(fields) as CoreHttpClientConfig),
+        ...generateDialer(config.dialer, maps),
+        tag,
+      }),
+    ]
+  })
+}
+
+const generateInbounds = (inbounds: InboundProfile[], maps: TagMaps) => {
+  return inbounds.flatMap((inbound): CoreInboundConfig[] => {
+    const { enable, type, tag, config, fields } = inbound
+    if (!enable) return []
+
+    switch (type) {
+      case Inbound.Tun: {
+        return [
+          filterInvalidProps({
+            ...(JSON.parse(fields) as CoreInboundOf<typeof Inbound.Tun>),
+            ...config,
+            type,
+            tag,
+            route_address_set: config.route_address_set.map((v) => maps.ruleSets.get(v)!),
+            route_exclude_address_set: config.route_exclude_address_set.map(
+              (v) => maps.ruleSets.get(v)!,
+            ),
+          }),
+        ]
+      }
+      case Inbound.Tproxy:
+      case Inbound.Direct: {
+        return [
+          filterInvalidProps({
+            ...(JSON.parse(fields) as CoreInboundOf<typeof Inbound.Direct>),
+            ...generateListen(config.listen, maps),
+            type,
+            tag,
+            network: config.network,
+          }),
+        ]
+      }
+      case Inbound.Mixed:
+      case Inbound.Socks:
+      case Inbound.Http: {
+        return [
+          filterInvalidProps({
+            ...(JSON.parse(fields) as CoreInboundOf<typeof Inbound.Mixed>),
+            ...generateListen(config.listen, maps),
+            type,
+            tag,
+            users: Object.entries(config.users).flatMap(([username, password]) => {
+              return username && password ? [{ username, password }] : []
+            }),
+          }),
+        ]
+      }
+      default:
+        return [
+          filterInvalidProps({
+            ...JSON.parse(fields),
+            ...generateListen(config.listen, maps),
+            type,
+            tag,
+          } as CoreInboundConfig),
+        ]
+    }
+  })
+}
+
+const generateOutbounds = async (
+  outbounds: OutboundProfile[],
+  maps: TagMaps,
+): Promise<CoreOutboundConfig[]> => {
   const subscribesStore = useSubscribesStore()
 
-  for (const outbound of outbounds) {
-    const _outbound: Recordable = {
-      type: outbound.type,
-      tag: outbound.tag,
-    }
-    if (outbound.type === Outbound.Urltest) {
-      _outbound.url = outbound.url
-      _outbound.interval = outbound.interval
-      _outbound.tolerance = outbound.tolerance
-    }
-    if (outbound.type === Outbound.Selector || outbound.type === Outbound.Urltest) {
-      _outbound.interrupt_exist_connections = outbound.interrupt_exist_connections
-      _outbound.outbounds = []
-      const isTagMatching = createTextMatcher(outbound.include, outbound.exclude)
-      for (const proxy of outbound.outbounds) {
-        if (proxy.type === 'Built-in') {
-          if ([Outbound.Direct, Outbound.Block].includes(proxy.id as Outbound)) {
-            builtInProxiesSet.add(proxy.id)
-          }
-          _outbound.outbounds.push(proxy.tag)
-        } else {
-          const subId = proxy.type === 'Subscription' ? proxy.id : proxy.type
-          if (!SubscriptionCache[subId]) {
-            const sub = subscribesStore.getSubscribeById(subId)
-            if (sub) {
-              const subStr = await ReadFile(sub.path)
-              const proxies = JSON.parse(subStr)
-              SubscriptionCache[subId] = proxies
-            }
-          }
-          if (proxy.type === 'Subscription') {
-            _outbound.outbounds.push(
-              ...SubscriptionCache[subId]!.map((v) => v.tag).filter((tag) => isTagMatching(tag)),
-            )
-            SubscriptionCache[subId]!.forEach((v) => proxiesSet.add(v))
-          } else {
-            const _proxy = SubscriptionCache[subId]!.find((v) => v.tag === proxy.tag)
-            if (_proxy && isTagMatching(_proxy.tag)) {
-              _outbound.outbounds.push(_proxy.tag)
-              proxiesSet.add(_proxy)
-            }
-          }
-        }
-      }
-    }
-    result.push(_outbound)
-  }
+  const SubscriptionCache = new Map<string, Promise<CoreOutboundConfig[]>>()
+  const proxiesSet = new Set<CoreOutboundConfig>()
 
-  result.push(...proxiesSet)
-  result.push(...Array.from(builtInProxiesSet).map((v) => ({ type: v, tag: v })))
-
-  return result
-}
-
-const generateRoute = (
-  route: App.Route,
-  inbounds: App.Inbound[],
-  outbounds: App.Outbound[],
-  dns: App.Dns,
-) => {
-  const getOutbound = (id: string) => outbounds.find((v) => v.id === id)?.tag
-  const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
-  const isInboundEnabled = (id: string) => inbounds.find((v) => v.id === id)?.enable
-
-  const rulesetsStore = useRulesetsStore()
-
-  const extra: Recordable = {}
-  if (!route.auto_detect_interface) {
-    extra.default_interface = route.default_interface
-  }
-  return {
-    rules: route.rules.flatMap((rule) => {
-      if (rule.type === RuleType.InsertionPoint || !rule.enable) {
-        return []
-      }
-      if (rule.type === RuleType.Inbound && !isInboundEnabled(rule.payload)) {
-        return []
-      }
-      const extra: Recordable = _generateRule(rule, route.rule_set, inbounds)
-
-      if (rule.action === RuleAction.Route) {
-        extra.outbound = getOutbound(rule.outbound)
-      } else if (rule.action === RuleAction.RouteOptions) {
-        deepAssign(extra, JSON.parse(rule.outbound))
-      } else if (rule.action === RuleAction.Reject) {
-        extra.method = rule.outbound
-      } else if (rule.action === RuleAction.Sniff) {
-        if (rule.sniffer.length) {
-          extra.sniffer = rule.sniffer
-        }
-      } else if (rule.action === RuleAction.Resolve) {
-        if (rule.strategy !== Strategy.Default) {
-          extra.strategy = rule.strategy
-        }
-        extra.server = getDnsServer(rule.server)
-      }
-      if (rule.invert) {
-        extra.invert = true
-      }
-      return extra
-    }),
-    rule_set: route.rule_set.map((ruleset) => {
-      const extra: Recordable = {}
-      if (ruleset.type === RuleType.Inline) {
-        extra.rules = JSON.parse(ruleset.rules)
-      } else if (ruleset.type === RulesetType.Local) {
-        const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
-        extra.path = _ruleset?.path.replace('data/', '../')
-        extra.format = ruleset.format
-      } else if (ruleset.type === RulesetType.Remote) {
-        extra.url = ruleset.url
-        extra.format = ruleset.format
-        extra.download_detour = getOutbound(ruleset.download_detour)
-        if (ruleset.update_interval) {
-          extra.update_interval = ruleset.update_interval
-        }
-      }
-      return {
-        tag: ruleset.tag,
-        type: ruleset.type,
-        ...extra,
-      }
-    }),
-    auto_detect_interface: route.auto_detect_interface,
-    find_process: route.find_process ? true : undefined,
-    final: getOutbound(route.final),
-    default_domain_resolver: {
-      server: getDnsServer(route.default_domain_resolver.server),
-    },
-    ...extra,
-  }
-}
-
-const generateDns = (
-  dns: App.Dns,
-  rule_set: App.ProfileRuleSet[],
-  inbounds: App.Inbound[],
-  outbounds: App.Outbound[],
-) => {
-  const getOutbound = (id: string) => outbounds.find((v) => v.id === id)
-  const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
-  const extra: Recordable = {}
-  if (dns.strategy !== Strategy.Default) {
-    extra.strategy = dns.strategy
-  }
-  if (dns.client_subnet) {
-    extra.client_subnet = dns.client_subnet
-  }
-  return {
-    servers: dns.servers.flatMap((server) => {
-      const extra: Recordable = {}
-      if (
-        [
-          DnsServer.Local,
-          DnsServer.Tcp,
-          DnsServer.Udp,
-          DnsServer.Tls,
-          DnsServer.Quic,
-          DnsServer.Https,
-          DnsServer.H3,
-          DnsServer.Dhcp,
-        ].includes(server.type as any)
-      ) {
-        if (server.detour) {
-          const outbound = getOutbound(server.detour)
-          if (outbound?.type !== Outbound.Direct) {
-            extra.detour = outbound?.tag
-          }
-        }
-        server.domain_resolver && (extra.domain_resolver = getDnsServer(server.domain_resolver))
-        if (
-          [
-            DnsServer.Tcp,
-            DnsServer.Udp,
-            DnsServer.Tls,
-            DnsServer.Quic,
-            DnsServer.Https,
-            DnsServer.H3,
-          ].includes(server.type as any)
-        ) {
-          server.server_port && (extra.server_port = Number(server.server_port))
-          extra.server = server.server
-          if ([DnsServer.Https, DnsServer.H3].includes(server.type as any)) {
-            server.path && (extra.path = server.path)
-          }
-        }
-      }
-      if (server.type === DnsServer.Hosts) {
-        extra.path = server.hosts_path.reduce((p, c) => p.concat(c.split(',')), [] as string[])
-        extra.predefined = Object.entries(server.predefined).reduce(
-          (p, [k, v]) => ({ ...p, [k]: v.split(',') }),
-          {},
-        )
-      } else if (server.type === DnsServer.Dhcp) {
-        server.interface && (extra.interface = server.interface)
-      } else if (server.type === DnsServer.FakeIP) {
-        server.inet4_range && (extra.inet4_range = server.inet4_range)
-        server.inet6_range && (extra.inet6_range = server.inet6_range)
-      }
-      return {
-        tag: server.tag,
-        type: server.type,
-        ...extra,
-      }
-    }),
-    rules: dns.rules.flatMap((rule) => {
-      if (rule.type === RuleType.InsertionPoint || !rule.enable) {
-        return []
-      }
-      const extra: Recordable = _generateRule(rule, rule_set, inbounds)
-      if (rule.type === RuleType.Inline && rule.payload.includes('__is_fake_ip')) {
-        if (!dns.servers.find((v) => v.type === DnsServer.FakeIP)) {
+  const getProxies = (subId: string): Promise<CoreOutboundConfig[]> => {
+    const cache = SubscriptionCache.get(subId)
+    if (cache) return cache
+    const handler = (async () => {
+      const sub = subscribesStore.getSubscribeById(subId)
+      if (sub) {
+        try {
+          return JSON.parse(await ReadFile(sub.path)) as CoreOutboundConfig[]
+        } catch {
           return []
         }
-        delete extra.__is_fake_ip
       }
-      if ([RuleAction.Route, RuleAction.RouteOptions].includes(rule.action as any)) {
-        rule.disable_cache && (extra.disable_cache = rule.disable_cache)
-        rule.client_subnet && (extra.client_subnet = rule.client_subnet)
-        if (rule.action === RuleAction.Route) {
-          extra.server = getDnsServer(rule.server)
-          if (rule.strategy !== Strategy.Default) {
-            // extra.strategy = rule.strategy
+      return []
+    })()
+    return SubscriptionCache.set(subId, handler).get(subId)!
+  }
+
+  const resolveProxyTags = async (group: OutboundGroupProfile): Promise<string[]> => {
+    const { outbounds: proxyRefs, include, exclude } = group
+
+    const tags: string[] = []
+    const isTagMatching = createTextMatcher(include, exclude)
+
+    for (const proxyRef of proxyRefs) {
+      switch (proxyRef.type) {
+        case OutboundMember.BuiltIn:
+        case OutboundMember.Endpoint: {
+          tags.push(proxyRef.tag)
+          break
+        }
+
+        case OutboundMember.Subscription: {
+          const cachedProxies = await getProxies(proxyRef.id)
+          for (const node of cachedProxies) {
+            if (isTagMatching(node.tag)) {
+              tags.push(node.tag)
+              proxiesSet.add(node)
+            }
           }
+          break
+        }
+        case OutboundMember.Proxy: {
+          const cachedProxies = await getProxies(proxyRef.subId)
+          const targetProxy = cachedProxies.find((v) => v.tag === proxyRef.tag)
+          if (targetProxy && isTagMatching(targetProxy.tag)) {
+            tags.push(targetProxy.tag)
+            proxiesSet.add(targetProxy)
+          }
+          break
         }
       }
-      if ([RuleAction.RouteOptions, RuleAction.Predefined].includes(rule.action as any)) {
-        deepAssign(extra, JSON.parse(rule.server))
+    }
+    return tags
+  }
+
+  const generatedOutbounds = await Promise.all(
+    outbounds.map(async (outbound): Promise<CoreOutboundConfig> => {
+      const { type, tag, config } = outbound
+
+      switch (type) {
+        case Outbound.Urltest:
+        case Outbound.Selector: {
+          const resolvedTags = await resolveProxyTags(outbound)
+
+          return filterInvalidProps({
+            ...config,
+            type,
+            tag,
+            interval: type !== Outbound.Selector ? (config.interval as any) : undefined,
+            outbounds: resolvedTags,
+          })
+        }
+
+        case Outbound.Direct: {
+          return filterInvalidProps({
+            ...generateDialer(config.dialer, maps),
+            type,
+            tag,
+          })
+        }
+
+        default: {
+          return filterInvalidProps({
+            ...config,
+            type,
+            tag,
+          })
+        }
       }
-      if (rule.action === RuleAction.Reject) {
-        extra.method = rule.server
-      }
-      return extra
     }),
-    disable_cache: dns.disable_cache,
-    disable_expire: dns.disable_expire,
-    independent_cache: dns.independent_cache,
-    final: getDnsServer(dns.final),
-    ...extra,
+  )
+
+  generatedOutbounds.push(...proxiesSet)
+
+  return generatedOutbounds
+}
+
+const generateRuleSets = (ruleSets: RuleSetProfile[], maps: TagMaps): CoreRuleSetConfig[] => {
+  const { env } = useEnvStore()
+  const rulesetsStore = useRulesetsStore()
+
+  return ruleSets.map((ruleset): CoreRuleSetConfig => {
+    const { type, tag, config } = ruleset
+
+    switch (type) {
+      case RuleSetType.Inline:
+        return {
+          type,
+          tag,
+          rules: JSON.parse(config.rules),
+        }
+      case RuleSetType.Local: {
+        const localRuleset = rulesetsStore.getRulesetById(config.path)
+        return {
+          ...config,
+          type,
+          tag,
+          path: localRuleset?.path.replace(/^data\//, `${env.appDataPath}/`) ?? '',
+        }
+      }
+      default: {
+        return filterInvalidProps({
+          ...config,
+          type,
+          tag,
+          http_client: maps.httpClients.get(config.http_client),
+        } as CoreRuleSetOf<typeof RuleSetType.Remote>)
+      }
+    }
+  })
+}
+
+export const generateRuleConditions = (
+  rule: DnsRuleProfile,
+  maps: TagMaps,
+): CoreDnsDefaultRule | CoreDnsLogicalRule => {
+  const mergeValue = <T>(value: T[], original: T[] | undefined): T[] => {
+    original ??= []
+    return [...new Set([...original, ...value])]
+  }
+
+  const flattenRuleItems = (items: DnsRuleItem[]): CoreDnsDefaultRule => {
+    const result: NormalizeListableProps<Pick<CoreDnsDefaultRule, DnsRuleType>> = {}
+
+    for (const item of items) {
+      const { type, value } = item
+      switch (type) {
+        case DnsRuleType.Inbound: {
+          result[type] = mergeValue(
+            value.map((v) => maps.inbounds.get(v)!),
+            result[type],
+          )
+          break
+        }
+
+        case DnsRuleType.RuleSet: {
+          result[type] = mergeValue(
+            value.map((v) => maps.ruleSets.get(v)!),
+            result[type],
+          )
+          break
+        }
+
+        case DnsRuleType.InterfaceAddress:
+        case DnsRuleType.NetworkInterfaceAddress: {
+          Object.entries(value).forEach(([key, v]) => {
+            const orig = (result[type] ?? {}) as Recordable<string[]>
+            orig[key] = mergeValue(v.split(','), orig[key])
+          })
+          break
+        }
+
+        case CommonRuleType.UserId:
+        case DnsRuleType.SourcePort:
+        case DnsRuleType.Port: {
+          result[type] = mergeValue(value.map(Number), result[type])
+          break
+        }
+
+        case CommonRuleType.IpVersion: {
+          result[type] = Number(value) as any
+          break
+        }
+
+        default:
+          if (Array.isArray(value)) {
+            result[type] = mergeValue(value, result[type] as any[]) as any
+          } else {
+            result[type] = value as any
+          }
+      }
+    }
+
+    return result
+  }
+
+  const { type, ruleConditions } = rule
+
+  switch (type) {
+    case RuleType.Inline: {
+      return JSON.parse(ruleConditions)
+    }
+
+    case RuleType.Logical: {
+      const { mode, rules } = ruleConditions
+
+      return {
+        type: 'logical',
+        mode,
+        rules: rules.map((subRule) => flattenRuleItems(subRule.conditions)),
+      }
+    }
+
+    default: {
+      return flattenRuleItems(ruleConditions)
+    }
   }
 }
 
-export const generateDnsServerURL = (dnsServer: App.DnsServerConfig) => {
-  const { type, server_port, path, server, interface: _interface } = dnsServer
-  let address = ''
-  if (type == DnsServer.Https) {
-    address = `https://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
-  } else if (type == DnsServer.H3) {
-    address = `h3://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
-  } else if (type == DnsServer.Dhcp) {
-    address = `dhcp://${_interface}`
-  } else if (type == DnsServer.FakeIP) {
-    address =
-      'fake-ip://' +
-      (dnsServer.inet4_range ? dnsServer.inet4_range : '') +
-      (dnsServer.inet6_range ? (dnsServer.inet4_range ? ',' : '') + dnsServer.inet6_range : '')
-  } else if (type === DnsServer.Hosts) {
-    address = 'hosts'
-  } else if (type === DnsServer.Local) {
-    address = 'local'
-  } else {
-    address = `${type}://${server}${server_port ? ':' + server_port : ''}`
+export const generateRouteRules = (
+  rules: RouteRuleProfile[],
+  maps: TagMaps,
+): CoreRouteRuleConfig[] => {
+  return rules.flatMap((rule): CoreRouteRuleConfig[] => {
+    const { enable, action, actionParams } = rule
+    if (!enable) return []
+
+    const ruleConditions = filterInvalidProps(
+      generateRuleConditions(rule as any, maps) as CoreRouteDefaultRule,
+    )
+
+    switch (action) {
+      case RouteRuleAction.Route:
+      case RouteRuleAction.Bypass: {
+        return [
+          filterInvalidProps({
+            ...ruleConditions,
+            ...actionParams.options,
+            action,
+            outbound: maps.outbounds.get(actionParams.outbound),
+          } as CoreRouteRuleConfig),
+        ]
+      }
+
+      case RouteRuleAction.Resolve: {
+        return [
+          filterInvalidProps({
+            ...ruleConditions,
+            ...generateDomainResolver(actionParams, maps),
+            action,
+          }),
+        ]
+      }
+
+      default: {
+        return [
+          filterInvalidProps({
+            ...ruleConditions,
+            ...actionParams,
+            action,
+          } as CoreRouteRuleConfig),
+        ]
+      }
+    }
+  })
+}
+
+const generateRoute = (route: RouteProfile, maps: TagMaps): CoreRouteConfig => {
+  const { fields, ...rest } = route
+  return filterInvalidProps({
+    ...JSON.parse(fields),
+    ...rest,
+    default_http_client: maps.httpClients.get(route.default_http_client),
+    final: maps.outbounds.get(route.final),
+    default_domain_resolver: generateDomainResolver(route.default_domain_resolver, maps),
+
+    rule_set: generateRuleSets(route.rule_set, maps),
+    rules: generateRouteRules(route.rules, maps),
+  })
+}
+
+const generateDnsServers = (
+  dnsServes: DnsServerProfile[],
+  maps: TagMaps,
+): CoreDnsServerConfig[] => {
+  return dnsServes.flatMap((server): CoreDnsServerConfig[] => {
+    const { type, tag, config, fields } = server
+
+    switch (type) {
+      case DnsServer.Local: {
+        const { prefer_go, neighbor_domain, dialer } = config
+        return [
+          filterInvalidProps({
+            ...generateDialer(dialer, maps),
+            prefer_go,
+            neighbor_domain,
+            type,
+            tag,
+          }),
+        ]
+      }
+
+      case DnsServer.Hosts: {
+        return [
+          filterInvalidProps({
+            ...config,
+            type,
+            tag,
+            predefined: Object.entries(config.predefined).reduce<Recordable<string[]>>(
+              (p, [k, v]) => {
+                p[k] = v.split(',')
+                return p
+              },
+              {},
+            ),
+          }),
+        ]
+      }
+
+      case DnsServer.Tcp:
+      case DnsServer.Udp:
+      case DnsServer.Tls:
+      case DnsServer.Quic:
+      case DnsServer.Https:
+      case DnsServer.H3: {
+        const { server, server_port, dialer } = config
+        const base = {
+          ...(JSON.parse(fields) as CoreDnsServerOf<typeof DnsServer.Udp>),
+          ...generateDialer(dialer, maps),
+          server,
+          server_port,
+        }
+        if (type === DnsServer.Https || type === DnsServer.H3) {
+          return [
+            filterInvalidProps({
+              ...base,
+              type,
+              tag,
+              path: config.path,
+            }),
+          ]
+        } else {
+          return [
+            filterInvalidProps({
+              ...base,
+              type,
+              tag,
+            }),
+          ]
+        }
+      }
+
+      case DnsServer.Dhcp: {
+        return [
+          filterInvalidProps({
+            ...config,
+            ...generateDialer(config.dialer, maps),
+            type,
+            tag,
+          }),
+        ]
+      }
+
+      case DnsServer.FakeIp: {
+        return [
+          filterInvalidProps({
+            ...config,
+            type,
+            tag,
+          }),
+        ]
+      }
+
+      default: {
+        return [
+          filterInvalidProps({
+            ...JSON.parse(fields),
+            ...(type === DnsServer.Mdns ? generateDialer(config.dialer, maps) : config),
+            type,
+            tag,
+          } as CoreDnsServerConfig),
+        ]
+      }
+    }
+  })
+}
+
+export const generateDnsRules = (rules: DnsRuleProfile[], maps: TagMaps): CoreDnsRuleConfig[] => {
+  return rules.flatMap((rule): CoreDnsRuleConfig[] => {
+    const { enable, action, actionParams } = rule
+    if (!enable) return []
+
+    const ruleConditions = filterInvalidProps(generateRuleConditions(rule, maps))
+
+    switch (action) {
+      case DnsRuleAction.Route:
+      case DnsRuleAction.Evaluate: {
+        return [
+          filterInvalidProps({
+            ...ruleConditions,
+            ...generateDomainResolver(actionParams, maps),
+            action,
+          }),
+        ]
+      }
+
+      default: {
+        return [
+          filterInvalidProps({
+            ...ruleConditions,
+            ...actionParams,
+            action,
+          } as CoreDnsRuleConfig),
+        ]
+      }
+    }
+  })
+}
+
+const generateDns = (dns: DnsProfile, maps: TagMaps): CoreDnsConfig => {
+  const { fields, ...rest } = dns
+  return filterInvalidProps({
+    ...JSON.parse(fields),
+    ...rest,
+    final: maps.dnsServers.get(dns.final),
+
+    servers: generateDnsServers(dns.servers, maps),
+    rules: generateDnsRules(dns.rules, maps),
+  })
+}
+
+export const generateDnsServerUrl = (server: DnsServerProfile): string => {
+  const { type, config } = server
+
+  const host = (c: StandardDnsServerConfig) => `${c.server}${c.server_port || ''}`
+
+  switch (type) {
+    case DnsServer.Tcp:
+    case DnsServer.Udp:
+    case DnsServer.Tls:
+    case DnsServer.Quic:
+    case DnsServer.Https:
+    case DnsServer.H3: {
+      return `${type}://${host(config)}${type === DnsServer.Https || type === DnsServer.H3 ? config.path : ''}`
+    }
+
+    case DnsServer.Dhcp: {
+      return `${type}://${config.interface}`
+    }
+
+    case DnsServer.FakeIp: {
+      const ranges = [config.inet4_range, config.inet6_range].filter(Boolean).join(',')
+      return `fake-ip://${ranges}`
+    }
+
+    default: {
+      return type
+    }
   }
-  return address
 }
 
 const _adaptToStableBranch = (_: Recordable) => {}
@@ -402,7 +776,7 @@ type GenerateConfigOptions = {
 }
 
 export const generateConfig = async (
-  originalProfile: App.Profile,
+  originalProfile: Profile,
   options: GenerateConfigOptions = {},
 ) => {
   if (typeof options === 'boolean') {
@@ -419,15 +793,28 @@ export const generateConfig = async (
   } = options
 
   const profile = deepClone(originalProfile)
-  // step 1
-  let config: Recordable = {
-    log: profile.log,
-    experimental: generateExperimental(profile.experimental, profile.outbounds),
-    inbounds: generateInbounds(profile.inbounds, profile.route.rule_set),
-    outbounds: await generateOutbounds(profile.outbounds),
-    route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns),
-    dns: generateDns(profile.dns, profile.route.rule_set, profile.inbounds, profile.outbounds),
+
+  const tagMaps: TagMaps = {
+    httpClients: buildIdTagMapping(profile.http_clients),
+    inbounds: buildIdTagMapping([...profile.endpoints, ...profile.inbounds]),
+    outbounds: buildIdTagMapping([...profile.endpoints, ...profile.outbounds]),
+    ruleSets: buildRuleSetMapping(profile.route.rule_set),
+    dnsServers: buildIdTagMapping(profile.dns.servers),
   }
+
+  // step 1
+  let config = filterInvalidProps({
+    log: filterInvalidProps(profile.log),
+    ntp: generateNtp(profile.ntp, tagMaps),
+    experimental: generateExperimental(profile.experimental, tagMaps),
+    endpoints: generateEndpoints(profile.endpoints, tagMaps) as any,
+    services: generateServices(profile.services, tagMaps) as any,
+    http_clients: generateHttpClients(profile.http_clients, tagMaps) as any,
+    inbounds: generateInbounds(profile.inbounds, tagMaps) as any,
+    outbounds: (await generateOutbounds(profile.outbounds, tagMaps)) as any,
+    route: generateRoute(profile.route, tagMaps),
+    dns: generateDns(profile.dns, tagMaps),
+  } satisfies CoreConfig)
 
   // adapt to stable branch
   if (enableStableConfigCompat) {
@@ -437,7 +824,7 @@ export const generateConfig = async (
   // step 2
   if (enablePluginProcessing) {
     const pluginsStore = usePluginsStore()
-    config = await pluginsStore.onGenerateTrigger(config, originalProfile)
+    config = (await pluginsStore.onGenerateTrigger(config, originalProfile)) as any
   }
 
   // step 3
@@ -471,15 +858,13 @@ export const generateConfig = async (
 }
 
 export const generateConfigFile = async (
-  profile: App.Profile,
+  profile: Profile,
   beforeWrite: (config: any) => Promise<any>,
 ) => {
-  const header = `DO NOT EDIT - Generated by ${APP_TITLE}`
+  const header = `DO NOT EDIT - Auto Generated by ${APP_TITLE}`
 
   const _config = await generateConfig(profile)
   const config = await beforeWrite(_config)
-
-  config.experimental.cache_file.path = 'cache.db'
 
   await WriteFile(CoreConfigFilePath, JSON.stringify({ $schema: header, ...config }, null, 2))
 }

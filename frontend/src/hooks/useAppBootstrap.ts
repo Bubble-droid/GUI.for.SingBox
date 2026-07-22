@@ -2,7 +2,7 @@ import { ref } from 'vue'
 
 import { IsStartup } from '@/bridge'
 import * as Stores from '@/stores'
-import { createCoreSymlinks, createDesktopEntry, message, sleep } from '@/utils'
+import { createCoreSymlinks, createDesktopEntry, downloadAppIcon, message, sleep } from '@/utils'
 
 const MIN_SPLASH_DURATION = 1000
 
@@ -37,14 +37,17 @@ export const useAppBootstrap = () => {
       scheduledTasksStore.setupScheduledTasks(),
     ])
 
-    try {
-      if (envStore.env.isSystemPackage) {
-        await createCoreSymlinks()
-      } else {
-        await createDesktopEntry()
+    if (envStore.env.os === 'linux') {
+      try {
+        if (!envStore.env.isSystemPackage) {
+          await createDesktopEntry()
+          downloadAppIcon()
+        } else if (envStore.env.isBundled) {
+          await createCoreSymlinks()
+        }
+      } catch (err) {
+        console.error('Linux integration failed:', err)
       }
-    } catch (err) {
-      console.error('Linux integration failed:', err)
     }
 
     const startTime = performance.now()

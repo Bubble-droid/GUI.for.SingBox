@@ -4,10 +4,10 @@ import { useI18n, I18nT } from 'vue-i18n'
 
 import { RemoveFile, WriteFile, OpenURI } from '@/bridge'
 import { DraggableOptions, ViewOptions } from '@/constant/app'
-import { BuiltInOutbound, EmptyRuleSet } from '@/constant/kernel'
-import { DefaultRouteRule, DefaultRouteRuleset } from '@/constant/profile'
+import { EmptyRuleSet } from '@/constant/kernel'
+import { getDefaultRuleSet } from '@/constant/profile.ts'
 import { View } from '@/enums/app'
-import { RulesetFormat, RulesetType, RuleType } from '@/enums/kernel'
+import { RuleSetFormat, RuleSetType } from '@/enums/kernel'
 import { useRulesetsStore, useAppSettingsStore, useProfilesStore } from '@/stores'
 import {
   debounce,
@@ -20,14 +20,19 @@ import {
   modal,
 } from '@/utils'
 
+import type { Menu, RuleSet } from '@/types/app.ts'
+import type { RuleSetLocalProfile } from '@/types/profile/index.ts'
+
 import RulesetForm from './components/RulesetForm.vue'
 import RulesetHub from './components/RulesetHub.vue'
 import RulesetView from './components/RulesetView.vue'
 
-const sourceMenuList: App.Menu[] = [
+const sourceMenuList: Menu[] = [
   {
     label: 'rulesets.editRuleset',
-    handler: (id: string) => handleEditRulesetList(id),
+    handler: (id: string) => {
+      handleEditRulesetList(id)
+    },
   },
   {
     label: 'common.openFile',
@@ -87,7 +92,7 @@ const handleEditRulesetList = (id: string) => {
   m.setContent(RulesetView, { id }).open()
 }
 
-const handleUpdateRuleset = async (r: App.RuleSet) => {
+const handleUpdateRuleset = async (r: RuleSet) => {
   try {
     await rulesetsStore.updateRuleset(r.id)
   } catch (error: any) {
@@ -96,7 +101,7 @@ const handleUpdateRuleset = async (r: App.RuleSet) => {
   }
 }
 
-const handleDeleteRuleset = async (r: App.RuleSet) => {
+const handleDeleteRuleset = async (r: RuleSet) => {
   try {
     await ignoredError(RemoveFile, r.path)
     await rulesetsStore.deleteRuleset(r.id)
@@ -106,7 +111,7 @@ const handleDeleteRuleset = async (r: App.RuleSet) => {
   }
 }
 
-const handleDisableRuleset = async (r: App.RuleSet) => {
+const handleDisableRuleset = async (r: RuleSet) => {
   r.disabled = !r.disabled
   rulesetsStore.editRuleset(r.id, r)
 }
@@ -114,7 +119,7 @@ const handleDisableRuleset = async (r: App.RuleSet) => {
 const handleClearRuleset = async (id: string) => {
   const r = rulesetsStore.getRulesetById(id)
   if (!r) return
-  if (r.format != RulesetFormat.Source) return
+  if (r.format != RuleSetFormat.Source) return
 
   try {
     await WriteFile(r.path, JSON.stringify(EmptyRuleSet, null, 2))
@@ -134,61 +139,26 @@ const handleAddRulesetToProfile = async (id: string) => {
     const profile = items[0]
     if (!profile) return
 
-    const insertionPointIndex = profile.route.rules.findIndex(
-      (rule) => rule.type === RuleType.InsertionPoint,
-    )
-
-    if (insertionPointIndex === -1) {
-      message.warn('kernel.missingInsertionPoint')
-      return
-    }
-
     const profileRuleset = profile.route.rule_set.find(
-      (item) => item.type === RulesetType.Local && item.path === ruleset.id,
+      (item) => item.type === RuleSetType.Local && item.config.path === ruleset.id,
     )
-    if (
-      profileRuleset &&
-      profile.route.rules.some(
-        (rule) =>
-          rule.type === RuleType.RuleSet && rule.payload.split(',').includes(profileRuleset.id),
-      )
-    ) {
-      message.info('common.added')
-      return
-    }
-
-    const outboundOptions = [
-      ...BuiltInOutbound.map((outbound) => ({ label: outbound, value: outbound })),
-      ...profile.outbounds.map((outbound) => ({
-        label: outbound.tag,
-        value: outbound.id,
-        description: outbound.type,
-      })),
-    ]
-    const target = await picker.single('kernel.route.rules.outbound', outboundOptions, [
-      profile.outbounds[0]?.id || BuiltInOutbound[0]!,
-    ])
-
-    if (!target) return
 
     const nextProfile = deepClone(profile)
     let rulesetReferenceId = profileRuleset?.id
     if (!rulesetReferenceId) {
-      const rulesetReference = {
-        ...DefaultRouteRuleset(),
+      const template = getDefaultRuleSet(RuleSetType.Local)
+      const rulesetReference: RuleSetLocalProfile = {
+        ...template,
         tag: ruleset.name,
-        format: ruleset.format,
-        path: ruleset.id,
+        config: {
+          ...template.config,
+          format: ruleset.format,
+          path: ruleset.id,
+        },
       }
       nextProfile.route.rule_set.unshift(rulesetReference)
       rulesetReferenceId = rulesetReference.id
     }
-
-    nextProfile.route.rules.splice(insertionPointIndex + 1, 0, {
-      ...DefaultRouteRule(),
-      payload: rulesetReferenceId,
-      outbound: target,
-    })
 
     await profilesStore.editProfile(nextProfile.id, nextProfile)
     message.success('common.success')
@@ -197,15 +167,15 @@ const handleAddRulesetToProfile = async (id: string) => {
   }
 }
 
-const generateMenus = (r: App.RuleSet) => {
-  const addToProfileMenu: App.Menu = {
+const generateMenus = (r: RuleSet) => {
+  const addToProfileMenu: Menu = {
     label: 'rulesets.addToProfile',
     handler: (id: string) => handleAddRulesetToProfile(id),
   }
 
   return {
-    [RulesetFormat.Source]: [addToProfileMenu, ...sourceMenuList],
-    [RulesetFormat.Binary]: [addToProfileMenu],
+    [RuleSetFormat.Source]: [addToProfileMenu, ...sourceMenuList],
+    [RuleSetFormat.Binary]: [addToProfileMenu],
   }[r.format].map((v) => ({ ...v, handler: () => v.handler?.(r.id) }))
 }
 
@@ -313,14 +283,14 @@ const onSortUpdate = debounce(rulesetsStore.saveRulesets, 1000)
         </Button>
       </template>
 
-      <div v-if="r.format === RulesetFormat.Binary">
+      <div v-if="r.format === RuleSetFormat.Binary">
         {{ t('ruleset.format.name') }}
         :
         {{ r.format || '--' }}
       </div>
 
       <template v-if="appSettingsStore.app.rulesetsView === View.Grid">
-        <div v-if="r.format === RulesetFormat.Source">
+        <div v-if="r.format === RuleSetFormat.Source">
           {{ t('rulesets.rulesetCount') }}
           :
           {{ r.count }}
@@ -332,7 +302,7 @@ const onSortUpdate = debounce(rulesetsStore.saveRulesets, 1000)
         </div>
       </template>
       <template v-else>
-        <div v-if="r.format === RulesetFormat.Source">
+        <div v-if="r.format === RuleSetFormat.Source">
           {{ t('rulesets.rulesetCount') }}
           :
           {{ r.count }}

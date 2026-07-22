@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type IconName } from '@/components/Icon/icons'
+import type { IconName } from '@/components/Icon/icons'
 
 interface Props {
   type?: 'primary' | 'normal' | 'link' | 'text'

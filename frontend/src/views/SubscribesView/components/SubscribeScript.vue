@@ -7,6 +7,8 @@ import { message } from '@/utils'
 
 import Button from '@/components/Button/index.vue'
 
+import type { Subscription } from '@/types'
+
 interface Props {
   id: string
 }
@@ -14,7 +16,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const loading = ref(false)
-const subscribe = ref<App.Subscription>()
+const subscribe = ref<Subscription>()
 const code = ref('')
 
 const { t } = useI18n()

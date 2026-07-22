@@ -8,6 +8,8 @@ import { deepClone, ignoredError, isValidJson, message } from '@/utils'
 
 import Button from '@/components/Button/index.vue'
 
+import type { RuleSet } from '@/types'
+
 interface Props {
   id: string
 }
@@ -15,7 +17,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const loading = ref(false)
-const ruleset = ref<App.RuleSet>()
+const ruleset = ref<RuleSet>()
 const rulesetContent = ref<string>('')
 
 const handleCancel = inject('cancel') as any

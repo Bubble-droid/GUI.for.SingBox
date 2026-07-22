@@ -1,94 +1,138 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { DraggableOptions } from '@/constant/app'
-import { OutboundOptions, BuiltInOutbound } from '@/constant/kernel'
-import { DefaultOutbound } from '@/constant/profile'
-import { Outbound } from '@/enums/kernel'
+import { DraggableOptions, getDefaultOutbound, OutboundOptions } from '@/constant'
+import { Outbound, OutboundMember } from '@/enums'
 import { useSubscribesStore } from '@/stores'
 import { deepClone, message } from '@/utils'
 
-const model = defineModel<App.Profile['outbounds']>({ required: true })
+import type { OutboundProfile, EndpointProfile, Recordable, OutboundMemberProfile } from '@/types'
+
+import DialerConfig from './Shared/DialerConfig.vue'
+
+interface Props {
+  endpoints: EndpointProfile[]
+  outboundOptions: { label: string; value: string }[]
+  serverOptions: { label: string; value: string }[]
+}
+
+const props = defineProps<Props>()
+const model = defineModel<OutboundProfile[]>({ required: true })
 
 let updateGroupId = 0
 const showEditModal = ref(false)
 const showSortModal = ref(false)
-const expandedSet = ref<Set<string>>(new Set(['Built-in', 'Subscription']))
-const SubscribesNameMap = ref<Record<string, string>>({})
+const expandedSet = ref<Set<string>>(
+  new Set([OutboundMember.BuiltIn, OutboundMember.Endpoint, OutboundMember.Subscription]),
+)
+const SubscribesNameMap = ref<Recordable<string>>({})
 
-const proxyGroup = ref([
-  {
-    id: 'Built-in',
-    name: 'kernel.outbounds.builtIn',
-    proxies: [
-      ...BuiltInOutbound.map((v) => ({ id: v, tag: v, type: 'Built-In' })),
-      ...model.value.map(({ id, tag, type }) => ({ id, tag, type: type as string })),
-    ],
-  },
-  {
-    id: 'Subscription',
-    name: 'kernel.outbounds.subscriptions',
-    proxies: [],
-  },
-])
-
-const fields = ref<App.Outbound>(DefaultOutbound())
-
-const { t } = useI18n()
 const subscribesStore = useSubscribesStore()
+const { t } = useI18n()
+
+subscribesStore.subscribes.forEach(({ id, name }) => {
+  SubscribesNameMap.value[id] = name
+})
+
+const proxyGroup = computed(() => {
+  const groups: Array<{
+    id: string
+    name: string
+    proxies: Array<{ id: string; tag: string; type: string }>
+  }> = [
+    {
+      id: OutboundMember.BuiltIn,
+      name: 'kernel.outbounds.builtIn',
+      proxies: model.value.map(({ id, tag, type }) => ({ id, tag, type: type })),
+    },
+    {
+      id: OutboundMember.Endpoint,
+      name: 'kernel.outbounds.endpoint',
+      proxies: props.endpoints.map((v) => ({
+        id: v.id,
+        tag: v.tag,
+        type: OutboundMember.Endpoint,
+      })),
+    },
+    {
+      id: OutboundMember.Subscription,
+      name: 'kernel.outbounds.subscriptions',
+      proxies: subscribesStore.subscribes.map((sub) => ({
+        id: sub.id,
+        tag: sub.name,
+        type: OutboundMember.Subscription,
+      })),
+    },
+  ]
+
+  subscribesStore.subscribes.forEach(({ id, name, proxies }) => {
+    groups.push({
+      id,
+      name,
+      proxies: proxies.map((p) => ({ id: p.id, tag: p.tag, type: OutboundMember.Proxy })),
+    })
+  })
+
+  return groups
+})
+
+const fields = ref<OutboundProfile>(getDefaultOutbound(Outbound.Selector))
 
 const handleAdd = () => {
   updateGroupId = -1
-  fields.value = DefaultOutbound()
+  fields.value = getDefaultOutbound(Outbound.Selector)
   showEditModal.value = true
 }
 
 defineExpose({ handleAdd })
 
 const handleDeleteGroup = (index: number) => {
-  const id = model.value[index]!.id
   model.value.splice(index, 1)
-  proxyGroup.value = proxyGroup.value.map((v) => ({
-    ...v,
-    proxies: v.proxies.filter((v) => v.id !== id),
-  }))
 }
 
-const handleClearGroup = async (outbound: App.Outbound) => {
-  const filtered = outbound.outbounds.filter(({ id, type }) => {
-    if (type === 'Built-in') {
-      return model.value.some((v) => v.id === id)
-    } else if (type === 'Subscription') {
-      return subscribesStore.getSubscribeById(id)
+const isGroupOutbound = (
+  outbound: OutboundProfile,
+): outbound is Extract<
+  OutboundProfile,
+  { type: typeof Outbound.Selector | typeof Outbound.Urltest }
+> => {
+  return outbound.type === Outbound.Selector || outbound.type === Outbound.Urltest
+}
+
+const handleClearGroup = (outbound: OutboundProfile) => {
+  if (!isGroupOutbound(outbound)) return
+  const validOutbounds = outbound.outbounds.filter((ref) => {
+    if (ref.type === OutboundMember.BuiltIn) {
+      return model.value.some((v) => v.id === ref.id)
+    } else if (ref.type === OutboundMember.Endpoint) {
+      return props.endpoints.some((v) => v.id === ref.id)
+    } else if (ref.type === OutboundMember.Subscription) {
+      return subscribesStore.getSubscribeById(ref.id)
+    } else if (ref.type === OutboundMember.Proxy) {
+      const sub = subscribesStore.getSubscribeById(ref.subId)
+      return sub?.proxies.some((v) => v.id === ref.id)
     }
-    const sub = subscribesStore.getSubscribeById(type)
-    return sub && sub.proxies.some((v) => v.id === id)
+    return false
   })
-  outbound.outbounds.splice(0)
-  outbound.outbounds.push(...filtered)
+  outbound.outbounds = validOutbounds
 }
 
 const handleAddEnd = () => {
-  const { id, tag, type } = fields.value
-  // Add
+  const { id, tag } = fields.value
   if (updateGroupId === -1) {
     model.value.unshift(fields.value)
-    proxyGroup.value[0]!.proxies.unshift({ id, tag, type })
     return
   }
-  // Update
+
   model.value[updateGroupId] = fields.value
-  const idx = proxyGroup.value[0]!.proxies.findIndex((v) => v.id === id)
-  if (idx !== -1) {
-    proxyGroup.value[0]!.proxies.splice(idx, 1, { id, tag, type })
-    model.value
-      .filter((outbound) => [Outbound.Selector, Outbound.Urltest].includes(outbound.type as any))
-      .forEach(({ outbounds }) => {
-        const proxy = outbounds.find((v) => v.id === id)
-        proxy && (proxy.tag = tag)
-      })
-  }
+
+  model.value
+    .filter((outbound) => isGroupOutbound(outbound))
+    .forEach((outbound) => {
+      const proxy = outbound.outbounds.find((v) => v.id === id)
+      if (proxy) proxy.tag = tag
+    })
 }
 
 const handleEditGroup = (index: number) => {
@@ -98,40 +142,56 @@ const handleEditGroup = (index: number) => {
 }
 
 const handleAddProxy = (groupID: string, proxyID: string, proxyName: string) => {
-  // self
-  if (groupID === 'Built-in' && proxyID === fields.value.id) return
+  if (!isGroupOutbound(fields.value)) return
+  if (groupID === OutboundMember.BuiltIn && proxyID === fields.value.id) return
 
   const idx = fields.value.outbounds.findIndex((outbound) => outbound.id === proxyID)
   if (idx !== -1) {
     fields.value.outbounds.splice(idx, 1)
   } else {
-    fields.value.outbounds.push({ id: proxyID, tag: proxyName, type: groupID })
-  }
-}
-
-const isInuse = (groupID: string, proxyID: string) => {
-  return fields.value.outbounds.find((outbound) => outbound.id === proxyID)
-}
-
-const hasLost = (outbound: App.Outbound) => {
-  if ([Outbound.Selector, Outbound.Urltest].includes(outbound.type as any)) {
-    return outbound.outbounds.some(({ id, type }) => {
-      if (type === 'Built-in') {
-        if (BuiltInOutbound.includes(id as Outbound)) {
-          return false
-        }
-        return model.value.every((v) => v.id !== id)
-      } else if (type === 'Subscription') {
-        const sub = subscribesStore.getSubscribeById(id)
-        if (!sub) return true
-        return false
+    let newMember: OutboundMemberProfile
+    if (groupID === OutboundMember.BuiltIn) {
+      newMember = {
+        id: proxyID,
+        tag: proxyName,
+        type: OutboundMember.BuiltIn,
       }
-      const sub = subscribesStore.getSubscribeById(type)
-      if (!sub) return true
-      return sub.proxies.every((v) => v.id !== id)
-    })
+    } else if (groupID === OutboundMember.Endpoint) {
+      newMember = { id: proxyID, tag: proxyName, type: OutboundMember.Endpoint }
+    } else if (groupID === OutboundMember.Subscription) {
+      newMember = { id: proxyID, tag: proxyName, type: OutboundMember.Subscription }
+    } else {
+      newMember = {
+        id: proxyID,
+        subId: groupID,
+        tag: proxyName,
+        type: OutboundMember.Proxy,
+      }
+    }
+    fields.value.outbounds.push(newMember)
   }
-  return false
+}
+
+const isInuse = (_groupID: string, proxyID: string) => {
+  if (!isGroupOutbound(fields.value)) return false
+  return fields.value.outbounds.some((outbound) => outbound.id === proxyID)
+}
+
+const hasLost = (outbound: OutboundProfile) => {
+  if (!isGroupOutbound(outbound)) return false
+  return outbound.outbounds.some((ref) => {
+    if (ref.type === OutboundMember.BuiltIn) {
+      return model.value.every((v) => v.id !== ref.id)
+    } else if (ref.type === OutboundMember.Endpoint) {
+      return props.endpoints.every((v) => v.id !== ref.id)
+    } else if (ref.type === OutboundMember.Subscription) {
+      return !subscribesStore.getSubscribeById(ref.id)
+    } else if (ref.type === OutboundMember.Proxy) {
+      const sub = subscribesStore.getSubscribeById(ref.subId)
+      return !sub || sub.proxies.every((v) => v.id !== ref.id)
+    }
+    return false
+  })
 }
 
 const handleSortGroup = (index: number) => {
@@ -144,25 +204,19 @@ const handleSortGroupEnd = () => {
   model.value[updateGroupId] = fields.value
 }
 
-const clacSubscriptionsCount = (outbound: App.Outbound) => {
-  if ([Outbound.Selector, Outbound.Urltest].includes(outbound.type as any)) {
-    return outbound.outbounds.filter((v) => v.type === 'Subscription').length
-  }
-  return 0
+const clacSubscriptionsCount = (outbound: OutboundProfile) => {
+  if (!isGroupOutbound(outbound)) return 0
+  return outbound.outbounds.filter((v) => v.type === OutboundMember.Subscription).length
 }
 
-const clacOutboundsCount = (outbound: App.Outbound) => {
-  if ([Outbound.Selector, Outbound.Urltest].includes(outbound.type as any)) {
-    return outbound.outbounds.filter((v) => v.type !== 'Subscription').length
-  }
-  return 0
+const clacOutboundsCount = (outbound: OutboundProfile) => {
+  if (!isGroupOutbound(outbound)) return 0
+  return outbound.outbounds.filter((v) => v.type !== OutboundMember.Subscription).length
 }
 
-const needToAdd = (outbound: App.Outbound) => {
-  if ([Outbound.Selector, Outbound.Urltest].includes(outbound.type as any)) {
-    return outbound.outbounds.length === 0
-  }
-  return false
+const needToAdd = (outbound: OutboundProfile) => {
+  if (!isGroupOutbound(outbound)) return false
+  return outbound.outbounds.length === 0
 }
 
 const toggleExpanded = (key: string) => {
@@ -176,14 +230,12 @@ const toggleExpanded = (key: string) => {
 const isExpanded = (key: string) => expandedSet.value.has(key)
 
 const showLost = () => message.warn('kernel.outbounds.notFound')
-
 const showNeedToAdd = () => message.error('kernel.outbounds.needToAdd')
 
-subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
-  proxyGroup.value[1]!.proxies.push({ id, tag: name, type: 'Subscribe' })
-  proxyGroup.value.push({ id, name, proxies })
-  SubscribesNameMap.value[id] = name
-})
+const onTypeChange = (newType: Outbound) => {
+  const base = { id: fields.value.id }
+  fields.value = { ...getDefaultOutbound(newType), ...base }
+}
 </script>
 
 <template>
@@ -199,7 +251,11 @@ subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
     <Card v-for="(outbound, index) in model" :key="outbound.id" class="mb-2">
       <div class="flex items-center py-2">
         <div class="font-bold flex items-center" style="min-width: 90px">
-          <img v-if="outbound.icon" :src="outbound.icon" class="w-18 h-18 mr-4" />
+          <img
+            v-if="isGroupOutbound(outbound) && outbound.icon"
+            :src="outbound.icon"
+            class="w-18 h-18 mr-4"
+          />
           <span
             v-if="hasLost(outbound)"
             class="cursor-pointer"
@@ -218,7 +274,12 @@ subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
           </span>
           {{ outbound.tag }}
         </div>
-        <Button type="link" size="small" @click="handleSortGroup(index)">
+        <Button
+          v-if="isGroupOutbound(outbound)"
+          type="link"
+          size="small"
+          @click="handleSortGroup(index)"
+        >
           (
           {{ t('kernel.outbounds.refsOutbound') }}:{{ clacOutboundsCount(outbound) }}
           /
@@ -245,8 +306,8 @@ subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
     max-height="80"
   >
     <Divider>{{ t('kernel.outbounds.refs') }}</Divider>
-    <Empty v-if="fields.outbounds.length === 0" />
-    <div v-draggable="[fields.outbounds, DraggableOptions]">
+    <Empty v-if="!isGroupOutbound(fields) || fields.outbounds.length === 0" />
+    <div v-if="isGroupOutbound(fields)" v-draggable="[fields.outbounds, DraggableOptions]">
       <Button v-for="proxy in fields.outbounds" :key="proxy.id" type="link">
         {{ proxy.tag }}
       </Button>
@@ -256,65 +317,90 @@ subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
   <Modal
     v-model:open="showEditModal"
     :on-ok="handleAddEnd"
-    title="kernel.outbounds.name"
+    title="kernel.outbounds.title"
     width="80"
     height="80"
   >
     <div class="form-item">
+      {{ t('kernel.outbounds.type.title') }}
+      <Select
+        :model-value="fields.type"
+        :options="OutboundOptions"
+        @update:model-value="onTypeChange"
+      />
+    </div>
+    <div class="form-item">
       {{ t('kernel.outbounds.tag') }}
       <Input v-model="fields.tag" autofocus />
     </div>
-    <div class="form-item">
-      {{ t('kernel.outbounds.type') }}
-      <Radio v-model="fields.type" :options="OutboundOptions" />
-    </div>
-    <template v-if="Outbound.Selector === fields.type || Outbound.Urltest === fields.type">
+    <template v-if="fields.type === Outbound.Direct">
+      <DialerConfig
+        v-model="fields.config.dialer"
+        :outbound-options="outboundOptions"
+        :server-options="serverOptions"
+      />
+    </template>
+    <template v-if="fields.type === Outbound.Bridge">
+      <div class="form-item">
+        {{ t('kernel.outbounds.bridge.interface') }}
+        <InterfaceSelect v-model="fields.config.interface" clearable />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.outbounds.bridge.bridge_name.title') }}
+        <Input
+          v-model="fields.config.bridge_name"
+          :placeholder="t('kernel.outbounds.bridge.bridge_name.default')"
+          editable
+          clearable
+        />
+      </div>
+    </template>
+    <template v-if="isGroupOutbound(fields)">
       <div class="form-item">
         {{ t('kernel.outbounds.hidden') }}
         <Switch v-model="fields.hidden" />
       </div>
-      <!-- <div class="form-item">
-        {{ t('kernel.outbounds.interrupt_exist_connections') }}
-        <Switch v-model="fields.interrupt_exist_connections" />
-      </div> -->
       <div class="form-item">
         {{ t('kernel.outbounds.include') }}
-        <Input v-model="fields.include" placeholder="keywords1|keywords2" />
+        <Input v-model="fields.include" placeholder="keywords1|keywords2" editable clearable />
       </div>
       <div class="form-item">
         {{ t('kernel.outbounds.exclude') }}
-        <Input v-model="fields.exclude" placeholder="keywords1|keywords2" />
+        <Input v-model="fields.exclude" placeholder="keywords1|keywords2" editable clearable />
       </div>
       <div class="form-item">
         <div class="flex items-center gap-8">
           {{ t('kernel.outbounds.icon') }}
           <img v-if="fields.icon" :src="fields.icon" class="w-18 h-18" />
         </div>
-        <Input v-model="fields.icon" clearable placeholder="https://" />
-      </div>
-    </template>
-    <template v-if="Outbound.Direct === fields.type || Outbound.Block === fields.type">
-      <Empty :description="t('kernel.outbounds.directDesc')" />
-    </template>
-    <template v-else-if="fields.type === Outbound.Urltest">
-      <div class="form-item">
-        {{ t('kernel.outbounds.url') }}
-        <Input v-model="fields.url" placeholder="http(s)://" />
+        <Input v-model="fields.icon" clearable placeholder="https://" editable />
       </div>
       <div class="form-item">
-        {{ t('kernel.outbounds.interval') }}
-        <Input v-model="fields.interval" placeholder="3m" />
-      </div>
-      <div class="form-item">
-        {{ t('kernel.outbounds.tolerance') }}
-        <Input v-model="fields.tolerance" type="number" />
+        {{ t('kernel.outbounds.group.interrupt_exist_connections') }}
+        <Switch v-model="fields.config.interrupt_exist_connections" />
       </div>
     </template>
-    <template v-if="[Outbound.Selector, Outbound.Urltest].includes(fields.type as any)">
-      <Divider>
-        {{ t('kernel.outbounds.refsOutbound') }} & {{ t('kernel.outbounds.refsSubscription') }}
-      </Divider>
 
+    <template v-if="fields.type === Outbound.Urltest">
+      <div class="form-item">
+        {{ t('kernel.outbounds.group.url') }}
+        <Input v-model="fields.config.url" placeholder="http(s)://" editable clearable />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.outbounds.group.interval') }}
+        <Input v-model="fields.config.interval" placeholder="3m" editable clearable />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.outbounds.group.tolerance') }}
+        <Input v-model="fields.config.tolerance" type="number" editable clearable />
+      </div>
+    </template>
+
+    <template v-if="isGroupOutbound(fields)">
+      <Divider
+        >{{ t('kernel.outbounds.refsOutbound') }} &
+        {{ t('kernel.outbounds.refsSubscription') }}</Divider
+      >
       <div v-for="group in proxyGroup" :key="group.id" class="group">
         <Button
           :type="isExpanded(group.id) ? 'link' : 'text'"

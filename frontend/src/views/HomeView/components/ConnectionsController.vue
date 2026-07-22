@@ -18,6 +18,7 @@ import {
 
 import type { PickerItem } from '@/components/Picker/index.vue'
 import type { Column } from '@/components/Table/index.vue'
+import type { Menu } from '@/types'
 import type { CoreApiConnectionsData } from '@/types/kernel'
 
 type TrafficCacheType = { up: number; down: number }
@@ -148,7 +149,7 @@ const columnTitleMap = computed(() => {
   return map
 })
 
-const menu: App.Menu[] = [
+const menu: Menu[] = [
   {
     label: 'common.details',
     handler: (record: Record<string, any>) => {

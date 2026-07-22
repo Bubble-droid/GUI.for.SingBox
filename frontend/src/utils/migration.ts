@@ -1,7 +1,8 @@
 import { RequestProxyMode } from '@/enums/app'
 
+import type { Profile, Subscription, RuleSet } from '@/types'
 
-export const migrateProfiles = async (profiles: App.Profile[], save: () => Promise<string>) => {
+export const migrateProfiles = async (profiles: Profile[], save: () => Promise<string>) => {
   let needSync = false
 
   profiles.forEach((profile) => {
@@ -23,7 +24,7 @@ export const migrateProfiles = async (profiles: App.Profile[], save: () => Promi
 }
 
 export const migrateSubscribes = async (
-  subscribes: App.Subscription[],
+  subscribes: Subscription[],
   save: () => Promise<string>,
 ) => {
   let needSync = false
@@ -42,11 +43,11 @@ export const migrateSubscribes = async (
   if (needSync) await save()
 }
 
-export const migrateRulesets = async (rulesets: App.RuleSet[], save: () => Promise<string>) => {
+export const migrateRulesets = async (rulesets: RuleSet[], save: () => Promise<string>) => {
   let needSync = false
 
   rulesets.forEach((ruleset) => {
-    const legacyRuleset = ruleset as App.RuleSet & { tag?: string }
+    const legacyRuleset = ruleset as RuleSet & { tag?: string }
 
     if (typeof ruleset.name === 'undefined' && legacyRuleset.tag) {
       ruleset.name = legacyRuleset.tag

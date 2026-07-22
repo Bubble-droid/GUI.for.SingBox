@@ -5,10 +5,17 @@ import { useI18n } from 'vue-i18n'
 import { IsNotificationAvailable, RequestNotificationAuthorization } from '@/bridge'
 import { ScheduledTaskOptions } from '@/constant/app'
 import { ScheduledTasksType } from '@/enums/app'
-import { useScheduledTasksStore, useSubscribesStore, useRulesetsStore, usePluginsStore } from '@/stores'
+import {
+  useScheduledTasksStore,
+  useSubscribesStore,
+  useRulesetsStore,
+  usePluginsStore,
+} from '@/stores'
 import { alert, deepClone, formatDate, isValidCron, message, sampleID } from '@/utils'
 
 import Button from '@/components/Button/index.vue'
+
+import type { ScheduledTask } from '@/types'
 
 interface Props {
   id?: string
@@ -18,7 +25,7 @@ const props = defineProps<Props>()
 
 const loading = ref(false)
 
-const task = ref<App.ScheduledTask>({
+const task = ref<ScheduledTask>({
   id: sampleID(),
   name: '',
   type: ScheduledTasksType.RunScript,

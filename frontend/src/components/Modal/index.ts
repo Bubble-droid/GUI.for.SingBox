@@ -8,6 +8,8 @@ import {
   type Component,
 } from 'vue'
 
+import type { Recordable } from '@/types/utils.js'
+
 import Modal from './index.vue'
 import type { Props as ModalProps, Slots as ModalSlots } from './index.vue'
 

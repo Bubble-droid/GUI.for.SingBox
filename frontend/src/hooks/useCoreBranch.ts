@@ -246,7 +246,7 @@ export const useCoreBranch = (isAlpha = false) => {
   )
 
   refreshLocalVersion()
-  if (!envStore.env.isSystemPackage) {
+  if (!envStore.env.isBundled) {
     refreshRemoteVersion()
   }
 

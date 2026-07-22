@@ -1,14 +1,16 @@
 <script lang="ts" setup>
 import { computed, h, isVNode, ref, resolveComponent, watch } from 'vue'
 
+import type { CustomAction, CustomActionFn, CustomActionApi } from '@/types'
+
 interface Props {
-  actions: (App.CustomAction | App.CustomActionFn)[]
+  actions: (CustomAction | CustomActionFn)[]
 }
 
 const props = defineProps<Props>()
 
-const resolvedActionMap = ref(new Map<string, App.CustomAction>())
-const api: App.CustomActionApi = {
+const resolvedActionMap = ref(new Map<string, CustomAction>())
+const api: CustomActionApi = {
   h: (type: any, ...args: any[]) => h(resolveComponent(type), ...args),
   ref,
 }
@@ -17,7 +19,7 @@ const computedActions = computed(() => Array.from(resolvedActionMap.value.values
 
 const resolveDynamicField = <T>(field: T): T => (typeof field === 'function' ? field(api) : field)
 
-const renderCustomActionSlot = (slot: App.CustomAction['componentSlots']) => {
+const renderCustomActionSlot = (slot: CustomAction['componentSlots']) => {
   const resolved = resolveDynamicField(slot ?? {})
   return isVNode(resolved) ? resolved : h('div', resolved)
 }
@@ -25,7 +27,7 @@ const renderCustomActionSlot = (slot: App.CustomAction['componentSlots']) => {
 watch(
   () => props.actions,
   (actions) => {
-    const newMap = new Map<string, App.CustomAction>()
+    const newMap = new Map<string, CustomAction>()
     for (const action of actions) {
       const id = action.id!
       if (resolvedActionMap.value.has(id)) {

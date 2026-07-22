@@ -1,765 +1,671 @@
 import {
-  LogLevel,
-  Inbound,
-  Outbound,
-  TunStack,
   ClashMode,
-  RulesetType,
-  RulesetFormat,
-  RuleType,
-  RuleAction,
-  Strategy,
+  DnsRcode,
+  DnsRejectMethod,
+  DnsRuleAction,
   DnsServer,
-} from '@/enums/kernel'
-import i18n from '@/lang'
+  Inbound,
+  LogLevel,
+  LogicalRuleMode,
+  Outbound,
+  RouteRejectMethod,
+  RouteRuleAction,
+  RuleSetFormat,
+  RuleSetType,
+  RuleType,
+  Service,
+  TunDnsMode,
+  TunStack,
+} from '@/enums'
+import { Endpoint } from '@/enums'
 import { generateSecureKey, sampleID } from '@/utils'
 
-import { DefaultTestURL } from './app'
+import type { NetworkStrategy, TlsSpoofMethod, DomainStrategy } from '@/enums'
+import type {
+  Dialer,
+  DnsProfile,
+  DnsRouteOptions,
+  DnsRuleProfile,
+  DnsServerProfile,
+  DomainResolver,
+  EndpointProfile,
+  ExperimentalProfile,
+  HttpClientProfile,
+  InboundProfile,
+  Listen,
+  LogProfile,
+  MixinProfile,
+  NtpProfile,
+  OutboundGroupProfile,
+  OutboundProfile,
+  Profile,
+  ProfileBase,
+  RouteOptions,
+  RouteProfile,
+  RouteRuleProfile,
+  RuleSetProfile,
+  ScriptProfile,
+  ServiceProfile,
+  SwitchableProfile,
+  TagItem,
+} from '@/types'
 
-const { t } = i18n.global
+const DefaultTagItem = (): TagItem => ({
+  id: sampleID(),
+  tag: '',
+})
 
-const DefaultOutboundIds = {
-  Select: 'outbound-select',
-  Urltest: 'outbound-urltest',
-  Direct: 'outbound-direct',
-  Block: 'outbound-block',
-  Fallback: 'outbound-fallback',
-  Global: 'outbound-global',
-}
+const DefaultProfileBase = (): ProfileBase => ({
+  ...DefaultTagItem(),
+  fields: '{}',
+})
 
-const DefaultInboundIds = {
-  MixedIn: 'mixed-in',
-  Tun: 'tun-in',
-}
+const DefaultSwitchable = (): SwitchableProfile => ({
+  ...DefaultProfileBase(),
+  enable: true,
+})
 
-const DefaultRulesetIds = {
-  CATEGORY_ADS: 'Category-Ads',
-  GEOIP_CN: 'GeoIP-CN',
-  GEOSITE_CN: 'GeoSite-CN',
-  GEOLOCATION_NOT_CN: 'GeoLocation-!CN',
-  GEOSITE_PRIVATE: 'GeoSite-Private',
-  GEOIP_PRIVATE: 'GeoIP-Private',
-}
+export const getDefaultListen = (portOffset = 0): Listen => ({
+  listen: '127.0.0.1',
+  listen_port: 20119 + portOffset,
+  bind_interface: '',
+  routing_mark: 0,
+  reuse_addr: false,
+  netns: '',
+  tcp_fast_open: false,
+  tcp_multi_path: false,
+  disable_tcp_keep_alive: false,
+  tcp_keep_alive: '',
+  tcp_keep_alive_interval: '',
+  udp_fragment: false,
+  udp_timeout: '',
+  detour: '',
+})
 
-const DefaultDnsServersIds = {
-  LocalDns: 'Local-DNS',
-  RemoteDns: 'Remote-DNS',
-  FakeIP: 'Fake-IP',
-  LocalDnsResolver: 'Local-DNS-Resolver',
-  RemoteDnsResolver: 'Remote-DNS-Resolver',
-}
+export const getDefaultDnsRouteOptions = (): DnsRouteOptions => ({
+  disable_cache: false,
+  disable_optimistic_cache: false,
+  rewrite_ttl: 0,
+  timeout: '',
+  client_subnet: '',
+})
 
-export const DefaultLog = (): App.Log => ({
+export const getDefaultDomainResolver = (): DomainResolver => ({
+  ...getDefaultDnsRouteOptions(),
+  server: '',
+  strategy: '' as DomainStrategy,
+})
+
+export const getDefaultDialer = (): Dialer => ({
+  detour: '',
+  bind_interface: '',
+  inet4_bind_address: '',
+  inet6_bind_address: '',
+  bind_address_no_port: false,
+  protect_path: '',
+  routing_mark: 0,
+  reuse_addr: false,
+  netns: '',
+  connect_timeout: '',
+  tcp_fast_open: false,
+  tcp_multi_path: false,
+  disable_tcp_keep_alive: false,
+  tcp_keep_alive: '',
+  tcp_keep_alive_interval: '',
+  udp_fragment: false,
+  domain_resolver: getDefaultDomainResolver(),
+  network_strategy: '' as NetworkStrategy,
+  network_type: [],
+  fallback_network_type: [],
+  fallback_delay: '',
+  network_fallback_delay: '',
+})
+
+export const getDefaultRouteOptions = (): RouteOptions => ({
+  override_address: '',
+  override_port: 0,
+  network_strategy: '' as NetworkStrategy,
+  fallback_delay: '',
+  udp_disable_domain_unmapping: false,
+  udp_connect: false,
+  udp_timeout: '',
+  tls_fragment: false,
+  tls_fragment_fallback_delay: '',
+  tls_record_fragment: false,
+  tls_spoof: '',
+  tls_spoof_method: '' as TlsSpoofMethod,
+})
+
+export const getDefaultLog = (): LogProfile => ({
   disabled: false,
   level: LogLevel.Info,
   output: '',
   timestamp: false,
 })
 
-export const DefaultExperimental = (): App.Experimental => ({
+export const getDefaultNtp = (): NtpProfile => ({
+  enabled: false,
+  server: '',
+  server_port: 123,
+  interval: '',
+  dialer: getDefaultDialer(),
+})
+
+export const getDefaultExperimental = (): ExperimentalProfile => ({
   clash_api: {
-    external_controller: '127.0.0.1:20123',
+    external_controller: '127.0.0.1:20118',
     external_ui: '',
     external_ui_download_url: '',
-    external_ui_download_detour: DefaultOutboundIds.Direct,
+    external_ui_download_detour: '',
     secret: generateSecureKey(),
     default_mode: ClashMode.Rule,
-    access_control_allow_origin: ['*'],
+    access_control_allow_origin: [],
     access_control_allow_private_network: false,
   },
   cache_file: {
     enabled: true,
     path: 'cache.db',
     cache_id: sampleID(),
-    store_fakeip: true,
-    store_rdrc: true,
-    rdrc_timeout: '7d',
+    store_dns: false,
+    store_fakeip: false,
   },
 })
 
-export const DefaultInboundDirect = (): NonNullable<App.Inbound['direct']> => ({
-  listen: {
-    listen: '127.0.0.1',
-    listen_port: 20119,
-    tcp_fast_open: false,
-    tcp_multi_path: false,
-    udp_fragment: false,
+export const getDefaultEndpoint = <T extends Endpoint>(
+  type: T,
+): Extract<EndpointProfile, { type: T }> => {
+  const base = {
+    ...DefaultSwitchable(),
+    type,
+    tag: `${type}-ep`,
+  }
+  if (type === Endpoint.OpenvpnServer) {
+    return {
+      ...base,
+      config: {
+        listen: getDefaultListen(),
+      },
+    } as Extract<EndpointProfile, { type: T }>
+  } else {
+    return {
+      ...base,
+      config: {
+        dialer: getDefaultDialer(),
+      },
+    } as Extract<EndpointProfile, { type: T }>
+  }
+}
+
+type ServiceProfileResult<T extends Service> = Extract<ServiceProfile, { type: T }>
+
+export const getDefaultService = <T extends Service>(type: T): ServiceProfileResult<T> => {
+  const base = {
+    ...DefaultSwitchable(),
+    type,
+    tag: `${type}-sv`,
+  }
+
+  switch (type) {
+    case Service.Api: {
+      return {
+        ...base,
+        config: {
+          listen: getDefaultListen(),
+          secret: '',
+          access_control_allow_origin: [],
+          access_control_allow_private_network: false,
+          dashboard: {
+            enabled: false,
+            path: '',
+            download_url: '',
+            http_client: '',
+            update_interval: '',
+          },
+        },
+      } as unknown as ServiceProfileResult<T>
+    }
+
+    case Service.UsbipClient: {
+      return {
+        ...base,
+        config: {
+          dialer: getDefaultDialer(),
+        },
+      } as ServiceProfileResult<T>
+    }
+
+    default: {
+      return {
+        ...base,
+        config: {
+          listen: getDefaultListen(),
+        },
+      } as ServiceProfileResult<T>
+    }
+  }
+}
+
+export const getDefaultHttpClient = (): HttpClientProfile => ({
+  ...DefaultSwitchable(),
+  config: {
+    dialer: getDefaultDialer(),
   },
-  network: '',
 })
 
-export const DefaultInboundSocks = (): NonNullable<App.Inbound['socks']> => ({
-  listen: {
-    listen: '127.0.0.1',
-    listen_port: 20120,
-    tcp_fast_open: false,
-    tcp_multi_path: false,
-    udp_fragment: false,
-  },
-  users: [],
-})
+type InboundProfileResult<T extends Inbound> = Extract<InboundProfile, { type: T }>
 
-export const DefaultInboundHttp = (): NonNullable<App.Inbound['http']> => ({
-  listen: {
-    listen: '127.0.0.1',
-    listen_port: 20121,
-    tcp_fast_open: false,
-    tcp_multi_path: false,
-    udp_fragment: false,
-  },
-  users: [],
-})
+export const getDefaultInbound = <T extends Inbound>(type: T): InboundProfileResult<T> => {
+  const base = {
+    ...DefaultSwitchable(),
+    type,
+    tag: `${type}-in`,
+  }
 
-export const DefaultInboundMixed = (): NonNullable<App.Inbound['mixed']> => ({
-  listen: {
-    listen: '127.0.0.1',
-    listen_port: 20122,
-    tcp_fast_open: false,
-    tcp_multi_path: false,
-    udp_fragment: false,
-  },
-  users: [],
-})
+  switch (type) {
+    case Inbound.Direct:
+    case Inbound.Tproxy:
+      return {
+        ...base,
+        config: {
+          listen: getDefaultListen(1),
+          network: '',
+        },
+      } as unknown as InboundProfileResult<T>
 
-export const DefaultInboundTun = (): NonNullable<App.Inbound['tun']> => ({
-  interface_name: '',
-  address: ['172.18.0.1/30', 'fdfe:dcba:9876::1/126'],
-  mtu: 0,
-  auto_route: true,
-  auto_redirect: false,
-  strict_route: false,
-  route_address: [],
-  route_exclude_address: [],
-  route_address_set: [],
-  route_exclude_address_set: [],
-  endpoint_independent_nat: false,
-  stack: TunStack.Mixed,
-  include_interface: [],
-  exclude_interface: [],
-  otherFields: '{}',
-})
+    case Inbound.Mixed:
+    case Inbound.Socks:
+    case Inbound.Http:
+      return {
+        ...base,
+        config: {
+          listen: getDefaultListen(3),
+          users: {},
+        },
+      } as unknown as InboundProfileResult<T>
 
-export const DefaultInbounds = (): App.Inbound[] => [
-  {
-    id: DefaultInboundIds.MixedIn,
-    type: Inbound.Mixed,
-    tag: 'mixed-in',
-    enable: true,
-    mixed: DefaultInboundMixed(),
-  },
-  {
-    id: DefaultInboundIds.Tun,
-    type: Inbound.Tun,
-    tag: 'tun-in',
-    enable: false,
-    tun: DefaultInboundTun(),
-  },
-]
+    case Inbound.Tun:
+      return {
+        ...base,
+        config: {
+          interface_name: '',
+          address: ['172.18.0.1/30', 'fdfe:dcba:9876::1/126'],
+          mtu: 0,
+          dns_mode: TunDnsMode.Hijack,
+          dns_address: [],
+          auto_route: true,
+          auto_redirect: false,
+          strict_route: false,
+          endpoint_independent_nat: false,
+          stack: TunStack.Mixed,
+          route_address: [],
+          route_exclude_address: [],
+          route_address_set: [],
+          route_exclude_address_set: [],
+          include_interface: [],
+          exclude_interface: [],
+        },
+      } as unknown as InboundProfileResult<T>
 
-export const DefaultOutbound = (): App.Outbound => ({
-  id: sampleID(),
-  tag: '',
-  type: Outbound.Selector,
-  outbounds: [],
-  interrupt_exist_connections: true,
-  url: DefaultTestURL,
-  interval: '3m',
-  tolerance: 150,
-  include: '',
-  exclude: '',
-  icon: '',
-  hidden: false,
-})
+    default:
+      return {
+        ...base,
+        config: {
+          listen: getDefaultListen(),
+        },
+      } as unknown as InboundProfileResult<T>
+  }
+}
 
-export const DefaultOutbounds = (): App.Outbound[] => [
-  {
-    id: DefaultOutboundIds.Select,
-    tag: t('outbound.select'),
-    type: Outbound.Selector,
-    outbounds: [{ id: DefaultOutboundIds.Urltest, type: 'Built-in', tag: t('outbound.urltest') }],
-    interrupt_exist_connections: true,
-    url: '',
-    interval: '3m',
-    tolerance: 150,
-    include: '',
-    exclude: '',
-    icon: '',
-    hidden: false,
-  },
-  {
-    id: DefaultOutboundIds.Urltest,
-    tag: t('outbound.urltest'),
-    type: Outbound.Urltest,
+type OutboundProfileResult<T extends Outbound> = Extract<OutboundProfile, { type: T }>
+
+export const getDefaultOutbound = <T extends Outbound>(type: T): OutboundProfileResult<T> => {
+  const base = {
+    ...DefaultProfileBase(),
+    type,
+    tag: `${type}-out`,
+  }
+
+  const groupFields: OutboundGroupProfile = {
     outbounds: [],
-    interrupt_exist_connections: true,
-    url: DefaultTestURL,
-    interval: '3m',
-    tolerance: 150,
     include: '',
     exclude: '',
     icon: '',
     hidden: false,
-  },
-  {
-    id: DefaultOutboundIds.Direct,
-    tag: t('outbound.direct'),
-    type: Outbound.Selector,
-    outbounds: [
-      { id: 'direct', type: 'Built-in', tag: 'direct' },
-      { id: 'block', type: 'Built-in', tag: 'block' },
-    ],
-    interrupt_exist_connections: true,
-    url: '',
-    interval: '3m',
-    tolerance: 150,
-    include: '',
-    exclude: '',
-    icon: '',
-    hidden: false,
-  },
-  {
-    id: DefaultOutboundIds.Block,
-    tag: t('outbound.block'),
-    type: Outbound.Selector,
-    outbounds: [
-      { id: 'block', type: 'Built-in', tag: 'block' },
-      { id: 'direct', type: 'Built-in', tag: 'direct' },
-    ],
-    interrupt_exist_connections: true,
-    url: '',
-    interval: '3m',
-    tolerance: 150,
-    include: '',
-    exclude: '',
-    icon: '',
-    hidden: false,
-  },
-  {
-    id: DefaultOutboundIds.Fallback,
-    tag: t('outbound.fallback'),
-    type: Outbound.Selector,
-    outbounds: [
-      { id: DefaultOutboundIds.Select, type: 'Built-in', tag: t('outbound.select') },
-      { id: DefaultOutboundIds.Direct, type: 'Built-in', tag: t('outbound.direct') },
-    ],
-    interrupt_exist_connections: true,
-    url: '',
-    interval: '3m',
-    tolerance: 150,
-    include: '',
-    exclude: '',
-    icon: '',
-    hidden: false,
-  },
-  {
-    id: DefaultOutboundIds.Global,
-    tag: 'GLOBAL',
-    type: Outbound.Selector,
-    outbounds: [
-      { id: DefaultOutboundIds.Select, type: 'Built-in', tag: t('outbound.select') },
-      { id: DefaultOutboundIds.Urltest, type: 'Built-in', tag: t('outbound.urltest') },
-      { id: DefaultOutboundIds.Direct, type: 'Built-in', tag: t('outbound.direct') },
-      { id: DefaultOutboundIds.Block, type: 'Built-in', tag: t('outbound.block') },
-      { id: DefaultOutboundIds.Fallback, type: 'Built-in', tag: t('outbound.fallback') },
-    ],
-    interrupt_exist_connections: true,
-    url: '',
-    interval: '3m',
-    tolerance: 150,
-    include: '',
-    exclude: '',
-    icon: '',
-    hidden: false,
-  },
-]
+  }
 
-export const DefaultRouteRule = (): App.Rule => ({
-  id: sampleID(),
-  type: RuleType.RuleSet,
-  enable: true,
-  payload: '',
-  invert: false,
-  action: RuleAction.Route,
-  outbound: '',
-  sniffer: [],
-  strategy: Strategy.Default,
-  server: '',
-})
+  switch (type) {
+    case Outbound.Direct:
+      return {
+        ...base,
+        config: {
+          dialer: getDefaultDialer(),
+        },
+      } as unknown as OutboundProfileResult<T>
 
-export const DefaultRouteRuleset = (): App.ProfileRuleSet => ({
-  id: sampleID(),
-  type: RulesetType.Local,
-  tag: '',
-  format: RulesetFormat.Binary,
-  url: '',
-  download_detour: '',
-  update_interval: '',
-  rules: '',
-  path: '',
-})
+    case Outbound.Bridge:
+      return {
+        ...base,
+        config: {
+          interface: '',
+          bridge_name: '',
+        },
+      } as unknown as OutboundProfileResult<T>
 
-export const DefaultRoute = (): App.Route => ({
-  rules: [
-    {
-      id: sampleID(),
-      type: RuleType.Inbound,
-      payload: DefaultInboundIds.Tun,
-      enable: true,
-      invert: false,
-      action: RuleAction.Sniff,
-      outbound: '',
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.Protocol,
-      enable: true,
-      payload: 'dns',
-      invert: false,
-      action: RuleAction.HijackDNS,
-      outbound: '',
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.ClashMode,
-      payload: ClashMode.Direct,
-      enable: true,
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Direct,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.ClashMode,
-      enable: true,
-      payload: ClashMode.Global,
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Global,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: RuleType.InsertionPoint,
-      type: RuleType.InsertionPoint,
-      enable: true,
-      payload: '',
-      invert: false,
-      action: RuleAction.Route,
-      outbound: '',
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.Network,
-      enable: true,
-      payload: 'icmp',
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Direct,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.Protocol,
-      enable: true,
-      payload: 'quic',
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Block,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.RuleSet,
-      enable: true,
-      payload: DefaultRulesetIds.CATEGORY_ADS,
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Block,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.RuleSet,
-      enable: true,
-      payload: DefaultRulesetIds.GEOSITE_PRIVATE,
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Direct,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.RuleSet,
-      enable: true,
-      payload: DefaultRulesetIds.GEOSITE_CN,
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Direct,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.RuleSet,
-      enable: true,
-      payload: DefaultRulesetIds.GEOIP_PRIVATE,
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Direct,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.RuleSet,
-      enable: true,
-      payload: DefaultRulesetIds.GEOIP_CN,
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Direct,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-    {
-      id: sampleID(),
-      type: RuleType.RuleSet,
-      enable: true,
-      payload: DefaultRulesetIds.GEOLOCATION_NOT_CN,
-      invert: false,
-      action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Select,
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: '',
-    },
-  ],
-  rule_set: [
-    {
-      id: DefaultRulesetIds.CATEGORY_ADS,
-      type: RulesetType.Remote,
-      tag: DefaultRulesetIds.CATEGORY_ADS,
-      format: RulesetFormat.Binary,
-      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs',
-      download_detour: DefaultOutboundIds.Direct,
-      update_interval: '',
-      rules: '',
-      path: '',
-    },
-    {
-      id: DefaultRulesetIds.GEOIP_PRIVATE,
-      type: RulesetType.Remote,
-      tag: DefaultRulesetIds.GEOIP_PRIVATE,
-      format: RulesetFormat.Binary,
-      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs',
-      download_detour: DefaultOutboundIds.Direct,
-      update_interval: '',
-      rules: '',
-      path: '',
-    },
-    {
-      id: DefaultRulesetIds.GEOSITE_PRIVATE,
-      type: RulesetType.Remote,
-      tag: DefaultRulesetIds.GEOSITE_PRIVATE,
-      format: RulesetFormat.Binary,
-      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs',
-      download_detour: DefaultOutboundIds.Direct,
-      update_interval: '',
-      rules: '',
-      path: '',
-    },
-    {
-      id: DefaultRulesetIds.GEOIP_CN,
-      type: RulesetType.Remote,
-      tag: DefaultRulesetIds.GEOIP_CN,
-      format: RulesetFormat.Binary,
-      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs',
-      download_detour: DefaultOutboundIds.Direct,
-      update_interval: '',
-      rules: '',
-      path: '',
-    },
-    {
-      id: DefaultRulesetIds.GEOSITE_CN,
-      type: RulesetType.Remote,
-      tag: DefaultRulesetIds.GEOSITE_CN,
-      format: RulesetFormat.Binary,
-      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs',
-      download_detour: DefaultOutboundIds.Direct,
-      update_interval: '',
-      rules: '',
-      path: '',
-    },
-    {
-      id: DefaultRulesetIds.GEOLOCATION_NOT_CN,
-      type: RulesetType.Remote,
-      tag: DefaultRulesetIds.GEOLOCATION_NOT_CN,
-      format: RulesetFormat.Binary,
-      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs',
-      download_detour: DefaultOutboundIds.Direct,
-      update_interval: '',
-      rules: '',
-      path: '',
-    },
-  ],
+    case Outbound.Block:
+      return {
+        ...base,
+        config: {},
+      } as unknown as OutboundProfileResult<T>
+
+    case Outbound.Urltest:
+      return {
+        ...base,
+        ...groupFields,
+        config: {
+          url: '',
+          interval: '3m',
+          tolerance: 50,
+          interrupt_exist_connections: false,
+        },
+      } as unknown as OutboundProfileResult<T>
+
+    case Outbound.Selector:
+      return {
+        ...base,
+        ...groupFields,
+        config: {
+          interrupt_exist_connections: false,
+        },
+      } as unknown as OutboundProfileResult<T>
+
+    default:
+      return base as OutboundProfileResult<T>
+  }
+}
+
+type RuleSetProfileResult<T extends RuleSetType> = Extract<RuleSetProfile, { type: T }>
+
+export const getDefaultRuleSet = <T extends RuleSetType>(type: T): RuleSetProfileResult<T> => {
+  const base = {
+    ...DefaultTagItem(),
+    type,
+  }
+
+  switch (type) {
+    case RuleSetType.Local:
+      return {
+        ...base,
+        config: {
+          path: '',
+          format: RuleSetFormat.Binary,
+        },
+      } as RuleSetProfileResult<T>
+
+    case RuleSetType.Remote:
+      return {
+        ...base,
+        tag: [],
+        config: {
+          url: '',
+          format: RuleSetFormat.Binary,
+          http_client: '',
+          update_interval: '',
+        },
+      } as unknown as RuleSetProfileResult<T>
+
+    case RuleSetType.Inline:
+    default:
+      return {
+        ...base,
+        config: {
+          rules: '[]',
+        },
+      } as RuleSetProfileResult<T>
+  }
+}
+
+const getDefaultRuleConditions = (type: RuleType) => {
+  switch (type) {
+    case RuleType.Logical:
+      return {
+        mode: LogicalRuleMode.And,
+        rules: [],
+      }
+    case RuleType.Inline:
+      return '{}'
+    case RuleType.Default:
+    default:
+      return []
+  }
+}
+
+const getRouteActionParams = (action: RouteRuleAction) => {
+  switch (action) {
+    case RouteRuleAction.Route:
+    case RouteRuleAction.Bypass:
+      return {
+        outbound: '',
+        options: getDefaultRouteOptions(),
+      }
+    case RouteRuleAction.RouteOptions:
+      return getDefaultRouteOptions()
+    case RouteRuleAction.Reject:
+      return {
+        method: RouteRejectMethod.Default,
+        no_drop: false,
+      }
+    case RouteRuleAction.Sniff:
+      return {
+        sniffer: [],
+      }
+    case RouteRuleAction.Resolve:
+      return getDefaultDomainResolver()
+    default:
+      return {}
+  }
+}
+
+type RouteRuleProfileResult<T extends RuleType, A extends RouteRuleAction> = Extract<
+  RouteRuleProfile,
+  { type: T; action: A }
+>
+
+export const getDefaultRouteRule = <T extends RuleType, A extends RouteRuleAction>(
+  type: T,
+  action: A,
+): RouteRuleProfileResult<T, A> => {
+  return {
+    id: sampleID(),
+    enable: true,
+    invert: false,
+    fields: '{}',
+    type,
+    ruleConditions: getDefaultRuleConditions(type),
+    action,
+    actionParams: getRouteActionParams(action),
+  } as unknown as RouteRuleProfileResult<T, A>
+}
+
+export const getDefaultRoute = (): RouteProfile => ({
+  rules: [],
+  rule_set: [],
   auto_detect_interface: true,
   default_interface: '',
-  final: DefaultOutboundIds.Fallback,
   find_process: false,
-  default_domain_resolver: {
-    server: DefaultDnsServersIds.LocalDns,
-    client_subnet: '',
-  },
+  final: '',
+  default_http_client: '',
+  default_domain_resolver: getDefaultDomainResolver(),
+  fields: '{}',
 })
 
-export const DefaultDnsServer = (): App.DnsServerConfig => ({
-  id: sampleID(),
-  tag: '',
-  type: DnsServer.Local,
-  detour: '',
-  domain_resolver: '',
-  server: '',
-  server_port: '',
-  path: '',
-  interface: '',
-  inet4_range: '',
-  inet6_range: '',
-  hosts_path: [],
-  predefined: {},
-})
+const getDnsActionParams = (action: DnsRuleAction) => {
+  switch (action) {
+    case DnsRuleAction.Route:
+    case DnsRuleAction.Evaluate:
+      return getDefaultDomainResolver()
+    case DnsRuleAction.RouteOptions:
+      return getDefaultDnsRouteOptions()
+    case DnsRuleAction.Reject:
+      return {
+        method: DnsRejectMethod.Default,
+        no_drop: false,
+      }
+    case DnsRuleAction.Predefined:
+      return {
+        rcode: DnsRcode.NOERROR,
+        answer: [],
+      }
+    default:
+      return {}
+  }
+}
 
-export const DefaultDnsServers = (): App.DnsServerConfig[] => [
-  {
-    id: DefaultDnsServersIds.FakeIP,
-    tag: DefaultDnsServersIds.FakeIP,
-    detour: '',
-    type: DnsServer.FakeIP,
-    domain_resolver: '',
+type DnsRuleProfileResult<T extends RuleType, A extends DnsRuleAction> = Extract<
+  DnsRuleProfile,
+  { type: T; action: A }
+>
+
+export const getDefaultDnsRule = <T extends RuleType, A extends DnsRuleAction>(
+  type: T,
+  action: A,
+): DnsRuleProfileResult<T, A> => {
+  return {
+    id: sampleID(),
+    enable: true,
+    invert: false,
+    match_response: false,
+    fields: '{}',
+    type,
+    ruleConditions: getDefaultRuleConditions(type),
+    action,
+    actionParams: getDnsActionParams(action),
+  } as unknown as DnsRuleProfileResult<T, A>
+}
+
+type DnsServerProfileResult<T extends DnsServer> = Extract<DnsServerProfile, { type: T }>
+
+export const getDefaultDnsServer = <T extends DnsServer>(type: T): DnsServerProfileResult<T> => {
+  const base = {
+    ...DefaultProfileBase(),
+    type,
+    tag: `${type}-dns`,
+  }
+
+  const standardConfig = {
     server: '',
-    server_port: '',
-    path: '',
-    interface: '',
-    inet4_range: '198.18.0.0/15',
-    inet6_range: 'fc00::/18',
-    hosts_path: [],
-    predefined: {},
-  },
-  {
-    id: DefaultDnsServersIds.LocalDns,
-    tag: DefaultDnsServersIds.LocalDns,
-    detour: '',
-    type: DnsServer.Https,
-    domain_resolver: DefaultDnsServersIds.LocalDnsResolver,
-    server: '223.5.5.5',
-    server_port: '443',
-    path: '/dns-query',
-    interface: '',
-    inet4_range: '',
-    inet6_range: '',
-    hosts_path: [],
-    predefined: {},
-  },
-  {
-    id: DefaultDnsServersIds.LocalDnsResolver,
-    tag: DefaultDnsServersIds.LocalDnsResolver,
-    detour: '',
-    type: DnsServer.Udp,
-    domain_resolver: '',
-    server: '223.5.5.5',
-    server_port: '53',
-    path: '',
-    interface: '',
-    inet4_range: '',
-    inet6_range: '',
-    hosts_path: [],
-    predefined: {},
-  },
-  {
-    id: DefaultDnsServersIds.RemoteDns,
-    tag: DefaultDnsServersIds.RemoteDns,
-    detour: DefaultOutboundIds.Select,
-    type: DnsServer.Tls,
-    domain_resolver: DefaultDnsServersIds.RemoteDnsResolver,
-    server: '8.8.8.8',
-    server_port: '853',
-    path: '',
-    interface: '',
-    inet4_range: '',
-    inet6_range: '',
-    hosts_path: [],
-    predefined: {},
-  },
-  {
-    id: DefaultDnsServersIds.RemoteDnsResolver,
-    tag: DefaultDnsServersIds.RemoteDnsResolver,
-    detour: DefaultOutboundIds.Select,
-    type: DnsServer.Udp,
-    domain_resolver: '',
-    server: '8.8.8.8',
-    server_port: '53',
-    path: '',
-    interface: '',
-    inet4_range: '',
-    inet6_range: '',
-    hosts_path: [],
-    predefined: {},
-  },
-]
+    server_port: 0,
+    dialer: getDefaultDialer(),
+  }
 
-export const DefaultFakeIPDnsRule = () => ({
-  __is_fake_ip: true,
-  type: 'logical',
-  mode: 'and',
-  rules: [
-    {
-      domain_suffix: [
-        '.lan',
-        '.localdomain',
-        '.example',
-        '.invalid',
-        '.localhost',
-        '.test',
-        '.local',
-        '.home.arpa',
-        '.msftconnecttest.com',
-        '.msftncsi.com',
-      ],
-      invert: true,
-    },
-    {
-      query_type: ['A', 'AAAA'],
-    },
-  ],
-})
+  switch (type) {
+    case DnsServer.Tcp:
+    case DnsServer.Udp:
+    case DnsServer.Tls:
+    case DnsServer.Quic:
+      return {
+        ...base,
+        config: standardConfig,
+      } as unknown as DnsServerProfileResult<T>
 
-export const DefaultDnsRule = (): App.DnsRule => ({
-  id: sampleID(),
-  type: RuleType.RuleSet,
-  enable: true,
-  payload: '',
-  action: RuleAction.Route,
-  invert: false,
-  // route
-  server: '',
-  strategy: Strategy.Default,
-  // route/route-options
-  disable_cache: false,
-  client_subnet: '',
-})
+    case DnsServer.Https:
+    case DnsServer.H3:
+      return {
+        ...base,
+        config: {
+          ...standardConfig,
+          path: '',
+        },
+      } as unknown as DnsServerProfileResult<T>
 
-export const DefaultDnsRules = (): App.DnsRule[] => [
-  {
-    id: sampleID(),
-    type: RuleType.ClashMode,
-    enable: true,
-    payload: ClashMode.Direct,
-    action: RuleAction.Route,
-    server: DefaultDnsServersIds.LocalDns,
-    invert: false,
-    strategy: Strategy.Default,
-    disable_cache: false,
-    client_subnet: '',
-  },
-  {
-    id: sampleID(),
-    type: RuleType.ClashMode,
-    enable: true,
-    payload: ClashMode.Global,
-    action: RuleAction.Route,
-    server: DefaultDnsServersIds.RemoteDns,
-    invert: false,
-    strategy: Strategy.Default,
-    disable_cache: false,
-    client_subnet: '',
-  },
-  {
-    id: RuleType.InsertionPoint,
-    type: RuleType.InsertionPoint,
-    enable: true,
-    payload: '',
-    action: RuleAction.Route,
-    server: '',
-    invert: false,
-    strategy: Strategy.Default,
-    disable_cache: false,
-    client_subnet: '',
-  },
-  {
-    id: sampleID(),
-    type: RuleType.RuleSet,
-    enable: true,
-    payload: DefaultRulesetIds.GEOSITE_CN,
-    action: RuleAction.Route,
-    server: DefaultDnsServersIds.LocalDns,
-    invert: false,
-    strategy: Strategy.Default,
-    disable_cache: false,
-    client_subnet: '',
-  },
-  {
-    id: sampleID(),
-    type: RuleType.Inline,
-    enable: false,
-    payload: JSON.stringify(DefaultFakeIPDnsRule(), null, 2),
-    action: RuleAction.Route,
-    server: DefaultDnsServersIds.FakeIP,
-    invert: false,
-    strategy: Strategy.Default,
-    disable_cache: false,
-    client_subnet: '',
-  },
-  {
-    id: sampleID(),
-    type: RuleType.RuleSet,
-    enable: true,
-    payload: DefaultRulesetIds.GEOLOCATION_NOT_CN,
-    action: RuleAction.Route,
-    server: DefaultDnsServersIds.RemoteDns,
-    invert: false,
-    strategy: Strategy.Default,
-    disable_cache: false,
-    client_subnet: '',
-  },
-]
+    case DnsServer.Local:
+      return {
+        ...base,
+        config: {
+          prefer_go: false,
+          neighbor_domain: [],
+          dialer: getDefaultDialer(),
+        },
+      } as unknown as DnsServerProfileResult<T>
 
-export const DefaultDns = (): App.Dns => ({
-  servers: DefaultDnsServers(),
-  rules: DefaultDnsRules(),
+    case DnsServer.Dhcp:
+      return {
+        ...base,
+        config: {
+          interface: '',
+          dialer: getDefaultDialer(),
+        },
+      } as unknown as DnsServerProfileResult<T>
+
+    case DnsServer.Hosts:
+      return {
+        ...base,
+        config: {
+          path: [],
+          predefined: {},
+        },
+      } as unknown as DnsServerProfileResult<T>
+
+    case DnsServer.FakeIp:
+      return {
+        ...base,
+        config: {
+          inet4_range: '198.18.0.0/15',
+          inet6_range: 'fc00::/18',
+        },
+      } as unknown as DnsServerProfileResult<T>
+
+    case DnsServer.Mdns:
+      return {
+        ...base,
+        config: {
+          dialer: getDefaultDialer(),
+        },
+      } as unknown as DnsServerProfileResult<T>
+
+    default:
+      return {
+        ...base,
+        config: {},
+      } as unknown as DnsServerProfileResult<T>
+  }
+}
+
+export const getDefaultDns = (): DnsProfile => ({
+  servers: [],
+  rules: [],
+  strategy: '' as DomainStrategy,
+  optimistic: false,
+  reverse_mapping: false,
   disable_cache: false,
   disable_expire: false,
-  independent_cache: false,
   client_subnet: '',
-  final: DefaultDnsServersIds.RemoteDns,
-  strategy: Strategy.Default,
+  final: '',
+  fields: '{}',
 })
 
-export const DefaultMixin = (): App.Profile['mixin'] => {
-  return { priority: 'mixin', format: 'json', config: '' }
-}
+export const getDefaultMixin = (): MixinProfile => ({
+  priority: 'mixin',
+  format: 'json',
+  config: '{}',
+})
 
-export const DefaultScript = (): App.Profile['script'] => {
-  return { code: `const onGenerate = async (config) => {\n  return config\n}` }
-}
+export const getDefaultScript = (): ScriptProfile => ({
+  code: `const onGenerate = async (config) => {\n  return config\n}`,
+})
+
+export const getDefaultProfile = (name = sampleID()): Profile => ({
+  id: sampleID(),
+  name,
+  log: getDefaultLog(),
+  ntp: getDefaultNtp(),
+  experimental: getDefaultExperimental(),
+  endpoints: [],
+  services: [],
+  http_clients: [],
+  inbounds: [],
+  outbounds: [],
+  route: getDefaultRoute(),
+  dns: getDefaultDns(),
+  mixin: getDefaultMixin(),
+  script: getDefaultScript(),
+})

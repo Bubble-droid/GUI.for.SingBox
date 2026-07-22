@@ -2,8 +2,10 @@ import { stringify } from 'yaml'
 
 import { OS } from '@/enums/app'
 import { useAppSettingsStore, useEnvStore } from '@/stores'
-import appDts from '@/types/app.d.ts?raw'
+import appDts from '@/types/app.ts?raw'
 import { APP_IDENTIFIER, APP_TITLE, APP_VERSION, isValidIPv4, isValidIPv6 } from '@/utils'
+
+import type { Entries, Recordable } from '@/types'
 
 export const getAppDts = () => appDts
 
@@ -36,46 +38,50 @@ export const ensureArray = <T>(value: T | T[] | null | undefined): T[] => {
   return value == null ? [] : Array.isArray(value) ? value : [value]
 }
 
-export const filterInvalidProps = <T extends object>(obj: T) => {
-  const result: Recordable<unknown> = {}
-
-  for (const [key, value] of Object.entries(obj)) {
-    if (!value) continue
-    if (Array.isArray(value) && value.length === 0) continue
-    if (isPlainObject(value) && Object.keys(value as object).length === 0) continue
-    result[key] = value
-  }
-
-  return result as StrictRequired<T>
-}
-
-export const filterByTemplate = <
-  O extends object,
-  T extends object,
-  M extends 'include' | 'exclude',
->(
-  obj: O,
-  template: T,
-  mode: M,
-) => {
-  const result: Recordable<unknown> = {}
-
-  for (const [key, value] of Object.entries(obj)) {
-    const hasKey = Object.prototype.hasOwnProperty.call(template, key)
-    if (hasKey === (mode === 'include')) {
-      result[key] = value
-    }
-  }
-
-  return result as M extends 'include' ? Pick<O, Extract<keyof O, keyof T>> : Omit<O, keyof T>
-}
-
-export const getKeys = <T extends object>(obj: T): (keyof T)[] => {
-  return Object.keys(obj) as (keyof T)[]
+export const strictEntries = <T extends object>(obj: T): Entries<T> => {
+  return Object.entries(obj) as unknown as Entries<T>
 }
 
 export const getValues = <T extends object>(obj: T): T[keyof T][] => {
   return Object.values(obj) as T[keyof T][]
+}
+
+type FilterResult<T> = {
+  [K in keyof T]-?: NonNullable<T[K]>
+}
+
+export const filterInvalidProps = <T extends object>(obj: T): FilterResult<T> => {
+  const result: Recordable = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (!value) continue
+    if (Array.isArray(value) && value.length === 0) continue
+    if (isPlainObject(value) && Object.keys(value).length === 0) continue
+    result[key] = value
+  }
+
+  return result as FilterResult<T>
+}
+
+interface ExtractResult<T, M> {
+  owned: Pick<T, Extract<keyof T, keyof M>>
+  rest: Omit<T, keyof M>
+}
+
+export const extractProps = <T extends object, M extends object>(
+  obj: T,
+  template: M,
+): ExtractResult<T, M> => {
+  const owned: Recordable = {}
+  const rest: Recordable = {}
+  for (const [key, value] of Object.entries(obj)) {
+    if (Object.prototype.hasOwnProperty.call(template, key)) {
+      owned[key] = value
+    } else {
+      rest[key] = value
+    }
+  }
+  return { owned, rest } as ExtractResult<T, M>
 }
 
 export const debounce = (fn: (...args: any) => any, wait: number) => {
@@ -314,7 +320,7 @@ export const transformRequestUrl = (url: string) => {
   return url
 }
 
-export const getAutoStartConfiguration = (os: App.OS, appPath: string, delay = 30) => {
+export const getAutoStartConfiguration = (os: OS, appPath: string, delay = 30) => {
   if (os === OS.Windows) {
     const xml = /*xml*/ `<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
