@@ -14,6 +14,7 @@ import (
 
 	sysruntime "runtime"
 
+	"github.com/adrg/xdg"
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -22,6 +23,7 @@ import (
 )
 
 var (
+	AppName             = "gui-for-singbox"
 	AppVersion          = "dev"
 	SingBoxVersion      = "unknown"
 	SingBoxAlphaVersion = "unknown"
@@ -43,6 +45,10 @@ var Env = &EnvResult{
 
 	IsSystemPackage: false,
 	IsBundled:       false,
+	AppDataPath:     "",
+	AppConfigPath:   "",
+	AppCachePath:    "",
+	AppCorePath:     "",
 }
 
 // NewApp creates a new App application struct
@@ -79,6 +85,31 @@ func CreateApp(fs embed.FS) *App {
 	Env.IsSystemPackage = isSystemPackage(exePath)
 	Env.IsBundled = IsBundled()
 
+	isXDGMode := Env.OS == "linux" && Env.AppVersion != "dev"
+
+	if isXDGMode {
+		Env.AppDataPath = filepath.Join(xdg.DataHome, AppName)
+		Env.AppConfigPath = filepath.Join(xdg.ConfigHome, AppName)
+		Env.AppCachePath = filepath.Join(xdg.CacheHome, AppName)
+		Env.AppCorePath = filepath.Join(Env.AppCachePath, "sing-box")
+
+		globalPathResolver = &XDGResolver{
+			dataDir:   Env.AppDataPath,
+			configDir: Env.AppConfigPath,
+			cacheDir:  Env.AppCachePath,
+		}
+	} else {
+		baseDataDir := filepath.Join(Env.BasePath, "data")
+		Env.AppDataPath = baseDataDir
+		Env.AppConfigPath = baseDataDir
+		Env.AppCachePath = filepath.Join(baseDataDir, ".cache")
+		Env.AppCorePath = filepath.Join(Env.AppDataPath, "sing-box")
+
+		globalPathResolver = &PortableResolver{
+			basePath: Env.BasePath,
+		}
+	}
+
 	loadConfig()
 
 	return app
@@ -94,6 +125,17 @@ func (a *App) Startup(ctx context.Context) {
 		log.Printf("Bundled Sing-Box Core (Stable): v%s", SingBoxVersion)
 		log.Printf("Bundled Sing-Box Core (Alpha) : v%s", SingBoxAlphaVersion)
 	}
+
+	isXDGMode := Env.OS == "linux" && Env.AppVersion != "dev"
+	if isXDGMode {
+		log.Println("Storage Mode: XDG Base Directory")
+	} else {
+		log.Println("Storage Mode: Portable (Relative to BasePath)")
+	}
+
+	log.Printf("App Data Path: %s", Env.AppDataPath)
+	log.Printf("App Config Path: %s", Env.AppConfigPath)
+	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
 	if Env.OS == "darwin" {
 		createMacOSSymlink()
@@ -152,6 +194,10 @@ func (a *App) GetEnv(key string) any {
 
 		IsSystemPackage: Env.IsSystemPackage,
 		IsBundled:       Env.IsBundled,
+		AppDataPath:     Env.AppDataPath,
+		AppConfigPath:   Env.AppConfigPath,
+		AppCachePath:    Env.AppCachePath,
+		AppCorePath:     Env.AppCorePath,
 	}
 }
 
@@ -184,7 +230,7 @@ func createMacOSSymlink() {
 		return
 	}
 
-	linkPath := filepath.Join(Env.BasePath, "data")
+	linkPath := resolvePath("data")
 	appPath := filepath.Join("/Users", currentUser.Username, "Library", "Application Support", Env.AppName)
 
 	if err := os.MkdirAll(appPath, os.ModePerm); err != nil {
@@ -215,7 +261,7 @@ func createMacOSMenus(app *App) {
 }
 
 func processFixedWebView2Runtime() {
-	webviewDir := filepath.Join(Env.BasePath, "data", "WebView2")
+	webviewDir := resolvePath("data/WebView2")
 
 	err := filepath.Walk(webviewDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {

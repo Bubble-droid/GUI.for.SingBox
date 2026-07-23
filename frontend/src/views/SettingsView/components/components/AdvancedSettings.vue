@@ -7,7 +7,7 @@ const appSettings = useAppSettingsStore()
 const envStore = useEnvStore()
 
 const handleOpenFolder = async () => {
-  await OpenDir(envStore.env.basePath)
+  await OpenDir(envStore.env.appDataPath)
 }
 </script>
 

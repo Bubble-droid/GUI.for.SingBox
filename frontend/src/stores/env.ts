@@ -20,6 +20,10 @@ export const useEnvStore = defineStore('env', () => {
     isPrivileged: false,
     isSystemPackage: false,
     isBundled: false,
+    appDataPath: '',
+    appConfigPath: '',
+    appCachePath: '',
+    appCorePath: '',
   })
 
   const systemProxy = ref(false)
