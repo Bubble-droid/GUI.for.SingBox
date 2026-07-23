@@ -192,6 +192,23 @@ func (a *App) CopyFile(src string, dst string) FlagResult {
 	return FlagResult{true, "Success"}
 }
 
+func (a *App) CreateSymlink(target string, symlink string) FlagResult {
+	log.Printf("CreateSymlink: %s -> %s", target, symlink)
+
+	fullTarget := resolvePath(target)
+	fullSymlink := resolvePath(symlink)
+
+	if err := os.MkdirAll(filepath.Dir(fullSymlink), os.ModePerm); err != nil {
+		return FlagResult{false, err.Error()}
+	}
+
+	if err := os.Symlink(fullTarget, fullSymlink); err != nil {
+		return FlagResult{false, err.Error()}
+	}
+
+	return FlagResult{true, "Success"}
+}
+
 func (a *App) MakeDir(path string) FlagResult {
 	log.Printf("MakeDir: %s", path)
 

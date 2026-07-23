@@ -49,6 +49,14 @@ export const CopyFile = async (source: string, target: string) => {
   return data
 }
 
+export const CreateSymlink = async (target: string, symlink: string) => {
+  const { flag, data } = await Bridge.CreateSymlink(target, symlink)
+  if (!flag) {
+    throw data
+  }
+  return data
+}
+
 export const FileExists = async (path: string) => {
   const { flag, data } = await Bridge.FileExists(path)
   if (!flag) {
