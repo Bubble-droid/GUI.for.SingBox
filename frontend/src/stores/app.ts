@@ -12,7 +12,7 @@ import {
   ReadDir,
   Exec,
 } from '@/bridge'
-import { LanguageOptions, LocalesFilePath, RollingReleaseDirectory } from '@/constant/app'
+import { LanguageOptions, LocalesFilePath } from '@/constant/app'
 import { OS } from '@/enums/app'
 import { loadLocale } from '@/lang'
 import {
@@ -155,7 +155,6 @@ export const useAppStore = defineStore('app', () => {
         await MoveFile(appPath, cur_pkg_bak)
         await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_TITLE}.app`, appPath)
         await Exec('xattr', ['-rd', 'com.apple.quarantine', appPath])
-        await RemoveFile(`${cur_pkg_bak}/Contents/MacOS/${RollingReleaseDirectory}`)
         await RemoveFile(cur_pkg_bak)
       } else {
         const suffix = { [OS.Windows]: '.exe', [OS.Linux]: '' }[os]
@@ -163,7 +162,6 @@ export const useAppStore = defineStore('app', () => {
         await UnzipZIPFile(downloadCacheFile, '.')
         await MoveFile(APP_TITLE + suffix, appName)
         await RemoveFile(downloadCacheFile)
-        await RemoveFile(RollingReleaseDirectory)
       }
       message.success('about.updateSuccessfulRestart')
       restartable.value = true

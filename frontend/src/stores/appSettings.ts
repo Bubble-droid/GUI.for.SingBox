@@ -102,7 +102,6 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     multipleInstance: false,
     addPluginToMenu: false,
     addGroupToMenu: false,
-    rollingRelease: true,
     debugOutline: false,
     debugNoAnimation: false,
     debugNoRounded: false,
@@ -176,6 +175,10 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     }
     if (settings.debugUsePointer === undefined) {
       settings.debugUsePointer = false
+    }
+
+    if ('rollingRelease' in settings) {
+      delete settings.rollingRelease
     }
 
     app.value = settings
