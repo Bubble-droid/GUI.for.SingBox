@@ -1,3 +1,5 @@
+import type { DefineLocaleMessage } from 'vue-i18n'
+
 export default {
   common: {
     grid: 'Grid',
@@ -810,4 +812,4 @@ export default {
     title: 'Commands',
     noMatching: 'No matching commands',
   },
-}
+} satisfies DefineLocaleMessage
