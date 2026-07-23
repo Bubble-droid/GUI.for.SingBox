@@ -8,7 +8,7 @@ enum ResponseType {
   YAML = 'YAML',
 }
 
-type RequestOptions = {
+interface RequestOptions {
   base?: string
   bearer?: string
   timeout?: number

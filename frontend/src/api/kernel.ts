@@ -11,10 +11,10 @@ import type {
 } from '@/types/kernel'
 
 type WsKey = keyof CoreApiWsDataMap
-type WsChannel<K extends WsKey> = {
+interface WsChannel<K extends WsKey> {
   url: string
   params?: Recordable
-  handlers: Array<(data: CoreApiWsDataMap[K]) => void>
+  handlers: ((data: CoreApiWsDataMap[K]) => void)[]
   isActive: boolean
   connect?: () => void
   disconnect?: () => void

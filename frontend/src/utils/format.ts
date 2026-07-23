@@ -1,6 +1,6 @@
 import i18n from '@/lang'
 
-export function formatBytes(bytes: number, decimals: number = 1): string {
+export function formatBytes(bytes: number, decimals = 1): string {
   if (bytes === 0) return '0 B'
 
   const k = 1024

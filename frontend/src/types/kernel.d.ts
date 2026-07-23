@@ -76,7 +76,7 @@ export interface CoreApiConnectionsData {
   }[]
 }
 
-export type CoreApiWsDataMap = {
+export interface CoreApiWsDataMap {
   logs: CoreApiLogsData
   memory: CoreApiMemoryData
   traffic: CoreApiTrafficData

@@ -383,7 +383,7 @@ export const generateDnsServerURL = (dnsServer: App.DnsServerConfig) => {
 
 const _adaptToStableBranch = (_: Recordable) => {}
 
-type GenerateConfigOptions = {
+interface GenerateConfigOptions {
   enableStableConfigCompat?: boolean
   enablePluginProcessing?: boolean
   enableMixinProcessing?: boolean

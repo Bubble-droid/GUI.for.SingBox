@@ -114,7 +114,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
         return withOutput([task.script], (script: string) => new window.AsyncFunction(script)())
       }
     }
-    throw new Error(`Unknown scheduled task type: ${task.type}`)
+    throw new Error(`Unknown scheduled task type: ${String(task.type)}`)
   }
 
   const saveScheduledTasks = () => {

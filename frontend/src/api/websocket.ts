@@ -1,10 +1,14 @@
-type WebSocketsOptions = {
+interface WebSocketsOptions {
   base?: string
   bearer?: string
   beforeConnect?: () => void
 }
 
-type Options = { url: string; cb: (data: any) => void; params?: Record<string, any> }
+interface Options {
+  url: string
+  cb: (data: any) => void
+  params?: Record<string, any>
+}
 
 export class WebSockets {
   public base: string

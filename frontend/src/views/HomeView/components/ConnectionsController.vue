@@ -20,7 +20,10 @@ import type { PickerItem } from '@/components/Picker/index.vue'
 import type { Column } from '@/components/Table/index.vue'
 import type { CoreApiConnectionsData } from '@/types/kernel'
 
-type TrafficCacheType = { up: number; down: number }
+interface TrafficCacheType {
+  up: number
+  down: number
+}
 const TrafficCache: Record<string, TrafficCacheType> = {}
 
 const appSettingsStore = useAppSettingsStore()

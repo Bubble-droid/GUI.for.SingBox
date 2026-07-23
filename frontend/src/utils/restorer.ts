@@ -39,7 +39,7 @@ const buildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<strin
   return arr.reduce((p, c, i) => ((p[c.tag] = prefix + i), p), {})
 }
 
-type RestoreProfileOptions = {
+interface RestoreProfileOptions {
   profile?: App.Profile
   subscriptionIds?: string[]
 }

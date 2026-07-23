@@ -1,3 +1,3 @@
-type Recordable<T = any> = { [x: string]: T }
+type Recordable<T = any> = Record<string, T>
 
 type MaybePromise<T> = T | Promise<T>

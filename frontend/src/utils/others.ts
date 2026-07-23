@@ -125,7 +125,11 @@ export const getValue = <T = unknown>(obj: unknown, expr: string): T | undefined
 }
 
 type IteratorFn<T, K> = (item: T, array: T[]) => Promise<K>
-type PoolController = { pause: () => void; resume: () => void; cancel: () => void }
+interface PoolController {
+  pause: () => void
+  resume: () => void
+  cancel: () => void
+}
 interface RunPoolOptions {
   shouldPause?: () => Promise<void>
   shouldCancel?: () => boolean

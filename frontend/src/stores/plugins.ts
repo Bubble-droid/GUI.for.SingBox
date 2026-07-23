@@ -19,7 +19,7 @@ import {
   base64Encode,
 } from '@/utils'
 
-type PluginRuntimeCache = {
+interface PluginRuntimeCache {
   plugin: App.Plugin
   code?: string
   module?: {
@@ -30,9 +30,7 @@ type PluginRuntimeCache = {
         default?: MaybePromise<
           (Plugin: App.Plugin) => Partial<Record<PluginTriggerEvent, (...args: any[]) => any>>
         >
-      } & {
-        [k in PluginTriggerEvent]: MaybePromise<(...args: any[]) => any>
-      }
+      } & Record<PluginTriggerEvent, MaybePromise<(...args: any[]) => any>>
     >
   }
 }
