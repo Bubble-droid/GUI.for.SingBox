@@ -24,6 +24,10 @@ declare namespace App {
     isPrivileged: boolean
     isSystemPackage: boolean
     isBundled: boolean
+    appDataPath: string
+    appConfigPath: string
+    appCachePath: string
+    appCorePath: string
   }
 
   interface TrayContent {

@@ -19,13 +19,82 @@ type requestTransportKey struct {
 	Insecure bool
 }
 
+type PathResolver interface {
+	Resolve(cleanPath string) string
+}
+
 var requestTransportCache sync.Map
 
-func resolvePath(path string) string {
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(Env.BasePath, path)
+var globalPathResolver PathResolver
+
+func resolvePath(rawPath string) string {
+	if rawPath == "" {
+		return ""
 	}
-	return filepath.ToSlash(filepath.Clean(path))
+
+	cleanPath := filepath.Clean(rawPath)
+	if filepath.IsAbs(cleanPath) {
+		return cleanPath
+	}
+
+	if globalPathResolver != nil {
+		return globalPathResolver.Resolve(cleanPath)
+	}
+
+	return cleanPath // Fallback
+}
+
+type PortableResolver struct {
+	basePath string
+}
+
+func (r *PortableResolver) Resolve(cleanPath string) string {
+	return filepath.Join(r.basePath, cleanPath)
+}
+
+type XDGResolver struct {
+	dataDir   string
+	configDir string
+	cacheDir  string
+}
+
+func (r *XDGResolver) Resolve(cleanPath string) string {
+	normalized := filepath.ToSlash(cleanPath)
+
+	var relPath string
+	if normalized == "data" || normalized == "./data" {
+		relPath = ""
+	} else if after, ok := strings.CutPrefix(normalized, "data/"); ok {
+		relPath = after
+	} else if after, ok := strings.CutPrefix(normalized, "./data/"); ok {
+		relPath = after
+	} else {
+		return filepath.Join(r.dataDir, cleanPath)
+	}
+
+	if relPath == "" {
+		return r.dataDir
+	}
+
+	if strings.HasSuffix(relPath, ".yaml") && !strings.Contains(relPath, "/") {
+		return filepath.Join(r.configDir, filepath.FromSlash(relPath))
+	}
+
+	if relPath == "sing-box" || strings.HasPrefix(relPath, "sing-box/") {
+		return filepath.Join(r.cacheDir, filepath.FromSlash(relPath))
+	}
+	if relPath == ".cache" {
+		return r.cacheDir
+	}
+	if after, ok := strings.CutPrefix(relPath, ".cache/"); ok {
+		return filepath.Join(r.cacheDir, filepath.FromSlash(after))
+	}
+
+	return filepath.Join(r.dataDir, filepath.FromSlash(relPath))
+}
+
+func normalizeDirName(name string) string {
+	return strings.ReplaceAll(strings.ToLower(name), ".", "-")
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {
