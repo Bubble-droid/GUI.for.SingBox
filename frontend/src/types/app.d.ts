@@ -115,7 +115,6 @@ declare namespace App {
     githubDownloadAcceleration: boolean
     githubDownloadMirror: string
     multipleInstance: boolean
-    rollingRelease: boolean
     debugOutline: boolean
     debugNoAnimation: boolean
     debugNoRounded: boolean
