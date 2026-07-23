@@ -5,7 +5,7 @@ import useI18n from '@/lang'
 
 import MarkdownViewer from '@/components/MarkdownViewer/index.vue'
 
-export type ConfirmOptions = {
+export interface ConfirmOptions {
   type: 'text' | 'markdown'
   cancelText?: string
   okText?: string

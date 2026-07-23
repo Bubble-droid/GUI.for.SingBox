@@ -3,7 +3,7 @@ import { ref, toRaw, type Ref } from 'vue'
 
 import useI18n from '@/lang'
 
-export type PickerItem<T> = {
+export interface PickerItem<T> {
   label: string
   value: T
   description?: string

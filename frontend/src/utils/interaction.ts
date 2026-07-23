@@ -144,7 +144,7 @@ const ResourceTypeMap = {
   5: 'scheduledtask',
 } as const
 
-type ResourceResultMap = {
+interface ResourceResultMap {
   profile: App.Profile
   subscription: App.Subscription
   ruleset: App.RuleSet

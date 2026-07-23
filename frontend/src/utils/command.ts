@@ -3,10 +3,18 @@ import { ColorOptions, ThemeOptions } from '@/constant/app'
 import { ModeOptions } from '@/constant/kernel'
 import { PluginTrigger, PluginTriggerEvent } from '@/enums/app'
 import useI18n from '@/lang'
-import { useAppSettingsStore, useAppStore, useEnvStore, useKernelApiStore, usePluginsStore, useRulesetsStore, useSubscribesStore } from '@/stores'
+import {
+  useAppSettingsStore,
+  useAppStore,
+  useEnvStore,
+  useKernelApiStore,
+  usePluginsStore,
+  useRulesetsStore,
+  useSubscribesStore,
+} from '@/stores'
 import { exitApp, handleChangeMode, message, reloadApp } from '@/utils'
 
-type Command = {
+interface Command {
   label: string
   cmd: string
   desc?: string

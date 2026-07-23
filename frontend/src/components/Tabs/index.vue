@@ -2,7 +2,7 @@
 import { computed, useSlots, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-type TabItemType = {
+interface TabItemType {
   key: string
   tab: string
   component?: Component
