@@ -134,6 +134,10 @@ export function StartServer(arg1, arg2, arg3) {
   return window['go']['bridge']['App']['StartServer'](arg1, arg2, arg3);
 }
 
+export function Startup(arg1) {
+  return window['go']['bridge']['App']['Startup'](arg1);
+}
+
 export function StopServer(arg1) {
   return window['go']['bridge']['App']['StopServer'](arg1);
 }

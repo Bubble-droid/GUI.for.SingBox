@@ -81,7 +81,7 @@ func main() {
 			},
 		},
 		OnStartup: func(ctx context.Context) {
-			app.Ctx = ctx
+			app.Startup(ctx)
 			runtime.InitializeNotifications(ctx)
 			trayStart()
 		},
