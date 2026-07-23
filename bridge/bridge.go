@@ -21,6 +21,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var (
+	AppVersion          = "dev"
+	SingBoxVersion      = "unknown"
+	SingBoxAlphaVersion = "unknown"
+)
+
 var Config = &AppConfig{}
 
 var Env = &EnvResult{
@@ -34,6 +40,9 @@ var Env = &EnvResult{
 	OS:           sysruntime.GOOS,
 	ARCH:         sysruntime.GOARCH,
 	IsPrivileged: false,
+
+	IsSystemPackage: false,
+	IsBundled:       false,
 }
 
 // NewApp creates a new App application struct
@@ -63,6 +72,13 @@ func CreateApp(fs embed.FS) *App {
 
 	app := NewApp(fs)
 
+	if AppVersion != "" {
+		Env.AppVersion = AppVersion
+	}
+
+	Env.IsSystemPackage = isSystemPackage(exePath)
+	Env.IsBundled = IsBundled()
+
 	loadConfig()
 
 	return app
@@ -70,6 +86,14 @@ func CreateApp(fs embed.FS) *App {
 
 func (a *App) Startup(ctx context.Context) {
 	a.Ctx = ctx
+
+	log.Printf("Build Version: %s", Env.AppVersion)
+	log.Printf("Install as a System Package: %t", Env.IsSystemPackage)
+	log.Printf("Bundled Package: %t", Env.IsBundled)
+	if Env.IsBundled {
+		log.Printf("Bundled Sing-Box Core (Stable): v%s", SingBoxVersion)
+		log.Printf("Bundled Sing-Box Core (Alpha) : v%s", SingBoxAlphaVersion)
+	}
 
 	if Env.OS == "darwin" {
 		createMacOSSymlink()
@@ -125,6 +149,9 @@ func (a *App) GetEnv(key string) any {
 		OS:           Env.OS,
 		ARCH:         Env.ARCH,
 		IsPrivileged: Env.IsPrivileged,
+
+		IsSystemPackage: Env.IsSystemPackage,
+		IsBundled:       Env.IsBundled,
 	}
 }
 

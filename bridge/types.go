@@ -26,6 +26,9 @@ type EnvResult struct {
 	OS           string `json:"os"`
 	ARCH         string `json:"arch"`
 	IsPrivileged bool   `json:"isPrivileged"`
+
+	IsSystemPackage bool `json:"isSystemPackage"`
+	IsBundled       bool `json:"isBundled"`
 }
 
 type RequestOptions struct {
