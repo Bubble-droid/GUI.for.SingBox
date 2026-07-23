@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 
+import { useAppSettingsStore } from '@/stores'
+
 import { NavigationBar, TitleBar } from '@/components'
 
 const route = useRoute()
+const appSettings = useAppSettingsStore()
 </script>
 
 <template>
-  <TitleBar />
+  <TitleBar v-if="!appSettings.app.systemTitleBar" />
   <div class="app-content flex-1 overflow-y-auto flex flex-col p-8">
     <NavigationBar />
     <div

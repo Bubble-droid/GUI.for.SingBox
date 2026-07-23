@@ -57,6 +57,7 @@ declare namespace App {
     primaryColor: string
     secondaryColor: string
     fontFamily: string
+    systemTitleBar: boolean
     profilesView: View
     subscribesView: View
     rulesetsView: View

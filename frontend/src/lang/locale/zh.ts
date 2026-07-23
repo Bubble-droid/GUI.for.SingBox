@@ -642,6 +642,7 @@ export default {
     },
     fontFamily: '字体',
     resetFont: '重置字体',
+    systemTitleBar: '系统标题栏',
     appFolder: {
       name: '应用程序文件夹',
       open: '打开应用程序文件夹',

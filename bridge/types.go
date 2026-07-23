@@ -97,6 +97,8 @@ type AppConfig struct {
 	Height            int  `yaml:"height"`
 	MultipleInstance  bool `yaml:"multipleInstance"`
 	StartHidden       bool
+
+	SystemTitleBar bool `yaml:"systemTitleBar"`
 }
 
 type TrayContent struct {
