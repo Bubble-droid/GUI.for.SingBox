@@ -2,6 +2,7 @@ package bridge
 
 import (
 	"context"
+	"embed"
 	"net/http"
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -11,6 +12,7 @@ import (
 type App struct {
 	Ctx     context.Context
 	AppMenu *menu.Menu
+	fs      embed.FS
 }
 
 type EnvResult struct {

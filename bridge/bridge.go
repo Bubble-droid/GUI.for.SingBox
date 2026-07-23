@@ -1,6 +1,7 @@
 package bridge
 
 import (
+	"context"
 	"embed"
 	"log"
 	"net"
@@ -36,9 +37,10 @@ var Env = &EnvResult{
 }
 
 // NewApp creates a new App application struct
-func NewApp() *App {
+func NewApp(fs embed.FS) *App {
 	return &App{
 		AppMenu: menu.NewMenu(),
+		fs:      fs,
 	}
 }
 
@@ -59,22 +61,26 @@ func CreateApp(fs embed.FS) *App {
 		Env.IsPrivileged = priv
 	}
 
-	app := NewApp()
+	app := NewApp(fs)
+
+	loadConfig()
+
+	return app
+}
+
+func (a *App) Startup(ctx context.Context) {
+	a.Ctx = ctx
 
 	if Env.OS == "darwin" {
 		createMacOSSymlink()
-		createMacOSMenus(app)
+		createMacOSMenus(a)
 	}
 
 	if Env.OS == "windows" {
 		processFixedWebView2Runtime()
 	}
 
-	extractEmbeddedFiles(fs)
-
-	loadConfig()
-
-	return app
+	extractEmbeddedFiles(a.fs)
 }
 
 func (a *App) IsStartup() bool {
