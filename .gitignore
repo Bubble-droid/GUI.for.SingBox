@@ -1,4 +1,8 @@
 build/bin
 frontend/dist
 
+package/dist
+package/cores
+package/temp
+
 .DS_Store
