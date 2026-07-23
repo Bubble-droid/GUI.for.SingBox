@@ -5,7 +5,14 @@
     "package.json": "package-lock.json, pnpm*, .oxlint*, eslint*, .oxfmtrc*, .editorconfig"
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit"
+    "source.fixAll": "explicit",
+    "source.fixAll.ts": "never",
+    "source.removeUnused.ts": "never",
+    "source.removeUnusedImports": "explicit",
+    "source.addMissingImports.ts": "explicit"
+  },
+  "search.exclude": {
+    "pnpm-lock.yaml": true
   },
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "oxc.oxc-vscode"
