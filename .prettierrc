@@ -4,5 +4,16 @@
   "printWidth": 100,
   "singleQuote": true,
   "semi": false,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "endOfLine": "lf",
+  "overrides": [
+    {
+      "files": "*.md",
+      "options": {
+        "proseWrap": "preserve"
+      }
+    }
+  ]
 }
