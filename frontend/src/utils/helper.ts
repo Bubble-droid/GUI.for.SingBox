@@ -1,6 +1,8 @@
 import { deleteConnection, getConnections, useProxy } from '@/api/kernel'
 import {
   AbsolutePath,
+  CreateSymlink,
+  Download,
   Exec,
   ExitApp,
   FileExists,
@@ -11,6 +13,7 @@ import {
   WindowReloadApp,
   WriteFile,
 } from '@/bridge'
+import { CoreWorkingDirectory } from '@/constant/kernel'
 import { OS, RequestProxyMode } from '@/enums/app'
 import { RulesetFormat } from '@/enums/kernel'
 import i18n from '@/lang'
@@ -31,6 +34,7 @@ import {
   APP_TITLE,
   getAutoStartConfiguration,
   APP_IDENTIFIER,
+  generateDesktopEntry,
 } from '@/utils'
 
 // Permissions Helper
@@ -384,6 +388,56 @@ export const exitApp = async () => {
 
   appStore.isAppExiting = false
   destroy()
+}
+
+export const createDesktopEntry = async () => {
+  const { systemPath, userPath } = await getDesktopEntryPaths()
+  if (!(await FileExists(systemPath)) && !(await FileExists(userPath))) {
+    const desktopEntryContent = generateDesktopEntry('%U')
+    await WriteFile(userPath, desktopEntryContent)
+  }
+}
+
+export const downloadAppIcon = async () => {
+  const home = await GetEnv('HOME')
+  const iconUrl =
+    'https://raw.githubusercontent.com/Bubble-droid/GUI.for.SingBox/feat/xdg-base-directory/build/appicon.png'
+  const iconPath = `icons/hicolor/512x512/apps/${APP_IDENTIFIER}.png`
+  const systemPath = `/usr/share/${iconPath}`
+  const userPath = `${home}/.local/share/${iconPath}`
+  try {
+    if (!(await FileExists(systemPath)) && !(await FileExists(userPath))) {
+      await Download(iconUrl, userPath, undefined, undefined, {
+        Sha256: '08257d0d21c76a56e48e38105460927293a452ddc6b0b62db401bf5b5b9b7adf',
+      })
+    }
+  } catch (error) {
+    console.error('Application icon download failed:', error)
+  }
+}
+
+export const createCoreSymlinks = async () => {
+  const bundledCoresPath = `/usr/lib/${APP_IDENTIFIER}/cores`
+  const baseBinName = 'sing-box'
+  const symlinkMappings = [
+    [baseBinName, baseBinName],
+    [`${baseBinName}-alpha`, `${baseBinName}-latest`],
+  ] as const
+
+  await Promise.all(
+    symlinkMappings.map(async ([srcFile, linkName]) => {
+      const target = `${bundledCoresPath}/${srcFile}`
+      const linkPath = `${CoreWorkingDirectory}/${linkName}`
+
+      if (!(await FileExists(target))) {
+        return
+      }
+
+      if (!(await FileExists(linkPath))) {
+        await CreateSymlink(target, linkPath)
+      }
+    }),
+  )
 }
 
 export const getKernelFileName = (isAlpha = false) => {
