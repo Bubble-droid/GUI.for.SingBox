@@ -246,7 +246,9 @@ export const useCoreBranch = (isAlpha = false) => {
   )
 
   refreshLocalVersion()
-  refreshRemoteVersion()
+  if (!envStore.env.isBundled) {
+    refreshRemoteVersion()
+  }
 
   return {
     restartable,
