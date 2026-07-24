@@ -1,5 +1,6 @@
 build/bin
 frontend/dist
+vendor
 
 package/dist
 package/cores
