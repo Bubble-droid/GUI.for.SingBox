@@ -35,8 +35,10 @@ const handleRestartApp = async () => {
   }
 }
 
-if (Date.now() - appStore.lastCheckTime > 60_000) {
-  appStore.checkForUpdates()
+if (!envStore.env.isSystemPackage) {
+  if (Date.now() - appStore.lastCheckTime > 60_000) {
+    appStore.checkForUpdates()
+  }
 }
 
 defineExpose({
@@ -96,7 +98,11 @@ defineExpose({
           :loading="appStore.checkForUpdatesLoading"
           type="text"
           size="small"
-          @click="appStore.checkForUpdates(true)"
+          @click="
+            envStore.env.isSystemPackage
+              ? message.info('about.updatesManagedByOS')
+              : appStore.checkForUpdates(true)
+          "
         >
           Bridge: {{ envStore.env.appVersion }} - UI: {{ APP_VERSION }}
         </Button>
