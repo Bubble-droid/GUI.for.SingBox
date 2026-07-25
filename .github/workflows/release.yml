@@ -1,139 +1,273 @@
 name: Build GUI.for.SingBox
 
 on:
+  workflow_dispatch:
+    inputs:
+      build_platform:
+        description: Target platform to build
+        required: true
+        type: choice
+        default: All
+        options:
+          - All
+          - Windows
+          - MacOS
+          - Linux
+      build_arch:
+        description: Target arch to build
+        required: true
+        type: choice
+        default: All
+        options:
+          - All
+          - amd64
+          - arm64
+          - '386'
   push:
     tags:
-      - 'v*'
+      - v*
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ inputs.build_platform }}-${{ inputs.build_arch }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -eux -o pipefail {0}
+
 jobs:
+  calculate_version:
+    name: Calculate Version & Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      win_matrix: ${{ steps.set_matrix.outputs.win_matrix }}
+      win_run: ${{ steps.set_matrix.outputs.win_run }}
+      macos_matrix: ${{ steps.set_matrix.outputs.macos_matrix }}
+      macos_run: ${{ steps.set_matrix.outputs.macos_run }}
+      linux_matrix: ${{ steps.set_matrix.outputs.linux_matrix }}
+      linux_run: ${{ steps.set_matrix.outputs.linux_run }}
+    steps:
+      - &checkout
+        name: Checkout
+        uses: actions/checkout@v7
+      - name: Set Version
+        id: get_version
+        run: |
+          VERSION="${{ github.ref_name }}"
+          if [[ -z "$VERSION" || "$VERSION" == "main" || "$VERSION" == "xdg" ]]; then
+            VERSION=$(git describe --tags --always 2>/dev/null || echo "v0.0.0-dev")
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Calculate Build Matrices
+        id: set_matrix
+        run: |
+          PLATFORM="${{ inputs.build_platform || 'All' }}"
+          ARCH="${{ inputs.build_arch || 'All' }}"
+
+          if [[ "$PLATFORM" == "All" || "$PLATFORM" == "Windows" ]]; then
+            WIN_ALL='[{"arch":"amd64","runner":"windows-latest"},{"arch":"arm64","runner":"windows-11-arm"},{"arch":"386","runner":"windows-latest"}]'
+            if [[ "$ARCH" == "All" ]]; then
+              echo "win_matrix={\"include\":$WIN_ALL}" >> "$GITHUB_OUTPUT"
+              echo "win_run=true" >> "$GITHUB_OUTPUT"
+            else
+              FILTERED=$(echo "$WIN_ALL" | jq -c --arg a "$ARCH" '[.[] | select(.arch == $a)]')
+              if [[ "$FILTERED" != "[]" ]]; then
+                echo "win_matrix={\"include\":$FILTERED}" >> "$GITHUB_OUTPUT"
+                echo "win_run=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "win_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+                echo "win_run=false" >> "$GITHUB_OUTPUT"
+              fi
+            fi
+          else
+            echo "win_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+            echo "win_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [[ "$PLATFORM" == "All" || "$PLATFORM" == "MacOS" ]]; then
+            MAC_ALL='[{"arch":"amd64","runner":"macos-26-intel"},{"arch":"arm64","runner":"macos-latest"}]'
+            if [[ "$ARCH" == "All" ]]; then
+              echo "macos_matrix={\"include\":$MAC_ALL}" >> "$GITHUB_OUTPUT"
+              echo "macos_run=true" >> "$GITHUB_OUTPUT"
+            else
+              FILTERED=$(echo "$MAC_ALL" | jq -c --arg a "$ARCH" '[.[] | select(.arch == $a)]')
+              if [[ "$FILTERED" != "[]" ]]; then
+                echo "macos_matrix={\"include\":$FILTERED}" >> "$GITHUB_OUTPUT"
+                echo "macos_run=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "macos_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+                echo "macos_run=false" >> "$GITHUB_OUTPUT"
+              fi
+            fi
+          else
+            echo "macos_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+            echo "macos_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [[ "$PLATFORM" == "All" || "$PLATFORM" == "Linux" ]]; then
+            LINUX_ALL='[{"arch":"amd64","runner":"ubuntu-latest"},{"arch":"arm64","runner":"ubuntu-26.04-arm"}]'
+            if [[ "$ARCH" == "All" ]]; then
+              echo "linux_matrix={\"include\":$LINUX_ALL}" >> "$GITHUB_OUTPUT"
+              echo "linux_run=true" >> "$GITHUB_OUTPUT"
+            else
+              FILTERED=$(echo "$LINUX_ALL" | jq -c --arg a "$ARCH" '[.[] | select(.arch == $a)]')
+              if [[ "$FILTERED" != "[]" ]]; then
+                echo "linux_matrix={\"include\":$FILTERED}" >> "$GITHUB_OUTPUT"
+                echo "linux_run=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "linux_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+                echo "linux_run=false" >> "$GITHUB_OUTPUT"
+              fi
+            fi
+          else
+            echo "linux_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+            echo "linux_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
   Build-Frontend:
+    name: Build Frontend
+    needs: calculate_version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - *checkout
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v6
         with:
           version: latest
-      - uses: actions/setup-node@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: 'latest'
-          cache: 'pnpm'
+          node-version: latest
+          cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
-      - run: make build-frontend APP_VERSION=${{ github.ref_name }}
-      - uses: actions/upload-artifact@v6
+      - name: Build Frontend Dist
+        run: make build-frontend APP_VERSION=${{ needs.calculate_version.outputs.version }}
+      - name: Upload Frontend Dist
+        uses: &upload actions/upload-artifact@v7
         with:
           name: frontend-dist
           path: frontend/dist
 
   Build-Windows:
-    needs: Build-Frontend
-    runs-on: windows-latest
+    name: Build Windows (${{ matrix.arch }})
+    needs: &build_needs [calculate_version, Build-Frontend]
+    if: needs.calculate_version.outputs.win_run == 'true'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.calculate_version.outputs.win_matrix) }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
+      - *checkout
+      - &setup_go
+        name: Setup Go
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           check-latest: true
-      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-      - uses: actions/download-artifact@v8
+          cache: true
+          cache-dependency-path: go.sum
+      - &install_wails
+        name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - &download_frontend_dist
+        name: Download Frontend Dist
+        uses: &download actions/download-artifact@v8
         with:
           name: frontend-dist
           path: frontend/dist
 
-      - name: Ensure make is available
-        shell: pwsh
-        run: |
-          if (-not (Get-Command make -ErrorAction SilentlyContinue)) {
-            choco install make -y --no-progress
-          }
+      - name: Build Windows Binary
+        run: make build-windows ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
 
-      - name: Build Windows
-        shell: pwsh
-        run: |
-          $arches = @("amd64","arm64","386")
-          foreach ($arch in $arches) {
-            make build-windows ARCH=$arch APP_VERSION=${{ github.ref_name }}
-          }
-
-      - uses: actions/upload-artifact@v6
+      - uses: *upload
+        name: Upload Windows Binary
         with:
-          name: windows-builds
+          name: binary-windows-${{ matrix.arch }}
           path: build/bin/*.zip
 
-  Build-macOS:
-    needs: Build-Frontend
-    runs-on: macos-latest
+  Build-MacOS:
+    name: Build MacOS (${{ matrix.arch }})
+    needs: *build_needs
+    if: needs.calculate_version.outputs.macos_run == 'true'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.calculate_version.outputs.macos_matrix) }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          check-latest: true
-      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-      - uses: actions/download-artifact@v8
-        with:
-          name: frontend-dist
-          path: frontend/dist
+      - *checkout
+      - *setup_go
+      - *install_wails
+      - *download_frontend_dist
 
-      - name: Build macOS
-        run: |
-          for arch in amd64 arm64; do
-            make build-macos ARCH=$arch APP_VERSION=${{ github.ref_name }}
-          done
+      - name: Build MacOS Binary
+        run: make build-macos ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
 
-      - uses: actions/upload-artifact@v6
+      - uses: *upload
+        name: Upload MacOS Binary
         with:
-          name: macos-builds
+          name: binary-macos-${{ matrix.arch }}
           path: build/bin/*.tar.gz
 
   Build-Linux:
-    needs: Build-Frontend
-    runs-on: ubuntu-latest
+    name: Build Linux (${{ matrix.arch }})
+    needs: *build_needs
+    if: needs.calculate_version.outputs.linux_run == 'true'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.calculate_version.outputs.linux_matrix) }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          check-latest: true
-      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-      - uses: actions/download-artifact@v8
-        with:
-          name: frontend-dist
-          path: frontend/dist
+      - *checkout
+      - *setup_go
+      - *install_wails
+      - *download_frontend_dist
 
-      - name: Install System Dependencies & fpm
+      - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget libgtk-3-dev libwebkit2gtk-4.1-dev ruby squashfs-tools ruby-dev rubygems build-essential rpm bsdtar
+          sudo apt-get install -y tar libgtk-3-dev libwebkit2gtk-4.1-dev ruby-full rpm squashfs-tools libarchive-tools
           sudo gem install fpm
 
-      - name: Build & Package Linux
-        run: |
-          for arch in amd64 arm64; do
-            make build-linux package-linux ARCH=$arch APP_VERSION=${{ github.ref_name }}
-            make clean-cores
-          done
+      - name: Build Linux Binary
+        run: make build-linux ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
 
-      - uses: actions/upload-artifact@v6
+      - name: Package DEB
+        run: make package-deb-all ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+
+      - name: Package RPM
+        run: make package-rpm-all ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+
+      - name: Package Pacman
+        run: make package-pacman-all ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir -p dist
+          cp -f build/bin/*.tar.gz dist/
+          cp -f package/dist/* dist/
+
+      - uses: *upload
+        name: Upload Linux Binary & Packages
         with:
-          name: linux-builds
-          path: |
-            build/bin/*.tar.gz
-            package/dist/*.deb
-            package/dist/*.rpm
-            package/dist/*.pkg.tar.zst
+          name: binary-linux-${{ matrix.arch }}
+          path: dist/*
 
   Generate-Release-Notes:
+    name: Generate Release Notes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+      - *checkout
       - name: Generate Notes
         run: |
           TAG="${{ github.ref_name }}"
@@ -141,7 +275,7 @@ jobs:
 
           mkdir -p release-notes
 
-          TAG_MSG=$(git tag -l --format='%(contents)' "$TAG" 2>/dev/null | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$$//')
+          TAG_MSG=$(git tag -l --format='%(contents)' "$TAG" 2>/dev/null | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
           if [ -z "$TAG_MSG" ]; then
             TAG_MSG=$(git log -1 --format='%B' "$TAG" 2>/dev/null)
           fi
@@ -162,25 +296,41 @@ jobs:
             fi
           } > release-notes/release_notes.md
 
-      - uses: actions/upload-artifact@v6
+      - uses: *upload
+        name: Upload Release Notes
         with:
           name: release-notes
           path: release-notes/release_notes.md
 
   Release:
-    needs: [Build-Windows, Build-macOS, Build-Linux, Generate-Release-Notes]
+    name: Release Artifacts
+    needs: [calculate_version, Build-Windows, Build-MacOS, Build-Linux, Generate-Release-Notes]
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - name: Download all builds
-        uses: actions/download-artifact@v8
+        uses: *download
         with:
+          pattern: binary-*
           path: release-assets
           merge-multiple: true
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
+
+      - name: Download release notes
+        uses: *download
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          name: release-notes
+          path: release-assets
+
+      - name: Attest Build Provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: 'release-assets/**'
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.calculate_version.outputs.version }}
+          name: ${{ needs.calculate_version.outputs.version }}
           files: |
             release-assets/*.zip
             release-assets/*.tar.gz
@@ -188,5 +338,5 @@ jobs:
             release-assets/*.rpm
             release-assets/*.pkg.tar.zst
           draft: false
-          prerelease: ${{ contains(github.ref_name, 'dev') }}
+          prerelease: ${{ contains(needs.calculate_version.outputs.version, 'dev') }}
           body_path: release-assets/release_notes.md
