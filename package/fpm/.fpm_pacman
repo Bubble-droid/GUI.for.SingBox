@@ -9,8 +9,9 @@
 --depends libcap
 --provides gui-for-singbox
 --conflicts gui-for-singbox
---conflicts gui-for-singbox-bin
 --conflicts gui.for.singbox
+--conflicts gui-for-singbox-bin
+--conflicts gui-for-singbox-xdg-full
 --after-install package/linux/postinst.sh
 
 build/bin/gui-for-singbox=/usr/bin/gui-for-singbox
