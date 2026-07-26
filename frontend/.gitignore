@@ -32,3 +32,5 @@ coverage
 
 package.json.md5
 .eslintcache
+
+scripts
