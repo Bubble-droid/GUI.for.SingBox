@@ -57,9 +57,10 @@ jobs:
       linux_matrix: ${{ steps.set_matrix.outputs.linux_matrix }}
       linux_run: ${{ steps.set_matrix.outputs.linux_run }}
     steps:
-      - &checkout
-        name: Checkout
-        uses: actions/checkout@v7
+      - name: Checkout
+        uses: &checkout actions/checkout@v7
+        with:
+          fetch-depth: 0
       - name: Set Version
         id: get_version
         run: |
@@ -140,7 +141,8 @@ jobs:
     needs: calculate_version
     runs-on: ubuntu-latest
     steps:
-      - *checkout
+      - name: Checkout
+        uses: *checkout
       - name: Setup PNPM
         uses: pnpm/action-setup@v6
         with:
@@ -168,7 +170,8 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.calculate_version.outputs.win_matrix) }}
     steps:
-      - *checkout
+      - name: Checkout
+        uses: *checkout
       - &setup_go
         name: Setup Go
         uses: actions/setup-go@v6
@@ -205,7 +208,8 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.calculate_version.outputs.macos_matrix) }}
     steps:
-      - *checkout
+      - name: Checkout
+        uses: *checkout
       - *setup_go
       - *install_wails
       - *download_frontend_dist
@@ -228,7 +232,8 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.calculate_version.outputs.linux_matrix) }}
     steps:
-      - *checkout
+      - name: Checkout
+        uses: *checkout
       - *setup_go
       - *install_wails
       - *download_frontend_dist
@@ -267,7 +272,10 @@ jobs:
     name: Generate Release Notes
     runs-on: ubuntu-latest
     steps:
-      - *checkout
+      - name: Checkout
+        uses: *checkout
+        with:
+          fetch-depth: 0
       - name: Generate Notes
         run: |
           TAG="${{ github.ref_name }}"
