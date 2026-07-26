@@ -91,7 +91,7 @@ func CreateApp(fs embed.FS) *App {
 		Env.AppDataPath = filepath.Join(xdg.DataHome, AppName)
 		Env.AppConfigPath = filepath.Join(xdg.ConfigHome, AppName)
 		Env.AppCachePath = filepath.Join(xdg.CacheHome, AppName)
-		Env.AppCorePath = filepath.Join(Env.AppCachePath, "sing-box")
+		Env.AppCorePath = filepath.Join(Env.AppDataPath, "sing-box")
 
 		globalPathResolver = &XDGResolver{
 			dataDir:   Env.AppDataPath,
