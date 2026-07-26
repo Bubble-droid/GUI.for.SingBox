@@ -53,48 +53,42 @@ func (r *PortableResolver) Resolve(cleanPath string) string {
 }
 
 type XDGResolver struct {
-	dataDir   string
-	configDir string
-	cacheDir  string
+	dataDir   string // ~/.local/share/gui-for-singbox
+	configDir string // ~/.config/gui-for-singbox
+	cacheDir  string // ~/.cache/gui-for-singbox
 }
 
 func (r *XDGResolver) Resolve(cleanPath string) string {
 	normalized := filepath.ToSlash(cleanPath)
 
-	var relPath string
-	if normalized == "data" || normalized == "./data" {
+	relPath := normalized
+	if after, ok := strings.CutPrefix(normalized, "data/"); ok {
+		relPath = after
+	} else if normalized == "data" {
 		relPath = ""
-	} else if after, ok := strings.CutPrefix(normalized, "data/"); ok {
-		relPath = after
-	} else if after, ok := strings.CutPrefix(normalized, "./data/"); ok {
-		relPath = after
-	} else {
-		return filepath.Join(r.dataDir, cleanPath)
 	}
 
-	if relPath == "" {
+	if strings.HasPrefix(relPath, "../") || relPath == ".." {
+		return r.dataDir
+	}
+
+	if relPath == "" || relPath == "." {
 		return r.dataDir
 	}
 
 	if strings.HasSuffix(relPath, ".yaml") && !strings.Contains(relPath, "/") {
-		return filepath.Join(r.configDir, filepath.FromSlash(relPath))
+		return filepath.Join(r.configDir, relPath)
 	}
 
-	if relPath == "sing-box" || strings.HasPrefix(relPath, "sing-box/") {
-		return filepath.Join(r.cacheDir, filepath.FromSlash(relPath))
-	}
 	if relPath == ".cache" {
 		return r.cacheDir
 	}
+
 	if after, ok := strings.CutPrefix(relPath, ".cache/"); ok {
-		return filepath.Join(r.cacheDir, filepath.FromSlash(after))
+		return filepath.Join(r.cacheDir, after)
 	}
 
 	return filepath.Join(r.dataDir, filepath.FromSlash(relPath))
-}
-
-func normalizeDirName(name string) string {
-	return strings.ReplaceAll(strings.ToLower(name), ".", "-")
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {
