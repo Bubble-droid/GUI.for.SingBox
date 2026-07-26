@@ -1,0 +1,3 @@
+{
+  "src/**/*": ["oxlint --fix", "eslint --fix --cache", "oxfmt"]
+}
