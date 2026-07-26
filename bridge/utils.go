@@ -232,10 +232,7 @@ func isSystemPackage(exePath string) bool {
 		return false
 	}
 
-	if os.Getenv("SNAP") != "" && os.Getenv("SNAP_NAME") != "" {
-		return true
-	}
-	if os.Getenv("container") == "flatpak" {
+	if os.Getenv("SNAP") != "" || os.Getenv("container") == "flatpak" {
 		return true
 	}
 	if _, err := os.Stat("/.flatpak-info"); err == nil {
@@ -258,12 +255,7 @@ func isSystemPackage(exePath string) bool {
 		}
 	}
 
-	exeDir := filepath.Dir(exePath)
-	if !isWritable(exeDir) {
-		return true
-	}
-
-	return false
+	return !isWritable(filepath.Dir(exePath))
 }
 
 func IsBundled() bool {
@@ -275,17 +267,13 @@ func IsBundled() bool {
 }
 
 func isWritable(dir string) bool {
-
-	testFile := filepath.Join(dir, ".wails_write_test")
-	file, err := os.OpenFile(testFile, os.O_WRONLY|os.O_CREATE, 0666)
+	file, err := os.CreateTemp(dir, ".wails_write_test_*")
 	if err != nil {
-		if os.IsPermission(err) {
-			return false
-		}
-
 		return false
 	}
+
+	defer os.Remove(file.Name())
+
 	file.Close()
-	os.Remove(testFile)
 	return true
 }
