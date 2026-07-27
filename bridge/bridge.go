@@ -3,6 +3,7 @@ package bridge
 import (
 	"context"
 	"embed"
+	"guiforcores/bridge/platform/resolver"
 	"log"
 	"net"
 	"os"
@@ -14,7 +15,6 @@ import (
 
 	sysruntime "runtime"
 
-	"github.com/adrg/xdg"
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -85,30 +85,13 @@ func CreateApp(fs embed.FS) *App {
 	Env.IsSystemPackage = isSystemPackage(exePath)
 	Env.IsBundled = IsBundled()
 
-	isXDGMode := Env.OS == "linux" && Env.AppVersion != "dev"
+	var paths resolver.AppPaths
+	globalPathResolver, paths = resolver.InitResolver(AppName, Env.BasePath, Env.AppVersion)
 
-	if isXDGMode {
-		Env.AppDataPath = filepath.Join(xdg.DataHome, AppName)
-		Env.AppConfigPath = filepath.Join(xdg.ConfigHome, AppName)
-		Env.AppCachePath = filepath.Join(xdg.CacheHome, AppName)
-		Env.AppCorePath = filepath.Join(Env.AppDataPath, "sing-box")
-
-		globalPathResolver = &XDGResolver{
-			dataDir:   Env.AppDataPath,
-			configDir: Env.AppConfigPath,
-			cacheDir:  Env.AppCachePath,
-		}
-	} else {
-		baseDataDir := filepath.Join(Env.BasePath, "data")
-		Env.AppDataPath = baseDataDir
-		Env.AppConfigPath = baseDataDir
-		Env.AppCachePath = filepath.Join(baseDataDir, ".cache")
-		Env.AppCorePath = filepath.Join(Env.AppDataPath, "sing-box")
-
-		globalPathResolver = &PortableResolver{
-			basePath: Env.BasePath,
-		}
-	}
+	Env.AppDataPath = paths.AppDataPath
+	Env.AppConfigPath = paths.AppConfigPath
+	Env.AppCachePath = paths.AppCachePath
+	Env.AppCorePath = paths.AppCorePath
 
 	loadConfig()
 
@@ -126,11 +109,8 @@ func (a *App) Startup(ctx context.Context) {
 		log.Printf("Bundled Sing-Box Core (Alpha) : v%s", SingBoxAlphaVersion)
 	}
 
-	isXDGMode := Env.OS == "linux" && Env.AppVersion != "dev"
-	if isXDGMode {
-		log.Println("Storage Mode: XDG Base Directory")
-	} else {
-		log.Println("Storage Mode: Portable (Relative to BasePath)")
+	if globalPathResolver != nil {
+		globalPathResolver.LogStorageMode()
 	}
 
 	log.Printf("App Data Path: %s", Env.AppDataPath)
