@@ -30,7 +30,6 @@ import {
   confirm,
   APP_TITLE,
   getAutoStartConfiguration,
-  APP_IDENTIFIER,
 } from '@/utils'
 
 // Permissions Helper
@@ -176,12 +175,9 @@ const getPlistPath = async () => {
   return `${home}/Library/LaunchAgents/${APP_TITLE}.plist`
 }
 
-export const getDesktopEntryPaths = async () => {
+const getDesktopPath = async () => {
   const home = await GetEnv('HOME')
-  const systemPath = `/usr/share/applications/${APP_IDENTIFIER}.desktop`
-  const userPath = `${home}/.local/share/applications/${APP_IDENTIFIER}.desktop`
-  const autoStartPath = `${home}/.config/autostart/${APP_IDENTIFIER}.desktop`
-  return { systemPath, userPath, autoStartPath }
+  return `${home}/.config/autostart/${APP_TITLE}.desktop`
 }
 
 export const IsAutoStartEnabled = async () => {
@@ -195,8 +191,8 @@ export const IsAutoStartEnabled = async () => {
     const plistPath = await getPlistPath()
     isAutoStart = await FileExists(plistPath)
   } else if (os === OS.Linux) {
-    const { autoStartPath } = await getDesktopEntryPaths()
-    isAutoStart = await FileExists(autoStartPath)
+    const desktopPath = await getDesktopPath()
+    isAutoStart = await FileExists(desktopPath)
   }
   return isAutoStart
 }
@@ -217,8 +213,8 @@ export const EnableAutoStart = async (delay = 10) => {
     await WriteFile(plistPath, configuration)
     await Exec('launchctl', ['load', plistPath])
   } else if (os === OS.Linux) {
-    const { autoStartPath } = await getDesktopEntryPaths()
-    await WriteFile(autoStartPath, configuration)
+    const desktopPath = await getDesktopPath()
+    await WriteFile(desktopPath, configuration)
   }
 }
 
@@ -232,8 +228,8 @@ export const DisableAutoStart = async () => {
     await Exec('launchctl', ['unload', plistPath])
     await RemoveFile(plistPath)
   } else if (os === OS.Linux) {
-    const { autoStartPath } = await getDesktopEntryPaths()
-    await RemoveFile(autoStartPath)
+    const desktopPath = await getDesktopPath()
+    await RemoveFile(desktopPath)
   }
 }
 
