@@ -7,7 +7,6 @@ import (
 	"guiforcores/bridge/platform/resolver"
 	"net/http"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -175,55 +174,4 @@ func parseByteRange(s string, size int64) (start int64, end int64, err error) {
 	}
 
 	return 0, 0, errors.New("invalid range format")
-}
-
-func isSystemPackage(exePath string) bool {
-	if Env.OS != "linux" || Env.AppVersion == "dev" {
-		return false
-	}
-
-	if os.Getenv("SNAP") != "" || os.Getenv("container") == "flatpak" {
-		return true
-	}
-	if _, err := os.Stat("/.flatpak-info"); err == nil {
-		return true
-	}
-
-	systemPrefixes := []string{
-		"/usr/bin/",
-		"/usr/sbin/",
-		"/usr/local/bin/",
-		"/usr/local/sbin/",
-		"/usr/lib/",
-		"/opt/",
-		"/nix/store/",
-	}
-
-	for _, prefix := range systemPrefixes {
-		if strings.HasPrefix(exePath, prefix) {
-			return true
-		}
-	}
-
-	return !isWritable(filepath.Dir(exePath))
-}
-
-func IsBundled() bool {
-	if Env.OS != "linux" || Env.AppVersion == "dev" {
-		return false
-	}
-	_, err := os.Stat("/usr/lib/gui-for-singbox/cores/sing-box")
-	return err == nil
-}
-
-func isWritable(dir string) bool {
-	file, err := os.CreateTemp(dir, ".wails_write_test_*")
-	if err != nil {
-		return false
-	}
-
-	defer os.Remove(file.Name())
-
-	file.Close()
-	return true
 }
