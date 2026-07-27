@@ -104,6 +104,7 @@ func (a *App) Startup(ctx context.Context) {
 	log.Printf("Build Version: %s", Env.AppVersion)
 
 	lifecycle.LogPackageInfo(Env.IsSystemPackage, Env.IsBundled, SingBoxVersion, SingBoxAlphaVersion)
+	lifecycle.SetupPlatformIntegration(Env.AppVersion, AppName)
 
 	if globalPathResolver != nil {
 		globalPathResolver.LogStorageMode()
@@ -113,7 +114,7 @@ func (a *App) Startup(ctx context.Context) {
 	log.Printf("App Config Path: %s", Env.AppConfigPath)
 	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
-	if webviewPath := lifecycle.OnStartup(a.Ctx, a.AppMenu, Env.AppName, resolvePath); webviewPath != "" {
+	if webviewPath := lifecycle.OnStartup(a.Ctx, a.AppMenu, AppName, resolvePath); webviewPath != "" {
 		Env.WebviewPath = webviewPath
 	}
 

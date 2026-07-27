@@ -8,6 +8,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/menu"
 )
 
+func SetupPlatformIntegration(appVersion string, appName string) {}
+
 func IsSystemPackage(exePath string, appVersion string) bool {
 	return false
 }
