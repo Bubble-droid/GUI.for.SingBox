@@ -13,6 +13,7 @@ import (
 	"slices"
 	"strings"
 
+	platformexec "guiforcores/bridge/platform/exec"
 	sysruntime "runtime"
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -72,7 +73,7 @@ func CreateApp(fs embed.FS) *App {
 		Env.FromTaskSch = true
 	}
 
-	if priv, err := IsPrivileged(); err == nil {
+	if priv, err := platformexec.IsPrivileged(); err == nil {
 		Env.IsPrivileged = priv
 	}
 
@@ -148,7 +149,7 @@ func (a *App) RestartApp() FlagResult {
 	exePath := resolvePath(Env.AppName)
 
 	cmd := exec.Command(exePath)
-	SetCmdWindowHidden(cmd)
+	platformexec.SetCmdWindowHidden(cmd)
 
 	if err := cmd.Start(); err != nil {
 		return FlagResult{false, err.Error()}
@@ -288,7 +289,7 @@ func processFixedWebView2Runtime() {
 	log.Printf("Found CAB file: %s\n", cabFile)
 
 	cmd := exec.Command("expand.exe", "-F:*", cabFile, webviewDir)
-	SetCmdWindowHidden(cmd)
+	platformexec.SetCmdWindowHidden(cmd)
 
 	log.Println("Extracting WebView2 Runtime...")
 	if err := cmd.Run(); err != nil {
