@@ -9,10 +9,19 @@ ARCH ?= amd64
 
 ifeq ($(GOOS),windows)
 NATIVE_BUILD_TARGET := build-windows
+DEV_TAGS :=
+DEV_PRE_REQ :=
+DEV_ENV :=
 else ifeq ($(GOOS),darwin)
 NATIVE_BUILD_TARGET := build-macos
+DEV_TAGS :=
+DEV_PRE_REQ := patch-macos
+DEV_ENV := GOFLAGS="-mod=vendor"
 else
 NATIVE_BUILD_TARGET := build-linux
+DEV_TAGS := -tags webkit2_41
+DEV_PRE_REQ :=
+DEV_ENV :=
 endif
 
 BIN_OUTPUT_DIR := build/bin
@@ -29,7 +38,7 @@ ALPHA_VER = $(eval ALPHA_VER := $(or $(_ALPHA_VER_RAW),1.14.0-alpha.1))$(ALPHA_V
 
 BUNDLE_SUFFIX = _with_sing-box_v$(STABLE_VER)_alpha_v$(ALPHA_VER)
 
-_APP_VERSION_RAW = $(shell git describe --tags --always 2>/dev/null || echo "dev")
+_APP_VERSION_RAW = $(shell git describe --tags --always 2>/dev/null || echo "v0.0.0-dev")
 APP_VERSION = $(eval APP_VERSION := $(_APP_VERSION_RAW))$(APP_VERSION)
 
 TAR_VERSION = $(patsubst v%,%,$(APP_VERSION))
@@ -43,13 +52,14 @@ DEB_OPTS_FULL = $(shell cat $(FPM_DIR)/.fpm_systemd_full)
 PACMAN_OPTS = $(shell cat $(FPM_DIR)/.fpm_pacman)
 PACMAN_OPTS_FULL = $(shell cat $(FPM_DIR)/.fpm_pacman_full)
 
-LDFLAGS_SHARED = -X '$(GO_MODULE)/bridge.AppVersion=$(APP_VERSION)' \
+LDFLAGS_BASE = -X '$(GO_MODULE)/bridge.AppVersion=$(APP_VERSION)'
+LDFLAGS_LINUX = $(LDFLAGS_BASE) \
 	-X '$(GO_MODULE)/bridge.SingBoxVersion=$(STABLE_VER)' \
 	-X '$(GO_MODULE)/bridge.SingBoxAlphaVersion=$(ALPHA_VER)'
 
-WAILS_FLAGS = -m -s -trimpath -skipbindings -devtools -ldflags "$(LDFLAGS_SHARED)"
+WAILS_FLAGS = -m -s -trimpath -skipbindings -devtools
 
-.PHONY: all \
+.PHONY: all dev dev-xdg \
  	patch-macos fetch-cores \
 	build-frontend \
 	build-windows build-macos build-linux \
@@ -57,13 +67,21 @@ WAILS_FLAGS = -m -s -trimpath -skipbindings -devtools -ldflags "$(LDFLAGS_SHARED
 
 all: build-frontend $(NATIVE_BUILD_TARGET)
 
+dev: $(DEV_PRE_REQ)
+	echo "==> Starting Wails dev mode (Version: dev)..."
+	$(DEV_ENV) VITE_APP_VERSION=dev wails dev $(DEV_TAGS) -ldflags "-X '$(GO_MODULE)/bridge.AppVersion=dev'"
+
+dev-xdg: $(DEV_PRE_REQ)
+	echo "==> Starting Wails dev mode with XDG (Version: $(APP_VERSION))..."
+	$(DEV_ENV) VITE_APP_VERSION=$(APP_VERSION) wails dev $(DEV_TAGS) -ldflags "$(LDFLAGS_BASE)"
+
 build-frontend:
 	pnpm --dir frontend install --frozen-lockfile
 	VITE_APP_VERSION=$(APP_VERSION) pnpm --dir frontend build-only
 
 build-windows:
 	echo "==> Building Windows binary ($(ARCH))..."
-	GOOS=windows GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -o $(APP_NAME).exe
+	GOOS=windows GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -ldflags "$(LDFLAGS_BASE)" -o $(APP_NAME).exe
 	cd $(BIN_OUTPUT_DIR) && \
 		if command -v zip >/dev/null 2>&1; then \
 			zip -9 -q $(APP_NAME)-$(TAR_VERSION)-windows-$(ARCH).zip $(APP_NAME).exe ; \
@@ -79,13 +97,13 @@ patch-macos:
 
 build-macos: patch-macos
 	echo "==> Building macOS binary ($(ARCH))..."
-	GOFLAGS="-mod=vendor" GOOS=darwin GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -o $(APP_NAME)
+	GOFLAGS="-mod=vendor" GOOS=darwin GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -ldflags "$(LDFLAGS_BASE)" -o $(APP_NAME)
 	cd $(BIN_OUTPUT_DIR) && mv GUI.for.SingBox.app $(APP_NAME).app && \
 		tar -czvf $(APP_NAME)-$(TAR_VERSION)-darwin-$(ARCH).tar.gz $(APP_NAME).app
 
 build-linux:
 	echo "==> Building Linux binary ($(ARCH))..."
-	GOOS=linux GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -tags webkit2_41 -o $(APP_NAME)
+	GOOS=linux GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -ldflags "$(LDFLAGS_LINUX)" -tags webkit2_41 -o $(APP_NAME)
 	cd $(BIN_OUTPUT_DIR) && tar -czvf $(APP_NAME)-$(TAR_VERSION)-linux-$(ARCH).tar.gz $(APP_NAME)
 
 fetch-cores:
