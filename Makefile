@@ -64,7 +64,12 @@ build-frontend:
 build-windows:
 	echo "==> Building Windows binary ($(ARCH))..."
 	GOOS=windows GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -o $(APP_NAME).exe
-	cd $(BIN_OUTPUT_DIR) && tar -a -c -f $(APP_NAME)-$(TAR_VERSION)-windows-$(ARCH).zip $(APP_NAME).exe
+	cd $(BIN_OUTPUT_DIR) && \
+		if command -v zip >/dev/null 2>&1; then \
+			zip -9 -q $(APP_NAME)-$(TAR_VERSION)-windows-$(ARCH).zip $(APP_NAME).exe ; \
+		else \
+			powershell -Command "Compress-Archive -Path '$(APP_NAME).exe' -DestinationPath '$(APP_NAME)-$(TAR_VERSION)-windows-$(ARCH).zip' -Force" ; \
+		fi
 
 patch-macos:
 	echo "==> Patching Wails AppDelegate for macOS Accessory Policy..."
