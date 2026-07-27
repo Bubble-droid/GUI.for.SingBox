@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
+	"guiforcores/bridge/platform/resolver"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,13 +20,9 @@ type requestTransportKey struct {
 	Insecure bool
 }
 
-type PathResolver interface {
-	Resolve(cleanPath string) string
-}
-
 var requestTransportCache sync.Map
 
-var globalPathResolver PathResolver
+var globalPathResolver resolver.PathResolver
 
 func resolvePath(rawPath string) string {
 	if rawPath == "" {
@@ -42,53 +39,6 @@ func resolvePath(rawPath string) string {
 	}
 
 	return cleanPath // Fallback
-}
-
-type PortableResolver struct {
-	basePath string
-}
-
-func (r *PortableResolver) Resolve(cleanPath string) string {
-	return filepath.Join(r.basePath, cleanPath)
-}
-
-type XDGResolver struct {
-	dataDir   string // ~/.local/share/gui-for-singbox
-	configDir string // ~/.config/gui-for-singbox
-	cacheDir  string // ~/.cache/gui-for-singbox
-}
-
-func (r *XDGResolver) Resolve(cleanPath string) string {
-	normalized := filepath.ToSlash(cleanPath)
-
-	relPath := normalized
-	if after, ok := strings.CutPrefix(normalized, "data/"); ok {
-		relPath = after
-	} else if normalized == "data" {
-		relPath = ""
-	}
-
-	if strings.HasPrefix(relPath, "../") || relPath == ".." {
-		return r.dataDir
-	}
-
-	if relPath == "" || relPath == "." {
-		return r.dataDir
-	}
-
-	if strings.HasSuffix(relPath, ".yaml") && !strings.Contains(relPath, "/") {
-		return filepath.Join(r.configDir, relPath)
-	}
-
-	if relPath == ".cache" {
-		return r.cacheDir
-	}
-
-	if after, ok := strings.CutPrefix(relPath, ".cache/"); ok {
-		return filepath.Join(r.cacheDir, after)
-	}
-
-	return filepath.Join(r.dataDir, filepath.FromSlash(relPath))
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {
