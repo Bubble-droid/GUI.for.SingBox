@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 # Determine project root directory dynamically
 ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"
@@ -26,7 +28,7 @@ STAGED_GO_FILES=$(cd "$ROOT_DIR" && git diff --cached --name-only --diff-filter=
 
 if [ -n "$STAGED_GO_FILES" ]; then
   echo "==> [Backend] Formatting staged Go files..."
-  (cd "$ROOT_DIR" && gofmt -w "$STAGED_GO_FILES" && git add "$STAGED_GO_FILES")
+  (cd "$ROOT_DIR" && echo "$STAGED_GO_FILES" | xargs gofmt -w && echo "$STAGED_GO_FILES" | xargs git add)
 fi
 
 echo "✅ [Pre-commit] Formatting completed successfully!"

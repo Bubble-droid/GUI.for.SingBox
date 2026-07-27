@@ -1,7 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 # Determine project root directory dynamically
-ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 if [ -z "$ROOT_DIR" ]; then
   ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 fi
