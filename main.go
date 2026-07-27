@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"guiforcores/bridge"
+	"os"
 	"time"
 
 	"github.com/wailsapp/wails/v2"
@@ -76,6 +77,10 @@ func main() {
 				return bridge.Env.AppName
 			}(),
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
+				if bridge.IsQuitArg(data.Args) {
+					runtime.EventsEmit(app.Ctx, "onExitApp")
+					return
+				}
 				runtime.Show(app.Ctx)
 				runtime.EventsEmit(app.Ctx, "onLaunchApp", data.Args)
 			},
@@ -84,6 +89,9 @@ func main() {
 			app.Startup(ctx)
 			runtime.InitializeNotifications(ctx)
 			trayStart()
+			if bridge.IsQuitArg(os.Args) {
+				runtime.EventsEmit(ctx, "onExitApp")
+			}
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
 			if !bridge.Env.PreventExit {

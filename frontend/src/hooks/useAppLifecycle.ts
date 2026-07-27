@@ -15,11 +15,6 @@ export const useAppLifecycle = () => {
   const offLaunchApp = EventsOn('onLaunchApp', async ([arg]: string[]) => {
     if (!arg) return
 
-    if (['quit', '--quit', '-q'].includes(arg.toLowerCase())) {
-      exitApp()
-      return
-    }
-
     let _url
     let _name = sampleID()
 

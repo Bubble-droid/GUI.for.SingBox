@@ -175,3 +175,13 @@ func parseByteRange(s string, size int64) (start int64, end int64, err error) {
 
 	return 0, 0, errors.New("invalid range format")
 }
+
+func IsQuitArg(args []string) bool {
+	for _, arg := range args {
+		switch strings.ToLower(strings.TrimSpace(arg)) {
+		case "quit", "--quit", "-q":
+			return true
+		}
+	}
+	return false
+}
