@@ -1,6 +1,6 @@
 //go:build !windows
 
-package bridge
+package exec
 
 import (
 	"errors"

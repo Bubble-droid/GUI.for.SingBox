@@ -11,6 +11,8 @@ import (
 	"slices"
 	"strings"
 	"sync"
+
+	platformexec "guiforcores/bridge/platform/exec"
 )
 
 func (a *App) GetSystemProxy() FlagResult {
@@ -506,7 +508,7 @@ func getLinuxSystemProxyBypass() (string, error) {
 
 func runSystemProxyCommand(path string, args ...string) (string, error) {
 	cmd := exec.Command(path, args...)
-	SetCmdWindowHidden(cmd)
+	platformexec.SetCmdWindowHidden(cmd)
 	cmd.Env = os.Environ()
 
 	out, err := cmd.CombinedOutput()
