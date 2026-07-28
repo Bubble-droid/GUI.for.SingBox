@@ -21,8 +21,6 @@ type requestTransportKey struct {
 
 var requestTransportCache sync.Map
 
-var globalPathResolver resolver.PathResolver
-
 func resolvePath(rawPath string) string {
 	if rawPath == "" {
 		return ""
@@ -33,11 +31,7 @@ func resolvePath(rawPath string) string {
 		return cleanPath
 	}
 
-	if globalPathResolver != nil {
-		return globalPathResolver.Resolve(cleanPath)
-	}
-
-	return cleanPath // Fallback
+	return resolver.Resolve(cleanPath)
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {

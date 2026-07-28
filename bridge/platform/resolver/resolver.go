@@ -5,11 +5,6 @@ import (
 	"path/filepath"
 )
 
-type PathResolver interface {
-	Resolve(cleanPath string) string
-	LogStorageMode()
-}
-
 type AppPaths struct {
 	AppDataPath   string
 	AppConfigPath string
@@ -17,25 +12,23 @@ type AppPaths struct {
 	AppCorePath   string
 }
 
-type PortableResolver struct {
-	basePath string
-}
+var basePath string
 
-func (r *PortableResolver) Resolve(cleanPath string) string {
-	return filepath.Join(r.basePath, cleanPath)
-}
-
-func (r *PortableResolver) LogStorageMode() {
-	log.Println("Storage Mode: Portable (Relative to Application Path)")
-}
-
-func NewPortableResolver(basePath string) (PathResolver, AppPaths) {
+func initPortable(base string) AppPaths {
+	basePath = base
 	baseDataDir := filepath.Join(basePath, "data")
-	paths := AppPaths{
+	return AppPaths{
 		AppDataPath:   baseDataDir,
 		AppConfigPath: baseDataDir,
 		AppCachePath:  filepath.Join(baseDataDir, ".cache"),
 		AppCorePath:   filepath.Join(baseDataDir, "sing-box"),
 	}
-	return &PortableResolver{basePath: basePath}, paths
+}
+
+func resolvePortable(cleanPath string) string {
+	return filepath.Join(basePath, cleanPath)
+}
+
+func logPortableStorageMode() {
+	log.Println("Storage Mode: Portable (Relative to Application Path)")
 }

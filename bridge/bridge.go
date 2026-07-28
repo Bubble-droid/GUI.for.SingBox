@@ -85,8 +85,7 @@ func CreateApp(fs embed.FS) *App {
 	Env.IsSystemPackage = lifecycle.IsSystemPackage(exePath, Env.AppVersion)
 	Env.IsBundled = lifecycle.IsBundled(Env.AppVersion)
 
-	var paths resolver.AppPaths
-	globalPathResolver, paths = resolver.InitResolver(AppName, Env.BasePath, Env.AppVersion)
+	paths := resolver.InitResolver(AppName, Env.BasePath)
 
 	Env.AppDataPath = paths.AppDataPath
 	Env.AppConfigPath = paths.AppConfigPath
@@ -106,9 +105,7 @@ func (a *App) Startup(ctx context.Context) {
 	lifecycle.LogPackageInfo(Env.IsSystemPackage, Env.IsBundled, SingBoxVersion, SingBoxAlphaVersion)
 	lifecycle.SetupPlatformIntegration(Env.AppVersion, AppName)
 
-	if globalPathResolver != nil {
-		globalPathResolver.LogStorageMode()
-	}
+	resolver.LogStorageMode()
 
 	log.Printf("App Data Path: %s", Env.AppDataPath)
 	log.Printf("App Config Path: %s", Env.AppConfigPath)
