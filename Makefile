@@ -19,7 +19,7 @@ DEV_PRE_REQ := patch-macos
 DEV_ENV := GOFLAGS="-mod=vendor"
 else
 NATIVE_BUILD_TARGET := build-linux
-DEV_TAGS := -tags webkit2_41
+DEV_TAGS := webkit2_41
 DEV_PRE_REQ :=
 DEV_ENV :=
 endif
@@ -69,11 +69,11 @@ all: build-frontend $(NATIVE_BUILD_TARGET)
 
 dev: $(DEV_PRE_REQ)
 	echo "==> Starting Wails dev mode (Version: dev)..."
-	$(DEV_ENV) VITE_APP_VERSION=dev wails dev $(DEV_TAGS) -ldflags "-X '$(GO_MODULE)/bridge.AppVersion=dev'"
+	$(DEV_ENV) VITE_APP_VERSION=dev wails dev -tags "$(DEV_TAGS) non_xdg" -ldflags "-X '$(GO_MODULE)/bridge.AppVersion=dev'"
 
 dev-xdg: $(DEV_PRE_REQ)
 	echo "==> Starting Wails dev mode with XDG (Version: $(APP_VERSION))..."
-	$(DEV_ENV) VITE_APP_VERSION=$(APP_VERSION) wails dev $(DEV_TAGS) -ldflags "$(LDFLAGS_BASE)"
+	$(DEV_ENV) VITE_APP_VERSION=$(APP_VERSION) wails dev -tags "$(DEV_TAGS)" -ldflags "$(LDFLAGS_BASE)"
 
 build-frontend:
 	pnpm --dir frontend install --frozen-lockfile
