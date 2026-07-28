@@ -14,13 +14,14 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func SetupPlatformIntegration(appVersion string, appName string) {}
+func SetupPlatformIntegration(isSystemPackage bool, isBundled bool, appName string) {
+}
 
-func IsSystemPackage(exePath string, appVersion string) bool {
+func IsSystemPackage(exePath string) bool {
 	return false
 }
 
-func IsBundled(appVersion string) bool {
+func IsBundled(isSystemPackage bool, appName string) bool {
 	return false
 }
 

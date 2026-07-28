@@ -1,4 +1,4 @@
-//go:build !windows && !darwin && !linux
+//go:build linux && dev
 
 package lifecycle
 
@@ -20,6 +20,7 @@ func IsBundled(isSystemPackage bool, appName string) bool {
 }
 
 func LogPackageInfo(isSystemPackage bool, isBundled bool, singBoxVersion string, singBoxAlphaVersion string) {
+	LogLinuxPackageInfo(false, false, "", "")
 }
 
 func OnStartup(ctx context.Context, appMenu *menu.Menu, appName string, resolvePathFunc func(string) string) string {
