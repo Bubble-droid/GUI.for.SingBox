@@ -61,7 +61,6 @@ Name=GUI.for.SingBox
 Name[zh_CN]=GUI for SingBox
 Comment=A GUI client application for sing-box
 Comment[zh_CN]=适用于 sing-box 的图形客户端
-TryExec=%s
 Exec=%s %%U
 Icon=gui-for-singbox
 Terminal=false
@@ -78,7 +77,7 @@ Exec=%s --quit
 Name=Quit
 Name[zh_CN]=退出应用
 Icon=application-exit
-`, execPath, execPath, execPath))
+`, execPath, execPath))
 
 	_ = os.MkdirAll(filepath.Dir(userPath), 0755)
 	_ = os.WriteFile(userPath, []byte(content), 0644)
