@@ -1,0 +1,33 @@
+export const inbounds = {
+  enable: '启用',
+  tag: '名称',
+  users: 'Http/Socks验证用户',
+  listen: {
+    listen: '监听地址',
+    listen_port: '端口',
+    tcp_fast_open: 'TCP快速打开',
+    tcp_multi_path: '多路径TCP',
+    udp_fragment: 'UDP分段',
+  },
+  tun: {
+    interface_name: 'TUN网卡名称',
+    address: 'IPv4和IPv6前缀',
+    mtu: '最大传输单元',
+    auto_route: '自动设置全局路由',
+    strict_route: '严格路由',
+    route_address: '自定义路由',
+    route_exclude_address: '排除自定义路由',
+    endpoint_independent_nat: '独立于端点的 NAT',
+    stack: 'TUN模式堆栈',
+    system: 'System',
+    gvisor: 'gVisor',
+    mixed: 'Mixed',
+  },
+  direct: {
+    network: '监听网络协议',
+    default: '默认所有',
+  },
+  mixedPort: '混合代理端口',
+  httpPort: 'HTTP(s)代理端口',
+  socksPort: 'SOCKS5代理端口',
+}
