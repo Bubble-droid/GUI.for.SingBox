@@ -1,5 +1,5 @@
 SHELL := bash
-.SHELLFLAGS := -eux -o pipefail -c
+.SHELLFLAGS := -eu -o pipefail -c
 .ONESHELL:
 
 APP_NAME := gui-for-singbox
