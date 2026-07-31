@@ -25,4 +25,16 @@ export const rules = {
     ip_accept_any: 'ip_accept_any',
     inline: 'Inline',
   },
+  action: {
+    reject: {
+      name: 'Reject Connection',
+      method: {
+        title: 'Reject Method',
+        default: 'Default',
+        drop: 'Drop',
+        reply: 'Reply',
+      },
+      no_drop: 'Do Not Drop',
+    },
+  },
 } satisfies MessageSchema['rules']

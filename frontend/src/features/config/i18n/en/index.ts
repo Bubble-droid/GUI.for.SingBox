@@ -6,6 +6,7 @@ import { log } from './log'
 import { outbounds } from './outbounds'
 import { route } from './route'
 import { rules } from './rules'
+import { shared } from './shared'
 
 export const kernel = {
   rule: 'Rule',
@@ -14,14 +15,15 @@ export const kernel = {
   ruleDesc: 'Route traffic based on rules',
   globalDesc: 'Only follow the Global group',
   directDesc: 'Directly connect all traffic',
+  shared,
   log,
   experimental,
   clash_api: experimental.clash_api,
   cache_file: experimental.cache_file,
   inbounds,
   outbounds,
-  route,
   rules,
+  route,
   strategy: {
     name: 'Strategy',
     default: 'Default',
