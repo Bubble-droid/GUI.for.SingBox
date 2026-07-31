@@ -8,6 +8,8 @@ import {
 } from '@/enums'
 import { sampleID } from '@/utils'
 
+import type { RouteConfig, RouteRuleConfig, RuleSetConfig } from '@/features/config/types'
+
 import {
   DefaultInboundIds,
   DefaultOutboundIds,
@@ -15,7 +17,7 @@ import {
   DefaultDnsServersIds,
 } from '../shared'
 
-export const DefaultRouteRule = (): App.Rule => ({
+export const DefaultRouteRule = (): RouteRuleConfig => ({
   id: sampleID(),
   type: RouteRuleType.RuleSet,
   enable: true,
@@ -28,7 +30,7 @@ export const DefaultRouteRule = (): App.Rule => ({
   server: '',
 })
 
-export const DefaultRouteRuleset = (): App.ProfileRuleSet => ({
+export const DefaultRouteRuleset = (): RuleSetConfig => ({
   id: sampleID(),
   type: RuleSetType.Local,
   tag: '',
@@ -40,7 +42,7 @@ export const DefaultRouteRuleset = (): App.ProfileRuleSet => ({
   path: '',
 })
 
-export const DefaultRoute = (): App.Route => ({
+export const DefaultRoute = (): RouteConfig => ({
   rules: [
     {
       id: sampleID(),

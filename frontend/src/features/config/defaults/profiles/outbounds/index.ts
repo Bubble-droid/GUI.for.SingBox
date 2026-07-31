@@ -3,11 +3,13 @@ import { Outbound } from '@/enums'
 import i18n from '@/lang'
 import { sampleID } from '@/utils'
 
+import type { OutboundConfig } from '@/features/config/types'
+
 import { DefaultOutboundIds } from '../shared'
 
 const { t } = i18n.global
 
-export const DefaultOutbound = (): App.Outbound => ({
+export const DefaultOutbound = (): OutboundConfig => ({
   id: sampleID(),
   tag: '',
   type: Outbound.Selector,
@@ -22,7 +24,7 @@ export const DefaultOutbound = (): App.Outbound => ({
   hidden: false,
 })
 
-export const DefaultOutbounds = (): App.Outbound[] => [
+export const DefaultOutbounds = (): OutboundConfig[] => [
   {
     id: DefaultOutboundIds.Select,
     tag: t('outbound.select'),

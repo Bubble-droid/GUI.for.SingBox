@@ -1,8 +1,10 @@
 import { TunStack, Inbound } from '@/enums'
 
+import type { InboundConfig } from '@/features/config/types'
+
 import { DefaultInboundIds } from '../shared'
 
-export const DefaultInboundSocks = (): NonNullable<App.Inbound['socks']> => ({
+export const DefaultInboundSocks = (): NonNullable<InboundConfig['socks']> => ({
   listen: {
     listen: '127.0.0.1',
     listen_port: 20120,
@@ -13,7 +15,7 @@ export const DefaultInboundSocks = (): NonNullable<App.Inbound['socks']> => ({
   users: [],
 })
 
-export const DefaultInboundHttp = (): NonNullable<App.Inbound['http']> => ({
+export const DefaultInboundHttp = (): NonNullable<InboundConfig['http']> => ({
   listen: {
     listen: '127.0.0.1',
     listen_port: 20121,
@@ -24,7 +26,7 @@ export const DefaultInboundHttp = (): NonNullable<App.Inbound['http']> => ({
   users: [],
 })
 
-export const DefaultInboundMixed = (): NonNullable<App.Inbound['mixed']> => ({
+export const DefaultInboundMixed = (): NonNullable<InboundConfig['mixed']> => ({
   listen: {
     listen: '127.0.0.1',
     listen_port: 20122,
@@ -35,7 +37,7 @@ export const DefaultInboundMixed = (): NonNullable<App.Inbound['mixed']> => ({
   users: [],
 })
 
-export const DefaultInboundDirect = (): NonNullable<App.Inbound['direct']> => ({
+export const DefaultInboundDirect = (): NonNullable<InboundConfig['direct']> => ({
   listen: {
     listen: '127.0.0.1',
     listen_port: 20119,
@@ -46,7 +48,7 @@ export const DefaultInboundDirect = (): NonNullable<App.Inbound['direct']> => ({
   network: '',
 })
 
-export const DefaultInboundTun = (): NonNullable<App.Inbound['tun']> => ({
+export const DefaultInboundTun = (): NonNullable<InboundConfig['tun']> => ({
   interface_name: '',
   address: ['172.18.0.1/30', 'fdfe:dcba:9876::1/126'],
   mtu: 0,
@@ -58,7 +60,7 @@ export const DefaultInboundTun = (): NonNullable<App.Inbound['tun']> => ({
   stack: TunStack.Mixed,
 })
 
-export const DefaultInbounds = (): App.Inbound[] => [
+export const DefaultInbounds = (): InboundConfig[] => [
   {
     id: DefaultInboundIds.MixedIn,
     type: Inbound.Mixed,

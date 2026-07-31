@@ -1,9 +1,11 @@
 import { ClashMode } from '@/enums'
 import { generateSecureKey, sampleID } from '@/utils'
 
+import type { ExperimentalConfig } from '@/features/config/types'
+
 import { DefaultOutboundIds } from './shared'
 
-export const DefaultExperimental = (): App.Experimental => ({
+export const DefaultExperimental = (): ExperimentalConfig => ({
   clash_api: {
     external_controller: '127.0.0.1:20123',
     external_ui: '',
