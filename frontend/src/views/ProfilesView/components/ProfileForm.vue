@@ -8,6 +8,8 @@ import { deepClone, generateConfig, message, alert } from '@/utils'
 import Button from '@/components/Button/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'
 
+import type { Profile } from '@/features/config/types'
+
 interface Props {
   id?: string
   step?: number
@@ -56,7 +58,7 @@ const stepItems = [
   { title: 'profile.step.mixin-script' },
 ] as const
 
-const profile = ref<App.Profile>(profilesStore.getProfileTemplate())
+const profile = ref<Profile>(profilesStore.getProfileTemplate())
 
 const inboundOptions = computed(() =>
   profile.value.inbounds.map((v) => ({ label: v.tag, value: v.id })),

@@ -4,6 +4,8 @@ import { useI18n } from 'vue-i18n'
 
 import { DomainStrategyOptions } from '@/constant/kernel'
 
+import type { DnsConfig } from '@/features/config/types'
+
 import DnsRulesConfig from './DnsRulesConfig.vue'
 import DnsServersConfig from './DnsServersConfig.vue'
 
@@ -15,7 +17,7 @@ interface Props {
 
 defineProps<Props>()
 
-const model = defineModel<App.Dns>({ required: true })
+const model = defineModel<DnsConfig>({ required: true })
 
 const serversOptions = computed(() =>
   model.value.servers.map((v) => ({ label: v.tag, value: v.id })),

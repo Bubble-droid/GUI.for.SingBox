@@ -11,6 +11,13 @@ import {
 } from '@/enums/kernel'
 import { useEnvStore, useProfilesStore, useRulesetsStore, useSubscribesStore } from '@/stores'
 
+import type {
+  DnsRuleConfig,
+  DnsServerConfig,
+  Profile,
+  RouteRuleConfig,
+} from '@/features/config/types'
+
 import { createTextMatcher, deepAssign, sampleID } from './others'
 
 const supportedRuleTypes = [
@@ -50,7 +57,7 @@ export const restoreProfile = (
   config: Recordable,
   name = sampleID(),
   options: RestoreProfileOptions = {},
-): App.Profile => {
+): Profile => {
   const template = useProfilesStore().getProfileTemplate()
 
   const { profile, subscriptionIds } = options
@@ -63,6 +70,7 @@ export const restoreProfile = (
   return {
     id: profile?.id || sampleID(),
     name,
+    schema: Defaults.ProfileSchemaVersion,
     log: deepAssign(Defaults.DefaultLog(), config.log),
     experimental: restoreExperimental(config.experimental, OutboundsIds),
     inbounds: restoreInbounds(config.inbounds || [], InboundsIds),
@@ -344,7 +352,7 @@ const restoreRouteRules = (
   OutboundsIds: Recordable,
   RouteRuleSetIds: Recordable,
   DnsServersIds: Recordable,
-): App.Rule[] => {
+): RouteRuleConfig[] => {
   return rules.flatMap((raw, i) => {
     const rule = Defaults.DefaultRouteRule()
 
@@ -423,7 +431,7 @@ const restoreDnsServers = (
   servers: Recordable[],
   DnsServersIds: Recordable,
   OutboundsIds: Recordable,
-): App.DnsServerConfig[] => {
+): DnsServerConfig[] => {
   return servers.flatMap((raw) => {
     if (!raw.type) return []
     const server = Defaults.DefaultDnsServer()
@@ -504,7 +512,7 @@ const restoreDnsRules = (
   InboundsIds: Recordable,
   RouteRuleSetIds: Recordable,
   DnsServersIds: Recordable,
-): App.DnsRule[] => {
+): DnsRuleConfig[] => {
   return rules.flatMap((raw: Recordable, i) => {
     const rule = Defaults.DefaultDnsRule()
     rule.id = 'rule-' + i
