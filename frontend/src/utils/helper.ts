@@ -12,7 +12,7 @@ import {
   WriteFile,
 } from '@/bridge'
 import { OS, RequestProxyMode } from '@/enums/app'
-import { RulesetFormat } from '@/enums/kernel'
+import { RuleSetFormat } from '@/enums/kernel'
 import i18n from '@/lang'
 import {
   useAppSettingsStore,
@@ -278,7 +278,7 @@ export const addToRuleSet = async (
       name: id,
       updateTime: 0,
       type: 'Manual',
-      format: RulesetFormat.Source,
+      format: RuleSetFormat.Source,
       url: '',
       path,
       count: 0,

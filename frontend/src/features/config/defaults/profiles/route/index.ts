@@ -1,4 +1,11 @@
-import { RuleType, RuleAction, Strategy, RulesetType, RulesetFormat, ClashMode } from '@/enums'
+import {
+  RuleType,
+  RuleAction,
+  DomainStrategy,
+  RuleSetType,
+  RuleSetFormat,
+  ClashMode,
+} from '@/enums'
 import { sampleID } from '@/utils'
 
 import {
@@ -17,15 +24,15 @@ export const DefaultRouteRule = (): App.Rule => ({
   action: RuleAction.Route,
   outbound: '',
   sniffer: [],
-  strategy: Strategy.Default,
+  strategy: DomainStrategy.Default,
   server: '',
 })
 
 export const DefaultRouteRuleset = (): App.ProfileRuleSet => ({
   id: sampleID(),
-  type: RulesetType.Local,
+  type: RuleSetType.Local,
   tag: '',
-  format: RulesetFormat.Binary,
+  format: RuleSetFormat.Binary,
   url: '',
   download_detour: '',
   update_interval: '',
@@ -44,7 +51,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Sniff,
       outbound: '',
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -53,10 +60,10 @@ export const DefaultRoute = (): App.Route => ({
       enable: true,
       payload: 'dns',
       invert: false,
-      action: RuleAction.HijackDNS,
+      action: RuleAction.HijackDns,
       outbound: '',
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -68,7 +75,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -80,7 +87,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Global,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -92,7 +99,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: '',
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -104,7 +111,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -116,7 +123,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Block,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -128,7 +135,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Block,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -140,7 +147,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -152,7 +159,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -164,7 +171,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -176,7 +183,7 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
     {
@@ -188,16 +195,16 @@ export const DefaultRoute = (): App.Route => ({
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Select,
       sniffer: [],
-      strategy: Strategy.Default,
+      strategy: DomainStrategy.Default,
       server: '',
     },
   ],
   rule_set: [
     {
       id: DefaultRulesetIds.CATEGORY_ADS,
-      type: RulesetType.Remote,
+      type: RuleSetType.Remote,
       tag: DefaultRulesetIds.CATEGORY_ADS,
-      format: RulesetFormat.Binary,
+      format: RuleSetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs',
       download_detour: DefaultOutboundIds.Direct,
       update_interval: '',
@@ -206,9 +213,9 @@ export const DefaultRoute = (): App.Route => ({
     },
     {
       id: DefaultRulesetIds.GEOIP_PRIVATE,
-      type: RulesetType.Remote,
+      type: RuleSetType.Remote,
       tag: DefaultRulesetIds.GEOIP_PRIVATE,
-      format: RulesetFormat.Binary,
+      format: RuleSetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs',
       download_detour: DefaultOutboundIds.Direct,
       update_interval: '',
@@ -217,9 +224,9 @@ export const DefaultRoute = (): App.Route => ({
     },
     {
       id: DefaultRulesetIds.GEOSITE_PRIVATE,
-      type: RulesetType.Remote,
+      type: RuleSetType.Remote,
       tag: DefaultRulesetIds.GEOSITE_PRIVATE,
-      format: RulesetFormat.Binary,
+      format: RuleSetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs',
       download_detour: DefaultOutboundIds.Direct,
       update_interval: '',
@@ -228,9 +235,9 @@ export const DefaultRoute = (): App.Route => ({
     },
     {
       id: DefaultRulesetIds.GEOIP_CN,
-      type: RulesetType.Remote,
+      type: RuleSetType.Remote,
       tag: DefaultRulesetIds.GEOIP_CN,
-      format: RulesetFormat.Binary,
+      format: RuleSetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs',
       download_detour: DefaultOutboundIds.Direct,
       update_interval: '',
@@ -239,9 +246,9 @@ export const DefaultRoute = (): App.Route => ({
     },
     {
       id: DefaultRulesetIds.GEOSITE_CN,
-      type: RulesetType.Remote,
+      type: RuleSetType.Remote,
       tag: DefaultRulesetIds.GEOSITE_CN,
-      format: RulesetFormat.Binary,
+      format: RuleSetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs',
       download_detour: DefaultOutboundIds.Direct,
       update_interval: '',
@@ -250,9 +257,9 @@ export const DefaultRoute = (): App.Route => ({
     },
     {
       id: DefaultRulesetIds.GEOLOCATION_NOT_CN,
-      type: RulesetType.Remote,
+      type: RuleSetType.Remote,
       tag: DefaultRulesetIds.GEOLOCATION_NOT_CN,
-      format: RulesetFormat.Binary,
+      format: RuleSetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs',
       download_detour: DefaultOutboundIds.Direct,
       update_interval: '',

@@ -3,7 +3,7 @@ import {
   Inbound,
   Outbound,
   RuleAction,
-  RulesetType,
+  RuleSetType,
   RuleType as RouteRuleType,
   DnsServer,
 } from '@/enums/kernel'
@@ -20,7 +20,7 @@ const supportedRuleTypes = [
   RouteRuleType.DomainKeyword,
   RouteRuleType.DomainRegex,
   RouteRuleType.SourceIPCidr,
-  RouteRuleType.IPCidr,
+  RouteRuleType.IpCidr,
   RouteRuleType.SourcePort,
   RouteRuleType.SourcePortRange,
   RouteRuleType.Port,
@@ -187,7 +187,7 @@ const restoreOutbounds = (
 
   const groupTags = new Set(
     outbounds
-      .filter((o: Recordable) => [Outbound.Selector, Outbound.Urltest].includes(o.type))
+      .filter((o: Recordable) => [Outbound.Selector, Outbound.UrlTest].includes(o.type))
       .map((o: Recordable) => o.tag),
   )
 
@@ -206,7 +206,7 @@ const restoreOutbounds = (
   })
 
   return outbounds.flatMap((raw) => {
-    if (![Outbound.Selector, Outbound.Urltest].includes(raw.type)) {
+    if (![Outbound.Selector, Outbound.UrlTest].includes(raw.type)) {
       return []
     }
     const outbound = Defaults.DefaultOutbound()
@@ -272,7 +272,7 @@ const restoreOutbounds = (
     if ('interrupt_exist_connections' in raw) {
       outbound.interrupt_exist_connections = raw.interrupt_exist_connections
     }
-    if (Outbound.Urltest === raw.type) {
+    if (Outbound.UrlTest === raw.type) {
       if ('url' in raw) {
         outbound.url = raw.url
       }
@@ -300,11 +300,11 @@ const restoreRouteRuleset = (
     ruleset.type = raw.type
     ruleset.tag = raw.tag
 
-    if (raw.type === RulesetType.Inline) {
+    if (raw.type === RuleSetType.Inline) {
       if ('rules' in raw) {
         ruleset.rules = JSON.stringify(raw.rules, null, 2)
       }
-    } else if (raw.type === RulesetType.Local) {
+    } else if (raw.type === RuleSetType.Local) {
       if ('path' in raw) {
         const r = rulesetsStore.rulesets.find(
           (v) => v.path === raw.path.replace(`${env.appDataPath}/`, 'data/'),
@@ -318,7 +318,7 @@ const restoreRouteRuleset = (
       if ('format' in raw) {
         ruleset.format = raw.format
       }
-    } else if (raw.type === RulesetType.Remote) {
+    } else if (raw.type === RuleSetType.Remote) {
       if ('format' in raw) {
         ruleset.format = raw.format
       }
@@ -485,7 +485,7 @@ const restoreDnsServers = (
       if ('interface' in raw) {
         server.interface = raw.interface
       }
-    } else if (DnsServer.FakeIP === server.type) {
+    } else if (DnsServer.FakeIp === server.type) {
       if ('inet4_range' in raw) {
         server.inet4_range = raw.inet4_range
       }

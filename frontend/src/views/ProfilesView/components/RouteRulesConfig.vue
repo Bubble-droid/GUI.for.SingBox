@@ -7,17 +7,17 @@ import { RuleActionRejectOptions } from '@/constant/kernel'
 import {
   DomainStrategyOptions,
   RuleActionOptions,
-  RuleSnifferOptions,
+  SniffProtocolOptions,
   RulesTypeOptions,
 } from '@/constant/kernel'
 import { DefaultRouteRule } from '@/constant/profile'
 import {
   RuleAction,
-  RulesetFormat,
-  RulesetType,
+  RuleSetFormat,
+  RuleSetType,
   RuleType,
   ClashMode,
-  Strategy,
+  DomainStrategy,
 } from '@/enums/kernel'
 import { useBool } from '@/hooks'
 import { deepClone, message } from '@/utils'
@@ -57,7 +57,7 @@ const handleAddInsertionPoint = () => {
     action: RuleAction.Sniff,
     outbound: '',
     sniffer: [],
-    strategy: Strategy.Default,
+    strategy: DomainStrategy.Default,
     server: '',
   })
 }
@@ -290,7 +290,7 @@ const renderRule = (rule: App.Rule) => {
           <Radio v-model="fields.outbound" :options="RuleActionRejectOptions" />
         </div>
       </template>
-      <template v-else-if="fields.action === RuleAction.HijackDNS">
+      <template v-else-if="fields.action === RuleAction.HijackDns">
         <Empty description="common.none" />
       </template>
       <template v-else-if="fields.action === RuleAction.Sniff">
@@ -300,7 +300,7 @@ const renderRule = (rule: App.Rule) => {
             v-model="fields.sniffer"
             multiple
             clearable
-            :options="RuleSnifferOptions"
+            :options="SniffProtocolOptions"
             placeholder="All"
           />
         </div>
@@ -335,7 +335,7 @@ const renderRule = (rule: App.Rule) => {
           >
             <div class="text-12">
               {{ ruleset.type }}
-              {{ ruleset.type === RulesetType.Inline ? RulesetFormat.Source : ruleset.format }}
+              {{ ruleset.type === RuleSetType.Inline ? RuleSetFormat.Source : ruleset.format }}
             </div>
           </Card>
         </template>

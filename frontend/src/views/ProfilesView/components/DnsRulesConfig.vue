@@ -13,11 +13,11 @@ import { DefaultDnsRule } from '@/constant/profile'
 import {
   RuleType,
   ClashMode,
-  RulesetType,
-  RulesetFormat,
+  RuleSetType,
+  RuleSetFormat,
   RuleAction,
   RuleActionReject,
-  Strategy,
+  DomainStrategy,
 } from '@/enums/kernel'
 import { useBool } from '@/hooks'
 import { deepClone, isValidJson, message } from '@/utils'
@@ -79,7 +79,7 @@ const handleAddInsertionPoint = () => {
     action: RuleAction.Route,
     server: '',
     invert: false,
-    strategy: Strategy.Default,
+    strategy: DomainStrategy.Default,
     disable_cache: false,
     client_subnet: '',
   })
@@ -320,7 +320,7 @@ const renderRule = (rule: App.DnsRule) => {
           @click="handleUse(ruleset)"
         >
           {{ ruleset.type }}
-          {{ ruleset.type === RulesetType.Inline ? RulesetFormat.Source : ruleset.format }}
+          {{ ruleset.type === RuleSetType.Inline ? RuleSetFormat.Source : ruleset.format }}
         </Card>
       </div>
     </template>

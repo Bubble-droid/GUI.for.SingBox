@@ -6,16 +6,16 @@ import {
   RuleType,
   TunStack,
   Network,
-  RulesetType,
-  RulesetFormat,
-  Strategy,
+  RuleSetType,
+  RuleSetFormat,
+  DomainStrategy,
   RuleAction,
   RuleActionReject,
   DnsServer,
-  Sniffer,
+  SniffProtocol,
 } from './kernel'
 
-export const ModeOptions = [
+export const PredefinedClashModeOptions = [
   {
     label: 'kernel.global',
     value: ClashMode.Global,
@@ -76,7 +76,7 @@ export const OutboundOptions = [
   { label: 'kernel.outbounds.direct', value: Outbound.Direct },
   { label: 'kernel.outbounds.block', value: Outbound.Block },
   { label: 'kernel.outbounds.selector', value: Outbound.Selector },
-  { label: 'kernel.outbounds.urltest', value: Outbound.Urltest },
+  { label: 'kernel.outbounds.urltest', value: Outbound.UrlTest },
 ]
 
 export const RulesTypeOptions = [
@@ -114,7 +114,7 @@ export const RulesTypeOptions = [
   },
   {
     label: 'kernel.rules.type.ip_cidr',
-    value: RuleType.IPCidr,
+    value: RuleType.IpCidr,
   },
   {
     label: 'kernel.rules.type.ip_is_private',
@@ -180,30 +180,30 @@ export const NetworkOptions = [
   { label: 'UDP', value: Network.Udp },
 ]
 
-export const RulesetTypeOptions = [
-  { label: 'kernel.route.rule_set.type.inline', value: RulesetType.Inline },
-  { label: 'kernel.route.rule_set.type.local', value: RulesetType.Local },
-  { label: 'kernel.route.rule_set.type.remote', value: RulesetType.Remote },
+export const RuleSetTypeOptions = [
+  { label: 'kernel.route.rule_set.type.inline', value: RuleSetType.Inline },
+  { label: 'kernel.route.rule_set.type.local', value: RuleSetType.Local },
+  { label: 'kernel.route.rule_set.type.remote', value: RuleSetType.Remote },
 ]
 
-export const RulesetFormatOptions = [
-  { label: 'ruleset.format.source', value: RulesetFormat.Source },
-  { label: 'ruleset.format.binary', value: RulesetFormat.Binary },
+export const RuleSetFormatOptions = [
+  { label: 'ruleset.format.source', value: RuleSetFormat.Source },
+  { label: 'ruleset.format.binary', value: RuleSetFormat.Binary },
 ]
 
 export const DomainStrategyOptions = [
-  { label: 'kernel.strategy.default', value: Strategy.Default },
-  { label: 'kernel.strategy.prefer_ipv4', value: Strategy.PreferIPv4 },
-  { label: 'kernel.strategy.prefer_ipv6', value: Strategy.PreferIPv6 },
-  { label: 'kernel.strategy.ipv4_only', value: Strategy.IPv4Only },
-  { label: 'kernel.strategy.ipv6_only', value: Strategy.IPv6Only },
+  { label: 'kernel.strategy.default', value: DomainStrategy.Default },
+  { label: 'kernel.strategy.prefer_ipv4', value: DomainStrategy.PreferIpv4 },
+  { label: 'kernel.strategy.prefer_ipv6', value: DomainStrategy.PreferIpv6 },
+  { label: 'kernel.strategy.ipv4_only', value: DomainStrategy.Ipv4Only },
+  { label: 'kernel.strategy.ipv6_only', value: DomainStrategy.Ipv6Only },
 ]
 
 export const RuleActionOptions = [
   { label: 'kernel.route.rules.action.route', value: RuleAction.Route },
   { label: 'kernel.route.rules.action.route-options', value: RuleAction.RouteOptions },
   { label: 'kernel.route.rules.action.reject', value: RuleAction.Reject },
-  { label: 'kernel.route.rules.action.hijack-dns', value: RuleAction.HijackDNS },
+  { label: 'kernel.route.rules.action.hijack-dns', value: RuleAction.HijackDns },
   { label: 'kernel.route.rules.action.sniff', value: RuleAction.Sniff },
   { label: 'kernel.route.rules.action.resolve', value: RuleAction.Resolve },
 ]
@@ -224,7 +224,7 @@ export const DnsServerTypeOptions = [
   { label: 'kernel.dns.type.https', value: DnsServer.Https },
   { label: 'kernel.dns.type.h3', value: DnsServer.H3 },
   { label: 'kernel.dns.type.dhcp', value: DnsServer.Dhcp },
-  { label: 'kernel.dns.type.fakeip', value: DnsServer.FakeIP },
+  { label: 'kernel.dns.type.fakeip', value: DnsServer.FakeIp },
 ]
 
 export const DnsRuleActionOptions = [
@@ -239,15 +239,15 @@ export const DnsRuleActionRejectOptions = [
   { label: 'kernel.route.rules.action.rejectDrop', value: RuleActionReject.Drop },
 ]
 
-export const RuleSnifferOptions = [
-  { label: 'kernel.route.rules.sniffer.http', value: Sniffer.Http },
-  { label: 'kernel.route.rules.sniffer.tls', value: Sniffer.Tls },
-  { label: 'kernel.route.rules.sniffer.quic', value: Sniffer.Quic },
-  { label: 'kernel.route.rules.sniffer.stun', value: Sniffer.Stun },
-  { label: 'kernel.route.rules.sniffer.dns', value: Sniffer.Dns },
-  { label: 'kernel.route.rules.sniffer.bittorrent', value: Sniffer.Bittorrent },
-  { label: 'kernel.route.rules.sniffer.dtls', value: Sniffer.Dtls },
-  { label: 'kernel.route.rules.sniffer.ssh', value: Sniffer.Ssh },
-  { label: 'kernel.route.rules.sniffer.rdp', value: Sniffer.Rdp },
-  { label: 'kernel.route.rules.sniffer.ntp', value: Sniffer.Ntp },
+export const SniffProtocolOptions = [
+  { label: 'kernel.route.rules.sniffer.http', value: SniffProtocol.Http },
+  { label: 'kernel.route.rules.sniffer.tls', value: SniffProtocol.Tls },
+  { label: 'kernel.route.rules.sniffer.quic', value: SniffProtocol.Quic },
+  { label: 'kernel.route.rules.sniffer.stun', value: SniffProtocol.Stun },
+  { label: 'kernel.route.rules.sniffer.dns', value: SniffProtocol.Dns },
+  { label: 'kernel.route.rules.sniffer.bittorrent', value: SniffProtocol.Bittorrent },
+  { label: 'kernel.route.rules.sniffer.dtls', value: SniffProtocol.Dtls },
+  { label: 'kernel.route.rules.sniffer.ssh', value: SniffProtocol.Ssh },
+  { label: 'kernel.route.rules.sniffer.rdp', value: SniffProtocol.Rdp },
+  { label: 'kernel.route.rules.sniffer.ntp', value: SniffProtocol.Ntp },
 ]

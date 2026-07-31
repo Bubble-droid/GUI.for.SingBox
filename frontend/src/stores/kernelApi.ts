@@ -23,7 +23,7 @@ import {
 } from '@/constant/kernel'
 import { DefaultInboundMixed } from '@/constant/profile'
 import { Branch } from '@/enums/app'
-import { Inbound, RulesetType, TunStack } from '@/enums/kernel'
+import { Inbound, RuleSetType, TunStack } from '@/enums/kernel'
 import {
   useAppSettingsStore,
   useProfilesStore,
@@ -499,7 +499,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   const collectRulesetIDs = () => {
     if (!profilesStore.currentProfile) return []
     const l1 = profilesStore.currentProfile.route.rule_set.flatMap((ruleset) =>
-      ruleset.type === RulesetType.Local ? ruleset.path : [],
+      ruleset.type === RuleSetType.Local ? ruleset.path : [],
     )
     return l1
   }
@@ -507,7 +507,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   eventBus.on('rulesetChange', ({ id }) => {
     if (running.value && profilesStore.currentProfile) {
       const inUse = profilesStore.currentProfile.route.rule_set.some(
-        (ruleset) => ruleset.type === RulesetType.Local && ruleset.path === id,
+        (ruleset) => ruleset.type === RuleSetType.Local && ruleset.path === id,
       )
       if (inUse) {
         needRestart.value = true
