@@ -40,7 +40,7 @@ export const DefaultOutbounds = (): App.Outbound[] => [
   {
     id: DefaultOutboundIds.Urltest,
     tag: t('outbound.urltest'),
-    type: Outbound.Urltest,
+    type: Outbound.UrlTest,
     outbounds: [],
     interrupt_exist_connections: true,
     url: DefaultTestURL,

@@ -34,7 +34,7 @@ export const Outbound = {
   Direct: 'direct',
   Block: 'block',
   Selector: 'selector',
-  Urltest: 'urltest',
+  UrlTest: 'urltest',
 } as const
 
 export type Outbound = ValueOf<typeof Outbound>
@@ -54,20 +54,20 @@ export const Network = {
 
 export type Network = ValueOf<typeof Network>
 
-export const RulesetType = {
+export const RuleSetType = {
   Inline: 'inline',
   Local: 'local',
   Remote: 'remote',
 } as const
 
-export type RulesetType = ValueOf<typeof RulesetType>
+export type RuleSetType = ValueOf<typeof RuleSetType>
 
-export const RulesetFormat = {
+export const RuleSetFormat = {
   Source: 'source',
   Binary: 'binary',
 } as const
 
-export type RulesetFormat = ValueOf<typeof RulesetFormat>
+export type RuleSetFormat = ValueOf<typeof RuleSetFormat>
 
 export const RuleType = {
   Inbound: 'inbound',
@@ -78,7 +78,7 @@ export const RuleType = {
   DomainKeyword: 'domain_keyword',
   DomainRegex: 'domain_regex',
   SourceIPCidr: 'source_ip_cidr',
-  IPCidr: 'ip_cidr',
+  IpCidr: 'ip_cidr',
   IpIsPrivate: 'ip_is_private',
   SourcePort: 'source_port',
   SourcePortRange: 'source_port_range',
@@ -97,15 +97,15 @@ export const RuleType = {
 
 export type RuleType = ValueOf<typeof RuleType>
 
-export const Strategy = {
+export const DomainStrategy = {
   Default: 'default',
-  PreferIPv4: 'prefer_ipv4',
-  PreferIPv6: 'prefer_ipv6',
-  IPv4Only: 'ipv4_only',
-  IPv6Only: 'ipv6_only',
+  PreferIpv4: 'prefer_ipv4',
+  PreferIpv6: 'prefer_ipv6',
+  Ipv4Only: 'ipv4_only',
+  Ipv6Only: 'ipv6_only',
 } as const
 
-export type Strategy = ValueOf<typeof Strategy>
+export type DomainStrategy = ValueOf<typeof DomainStrategy>
 
 export const DnsServer = {
   Local: 'local',
@@ -117,7 +117,7 @@ export const DnsServer = {
   Quic: 'quic',
   H3: 'h3',
   Dhcp: 'dhcp',
-  FakeIP: 'fakeip',
+  FakeIp: 'fakeip',
 } as const
 
 export type DnsServer = ValueOf<typeof DnsServer>
@@ -126,7 +126,7 @@ export const RuleAction = {
   Route: 'route',
   RouteOptions: 'route-options',
   Reject: 'reject',
-  HijackDNS: 'hijack-dns',
+  HijackDns: 'hijack-dns',
   Sniff: 'sniff',
   Resolve: 'resolve',
   Predefined: 'predefined',
@@ -142,7 +142,7 @@ export const RuleActionReject = {
 
 export type RuleActionReject = ValueOf<typeof RuleActionReject>
 
-export const Sniffer = {
+export const SniffProtocol = {
   Http: 'http',
   Tls: 'tls',
   Quic: 'quic',
@@ -155,4 +155,4 @@ export const Sniffer = {
   Ntp: 'ntp',
 } as const
 
-export type Sniffer = ValueOf<typeof Sniffer>
+export type SniffProtocol = ValueOf<typeof SniffProtocol>

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 
-import { ModeOptions, LogLevelOptions } from '@/constant/kernel'
+import { PredefinedClashModeOptions, LogLevelOptions } from '@/constant/kernel'
 import { useBool } from '@/hooks'
 import { generateSecureKey } from '@/utils'
 
@@ -23,7 +23,10 @@ const [showMore, toggleMore] = useBool(false)
   <div>
     <div class="form-item">
       {{ t('kernel.clash_api.default_mode') }}
-      <Radio v-model="model.experimental.clash_api.default_mode" :options="ModeOptions" />
+      <Radio
+        v-model="model.experimental.clash_api.default_mode"
+        :options="PredefinedClashModeOptions"
+      />
     </div>
     <div class="form-item">
       {{ t('kernel.log.disabled') }}

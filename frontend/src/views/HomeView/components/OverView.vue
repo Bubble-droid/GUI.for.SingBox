@@ -3,7 +3,7 @@ import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { ProcessMemory } from '@/bridge'
-import { ModeOptions } from '@/constant/kernel'
+import { PredefinedClashModeOptions } from '@/constant/kernel'
 import { useEnvStore, useAppStore, useKernelApiStore, useAppSettingsStore } from '@/stores'
 import { formatBytes, handleChangeMode, message, modal } from '@/utils'
 
@@ -264,7 +264,7 @@ onUnmounted(() => {
         </div>
         <div class="mode-panel__list flex flex-col gap-12">
           <Card
-            v-for="mode in ModeOptions"
+            v-for="mode in PredefinedClashModeOptions"
             :key="mode.value"
             :selected="kernelApiStore.config.mode === mode.value"
             :title="t(mode.label)"

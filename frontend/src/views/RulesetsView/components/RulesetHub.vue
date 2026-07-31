@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { HttpGet } from '@/bridge'
 import { BuiltInOutbound } from '@/constant/kernel'
 import { DefaultRouteRule, DefaultRouteRuleset } from '@/constant/profile'
-import { RulesetFormat, RulesetType, RuleType } from '@/enums/kernel'
+import { RuleSetFormat, RuleSetType, RuleType } from '@/enums/kernel'
 import { useProfilesStore, useRulesetsStore } from '@/stores'
 import { alert, deepClone, message, picker } from '@/utils'
 
@@ -13,7 +13,7 @@ import Button from '@/components/Button/index.vue'
 import Pagination from '@/components/Pagination/index.vue'
 
 const pageSize = 27
-const rulesetFormats = [RulesetFormat.Source, RulesetFormat.Binary]
+const rulesetFormats = [RuleSetFormat.Source, RuleSetFormat.Binary]
 const currentPage = ref(1)
 
 const { t } = useI18n()
@@ -44,8 +44,8 @@ const currentList = computed(() => {
   )
 })
 
-const getRulesetUrlAndSuffix = (ruleset: App.RulesetHub['list'][number], format: RulesetFormat) => {
-  const suffix = { [RulesetFormat.Binary]: '.srs', [RulesetFormat.Source]: '.json' }[format]
+const getRulesetUrlAndSuffix = (ruleset: App.RulesetHub['list'][number], format: RuleSetFormat) => {
+  const suffix = { [RuleSetFormat.Binary]: '.srs', [RuleSetFormat.Source]: '.json' }[format]
   const basrUrl = {
     geosite: rulesetsStore.rulesetHub.geosite,
     geoip: rulesetsStore.rulesetHub.geoip,
@@ -53,7 +53,7 @@ const getRulesetUrlAndSuffix = (ruleset: App.RulesetHub['list'][number], format:
   return [basrUrl + ruleset.name + suffix, suffix] as const
 }
 
-const handleAddRuleset = async (ruleset: App.RulesetHub['list'][number], format: RulesetFormat) => {
+const handleAddRuleset = async (ruleset: App.RulesetHub['list'][number], format: RuleSetFormat) => {
   const [url, suffix] = getRulesetUrlAndSuffix(ruleset, format)
   const id = ruleset.type + '_' + ruleset.name + '.' + format
   const file = ruleset.type + '_' + ruleset.name + suffix
@@ -80,7 +80,7 @@ const handleAddRuleset = async (ruleset: App.RulesetHub['list'][number], format:
 
 const handleAddRulesetToProfile = async (
   ruleset: App.RulesetHub['list'][number],
-  format: RulesetFormat,
+  format: RuleSetFormat,
 ) => {
   const [url, suffix] = getRulesetUrlAndSuffix(ruleset, format)
 
@@ -99,7 +99,7 @@ const handleAddRulesetToProfile = async (
     }
 
     const profileRuleset = profile.route.rule_set.find(
-      (item) => item.type === RulesetType.Remote && item.url === url,
+      (item) => item.type === RuleSetType.Remote && item.url === url,
     )
     if (
       profileRuleset &&
@@ -131,7 +131,7 @@ const handleAddRulesetToProfile = async (
     if (!rulesetReferenceId) {
       const rulesetReference = {
         ...DefaultRouteRuleset(),
-        type: RulesetType.Remote,
+        type: RuleSetType.Remote,
         tag: `${ruleset.name}-${ruleset.type}${suffix}`,
         format,
         url,
@@ -153,7 +153,7 @@ const handleAddRulesetToProfile = async (
   }
 }
 
-const handlePreview = async (ruleset: App.RulesetHub['list'][number], format: RulesetFormat) => {
+const handlePreview = async (ruleset: App.RulesetHub['list'][number], format: RuleSetFormat) => {
   const { destroy, error } = message.info('rulesets.fetching', 15_000)
   try {
     const { body } = await HttpGet(getRulesetUrlAndSuffix(ruleset, format)[0])
@@ -174,7 +174,7 @@ const handleUpdatePluginHub = async () => {
   }
 }
 
-const isAlreadyAdded = (ruleset: App.RulesetHub['list'][number], format: RulesetFormat) => {
+const isAlreadyAdded = (ruleset: App.RulesetHub['list'][number], format: RuleSetFormat) => {
   const id = ruleset.type + '_' + ruleset.name + '.' + format
   return rulesetsStore.getRulesetById(id)
 }
@@ -249,7 +249,7 @@ defineExpose({ modalSlots })
                 icon="preview"
                 size="small"
                 type="text"
-                @click="handlePreview(ruleset, RulesetFormat.Source)"
+                @click="handlePreview(ruleset, RuleSetFormat.Source)"
               />
             </div>
             <div class="flex items-center justify-between">

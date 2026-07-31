@@ -7,7 +7,7 @@ import { DraggableOptions, ViewOptions } from '@/constant/app'
 import { BuiltInOutbound, EmptyRuleSet } from '@/constant/kernel'
 import { DefaultRouteRule, DefaultRouteRuleset } from '@/constant/profile'
 import { View } from '@/enums/app'
-import { RulesetFormat, RulesetType, RuleType } from '@/enums/kernel'
+import { RuleSetFormat, RuleSetType, RuleType } from '@/enums/kernel'
 import { useRulesetsStore, useAppSettingsStore, useProfilesStore } from '@/stores'
 import {
   debounce,
@@ -116,7 +116,7 @@ const handleDisableRuleset = async (r: App.RuleSet) => {
 const handleClearRuleset = async (id: string) => {
   const r = rulesetsStore.getRulesetById(id)
   if (!r) return
-  if (r.format != RulesetFormat.Source) return
+  if (r.format != RuleSetFormat.Source) return
 
   try {
     await WriteFile(r.path, JSON.stringify(EmptyRuleSet, null, 2))
@@ -146,7 +146,7 @@ const handleAddRulesetToProfile = async (id: string) => {
     }
 
     const profileRuleset = profile.route.rule_set.find(
-      (item) => item.type === RulesetType.Local && item.path === ruleset.id,
+      (item) => item.type === RuleSetType.Local && item.path === ruleset.id,
     )
     if (
       profileRuleset &&
@@ -206,8 +206,8 @@ const generateMenus = (r: App.RuleSet) => {
   }
 
   return {
-    [RulesetFormat.Source]: [addToProfileMenu, ...sourceMenuList],
-    [RulesetFormat.Binary]: [addToProfileMenu],
+    [RuleSetFormat.Source]: [addToProfileMenu, ...sourceMenuList],
+    [RuleSetFormat.Binary]: [addToProfileMenu],
   }[r.format].map((v) => ({ ...v, handler: () => v.handler?.(r.id) }))
 }
 
@@ -315,14 +315,14 @@ const onSortUpdate = debounce(rulesetsStore.saveRulesets, 1000)
         </Button>
       </template>
 
-      <div v-if="r.format === RulesetFormat.Binary">
+      <div v-if="r.format === RuleSetFormat.Binary">
         {{ t('ruleset.format.name') }}
         :
         {{ r.format || '--' }}
       </div>
 
       <template v-if="appSettingsStore.app.rulesetsView === View.Grid">
-        <div v-if="r.format === RulesetFormat.Source">
+        <div v-if="r.format === RuleSetFormat.Source">
           {{ t('rulesets.rulesetCount') }}
           :
           {{ r.count }}
@@ -334,7 +334,7 @@ const onSortUpdate = debounce(rulesetsStore.saveRulesets, 1000)
         </div>
       </template>
       <template v-else>
-        <div v-if="r.format === RulesetFormat.Source">
+        <div v-if="r.format === RuleSetFormat.Source">
           {{ t('rulesets.rulesetCount') }}
           :
           {{ r.count }}

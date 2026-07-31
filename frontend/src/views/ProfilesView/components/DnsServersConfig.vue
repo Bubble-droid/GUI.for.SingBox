@@ -174,7 +174,7 @@ const renderServer = (server: App.DnsServerConfig) => {
         {{ t('kernel.dns.interface') }}
         <Input v-model="fields.interface" placeholder="wlan0,eth0" />
       </div>
-      <template v-else-if="fields.type === DnsServer.FakeIP">
+      <template v-else-if="fields.type === DnsServer.FakeIp">
         <div class="form-item">
           {{ t('kernel.dns.inet4_range') }}
           <Input v-model="fields.inet4_range" placeholder="198.18.0.0/15" clearable>

@@ -5,7 +5,7 @@ import { parse } from 'yaml'
 import { ReadFile, WriteFile, CopyFile, Download, HttpGet } from '@/bridge'
 import { RulesetHubFilePath, RulesetsFilePath } from '@/constant/app'
 import { EmptyRuleSet } from '@/constant/kernel'
-import { RulesetFormat } from '@/enums/kernel'
+import { RuleSetFormat } from '@/enums/kernel'
 import {
   asyncPool,
   stringifyNoFolding,
@@ -77,7 +77,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
   }
 
   const _doUpdateRuleset = async (r: App.RuleSet) => {
-    if (r.format === RulesetFormat.Source) {
+    if (r.format === RuleSetFormat.Source) {
       let body = ''
       let isExist = true
 
@@ -120,7 +120,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
       }
     }
 
-    if (r.format === RulesetFormat.Binary) {
+    if (r.format === RuleSetFormat.Binary) {
       if (r.type === 'File' && r.url !== r.path) {
         await CopyFile(r.url, r.path)
       } else if (r.type === 'Http') {

@@ -3,9 +3,9 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
-import { RulesetFormatOptions, RulesetTypeOptions } from '@/constant/kernel'
+import { RuleSetFormatOptions, RuleSetTypeOptions } from '@/constant/kernel'
 import { DefaultRouteRuleset } from '@/constant/profile'
-import { RulesetFormat, RulesetType } from '@/enums/kernel'
+import { RuleSetFormat, RuleSetType } from '@/enums/kernel'
 import { useBool } from '@/hooks'
 import { useRulesetsStore } from '@/stores'
 import { deepClone, message } from '@/utils'
@@ -54,7 +54,7 @@ const handleDelete = (index: number) => {
 const showLost = () => message.warn('kernel.route.rule_set.notFound')
 
 const hasLost = (ruleset: App.ProfileRuleSet) => {
-  if (ruleset.type !== RulesetType.Local) return false
+  if (ruleset.type !== RuleSetType.Local) return false
   return !rulesetsStore.getRulesetById(ruleset.path)
 }
 
@@ -92,11 +92,11 @@ const handleUse = (ruleset: any) => {
             {{
               t(
                 'kernel.route.rule_set.format.' +
-                  (ruleset.type === RulesetType.Inline ? RulesetFormat.Source : ruleset.format),
+                  (ruleset.type === RuleSetType.Inline ? RuleSetFormat.Source : ruleset.format),
               )
             }}
           </Tag>
-          <template v-if="ruleset.type === RulesetType.Inline">
+          <template v-if="ruleset.type === RuleSetType.Inline">
             {{ ruleset.rules }}
           </template>
         </div>
@@ -121,9 +121,9 @@ const handleUse = (ruleset: any) => {
     </div>
     <div class="form-item">
       {{ t('kernel.route.rule_set.type.name') }}
-      <Radio v-model="fields.type" :options="RulesetTypeOptions" />
+      <Radio v-model="fields.type" :options="RuleSetTypeOptions" />
     </div>
-    <template v-if="fields.type === RulesetType.Local">
+    <template v-if="fields.type === RuleSetType.Local">
       <Divider>{{ t('kernel.route.tab.rule_set') }}</Divider>
       <div class="grid grid-cols-3 gap-8">
         <Empty
@@ -146,10 +146,10 @@ const handleUse = (ruleset: any) => {
         </template>
       </div>
     </template>
-    <template v-else-if="fields.type === RulesetType.Remote">
+    <template v-else-if="fields.type === RuleSetType.Remote">
       <div class="form-item">
         {{ t('kernel.route.rule_set.format.name') }}
-        <Radio v-model="fields.format" :options="RulesetFormatOptions" />
+        <Radio v-model="fields.format" :options="RuleSetFormatOptions" />
       </div>
       <div class="form-item">
         {{ t('kernel.route.rule_set.url') }}
@@ -164,7 +164,7 @@ const handleUse = (ruleset: any) => {
         <Input v-model="fields.update_interval" editable />
       </div>
     </template>
-    <template v-else-if="fields.type === RulesetType.Inline">
+    <template v-else-if="fields.type === RuleSetType.Inline">
       <CodeEditor v-model="fields.rules" lang="json" editable />
     </template>
   </Modal>

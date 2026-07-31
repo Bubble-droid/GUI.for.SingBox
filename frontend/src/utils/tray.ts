@@ -7,7 +7,7 @@ import {
   UpdateTrayAndMenus,
 } from '@/bridge'
 import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { ModeOptions } from '@/constant/kernel'
+import { PredefinedClashModeOptions } from '@/constant/kernel'
 import { OS } from '@/enums/app'
 import i18n from '@/lang'
 import {
@@ -188,7 +188,7 @@ const getTrayMenus = () => {
       type: 'item',
       text: 'kernel.mode',
       hidden: !kernelApiStore.running,
-      children: ModeOptions.map((mode) => ({
+      children: PredefinedClashModeOptions.map((mode) => ({
         type: 'item',
         text: mode.label,
         checkable: true,

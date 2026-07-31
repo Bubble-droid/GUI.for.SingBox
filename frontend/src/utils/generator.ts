@@ -8,9 +8,9 @@ import {
   Inbound,
   Outbound,
   RuleAction,
-  RulesetType,
+  RuleSetType,
   RuleType,
-  Strategy,
+  DomainStrategy,
 } from '@/enums/kernel'
 import {
   useAppSettingsStore,
@@ -121,12 +121,12 @@ const generateOutbounds = async (outbounds: App.Outbound[]) => {
       type: outbound.type,
       tag: outbound.tag,
     }
-    if (outbound.type === Outbound.Urltest) {
+    if (outbound.type === Outbound.UrlTest) {
       _outbound.url = outbound.url
       _outbound.interval = outbound.interval
       _outbound.tolerance = outbound.tolerance
     }
-    if (outbound.type === Outbound.Selector || outbound.type === Outbound.Urltest) {
+    if (outbound.type === Outbound.Selector || outbound.type === Outbound.UrlTest) {
       _outbound.interrupt_exist_connections = outbound.interrupt_exist_connections
       _outbound.outbounds = []
       const isTagMatching = createTextMatcher(outbound.include, outbound.exclude)
@@ -208,7 +208,7 @@ const generateRoute = (
           extra.sniffer = rule.sniffer
         }
       } else if (rule.action === RuleAction.Resolve) {
-        if (rule.strategy !== Strategy.Default) {
+        if (rule.strategy !== DomainStrategy.Default) {
           extra.strategy = rule.strategy
         }
         extra.server = getDnsServer(rule.server)
@@ -222,11 +222,11 @@ const generateRoute = (
       const extra: Recordable = {}
       if (ruleset.type === RuleType.Inline) {
         extra.rules = JSON.parse(ruleset.rules)
-      } else if (ruleset.type === RulesetType.Local) {
+      } else if (ruleset.type === RuleSetType.Local) {
         const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
         extra.path = _ruleset?.path.replace(/^data\//, `${env.appDataPath}/`)
         extra.format = ruleset.format
-      } else if (ruleset.type === RulesetType.Remote) {
+      } else if (ruleset.type === RuleSetType.Remote) {
         extra.url = ruleset.url
         extra.format = ruleset.format
         extra.download_detour = getOutbound(ruleset.download_detour)
@@ -259,7 +259,7 @@ const generateDns = (
   const getOutbound = (id: string) => outbounds.find((v) => v.id === id)
   const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
   const extra: Recordable = {}
-  if (dns.strategy !== Strategy.Default) {
+  if (dns.strategy !== DomainStrategy.Default) {
     extra.strategy = dns.strategy
   }
   if (dns.client_subnet) {
@@ -312,7 +312,7 @@ const generateDns = (
         )
       } else if (server.type === DnsServer.Dhcp) {
         server.interface && (extra.interface = server.interface)
-      } else if (server.type === DnsServer.FakeIP) {
+      } else if (server.type === DnsServer.FakeIp) {
         server.inet4_range && (extra.inet4_range = server.inet4_range)
         server.inet6_range && (extra.inet6_range = server.inet6_range)
       }
@@ -328,7 +328,7 @@ const generateDns = (
       }
       const extra: Recordable = _generateRule(rule, rule_set, inbounds)
       if (rule.type === RuleType.Inline && rule.payload.includes('__is_fake_ip')) {
-        if (!dns.servers.find((v) => v.type === DnsServer.FakeIP)) {
+        if (!dns.servers.find((v) => v.type === DnsServer.FakeIp)) {
           return []
         }
         delete extra.__is_fake_ip
@@ -338,7 +338,7 @@ const generateDns = (
         rule.client_subnet && (extra.client_subnet = rule.client_subnet)
         if (rule.action === RuleAction.Route) {
           extra.server = getDnsServer(rule.server)
-          if (rule.strategy !== Strategy.Default) {
+          if (rule.strategy !== DomainStrategy.Default) {
             // extra.strategy = rule.strategy
           }
         }
@@ -368,7 +368,7 @@ export const generateDnsServerURL = (dnsServer: App.DnsServerConfig) => {
     address = `h3://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
   } else if (type == DnsServer.Dhcp) {
     address = `dhcp://${_interface}`
-  } else if (type == DnsServer.FakeIP) {
+  } else if (type == DnsServer.FakeIp) {
     address =
       'fake-ip://' +
       (dnsServer.inet4_range ? dnsServer.inet4_range : '') +

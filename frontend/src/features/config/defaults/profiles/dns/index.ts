@@ -1,4 +1,4 @@
-import { DnsServer, RuleType, RuleAction, Strategy, ClashMode } from '@/enums'
+import { DnsServer, RuleType, RuleAction, DomainStrategy, ClashMode } from '@/enums'
 import { sampleID } from '@/utils'
 
 import { DefaultDnsServersIds, DefaultOutboundIds, DefaultRulesetIds } from '../shared'
@@ -24,7 +24,7 @@ export const DefaultDnsServers = (): App.DnsServerConfig[] => [
     id: DefaultDnsServersIds.FakeIP,
     tag: DefaultDnsServersIds.FakeIP,
     detour: '',
-    type: DnsServer.FakeIP,
+    type: DnsServer.FakeIp,
     domain_resolver: '',
     server: '',
     server_port: '',
@@ -132,7 +132,7 @@ export const DefaultDnsRule = (): App.DnsRule => ({
   invert: false,
   // route
   server: '',
-  strategy: Strategy.Default,
+  strategy: DomainStrategy.Default,
   // route/route-options
   disable_cache: false,
   client_subnet: '',
@@ -147,7 +147,7 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
     action: RuleAction.Route,
     server: DefaultDnsServersIds.LocalDns,
     invert: false,
-    strategy: Strategy.Default,
+    strategy: DomainStrategy.Default,
     disable_cache: false,
     client_subnet: '',
   },
@@ -159,7 +159,7 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
     action: RuleAction.Route,
     server: DefaultDnsServersIds.RemoteDns,
     invert: false,
-    strategy: Strategy.Default,
+    strategy: DomainStrategy.Default,
     disable_cache: false,
     client_subnet: '',
   },
@@ -171,7 +171,7 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
     action: RuleAction.Route,
     server: '',
     invert: false,
-    strategy: Strategy.Default,
+    strategy: DomainStrategy.Default,
     disable_cache: false,
     client_subnet: '',
   },
@@ -183,7 +183,7 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
     action: RuleAction.Route,
     server: DefaultDnsServersIds.LocalDns,
     invert: false,
-    strategy: Strategy.Default,
+    strategy: DomainStrategy.Default,
     disable_cache: false,
     client_subnet: '',
   },
@@ -195,7 +195,7 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
     action: RuleAction.Route,
     server: DefaultDnsServersIds.FakeIP,
     invert: false,
-    strategy: Strategy.Default,
+    strategy: DomainStrategy.Default,
     disable_cache: false,
     client_subnet: '',
   },
@@ -207,7 +207,7 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
     action: RuleAction.Route,
     server: DefaultDnsServersIds.RemoteDns,
     invert: false,
-    strategy: Strategy.Default,
+    strategy: DomainStrategy.Default,
     disable_cache: false,
     client_subnet: '',
   },
@@ -221,5 +221,5 @@ export const DefaultDns = (): App.Dns => ({
   independent_cache: false,
   client_subnet: '',
   final: DefaultDnsServersIds.RemoteDns,
-  strategy: Strategy.Default,
+  strategy: DomainStrategy.Default,
 })

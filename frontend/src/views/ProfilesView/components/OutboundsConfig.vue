@@ -83,7 +83,7 @@ const handleAddEnd = () => {
   if (idx !== -1) {
     proxyGroup.value[0]!.proxies.splice(idx, 1, { id, tag, type })
     model.value
-      .filter((outbound) => [Outbound.Selector, Outbound.Urltest].includes(outbound.type as any))
+      .filter((outbound) => [Outbound.Selector, Outbound.UrlTest].includes(outbound.type as any))
       .forEach(({ outbounds }) => {
         const proxy = outbounds.find((v) => v.id === id)
         proxy && (proxy.tag = tag)
@@ -114,7 +114,7 @@ const isInuse = (_groupID: string, proxyID: string) => {
 }
 
 const hasLost = (outbound: App.Outbound) => {
-  if ([Outbound.Selector, Outbound.Urltest].includes(outbound.type as any)) {
+  if ([Outbound.Selector, Outbound.UrlTest].includes(outbound.type as any)) {
     return outbound.outbounds.some(({ id, type }) => {
       if (type === 'Built-in') {
         if (BuiltInOutbound.includes(id as any)) {
@@ -145,21 +145,21 @@ const handleSortGroupEnd = () => {
 }
 
 const clacSubscriptionsCount = (outbound: App.Outbound) => {
-  if ([Outbound.Selector, Outbound.Urltest].includes(outbound.type as any)) {
+  if ([Outbound.Selector, Outbound.UrlTest].includes(outbound.type as any)) {
     return outbound.outbounds.filter((v) => v.type === 'Subscription').length
   }
   return 0
 }
 
 const clacOutboundsCount = (outbound: App.Outbound) => {
-  if ([Outbound.Selector, Outbound.Urltest].includes(outbound.type as any)) {
+  if ([Outbound.Selector, Outbound.UrlTest].includes(outbound.type as any)) {
     return outbound.outbounds.filter((v) => v.type !== 'Subscription').length
   }
   return 0
 }
 
 const needToAdd = (outbound: App.Outbound) => {
-  if ([Outbound.Selector, Outbound.Urltest].includes(outbound.type as any)) {
+  if ([Outbound.Selector, Outbound.UrlTest].includes(outbound.type as any)) {
     return outbound.outbounds.length === 0
   }
   return false
@@ -268,7 +268,7 @@ subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
       {{ t('kernel.outbounds.type') }}
       <Radio v-model="fields.type" :options="OutboundOptions" />
     </div>
-    <template v-if="Outbound.Selector === fields.type || Outbound.Urltest === fields.type">
+    <template v-if="Outbound.Selector === fields.type || Outbound.UrlTest === fields.type">
       <div class="form-item">
         {{ t('kernel.outbounds.hidden') }}
         <Switch v-model="fields.hidden" />
@@ -296,7 +296,7 @@ subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
     <template v-if="Outbound.Direct === fields.type || Outbound.Block === fields.type">
       <Empty :description="t('kernel.outbounds.directDesc')" />
     </template>
-    <template v-else-if="fields.type === Outbound.Urltest">
+    <template v-else-if="fields.type === Outbound.UrlTest">
       <div class="form-item">
         {{ t('kernel.outbounds.url') }}
         <Input v-model="fields.url" placeholder="http(s)://" />
@@ -310,7 +310,7 @@ subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
         <Input v-model="fields.tolerance" type="number" />
       </div>
     </template>
-    <template v-if="[Outbound.Selector, Outbound.Urltest].includes(fields.type as any)">
+    <template v-if="[Outbound.Selector, Outbound.UrlTest].includes(fields.type as any)">
       <Divider>
         {{ t('kernel.outbounds.refsOutbound') }} & {{ t('kernel.outbounds.refsSubscription') }}
       </Divider>
