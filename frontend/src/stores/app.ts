@@ -30,7 +30,7 @@ import {
 
 import AboutView from '@/components/_common/AboutView.vue'
 
-import type { GitHubApiRelease } from '@/types/github'
+import type { GitHubApiRelease } from '@/features/types'
 
 import { useEnvStore } from './env'
 
