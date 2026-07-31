@@ -1,1 +1,1 @@
-export * from '@/features/config/defaults/profile'
+export * from '@/features/config/defaults/profiles'
