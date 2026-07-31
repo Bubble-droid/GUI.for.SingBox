@@ -14,7 +14,7 @@ export * from './outbounds'
 export * from './route'
 export * from './dns'
 
-export const ProfileSchemaVersion = 'v1'
+export const ProfileSchemaVersion = 'v0.0.1'
 
 export const DefaultMixin = (): MixinConfig => {
   return { priority: 'mixin', format: 'json', config: '' }
