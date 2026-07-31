@@ -158,7 +158,7 @@ const restoreInbounds = (inbounds: Recordable[], InboundsIds: Recordable): App.I
     }
     if ([Inbound.Mixed, Inbound.Http, Inbound.Socks].includes(raw.type)) {
       const template = Defaults.DefaultInboundMixed()
-      inbound[raw.type as Exclude<Inbound, Inbound.Tun | Inbound.Direct>] = {
+      inbound[raw.type as Exclude<Inbound, typeof Inbound.Tun | typeof Inbound.Direct>] = {
         listen: {
           listen: raw.listen ?? template.listen.listen,
           listen_port: raw.listen_port ?? template.listen.listen_port,
@@ -217,7 +217,7 @@ const restoreOutbounds = (
     let newOutbounds: App.Proxy[] = []
 
     raw.outbounds?.forEach((tag: string) => {
-      const isBuiltIn = [Outbound.Direct, Outbound.Block].includes(tag as Outbound)
+      const isBuiltIn = [Outbound.Direct, Outbound.Block].includes(tag as any)
       if (isBuiltIn) {
         newOutbounds.push({ id: tag, type: 'Built-in', tag })
       } else if (groupTags.has(tag)) {

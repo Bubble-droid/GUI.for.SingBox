@@ -117,7 +117,7 @@ const hasLost = (outbound: App.Outbound) => {
   if ([Outbound.Selector, Outbound.Urltest].includes(outbound.type as any)) {
     return outbound.outbounds.some(({ id, type }) => {
       if (type === 'Built-in') {
-        if (BuiltInOutbound.includes(id as Outbound)) {
+        if (BuiltInOutbound.includes(id as any)) {
           return false
         }
         return model.value.every((v) => v.id !== id)

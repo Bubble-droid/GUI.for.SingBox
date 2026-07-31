@@ -165,7 +165,7 @@ export const RulesTypeOptions = [
 export const DnsRuleTypeOptions = RulesTypeOptions.concat([
   {
     label: 'kernel.rules.type.ip_accept_any',
-    value: RuleType.IpAcceptAny,
+    value: RuleType.IpAcceptAny as any,
   },
 ])
 
