@@ -3,19 +3,19 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
-import { RuleActionRejectOptions } from '@/constant/kernel'
+import { RouteRejectMethodOptions } from '@/constant/kernel'
 import {
   DomainStrategyOptions,
-  RuleActionOptions,
+  RouteRuleActionOptions,
   SniffProtocolOptions,
-  RulesTypeOptions,
+  RouteRuleTypeOptions,
 } from '@/constant/kernel'
 import { DefaultRouteRule } from '@/constant/profile'
 import {
-  RuleAction,
+  RouteRuleAction,
   RuleSetFormat,
   RuleSetType,
-  RuleType,
+  RouteRuleType,
   ClashMode,
   DomainStrategy,
 } from '@/enums/kernel'
@@ -49,12 +49,12 @@ defineExpose({ handleAdd })
 
 const handleAddInsertionPoint = () => {
   model.value.unshift({
-    id: RuleType.InsertionPoint,
-    type: RuleType.InsertionPoint,
+    id: RouteRuleType.InsertionPoint,
+    type: RouteRuleType.InsertionPoint,
     enable: true,
     payload: '',
     invert: false,
-    action: RuleAction.Sniff,
+    action: RouteRuleAction.Sniff,
     outbound: '',
     sniffer: [],
     strategy: DomainStrategy.Default,
@@ -66,7 +66,7 @@ const handleAddEnd = () => {
   if (ruleId !== -1) {
     model.value[ruleId] = fields.value
   } else {
-    const index = model.value.findIndex((v) => v.type === RuleType.InsertionPoint)
+    const index = model.value.findIndex((v) => v.type === RouteRuleType.InsertionPoint)
     if (index !== -1) {
       model.value.splice(index + 1, 0, fields.value)
     } else {
@@ -104,11 +104,11 @@ const handleDelete = (index: number) => {
 const showLost = () => message.warn('kernel.route.rules.invalid')
 
 const isSupportPayload = computed(() => {
-  return ![RuleType.RuleSet].includes(fields.value.type as any)
+  return ![RouteRuleType.RuleSet].includes(fields.value.type as any)
 })
 
 const isInsertionPointMissing = computed(
-  () => model.value.findIndex((rule) => rule.type === RuleType.InsertionPoint) === -1,
+  () => model.value.findIndex((rule) => rule.type === RouteRuleType.InsertionPoint) === -1,
 )
 
 const hasLost = (rule: App.Rule) => {
@@ -118,9 +118,9 @@ const hasLost = (rule: App.Rule) => {
   const hasMissingRuleset = rule.payload
     .split(',')
     .some((id) => !props.ruleSet.find((v) => v.id === id))
-  if (rule.action === RuleAction.Route) {
+  if (rule.action === RouteRuleAction.Route) {
     rulesValidationFlags.push(hasMissingOutbound)
-  } else if (rule.action === RuleAction.RouteOptions) {
+  } else if (rule.action === RouteRuleAction.RouteOptions) {
     let isValid = true
     try {
       JSON.parse(rule.outbound)
@@ -129,11 +129,11 @@ const hasLost = (rule: App.Rule) => {
     }
     rulesValidationFlags.push(!isValid)
   }
-  if (rule.type === RuleType.Inbound) {
+  if (rule.type === RouteRuleType.Inbound) {
     rulesValidationFlags.push(hasMissingInbound)
-  } else if (rule.type === RuleType.IpIsPrivate) {
+  } else if (rule.type === RouteRuleType.IpIsPrivate) {
     rulesValidationFlags.push(!['true', 'false'].includes(rule.payload))
-  } else if (rule.type === RuleType.RuleSet) {
+  } else if (rule.type === RouteRuleType.RuleSet) {
     rulesValidationFlags.push(hasMissingRuleset)
   }
   return rulesValidationFlags.some((v) => v) || !rule.payload
@@ -143,12 +143,12 @@ const renderRule = (rule: App.Rule) => {
   const { type, payload, outbound, action, invert } = rule
   const children: string[] = [type]
   let _payload = payload
-  if (type === RuleType.RuleSet) {
+  if (type === RouteRuleType.RuleSet) {
     _payload = rule.payload
       .split(',')
       .map((id) => props.ruleSet.find((v) => v.id === id)?.tag || id)
       .join(',')
-  } else if (type === RuleType.Inbound) {
+  } else if (type === RouteRuleType.Inbound) {
     _payload = props.inboundOptions.find((v) => v.value === rule.payload)?.label || rule.payload
   }
   if (invert) {
@@ -180,7 +180,7 @@ const renderRule = (rule: App.Rule) => {
 
   <div v-draggable="[model, DraggableOptions]">
     <Card v-for="(rule, index) in model" :key="rule.id" class="mb-2">
-      <div v-if="rule.type === RuleType.InsertionPoint" class="text-center font-bold">
+      <div v-if="rule.type === RouteRuleType.InsertionPoint" class="text-center font-bold">
         <Divider class="cursor-move">
           <Button icon="add" type="text" size="small" @click="handleAdd">
             {{ t('kernel.insertionPoint') }}
@@ -204,7 +204,7 @@ const renderRule = (rule: App.Rule) => {
         </div>
         <div class="ml-auto shrink-0">
           <Button
-            v-if="rule.type === RuleType.RuleSet && rule.payload && hasLost(rule)"
+            v-if="rule.type === RouteRuleType.RuleSet && rule.payload && hasLost(rule)"
             type="text"
             @click="handleClearRuleset(rule)"
           >
@@ -226,16 +226,16 @@ const renderRule = (rule: App.Rule) => {
   >
     <div class="form-item">
       {{ t('kernel.route.rules.type') }}
-      <Select v-model="fields.type" :options="RulesTypeOptions" />
+      <Select v-model="fields.type" :options="RouteRuleTypeOptions" />
     </div>
     <div class="form-item">
       {{ t('kernel.route.rules.action.name') }}
-      <Radio v-model="fields.action" :options="RuleActionOptions" class="ml-8" />
+      <Radio v-model="fields.action" :options="RouteRuleActionOptions" class="ml-8" />
     </div>
     <div v-if="isSupportPayload" class="form-item">
       {{ t('kernel.route.rules.payload') }}
       <Radio
-        v-if="fields.type === RuleType.ClashMode"
+        v-if="fields.type === RouteRuleType.ClashMode"
         v-model="fields.payload"
         :options="[
           {
@@ -249,19 +249,19 @@ const renderRule = (rule: App.Rule) => {
         ]"
       />
       <Select
-        v-else-if="fields.type === RuleType.Inbound"
+        v-else-if="fields.type === RouteRuleType.Inbound"
         v-model="fields.payload"
         :options="inboundOptions"
       />
       <CodeEditor
-        v-else-if="fields.type === RuleType.Inline"
+        v-else-if="fields.type === RouteRuleType.Inline"
         v-model="fields.payload"
         editable
         lang="json"
         style="min-width: 320px"
       />
       <Switch
-        v-else-if="fields.type === RuleType.IpIsPrivate"
+        v-else-if="fields.type === RouteRuleType.IpIsPrivate"
         :model-value="fields.payload === 'true'"
         @change="(val) => (fields.payload = val ? 'true' : 'false')"
       />
@@ -272,28 +272,28 @@ const renderRule = (rule: App.Rule) => {
       <Switch v-model="fields.invert" />
     </div>
     <Card class="mt-4 mb-16">
-      <template v-if="fields.action === RuleAction.Route">
+      <template v-if="fields.action === RouteRuleAction.Route">
         <div class="form-item">
           {{ t('kernel.route.rules.outbound') }}
           <Select v-model="fields.outbound" :options="outboundOptions" clearable />
         </div>
       </template>
-      <template v-else-if="fields.action === RuleAction.RouteOptions">
+      <template v-else-if="fields.action === RouteRuleAction.RouteOptions">
         <div class="form-item">
           {{ t('kernel.route.rules.routeOptions') }}
           <CodeEditor v-model="fields.outbound" editable lang="json" style="min-width: 320px" />
         </div>
       </template>
-      <template v-else-if="fields.action === RuleAction.Reject">
+      <template v-else-if="fields.action === RouteRuleAction.Reject">
         <div class="form-item">
           {{ t('kernel.route.rules.action.rejectMethod') }}
-          <Radio v-model="fields.outbound" :options="RuleActionRejectOptions" />
+          <Radio v-model="fields.outbound" :options="RouteRejectMethodOptions" />
         </div>
       </template>
-      <template v-else-if="fields.action === RuleAction.HijackDns">
+      <template v-else-if="fields.action === RouteRuleAction.HijackDns">
         <Empty description="common.none" />
       </template>
-      <template v-else-if="fields.action === RuleAction.Sniff">
+      <template v-else-if="fields.action === RouteRuleAction.Sniff">
         <div class="form-item">
           {{ t('kernel.route.rules.sniffer.name') }}
           <Select
@@ -305,7 +305,7 @@ const renderRule = (rule: App.Rule) => {
           />
         </div>
       </template>
-      <template v-else-if="fields.action === RuleAction.Resolve">
+      <template v-else-if="fields.action === RouteRuleAction.Resolve">
         <div class="form-item">
           {{ t('kernel.strategy.name') }}
           <Select v-model="fields.strategy" :options="DomainStrategyOptions" />
@@ -319,7 +319,7 @@ const renderRule = (rule: App.Rule) => {
         </div>
       </template>
     </Card>
-    <template v-if="fields.type === RuleType.RuleSet">
+    <template v-if="fields.type === RouteRuleType.RuleSet">
       <Divider>{{ t('kernel.route.tab.rule_set') }}</Divider>
       <div class="grid grid-cols-3 gap-8">
         <Empty v-if="ruleSet.length === 0" :description="t('kernel.route.rule_set.empty')" />

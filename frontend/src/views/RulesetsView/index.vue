@@ -7,7 +7,7 @@ import { DraggableOptions, ViewOptions } from '@/constant/app'
 import { BuiltInOutbound, EmptyRuleSet } from '@/constant/kernel'
 import { DefaultRouteRule, DefaultRouteRuleset } from '@/constant/profile'
 import { View } from '@/enums/app'
-import { RuleSetFormat, RuleSetType, RuleType } from '@/enums/kernel'
+import { RuleSetFormat, RuleSetType, RouteRuleType } from '@/enums/kernel'
 import { useRulesetsStore, useAppSettingsStore, useProfilesStore } from '@/stores'
 import {
   debounce,
@@ -137,7 +137,7 @@ const handleAddRulesetToProfile = async (id: string) => {
     if (!profile) return
 
     const insertionPointIndex = profile.route.rules.findIndex(
-      (rule) => rule.type === RuleType.InsertionPoint,
+      (rule) => rule.type === RouteRuleType.InsertionPoint,
     )
 
     if (insertionPointIndex === -1) {
@@ -152,7 +152,8 @@ const handleAddRulesetToProfile = async (id: string) => {
       profileRuleset &&
       profile.route.rules.some(
         (rule) =>
-          rule.type === RuleType.RuleSet && rule.payload.split(',').includes(profileRuleset.id),
+          rule.type === RouteRuleType.RuleSet &&
+          rule.payload.split(',').includes(profileRuleset.id),
       )
     ) {
       message.info('common.added')

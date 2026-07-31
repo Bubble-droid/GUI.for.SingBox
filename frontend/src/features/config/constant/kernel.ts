@@ -69,7 +69,7 @@ export const RuleSetFormat = {
 
 export type RuleSetFormat = ValueOf<typeof RuleSetFormat>
 
-export const RuleType = {
+export const CommonRuleType = {
   Inbound: 'inbound',
   Network: 'network',
   Protocol: 'protocol',
@@ -89,13 +89,23 @@ export const RuleType = {
   ProcessPathRegex: 'process_path_regex',
   ClashMode: 'clash_mode',
   RuleSet: 'rule_set',
-  IpAcceptAny: 'ip_accept_any',
   // GUI
   Inline: 'inline',
   InsertionPoint: 'InsertionPoint',
 } as const
 
-export type RuleType = ValueOf<typeof RuleType>
+export const RouteRuleType = {
+  ...CommonRuleType,
+} as const
+
+export type RouteRuleType = ValueOf<typeof RouteRuleType>
+
+export const DnsRuleType = {
+  ...CommonRuleType,
+  IpAcceptAny: 'ip_accept_any',
+} as const
+
+export type DnsRuleType = ValueOf<typeof DnsRuleType>
 
 export const DomainStrategy = {
   Default: 'default',
@@ -122,25 +132,41 @@ export const DnsServer = {
 
 export type DnsServer = ValueOf<typeof DnsServer>
 
-export const RuleAction = {
+export const CommonRuleAction = {
   Route: 'route',
   RouteOptions: 'route-options',
   Reject: 'reject',
+} as const
+
+export const RouteRuleAction = {
+  ...CommonRuleAction,
   HijackDns: 'hijack-dns',
   Sniff: 'sniff',
   Resolve: 'resolve',
+} as const
+
+export type RouteRuleAction = ValueOf<typeof RouteRuleAction>
+
+export const DnsRuleAction = {
+  ...CommonRuleAction,
   Predefined: 'predefined',
 } as const
 
-export type RuleAction = ValueOf<typeof RuleAction>
+export type DnsRuleAction = ValueOf<typeof DnsRuleAction>
 
-export const RuleActionReject = {
+export const DnsRejectMethod = {
   Default: 'default',
   Drop: 'drop',
+} as const
+
+export type DnsRejectMethod = ValueOf<typeof DnsRejectMethod>
+
+export const RouteRejectMethod = {
+  ...DnsRejectMethod,
   Reply: 'reply',
 } as const
 
-export type RuleActionReject = ValueOf<typeof RuleActionReject>
+export type RouteRejectMethod = ValueOf<typeof RouteRejectMethod>
 
 export const SniffProtocol = {
   Http: 'http',

@@ -7,10 +7,12 @@ import {
   DnsServer,
   Inbound,
   Outbound,
-  RuleAction,
+  RouteRuleAction,
   RuleSetType,
-  RuleType,
+  RouteRuleType,
   DomainStrategy,
+  DnsRuleType,
+  DnsRuleAction,
 } from '@/enums/kernel'
 import {
   useAppSettingsStore,
@@ -30,21 +32,21 @@ const _generateRule = (
   const getRuleset = (id: string) => rule_set.find((v) => v.id === id)?.tag
 
   const extra: Recordable = { action: rule.action, invert: rule.invert ? true : undefined }
-  if (rule.type === RuleType.Inline) {
+  if (rule.type === RouteRuleType.Inline) {
     deepAssign(extra, JSON.parse(rule.payload))
-  } else if (rule.type === RuleType.RuleSet) {
+  } else if (rule.type === RouteRuleType.RuleSet) {
     extra[rule.type] = rule.payload.split(',').map((id) => getRuleset(id))
-  } else if (rule.type === RuleType.Inbound) {
+  } else if (rule.type === RouteRuleType.Inbound) {
     extra[rule.type] = getInbound(rule.payload)
-  } else if ([RuleType.IpIsPrivate, RuleType.IpAcceptAny].includes(rule.type as any)) {
+  } else if ([RouteRuleType.IpIsPrivate, DnsRuleType.IpAcceptAny].includes(rule.type as any)) {
     extra[rule.type] = rule.payload === 'true'
-  } else if (rule.type === RuleType.ClashMode) {
+  } else if (rule.type === RouteRuleType.ClashMode) {
     extra[rule.type] = rule.payload
   } else {
     extra[rule.type] = String(rule.payload)
       .split(',')
       .map((val) => {
-        if ([RuleType.Port, RuleType.SourcePort].includes(rule.type as any)) {
+        if ([RouteRuleType.Port, RouteRuleType.SourcePort].includes(rule.type as any)) {
           return Number(val)
         }
         return val
@@ -189,25 +191,25 @@ const generateRoute = (
   }
   return {
     rules: route.rules.flatMap((rule) => {
-      if (rule.type === RuleType.InsertionPoint || !rule.enable) {
+      if (rule.type === RouteRuleType.InsertionPoint || !rule.enable) {
         return []
       }
-      if (rule.type === RuleType.Inbound && !isInboundEnabled(rule.payload)) {
+      if (rule.type === RouteRuleType.Inbound && !isInboundEnabled(rule.payload)) {
         return []
       }
       const extra: Recordable = _generateRule(rule, route.rule_set, inbounds)
 
-      if (rule.action === RuleAction.Route) {
+      if (rule.action === RouteRuleAction.Route) {
         extra.outbound = getOutbound(rule.outbound)
-      } else if (rule.action === RuleAction.RouteOptions) {
+      } else if (rule.action === RouteRuleAction.RouteOptions) {
         deepAssign(extra, JSON.parse(rule.outbound))
-      } else if (rule.action === RuleAction.Reject) {
+      } else if (rule.action === RouteRuleAction.Reject) {
         extra.method = rule.outbound
-      } else if (rule.action === RuleAction.Sniff) {
+      } else if (rule.action === RouteRuleAction.Sniff) {
         if (rule.sniffer.length) {
           extra.sniffer = rule.sniffer
         }
-      } else if (rule.action === RuleAction.Resolve) {
+      } else if (rule.action === RouteRuleAction.Resolve) {
         if (rule.strategy !== DomainStrategy.Default) {
           extra.strategy = rule.strategy
         }
@@ -220,7 +222,7 @@ const generateRoute = (
     }),
     rule_set: route.rule_set.map((ruleset) => {
       const extra: Recordable = {}
-      if (ruleset.type === RuleType.Inline) {
+      if (ruleset.type === RouteRuleType.Inline) {
         extra.rules = JSON.parse(ruleset.rules)
       } else if (ruleset.type === RuleSetType.Local) {
         const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
@@ -323,30 +325,30 @@ const generateDns = (
       }
     }),
     rules: dns.rules.flatMap((rule) => {
-      if (rule.type === RuleType.InsertionPoint || !rule.enable) {
+      if (rule.type === DnsRuleType.InsertionPoint || !rule.enable) {
         return []
       }
       const extra: Recordable = _generateRule(rule, rule_set, inbounds)
-      if (rule.type === RuleType.Inline && rule.payload.includes('__is_fake_ip')) {
+      if (rule.type === DnsRuleType.Inline && rule.payload.includes('__is_fake_ip')) {
         if (!dns.servers.find((v) => v.type === DnsServer.FakeIp)) {
           return []
         }
         delete extra.__is_fake_ip
       }
-      if ([RuleAction.Route, RuleAction.RouteOptions].includes(rule.action as any)) {
+      if ([DnsRuleAction.Route, DnsRuleAction.RouteOptions].includes(rule.action as any)) {
         rule.disable_cache && (extra.disable_cache = rule.disable_cache)
         rule.client_subnet && (extra.client_subnet = rule.client_subnet)
-        if (rule.action === RuleAction.Route) {
+        if (rule.action === DnsRuleAction.Route) {
           extra.server = getDnsServer(rule.server)
           if (rule.strategy !== DomainStrategy.Default) {
             // extra.strategy = rule.strategy
           }
         }
       }
-      if ([RuleAction.RouteOptions, RuleAction.Predefined].includes(rule.action as any)) {
+      if ([DnsRuleAction.RouteOptions, DnsRuleAction.Predefined].includes(rule.action as any)) {
         deepAssign(extra, JSON.parse(rule.server))
       }
-      if (rule.action === RuleAction.Reject) {
+      if (rule.action === DnsRuleAction.Reject) {
         extra.method = rule.server
       }
       return extra

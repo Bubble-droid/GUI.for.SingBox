@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { HttpGet } from '@/bridge'
 import { BuiltInOutbound } from '@/constant/kernel'
 import { DefaultRouteRule, DefaultRouteRuleset } from '@/constant/profile'
-import { RuleSetFormat, RuleSetType, RuleType } from '@/enums/kernel'
+import { RuleSetFormat, RuleSetType, RouteRuleType } from '@/enums/kernel'
 import { useProfilesStore, useRulesetsStore } from '@/stores'
 import { alert, deepClone, message, picker } from '@/utils'
 
@@ -90,7 +90,7 @@ const handleAddRulesetToProfile = async (
     if (!profile) return
 
     const insertionPointIndex = profile.route.rules.findIndex(
-      (rule) => rule.type === RuleType.InsertionPoint,
+      (rule) => rule.type === RouteRuleType.InsertionPoint,
     )
 
     if (insertionPointIndex === -1) {
@@ -105,7 +105,8 @@ const handleAddRulesetToProfile = async (
       profileRuleset &&
       profile.route.rules.some(
         (rule) =>
-          rule.type === RuleType.RuleSet && rule.payload.split(',').includes(profileRuleset.id),
+          rule.type === RouteRuleType.RuleSet &&
+          rule.payload.split(',').includes(profileRuleset.id),
       )
     ) {
       message.info('common.added')

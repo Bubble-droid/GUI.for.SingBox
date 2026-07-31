@@ -1,4 +1,4 @@
-import { DnsServer, RuleType, RuleAction, DomainStrategy, ClashMode } from '@/enums'
+import { DnsServer, DnsRuleType, DnsRuleAction, DomainStrategy, ClashMode } from '@/enums'
 import { sampleID } from '@/utils'
 
 import { DefaultDnsServersIds, DefaultOutboundIds, DefaultRulesetIds } from '../shared'
@@ -125,10 +125,10 @@ export const DefaultFakeIPDnsRule = () => ({
 
 export const DefaultDnsRule = (): App.DnsRule => ({
   id: sampleID(),
-  type: RuleType.RuleSet,
+  type: DnsRuleType.RuleSet,
   enable: true,
   payload: '',
-  action: RuleAction.Route,
+  action: DnsRuleAction.Route,
   invert: false,
   // route
   server: '',
@@ -141,10 +141,10 @@ export const DefaultDnsRule = (): App.DnsRule => ({
 export const DefaultDnsRules = (): App.DnsRule[] => [
   {
     id: sampleID(),
-    type: RuleType.ClashMode,
+    type: DnsRuleType.ClashMode,
     enable: true,
     payload: ClashMode.Direct,
-    action: RuleAction.Route,
+    action: DnsRuleAction.Route,
     server: DefaultDnsServersIds.LocalDns,
     invert: false,
     strategy: DomainStrategy.Default,
@@ -153,10 +153,10 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
   },
   {
     id: sampleID(),
-    type: RuleType.ClashMode,
+    type: DnsRuleType.ClashMode,
     enable: true,
     payload: ClashMode.Global,
-    action: RuleAction.Route,
+    action: DnsRuleAction.Route,
     server: DefaultDnsServersIds.RemoteDns,
     invert: false,
     strategy: DomainStrategy.Default,
@@ -164,11 +164,11 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
     client_subnet: '',
   },
   {
-    id: RuleType.InsertionPoint,
-    type: RuleType.InsertionPoint,
+    id: DnsRuleType.InsertionPoint,
+    type: DnsRuleType.InsertionPoint,
     enable: true,
     payload: '',
-    action: RuleAction.Route,
+    action: DnsRuleAction.Route,
     server: '',
     invert: false,
     strategy: DomainStrategy.Default,
@@ -177,10 +177,10 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
   },
   {
     id: sampleID(),
-    type: RuleType.RuleSet,
+    type: DnsRuleType.RuleSet,
     enable: true,
     payload: DefaultRulesetIds.GEOSITE_CN,
-    action: RuleAction.Route,
+    action: DnsRuleAction.Route,
     server: DefaultDnsServersIds.LocalDns,
     invert: false,
     strategy: DomainStrategy.Default,
@@ -189,10 +189,10 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
   },
   {
     id: sampleID(),
-    type: RuleType.Inline,
+    type: DnsRuleType.Inline,
     enable: false,
     payload: JSON.stringify(DefaultFakeIPDnsRule(), null, 2),
-    action: RuleAction.Route,
+    action: DnsRuleAction.Route,
     server: DefaultDnsServersIds.FakeIP,
     invert: false,
     strategy: DomainStrategy.Default,
@@ -201,10 +201,10 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
   },
   {
     id: sampleID(),
-    type: RuleType.RuleSet,
+    type: DnsRuleType.RuleSet,
     enable: true,
     payload: DefaultRulesetIds.GEOLOCATION_NOT_CN,
-    action: RuleAction.Route,
+    action: DnsRuleAction.Route,
     server: DefaultDnsServersIds.RemoteDns,
     invert: false,
     strategy: DomainStrategy.Default,

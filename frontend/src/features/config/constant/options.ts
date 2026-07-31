@@ -3,16 +3,19 @@ import {
   LogLevel,
   Inbound,
   Outbound,
-  RuleType,
+  RouteRuleType,
   TunStack,
   Network,
   RuleSetType,
   RuleSetFormat,
   DomainStrategy,
-  RuleAction,
-  RuleActionReject,
+  RouteRuleAction,
+  RouteRejectMethod,
   DnsServer,
   SniffProtocol,
+  DnsRejectMethod,
+  DnsRuleAction,
+  DnsRuleType,
 } from './kernel'
 
 export const PredefinedClashModeOptions = [
@@ -79,93 +82,93 @@ export const OutboundOptions = [
   { label: 'kernel.outbounds.urltest', value: Outbound.UrlTest },
 ]
 
-export const RulesTypeOptions = [
+export const RouteRuleTypeOptions = [
   {
     label: 'kernel.rules.type.inbound',
-    value: RuleType.Inbound,
+    value: RouteRuleType.Inbound,
   },
   {
     label: 'kernel.rules.type.network',
-    value: RuleType.Network,
+    value: RouteRuleType.Network,
   },
   {
     label: 'kernel.rules.type.protocol',
-    value: RuleType.Protocol,
+    value: RouteRuleType.Protocol,
   },
   {
     label: 'kernel.rules.type.domain',
-    value: RuleType.Domain,
+    value: RouteRuleType.Domain,
   },
   {
     label: 'kernel.rules.type.domain_suffix',
-    value: RuleType.DomainSuffix,
+    value: RouteRuleType.DomainSuffix,
   },
   {
     label: 'kernel.rules.type.domain_keyword',
-    value: RuleType.DomainKeyword,
+    value: RouteRuleType.DomainKeyword,
   },
   {
     label: 'kernel.rules.type.domain_regex',
-    value: RuleType.DomainRegex,
+    value: RouteRuleType.DomainRegex,
   },
   {
     label: 'kernel.rules.type.source_ip_cidr',
-    value: RuleType.SourceIPCidr,
+    value: RouteRuleType.SourceIPCidr,
   },
   {
     label: 'kernel.rules.type.ip_cidr',
-    value: RuleType.IpCidr,
+    value: RouteRuleType.IpCidr,
   },
   {
     label: 'kernel.rules.type.ip_is_private',
-    value: RuleType.IpIsPrivate,
+    value: RouteRuleType.IpIsPrivate,
   },
   {
     label: 'kernel.rules.type.source_port',
-    value: RuleType.SourcePort,
+    value: RouteRuleType.SourcePort,
   },
   {
     label: 'kernel.rules.type.source_port_range',
-    value: RuleType.SourcePortRange,
+    value: RouteRuleType.SourcePortRange,
   },
   {
     label: 'kernel.rules.type.port',
-    value: RuleType.Port,
+    value: RouteRuleType.Port,
   },
   {
     label: 'kernel.rules.type.port_range',
-    value: RuleType.PortRange,
+    value: RouteRuleType.PortRange,
   },
   {
     label: 'kernel.rules.type.process_name',
-    value: RuleType.ProcessName,
+    value: RouteRuleType.ProcessName,
   },
   {
     label: 'kernel.rules.type.process_path',
-    value: RuleType.ProcessPath,
+    value: RouteRuleType.ProcessPath,
   },
   {
     label: 'kernel.rules.type.process_path_regex',
-    value: RuleType.ProcessPathRegex,
+    value: RouteRuleType.ProcessPathRegex,
   },
   {
     label: 'kernel.rules.type.clash_mode',
-    value: RuleType.ClashMode,
+    value: RouteRuleType.ClashMode,
   },
   {
     label: 'kernel.rules.type.rule_set',
-    value: RuleType.RuleSet,
+    value: RouteRuleType.RuleSet,
   },
   {
     label: 'kernel.rules.type.inline',
-    value: RuleType.Inline,
+    value: RouteRuleType.Inline,
   },
 ]
 
-export const DnsRuleTypeOptions = RulesTypeOptions.concat([
+export const DnsRuleTypeOptions = RouteRuleTypeOptions.concat([
   {
     label: 'kernel.rules.type.ip_accept_any',
-    value: RuleType.IpAcceptAny as any,
+    value: DnsRuleType.IpAcceptAny as any,
   },
 ])
 
@@ -199,19 +202,19 @@ export const DomainStrategyOptions = [
   { label: 'kernel.strategy.ipv6_only', value: DomainStrategy.Ipv6Only },
 ]
 
-export const RuleActionOptions = [
-  { label: 'kernel.route.rules.action.route', value: RuleAction.Route },
-  { label: 'kernel.route.rules.action.route-options', value: RuleAction.RouteOptions },
-  { label: 'kernel.route.rules.action.reject', value: RuleAction.Reject },
-  { label: 'kernel.route.rules.action.hijack-dns', value: RuleAction.HijackDns },
-  { label: 'kernel.route.rules.action.sniff', value: RuleAction.Sniff },
-  { label: 'kernel.route.rules.action.resolve', value: RuleAction.Resolve },
+export const RouteRuleActionOptions = [
+  { label: 'kernel.route.rules.action.route', value: RouteRuleAction.Route },
+  { label: 'kernel.route.rules.action.route-options', value: RouteRuleAction.RouteOptions },
+  { label: 'kernel.route.rules.action.reject', value: RouteRuleAction.Reject },
+  { label: 'kernel.route.rules.action.hijack-dns', value: RouteRuleAction.HijackDns },
+  { label: 'kernel.route.rules.action.sniff', value: RouteRuleAction.Sniff },
+  { label: 'kernel.route.rules.action.resolve', value: RouteRuleAction.Resolve },
 ]
 
-export const RuleActionRejectOptions = [
-  { label: 'kernel.route.rules.action.rejectDefault', value: RuleActionReject.Default },
-  { label: 'kernel.route.rules.action.rejectDrop', value: RuleActionReject.Drop },
-  { label: 'kernel.route.rules.action.rejectReply', value: RuleActionReject.Reply },
+export const RouteRejectMethodOptions = [
+  { label: 'kernel.route.rules.action.rejectDefault', value: RouteRejectMethod.Default },
+  { label: 'kernel.route.rules.action.rejectDrop', value: RouteRejectMethod.Drop },
+  { label: 'kernel.route.rules.action.rejectReply', value: RouteRejectMethod.Reply },
 ]
 
 export const DnsServerTypeOptions = [
@@ -228,15 +231,15 @@ export const DnsServerTypeOptions = [
 ]
 
 export const DnsRuleActionOptions = [
-  { label: 'kernel.route.rules.action.route', value: RuleAction.Route },
-  { label: 'kernel.route.rules.action.route-options', value: RuleAction.RouteOptions },
-  { label: 'kernel.route.rules.action.reject', value: RuleAction.Reject },
-  { label: 'kernel.route.rules.action.predefined', value: RuleAction.Predefined },
+  { label: 'kernel.route.rules.action.route', value: DnsRuleAction.Route },
+  { label: 'kernel.route.rules.action.route-options', value: DnsRuleAction.RouteOptions },
+  { label: 'kernel.route.rules.action.reject', value: DnsRuleAction.Reject },
+  { label: 'kernel.route.rules.action.predefined', value: DnsRuleAction.Predefined },
 ]
 
-export const DnsRuleActionRejectOptions = [
-  { label: 'kernel.route.rules.action.rejectDefault', value: RuleActionReject.Default },
-  { label: 'kernel.route.rules.action.rejectDrop', value: RuleActionReject.Drop },
+export const DnsRejectMethodOptions = [
+  { label: 'kernel.route.rules.action.rejectDefault', value: DnsRejectMethod.Default },
+  { label: 'kernel.route.rules.action.rejectDrop', value: DnsRejectMethod.Drop },
 ]
 
 export const SniffProtocolOptions = [
