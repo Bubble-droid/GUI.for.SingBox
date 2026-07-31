@@ -47,6 +47,7 @@ import {
   sleep,
 } from '@/utils'
 
+import type { Profile } from '@/features/config/types'
 import type { CoreApiConfig, CoreApiProxy } from '@/types/kernel'
 
 export type ProxyType = 'mixed' | 'http' | 'socks'
@@ -83,7 +84,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     },
   })
 
-  let runtimeProfile: App.Profile | undefined
+  let runtimeProfile: Profile | undefined
 
   const proxies = ref<Record<string, CoreApiProxy>>({})
 
@@ -350,7 +351,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     coreStoppedResolver(null)
   }
 
-  const startCore = async (_profile?: App.Profile) => {
+  const startCore = async (_profile?: Profile) => {
     if (running.value) throw 'The core is already running'
 
     logsStore.clearKernelLog()

@@ -6,10 +6,13 @@ import { DraggableOptions } from '@/constant/app'
 import { DnsServerTypeOptions } from '@/constant/kernel'
 import { DefaultDnsServer } from '@/constant/profile'
 import { DnsServer } from '@/enums/kernel'
+import { generateDnsServerURL } from '@/features/config/transformers'
 import { useBool } from '@/hooks'
-import { deepClone, generateDnsServerURL } from '@/utils'
+import { deepClone } from '@/utils'
 
 import Tag from '@/components/Tag/index.vue'
+
+import type { DnsServerConfig } from '@/features/config/types'
 
 interface Props {
   outboundOptions: { label: string; value: string }[]
@@ -18,10 +21,10 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const model = defineModel<App.DnsServerConfig[]>({ required: true })
+const model = defineModel<DnsServerConfig[]>({ required: true })
 
 let serverId = 0
-const fields = ref<App.DnsServerConfig>(DefaultDnsServer())
+const fields = ref<DnsServerConfig>(DefaultDnsServer())
 
 const isSupportDetourAndDomainResolver = computed(() => {
   return [
@@ -80,7 +83,7 @@ const handleDeleteRule = (index: number) => {
   model.value.splice(index, 1)
 }
 
-const renderServer = (server: App.DnsServerConfig) => {
+const renderServer = (server: DnsServerConfig) => {
   const { tag, detour } = server
   const children: VNode[] = [
     h(Tag, { color: 'cyan' }, () => tag),

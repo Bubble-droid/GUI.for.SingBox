@@ -14,7 +14,7 @@ export * from './outbounds'
 export * from './route'
 export * from './dns'
 
-const SchemaVersion = 'v1'
+export const ProfileSchemaVersion = 'v1'
 
 export const DefaultMixin = (): MixinConfig => {
   return { priority: 'mixin', format: 'json', config: '' }
@@ -27,7 +27,7 @@ export const DefaultScript = (): ScriptConfig => {
 export const createDefaultProfile = (name = ''): Profile => ({
   id: sampleID(),
   name,
-  schema: SchemaVersion,
+  schema: ProfileSchemaVersion,
   log: DefaultLog(),
   experimental: DefaultExperimental(),
   inbounds: DefaultInbounds(),
