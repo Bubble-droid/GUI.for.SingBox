@@ -14,6 +14,8 @@ import {
 } from '@/stores'
 import { debounce, deepClone, generateConfig, message, sampleID, alert, modal } from '@/utils'
 
+import type { Profile } from '@/features/config/types'
+
 import ProfileEditor from './components/ProfileEditor.vue'
 import ProfileForm from './components/ProfileForm.vue'
 
@@ -107,7 +109,7 @@ const secondaryMenusList: App.Menu[] = [
   },
 ]
 
-const generateMenus = (profile: App.Profile) => {
+const generateMenus = (profile: Profile) => {
   const moreMenus: App.Menu[] = secondaryMenusList.map((v) => ({
     ...v,
     handler: () => v.handler?.(profile.id),
@@ -165,7 +167,7 @@ const handleShowProfileForm = (id?: string, step = 0) => {
   m.setContent(ProfileForm, { id, step }).open()
 }
 
-const handleDeleteProfile = async (p: App.Profile) => {
+const handleDeleteProfile = async (p: Profile) => {
   const { profile } = appSettingsStore.app.kernel
   if (profile === p.id && kernelApiStore.running) {
     message.warn('profiles.shouldStop')
@@ -180,7 +182,7 @@ const handleDeleteProfile = async (p: App.Profile) => {
   }
 }
 
-const handleUseProfile = async (p: App.Profile) => {
+const handleUseProfile = async (p: Profile) => {
   if (appSettingsStore.app.kernel.profile === p.id) return
 
   appSettingsStore.app.kernel.profile = p.id

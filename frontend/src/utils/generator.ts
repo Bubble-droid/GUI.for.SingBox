@@ -411,7 +411,7 @@ export const legacyGenerateConfig = async (
   // step 2
   if (enablePluginProcessing) {
     const pluginsStore = usePluginsStore()
-    config = await pluginsStore.onGenerateTrigger(config, originalProfile)
+    config = await pluginsStore.onGenerateTrigger(config, originalProfile as any)
   }
 
   // step 3

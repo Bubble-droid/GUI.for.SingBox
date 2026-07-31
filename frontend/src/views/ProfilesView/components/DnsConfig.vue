@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import { DomainStrategyOptions } from '@/constant/kernel'
 
-import type { DnsConfig } from '@/features/config/types'
+import type { DnsConfig, RuleSetConfig } from '@/features/config/types'
 
 import DnsRulesConfig from './DnsRulesConfig.vue'
 import DnsServersConfig from './DnsServersConfig.vue'
@@ -12,7 +12,7 @@ import DnsServersConfig from './DnsServersConfig.vue'
 interface Props {
   inboundOptions: { label: string; value: string }[]
   outboundOptions: { label: string; value: string }[]
-  ruleSet: App.ProfileRuleSet[]
+  ruleSet: RuleSetConfig[]
 }
 
 defineProps<Props>()

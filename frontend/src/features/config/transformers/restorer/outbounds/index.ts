@@ -3,7 +3,7 @@ import { Outbound } from '@/enums'
 import { useSubscribesStore } from '@/stores'
 import { createTextMatcher } from '@/utils'
 
-import type { OutboundConfig } from '@/features/config/types'
+import type { OutboundConfig, ProxyConfig } from '@/features/config/types'
 
 export const restoreOutbounds = (
   outbounds: Recordable[],
@@ -46,7 +46,7 @@ export const restoreOutbounds = (
     outbound.tag = raw.tag
     outbound.type = raw.type
 
-    let newOutbounds: App.Proxy[] = []
+    let newOutbounds: ProxyConfig[] = []
 
     raw.outbounds?.forEach((tag: string) => {
       const isBuiltIn = [Outbound.Direct, Outbound.Block].includes(tag as any)

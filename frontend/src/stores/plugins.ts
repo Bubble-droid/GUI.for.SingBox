@@ -19,6 +19,8 @@ import {
   base64Encode,
 } from '@/utils'
 
+import type { Profile } from '@/features/config/types'
+
 interface PluginRuntimeCache {
   plugin: App.Plugin
   code?: string
@@ -737,7 +739,7 @@ export const usePluginsStore = defineStore('plugins', () => {
     }
   }
 
-  const onGenerateTrigger = async (config: Recordable, profile: App.Profile) => {
+  const onGenerateTrigger = async (config: Recordable, profile: Profile) => {
     const { fnName, observers } = PluginsTriggerMap[PluginTrigger.OnGenerate]!
     if (observers.length === 0) return config
 
@@ -756,7 +758,7 @@ export const usePluginsStore = defineStore('plugins', () => {
     return config
   }
 
-  const onBeforeCoreStartTrigger = async (params: Recordable, profile: App.Profile) => {
+  const onBeforeCoreStartTrigger = async (params: Recordable, profile: Profile) => {
     const { fnName, observers } = PluginsTriggerMap[PluginTrigger.OnBeforeCoreStart]!
     if (observers.length === 0) return params
 

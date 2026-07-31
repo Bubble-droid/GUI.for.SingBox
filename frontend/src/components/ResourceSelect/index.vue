@@ -11,8 +11,10 @@ import {
 } from '@/stores'
 import { message, modal } from '@/utils'
 
+import type { Profile } from '@/features/config/types'
+
 type ResourceType = 'profile' | 'subscription' | 'ruleset' | 'plugin' | 'scheduledtask'
-type ResourceItem = App.Profile | App.Subscription | App.RuleSet | App.Plugin | App.ScheduledTask
+type ResourceItem = Profile | App.Subscription | App.RuleSet | App.Plugin | App.ScheduledTask
 interface ResourceConfig {
   title: string
   list: ResourceItem[]
@@ -60,7 +62,7 @@ const resourceConfig = computed(() => {
       title: 'profiles.select',
       list: profilesStore.profiles,
       getById: profilesStore.getProfileById,
-      getName: (item) => (item as App.Profile).name,
+      getName: (item) => (item as Profile).name,
       getDescription: () => '',
     },
     subscription: {

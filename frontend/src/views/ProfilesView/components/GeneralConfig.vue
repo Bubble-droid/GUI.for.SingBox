@@ -5,13 +5,15 @@ import { PredefinedClashModeOptions, LogLevelOptions } from '@/constant/kernel'
 import { useBool } from '@/hooks'
 import { generateSecureKey } from '@/utils'
 
+import type { ExperimentalConfig, LogConfig } from '@/features/config/types'
+
 interface Props {
   outboundOptions: { label: string; value: string }[]
 }
 
 defineProps<Props>()
 
-const model = defineModel<{ log: App.Profile['log']; experimental: App.Profile['experimental'] }>({
+const model = defineModel<{ log: LogConfig; experimental: ExperimentalConfig }>({
   required: true,
 })
 

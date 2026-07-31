@@ -22,19 +22,21 @@ import {
 import { useBool } from '@/hooks'
 import { deepClone, message } from '@/utils'
 
+import type { RouteRuleConfig, RuleSetConfig } from '@/features/config/types'
+
 interface Props {
   inboundOptions: { label: string; value: string }[]
   outboundOptions: { label: string; value: string }[]
   serverOptions: { label: string; value: string }[]
-  ruleSet: App.ProfileRuleSet[]
+  ruleSet: RuleSetConfig[]
 }
 
 const props = defineProps<Props>()
 
-const model = defineModel<App.Rule[]>({ required: true })
+const model = defineModel<RouteRuleConfig[]>({ required: true })
 
 let ruleId = 0
-const fields = ref<App.Rule>(DefaultRouteRule())
+const fields = ref<RouteRuleConfig>(DefaultRouteRule())
 
 const { t } = useI18n()
 const [showEditModal] = useBool(false)
@@ -111,7 +113,7 @@ const isInsertionPointMissing = computed(
   () => model.value.findIndex((rule) => rule.type === RouteRuleType.InsertionPoint) === -1,
 )
 
-const hasLost = (rule: App.Rule) => {
+const hasLost = (rule: RouteRuleConfig) => {
   const rulesValidationFlags: boolean[] = []
   const hasMissingInbound = !props.inboundOptions.find((v) => v.value === rule.payload)
   const hasMissingOutbound = !props.outboundOptions.find((v) => v.value === rule.outbound)
@@ -139,7 +141,7 @@ const hasLost = (rule: App.Rule) => {
   return rulesValidationFlags.some((v) => v) || !rule.payload
 }
 
-const renderRule = (rule: App.Rule) => {
+const renderRule = (rule: RouteRuleConfig) => {
   const { type, payload, outbound, action, invert } = rule
   const children: string[] = [type]
   let _payload = payload

@@ -212,7 +212,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       if (!inbound) throw 'home.overview.needTun'
       options = { ...config.value.tun, ...options }
       inbound.enable = options.enable
-      inbound.tun!.stack = (options.stack || TunStack.Mixed) as App.TunStack
+      inbound.tun!.stack = (options.stack || TunStack.Mixed) as TunStack
       inbound.tun!.interface_name = options.device || ''
       if (options.interface_name) {
         runtimeProfile.route.default_interface = options.interface_name
