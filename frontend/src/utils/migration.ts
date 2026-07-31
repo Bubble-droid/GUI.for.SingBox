@@ -1,6 +1,17 @@
+import { ProfileSchemaVersion } from '@/constant'
 import { RequestProxyMode } from '@/enums/app'
 
-export const migrateProfiles = async (profiles: App.Profile[], save: () => Promise<string>) => {
+import type { Profile } from '@/features/config/types'
+
+import { generateConfig, legacyGenerateConfig } from './generator'
+import { message } from './interaction'
+import { normalizeErrorMessage } from './others'
+import { restoreProfile } from './restorer'
+
+export const migrateProfiles = async (
+  profiles: (Profile | App.Profile)[],
+  save: () => Promise<string>,
+) => {
   let needSync = false
 
   profiles.forEach((profile) => {
@@ -17,6 +28,27 @@ export const migrateProfiles = async (profiles: App.Profile[], save: () => Promi
       }
     })
   })
+
+  for (const [i, p] of profiles.entries()) {
+    let newConfig: Recordable
+    try {
+      if (!('schema' in p)) {
+        newConfig = await legacyGenerateConfig(p)
+      } else if (p.schema !== ProfileSchemaVersion) {
+        newConfig = await generateConfig(p)
+      } else {
+        continue
+      }
+
+      const newProfile = restoreProfile(newConfig)
+      profiles[i] = newProfile
+      needSync = true
+    } catch (error) {
+      message.error(
+        `Failed to migrate profile [${p.name || p.id}]: ${normalizeErrorMessage(error)}`,
+      )
+    }
+  }
 
   if (needSync) await save()
 }
