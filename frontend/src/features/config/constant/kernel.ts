@@ -1,3 +1,4 @@
+import type { SingBoxLogConfig } from '@/features/config/types'
 import type { ValueOf } from '@/features/types'
 
 export const LogLevel = {
@@ -8,7 +9,7 @@ export const LogLevel = {
   Error: 'error',
   Fatal: 'fatal',
   Panic: 'panic',
-} as const
+} as const satisfies Recordable<SingBoxLogConfig['level']>
 
 export type LogLevel = ValueOf<typeof LogLevel>
 

@@ -3,9 +3,9 @@ import { sampleID } from '@/utils'
 
 import type { MixinConfig, Profile, ScriptConfig } from '@/features/config/types'
 
-import { DefaultExperimental } from './experimental'
+import { createDefaultExperimental } from './experimental'
 import { DefaultInbounds } from './inbounds'
-import { DefaultLog } from './log'
+import { createDefaultLog } from './log'
 
 export * from './log'
 export * from './experimental'
@@ -14,10 +14,10 @@ export * from './outbounds'
 export * from './route'
 export * from './dns'
 
-export const ProfileSchemaVersion = 'v0.0.1'
+export const ProfileSchemaVersion = 'v0.1.0'
 
 export const DefaultMixin = (): MixinConfig => {
-  return { priority: 'mixin', format: 'json', config: '' }
+  return { priority: 'mixin', format: 'json', config: '{}' }
 }
 
 export const DefaultScript = (): ScriptConfig => {
@@ -28,8 +28,8 @@ export const createDefaultProfile = (name = ''): Profile => ({
   id: sampleID(),
   name,
   schema: ProfileSchemaVersion,
-  log: DefaultLog(),
-  experimental: DefaultExperimental(),
+  log: createDefaultLog(),
+  experimental: createDefaultExperimental(),
   inbounds: DefaultInbounds(),
   outbounds: DefaultOutbounds(),
   route: DefaultRoute(),

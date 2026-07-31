@@ -197,7 +197,8 @@ export default {
     advancedSettings: '高级设置',
     step: {
       name: '名称设置',
-      general: '通用设置',
+      log: '日志设置',
+      experimental: '实验性设置',
       inbounds: '入站设置',
       outbounds: '出站设置',
       route: '路由设置',

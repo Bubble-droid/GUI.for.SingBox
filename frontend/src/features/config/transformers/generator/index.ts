@@ -1,10 +1,11 @@
 import { parse } from 'yaml'
 
 import { Branch } from '@/enums/app'
+import { filterInvalidProps } from '@/features/config/utils'
 import { useAppSettingsStore, usePluginsStore } from '@/stores'
 import { deepAssign, deepClone } from '@/utils'
 
-import type { Profile } from '@/features/config/types'
+import type { Profile, TagItem } from '@/features/config/types'
 
 import { _adaptToStableBranch } from './adapter'
 import { generateDns } from './dns'
@@ -12,13 +13,17 @@ import { generateExperimental } from './experimental'
 import { generateInbounds } from './inbounds'
 import { generateOutbounds } from './outbounds'
 import { generateRoute } from './route'
-import type { GenerateConfigOptions } from './types'
+import type { GenerateConfigOptions, TagMaps } from './types'
 
 export * from './shared'
 export * from './inbounds'
 export * from './outbounds'
 export * from './route'
 export * from './dns'
+
+const buildIdTagMapping = (items: TagItem[]): Map<string, string> => {
+  return new Map(items.map((v) => [v.id, v.tag]))
+}
 
 export const generateConfig = async (
   originalProfile: Profile,
@@ -38,10 +43,15 @@ export const generateConfig = async (
   } = options
 
   const profile = deepClone(originalProfile)
+
+  const tagMaps: TagMaps = {
+    outbounds: buildIdTagMapping(profile.outbounds),
+  }
+
   // step 1
   let config: Recordable = {
-    log: profile.log,
-    experimental: generateExperimental(profile.experimental, profile.outbounds),
+    log: filterInvalidProps(profile.log),
+    experimental: generateExperimental(profile.experimental, tagMaps),
     inbounds: generateInbounds(profile.inbounds),
     outbounds: await generateOutbounds(profile.outbounds),
     route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns),

@@ -17,12 +17,13 @@ interface Props {
 
 enum Step {
   Name = 0,
-  General = 1,
-  Inbounds = 2,
-  Outbounds = 3,
-  Route = 4,
-  Dns = 5,
-  MixinScript = 6,
+  Log = 1,
+  Experimental = 2,
+  Inbounds = 3,
+  Outbounds = 4,
+  Route = 5,
+  Dns = 6,
+  MixinScript = 7,
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -31,8 +32,9 @@ const props = withDefaults(defineProps<Props>(), {
   step: Step.Name,
 })
 
+import { ExperimentalConfig, LogConfig } from '@/features/config/views/ProfilesView'
+
 import DnsConfig from './DnsConfig.vue'
-import GeneralConfig from './GeneralConfig.vue'
 import InboundsConfig from './InboundsConfig.vue'
 import MixinAndScript from './MixinAndScriptConfig.vue'
 import OutboundsConfig from './OutboundsConfig.vue'
@@ -50,7 +52,8 @@ const currentStep = ref(props.step)
 
 const stepItems = [
   { title: 'profile.step.name' },
-  { title: 'profile.step.general' },
+  { title: 'profile.step.log' },
+  { title: 'profile.step.experimental' },
   { title: 'profile.step.inbounds' },
   { title: 'profile.step.outbounds' },
   { title: 'profile.step.route' },
@@ -71,16 +74,6 @@ const outboundOptions = computed(() =>
 const serverOptions = computed(() =>
   profile.value.dns.servers.map((v) => ({ label: v.tag, value: v.id })),
 )
-
-const generalConfig = computed({
-  get() {
-    return { log: profile.value.log, experimental: profile.value.experimental }
-  },
-  set({ log, experimental }) {
-    profile.value.log = log
-    profile.value.experimental = experimental
-  },
-})
 
 const mixinAndScriptConfig = computed({
   get() {
@@ -246,8 +239,11 @@ defineExpose({ modalSlots })
         class="w-full"
       />
     </div>
-    <div v-if="currentStep === Step.General">
-      <GeneralConfig v-model="generalConfig" :outbound-options="outboundOptions" />
+    <div v-if="currentStep === Step.Log">
+      <LogConfig v-model="profile.log" />
+    </div>
+    <div v-if="currentStep === Step.Experimental">
+      <ExperimentalConfig v-model="profile.experimental" :outbound-options="outboundOptions" />
     </div>
     <div v-if="currentStep === Step.Inbounds">
       <InboundsConfig ref="inboundsRef" v-model="profile.inbounds" />
