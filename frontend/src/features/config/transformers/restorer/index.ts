@@ -1,6 +1,6 @@
-import { DefaultLog, DefaultMixin, DefaultScript, ProfileSchemaVersion } from '@/constant'
+import { createDefaultLog, DefaultMixin, DefaultScript, ProfileSchemaVersion } from '@/constant'
 import { useProfilesStore } from '@/stores'
-import { sampleID, deepAssign, restoreExperimental } from '@/utils'
+import { sampleID, restoreExperimental } from '@/utils'
 
 import type { Profile } from '@/features/config/types'
 
@@ -9,7 +9,7 @@ import { restoreDnsRules } from './dns/rules'
 import { restoreInbounds } from './inbounds'
 import { restoreOutbounds } from './outbounds'
 import { restoreRouteRules, restoreRouteRuleset } from './route'
-import type { RestoreProfileOptions } from './types'
+import type { IdMaps, RestoreProfileOptions } from './types'
 
 export * from './experimental'
 export * from './inbounds'
@@ -17,9 +17,18 @@ export * from './outbounds'
 export * from './route'
 export * from './dns'
 
-const buildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<string> => {
+const legacyBuildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<string> => {
   if (!arr) return {}
   return arr.reduce((p, c, i) => ((p[c.tag] = prefix + i), p), {})
+}
+
+const buildTagIdMapping = (prefix: string, arr: { tag?: string }[] = []): Map<string, string> => {
+  return new Map(
+    arr.flatMap((v, i) => {
+      if (!v.tag) return []
+      return [[v.tag, `${prefix}${i}`]]
+    }),
+  )
 }
 
 export const restoreProfile = (
@@ -31,17 +40,23 @@ export const restoreProfile = (
 
   const { profile, subscriptionIds } = options
 
-  const InboundsIds = buildTagIdMapping('in-', config.inbounds)
-  const OutboundsIds = buildTagIdMapping('out-', config.outbounds)
-  const RouteRuleSetIds = buildTagIdMapping('ruleset-', config.route?.rule_set)
-  const DnsServersIds = buildTagIdMapping('dns-', config.dns?.servers)
+  const InboundsIds = legacyBuildTagIdMapping('in-', config.inbounds)
+  const OutboundsIds = legacyBuildTagIdMapping('out-', config.outbounds)
+  const RouteRuleSetIds = legacyBuildTagIdMapping('ruleset-', config.route?.rule_set)
+  const DnsServersIds = legacyBuildTagIdMapping('dns-', config.dns?.servers)
+
+  const outboundIds = buildTagIdMapping('out-', config.outbounds)
+
+  const idMaps: IdMaps = {
+    outbounds: outboundIds,
+  }
 
   return {
     id: profile?.id || sampleID(),
     name,
     schema: ProfileSchemaVersion,
-    log: deepAssign(DefaultLog(), config.log),
-    experimental: restoreExperimental(config.experimental, OutboundsIds),
+    log: { ...createDefaultLog(), ...config.log },
+    experimental: restoreExperimental(config.experimental, idMaps),
     inbounds: restoreInbounds(config.inbounds || [], InboundsIds),
     outbounds: restoreOutbounds(
       config.outbounds || [],

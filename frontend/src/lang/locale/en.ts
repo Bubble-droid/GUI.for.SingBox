@@ -200,7 +200,8 @@ export default {
     advancedSettings: 'Advanced Settings',
     step: {
       name: 'Name',
-      general: 'General',
+      log: 'Log',
+      experimental: 'Experimental',
       inbounds: 'Inbounds',
       outbounds: 'Outbounds',
       route: 'Route',

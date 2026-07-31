@@ -29,7 +29,8 @@ const pluginsStore = usePluginsStore()
 
 const menuList: App.Menu[] = [
   'profile.step.name',
-  'profile.step.general',
+  'profile.step.log',
+  'profile.step.experimental',
   'profile.step.inbounds',
   'profile.step.outbounds',
   'profile.step.route',

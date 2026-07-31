@@ -2,7 +2,7 @@ import { LogLevel } from '@/enums'
 
 import type { LogConfig } from '@/features/config/types'
 
-export const DefaultLog = (): LogConfig => ({
+export const createDefaultLog = (): LogConfig => ({
   disabled: false,
   level: LogLevel.Info,
   output: '',

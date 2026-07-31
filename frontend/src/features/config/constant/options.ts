@@ -63,7 +63,7 @@ export const PredefinedClashModeOptions = [
   },
 ]
 
-export const LogLevelOptions = defineOptions(LogLevel, 'kernel.log.{{val}}')
+export const LogLevelOptions = defineOptions(LogLevel, 'kernel.log.level.{{val}}')
 
 export const InboundOptions = defineOptions(Inbound, '{{val}}')
 

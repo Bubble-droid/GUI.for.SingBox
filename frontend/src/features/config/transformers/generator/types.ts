@@ -4,3 +4,7 @@ export interface GenerateConfigOptions {
   enableMixinProcessing?: boolean
   enableScriptProcessing?: boolean
 }
+
+export interface TagMaps {
+  outbounds: Map<string, string>
+}

@@ -355,7 +355,7 @@ export const setIntervalImmediately = (func: () => void, interval: number) => {
   return setInterval(func, interval)
 }
 
-const isPlainObject = (obj: any) => {
+export const isPlainObject = (obj: any) => {
   return typeof obj === 'object' && Object.prototype.toString.call(obj) === '[object Object]'
 }
 
