@@ -1,9 +1,11 @@
 import { DnsServer, DnsRuleType, DnsRuleAction, DomainStrategy, ClashMode } from '@/enums'
 import { sampleID } from '@/utils'
 
+import type { DnsConfig, DnsRuleConfig, DnsServerConfig } from '@/features/config/types'
+
 import { DefaultDnsServersIds, DefaultOutboundIds, DefaultRulesetIds } from '../shared'
 
-export const DefaultDnsServer = (): App.DnsServerConfig => ({
+export const DefaultDnsServer = (): DnsServerConfig => ({
   id: sampleID(),
   tag: '',
   type: DnsServer.Local,
@@ -19,7 +21,7 @@ export const DefaultDnsServer = (): App.DnsServerConfig => ({
   predefined: {},
 })
 
-export const DefaultDnsServers = (): App.DnsServerConfig[] => [
+export const DefaultDnsServers = (): DnsServerConfig[] => [
   {
     id: DefaultDnsServersIds.FakeIP,
     tag: DefaultDnsServersIds.FakeIP,
@@ -123,7 +125,7 @@ export const DefaultFakeIPDnsRule = () => ({
   ],
 })
 
-export const DefaultDnsRule = (): App.DnsRule => ({
+export const DefaultDnsRule = (): DnsRuleConfig => ({
   id: sampleID(),
   type: DnsRuleType.RuleSet,
   enable: true,
@@ -138,7 +140,7 @@ export const DefaultDnsRule = (): App.DnsRule => ({
   client_subnet: '',
 })
 
-export const DefaultDnsRules = (): App.DnsRule[] => [
+export const DefaultDnsRules = (): DnsRuleConfig[] => [
   {
     id: sampleID(),
     type: DnsRuleType.ClashMode,
@@ -213,7 +215,7 @@ export const DefaultDnsRules = (): App.DnsRule[] => [
   },
 ]
 
-export const DefaultDns = (): App.Dns => ({
+export const DefaultDns = (): DnsConfig => ({
   servers: DefaultDnsServers(),
   rules: DefaultDnsRules(),
   disable_cache: false,
