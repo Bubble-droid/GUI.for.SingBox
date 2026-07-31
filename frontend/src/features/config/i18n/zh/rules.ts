@@ -23,4 +23,16 @@ export const rules = {
     ip_accept_any: '匹配任意 IP(ip_accept_any)',
     inline: '内联(Inline)',
   },
+  action: {
+    reject: {
+      name: '拒绝连接',
+      method: {
+        title: '拒绝方式',
+        default: '默认',
+        drop: '丢弃',
+        reply: '回复',
+      },
+      no_drop: '不丢弃',
+    },
+  },
 }

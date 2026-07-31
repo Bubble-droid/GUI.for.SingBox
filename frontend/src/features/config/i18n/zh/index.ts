@@ -5,6 +5,7 @@ import { log } from './log'
 import { outbounds } from './outbounds'
 import { route } from './route'
 import { rules } from './rules'
+import { shared } from './shared'
 
 export const kernel = {
   rule: '规则',
@@ -13,14 +14,15 @@ export const kernel = {
   ruleDesc: '按照规则文件分流',
   globalDesc: '仅走Global策略组',
   directDesc: '直接连接所有流量',
+  shared,
   log,
   experimental,
   clash_api: experimental.clash_api,
   cache_file: experimental.cache_file,
   inbounds,
   outbounds,
-  route,
   rules,
+  route,
   strategy: {
     name: '策略',
     default: '默认',
