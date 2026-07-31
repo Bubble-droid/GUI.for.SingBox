@@ -13,7 +13,9 @@ import {
 import { Inbound } from '@/enums/kernel'
 import { picker, sampleID } from '@/utils'
 
-const model = defineModel<App.Profile['inbounds']>({ required: true })
+import type { InboundConfig } from '@/features/config/types'
+
+const model = defineModel<InboundConfig[]>({ required: true })
 
 const { t } = useI18n()
 

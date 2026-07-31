@@ -22,19 +22,21 @@ import {
 import { useBool } from '@/hooks'
 import { deepClone, isValidJson, message } from '@/utils'
 
+import type { DnsRuleConfig, RuleSetConfig } from '@/features/config/types'
+
 interface Props {
   inboundOptions: { label: string; value: string }[]
   outboundOptions: { label: string; value: string }[]
   serversOptions: { label: string; value: string }[]
-  ruleSet: App.ProfileRuleSet[]
+  ruleSet: RuleSetConfig[]
 }
 
 const props = defineProps<Props>()
 
-const model = defineModel<App.DnsRule[]>({ required: true })
+const model = defineModel<DnsRuleConfig[]>({ required: true })
 
 let ruleId = 0
-const fields = ref<App.DnsRule>(DefaultDnsRule())
+const fields = ref<DnsRuleConfig>(DefaultDnsRule())
 
 const isInsertionPointMissing = computed(
   () => model.value.findIndex((rule) => rule.type === DnsRuleType.InsertionPoint) === -1,
@@ -107,7 +109,7 @@ const handleClearRuleset = (ruleset: any) => {
 
 const showLost = () => message.warn('kernel.route.rules.invalid')
 
-const hasLost = (rule: App.DnsRule) => {
+const hasLost = (rule: DnsRuleConfig) => {
   const checkServer = () => {
     if (rule.action === DnsRuleAction.Route) {
       if (!props.serversOptions.find((v) => v.value === rule.server)) {
@@ -143,7 +145,7 @@ const hasLost = (rule: App.DnsRule) => {
   return checkServer() || checkPayload()
 }
 
-const renderRule = (rule: App.DnsRule) => {
+const renderRule = (rule: DnsRuleConfig) => {
   const { type, payload, server, action, invert } = rule
   const children: string[] = [type]
   let _payload = payload

@@ -9,7 +9,9 @@ import { Outbound } from '@/enums/kernel'
 import { useSubscribesStore } from '@/stores'
 import { deepClone, message } from '@/utils'
 
-const model = defineModel<App.Profile['outbounds']>({ required: true })
+import type { OutboundConfig } from '@/features/config/types'
+
+const model = defineModel<OutboundConfig[]>({ required: true })
 
 let updateGroupId = 0
 const showEditModal = ref(false)
@@ -33,7 +35,7 @@ const proxyGroup = ref([
   },
 ])
 
-const fields = ref<App.Outbound>(DefaultOutbound())
+const fields = ref<OutboundConfig>(DefaultOutbound())
 
 const { t } = useI18n()
 const subscribesStore = useSubscribesStore()
@@ -55,7 +57,7 @@ const handleDeleteGroup = (index: number) => {
   }))
 }
 
-const handleClearGroup = async (outbound: App.Outbound) => {
+const handleClearGroup = async (outbound: OutboundConfig) => {
   const filtered = outbound.outbounds.filter(({ id, type }) => {
     if (type === 'Built-in') {
       return model.value.some((v) => v.id === id)
@@ -113,7 +115,7 @@ const isInuse = (_groupID: string, proxyID: string) => {
   return fields.value.outbounds.find((outbound) => outbound.id === proxyID)
 }
 
-const hasLost = (outbound: App.Outbound) => {
+const hasLost = (outbound: OutboundConfig) => {
   if ([Outbound.Selector, Outbound.UrlTest].includes(outbound.type as any)) {
     return outbound.outbounds.some(({ id, type }) => {
       if (type === 'Built-in') {
@@ -144,21 +146,21 @@ const handleSortGroupEnd = () => {
   model.value[updateGroupId] = fields.value
 }
 
-const clacSubscriptionsCount = (outbound: App.Outbound) => {
+const clacSubscriptionsCount = (outbound: OutboundConfig) => {
   if ([Outbound.Selector, Outbound.UrlTest].includes(outbound.type as any)) {
     return outbound.outbounds.filter((v) => v.type === 'Subscription').length
   }
   return 0
 }
 
-const clacOutboundsCount = (outbound: App.Outbound) => {
+const clacOutboundsCount = (outbound: OutboundConfig) => {
   if ([Outbound.Selector, Outbound.UrlTest].includes(outbound.type as any)) {
     return outbound.outbounds.filter((v) => v.type !== 'Subscription').length
   }
   return 0
 }
 
-const needToAdd = (outbound: App.Outbound) => {
+const needToAdd = (outbound: OutboundConfig) => {
   if ([Outbound.Selector, Outbound.UrlTest].includes(outbound.type as any)) {
     return outbound.outbounds.length === 0
   }

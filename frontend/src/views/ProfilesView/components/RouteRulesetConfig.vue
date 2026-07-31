@@ -10,16 +10,18 @@ import { useBool } from '@/hooks'
 import { useRulesetsStore } from '@/stores'
 import { deepClone, message } from '@/utils'
 
+import type { RuleSetConfig } from '@/features/config/types'
+
 interface Props {
   outboundOptions: { label: string; value: string }[]
 }
 
 defineProps<Props>()
 
-const model = defineModel<App.ProfileRuleSet[]>({ required: true })
+const model = defineModel<RuleSetConfig[]>({ required: true })
 
 let rulesetId = 0
-const fields = ref<App.ProfileRuleSet>(DefaultRouteRuleset())
+const fields = ref<RuleSetConfig>(DefaultRouteRuleset())
 
 const { t } = useI18n()
 const [showEditModal] = useBool(false)
@@ -53,7 +55,7 @@ const handleDelete = (index: number) => {
 
 const showLost = () => message.warn('kernel.route.rule_set.notFound')
 
-const hasLost = (ruleset: App.ProfileRuleSet) => {
+const hasLost = (ruleset: RuleSetConfig) => {
   if (ruleset.type !== RuleSetType.Local) return false
   return !rulesetsStore.getRulesetById(ruleset.path)
 }
