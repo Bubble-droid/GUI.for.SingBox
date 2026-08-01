@@ -1,4 +1,8 @@
-import type { SingBoxLogConfig } from '@/features/config/types'
+import type {
+  SingBoxDialer,
+  SingBoxDomainResolver,
+  SingBoxLogConfig,
+} from '@/features/config/types'
 import type { ValueOf } from '@/features/types'
 
 export const LogLevel = {
@@ -114,7 +118,7 @@ export const DomainStrategy = {
   PreferIpv6: 'prefer_ipv6',
   Ipv4Only: 'ipv4_only',
   Ipv6Only: 'ipv6_only',
-} as const
+} as const satisfies Recordable<SingBoxDomainResolver['strategy'] | 'default'>
 
 export type DomainStrategy = ValueOf<typeof DomainStrategy>
 
@@ -183,3 +187,26 @@ export const SniffProtocol = {
 } as const
 
 export type SniffProtocol = ValueOf<typeof SniffProtocol>
+
+export const NetworkType = {
+  Wifi: 'wifi',
+  Cellular: 'cellular',
+  Ethernet: 'ethernet',
+  Other: 'other',
+} as const satisfies Recordable<SingBoxDialer['network_type']>
+
+export type NetworkType = ValueOf<typeof NetworkType>
+
+export const NetworkStrategy = {
+  Default: 'default',
+  Fallback: 'fallback',
+  Hybrid: 'hybrid',
+  Wifi: 'wifi',
+  Cellular: 'cellular',
+  Ethernet: 'ethernet',
+  Wifi_only: 'wifi_only',
+  CellularOnly: 'cellular_only',
+  EthernetOnly: 'ethernet_only',
+} as const satisfies Recordable<SingBoxDialer['network_strategy']>
+
+export type NetworkStrategy = ValueOf<typeof NetworkStrategy>

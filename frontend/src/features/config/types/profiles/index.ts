@@ -3,11 +3,13 @@ import type { ExperimentalConfig } from './experimental'
 import type { InboundConfig } from './inbounds'
 import type { LogConfig } from './log'
 import type { MixinConfig, ScriptConfig } from './mixin-script'
+import type { NtpConfig } from './ntp'
 import type { OutboundConfig } from './outbounds'
 import type { RouteConfig } from './route'
 
 export type * from './shared'
 export type * from './log'
+export type * from './ntp'
 export type * from './experimental'
 export type * from './inbounds'
 export type * from './outbounds'
@@ -20,6 +22,7 @@ export interface Profile {
   name: string
   schema: string
   log: LogConfig
+  ntp: NtpConfig
   experimental: ExperimentalConfig
   inbounds: InboundConfig[]
   outbounds: OutboundConfig[]

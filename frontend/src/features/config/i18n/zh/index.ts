@@ -2,6 +2,7 @@ import { dns } from './dns'
 import { experimental } from './experimental'
 import { inbounds } from './inbounds'
 import { log } from './log'
+import { ntp } from './ntp'
 import { outbounds } from './outbounds'
 import { route } from './route'
 import { rules } from './rules'
@@ -16,6 +17,7 @@ export const kernel = {
   directDesc: '直接连接所有流量',
   shared,
   log,
+  ntp,
   experimental,
   clash_api: experimental.clash_api,
   cache_file: experimental.cache_file,

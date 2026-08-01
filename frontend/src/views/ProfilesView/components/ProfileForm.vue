@@ -18,12 +18,13 @@ interface Props {
 enum Step {
   Name = 0,
   Log = 1,
-  Experimental = 2,
-  Inbounds = 3,
-  Outbounds = 4,
-  Route = 5,
-  Dns = 6,
-  MixinScript = 7,
+  Ntp = 2,
+  Experimental = 3,
+  Inbounds = 4,
+  Outbounds = 5,
+  Route = 6,
+  Dns = 7,
+  MixinScript = 8,
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,7 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
   step: Step.Name,
 })
 
-import { ExperimentalConfig, LogConfig } from '@/features/config/views/ProfilesView'
+import { ExperimentalConfig, LogConfig, NtpConfig } from '@/features/config/views/ProfilesView'
 
 import DnsConfig from './DnsConfig.vue'
 import InboundsConfig from './InboundsConfig.vue'
@@ -53,6 +54,7 @@ const currentStep = ref(props.step)
 const stepItems = [
   { title: 'profile.step.name' },
   { title: 'profile.step.log' },
+  { title: 'profile.step.ntp' },
   { title: 'profile.step.experimental' },
   { title: 'profile.step.inbounds' },
   { title: 'profile.step.outbounds' },
@@ -241,6 +243,13 @@ defineExpose({ modalSlots })
     </div>
     <div v-if="currentStep === Step.Log">
       <LogConfig v-model="profile.log" />
+    </div>
+    <div v-if="currentStep === Step.Ntp">
+      <NtpConfig
+        v-model="profile.ntp"
+        :outbound-options="outboundOptions"
+        :server-options="serverOptions"
+      />
     </div>
     <div v-if="currentStep === Step.Experimental">
       <ExperimentalConfig v-model="profile.experimental" :outbound-options="outboundOptions" />

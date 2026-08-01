@@ -7,10 +7,12 @@ import type { Profile } from '@/features/config/types'
 import { restoreDnsServers } from './dns'
 import { restoreDnsRules } from './dns/rules'
 import { restoreInbounds } from './inbounds'
+import { restoreNtp } from './ntp'
 import { restoreOutbounds } from './outbounds'
 import { restoreRouteRules, restoreRouteRuleset } from './route'
 import type { IdMaps, RestoreProfileOptions } from './types'
 
+export * from './ntp'
 export * from './experimental'
 export * from './inbounds'
 export * from './outbounds'
@@ -49,6 +51,7 @@ export const restoreProfile = (
 
   const idMaps: IdMaps = {
     outbounds: outboundIds,
+    dnsServers: buildTagIdMapping('dns-', config.dns?.servers),
   }
 
   return {
@@ -56,6 +59,7 @@ export const restoreProfile = (
     name,
     schema: ProfileSchemaVersion,
     log: { ...createDefaultLog(), ...config.log },
+    ntp: restoreNtp(config.ntp, idMaps),
     experimental: restoreExperimental(config.experimental, idMaps),
     inbounds: restoreInbounds(config.inbounds || [], InboundsIds),
     outbounds: restoreOutbounds(

@@ -1,3 +1,5 @@
+import type { ComponentOption } from '@/features/types'
+
 import {
   ClashMode,
   LogLevel,
@@ -16,6 +18,8 @@ import {
   DnsRejectMethod,
   DnsRuleAction,
   DnsRuleType,
+  NetworkStrategy,
+  NetworkType,
 } from './kernel'
 
 type FormatString<
@@ -65,6 +69,45 @@ export const PredefinedClashModeOptions = [
 
 export const LogLevelOptions = defineOptions(LogLevel, 'kernel.log.level.{{val}}')
 
+export const PredefinedNtpServerOptions = [
+  {
+    label: 'kernel.ntp.server.aliyun',
+    value: 'ntp.aliyun.com',
+  },
+  {
+    label: 'kernel.ntp.server.tencent',
+    value: 'ntp.tencent.com',
+  },
+  {
+    label: 'kernel.ntp.server.tsinghua',
+    value: 'ntp.tuna.tsinghua.edu.cn',
+  },
+  {
+    label: 'kernel.ntp.server.ntsc',
+    value: 'ntp.ntsc.ac.cn',
+  },
+  {
+    label: 'kernel.ntp.server.google',
+    value: 'time.google.com',
+  },
+  {
+    label: 'kernel.ntp.server.cloudflare',
+    value: 'time.cloudflare.com',
+  },
+  {
+    label: 'kernel.ntp.server.apple',
+    value: 'time.apple.com',
+  },
+  {
+    label: 'kernel.ntp.server.microsoft',
+    value: 'time.windows.com',
+  },
+  {
+    label: 'kernel.ntp.server.custom',
+    value: 'custom',
+  },
+] satisfies ComponentOption[]
+
 export const InboundOptions = defineOptions(Inbound, '{{val}}')
 
 export const OutboundOptions = defineOptions(Outbound, 'kernel.outbounds.{{val}}')
@@ -103,9 +146,19 @@ export const DnsRejectMethodOptions = defineOptions(
   'kernel.rules.action.reject.method.{{val}}',
 )
 
-export const DomainStrategyOptions = defineOptions(DomainStrategy, 'kernel.strategy.{{val}}')
+export const DomainStrategyOptions = defineOptions(
+  DomainStrategy,
+  'kernel.shared.domain_resolver.strategy.{{val}}',
+)
 
 export const SniffProtocolOptions = defineOptions(
   SniffProtocol,
   'kernel.route.rules.sniffer.{{val}}',
+)
+
+export const NetworkTypeOptions = defineOptions(NetworkType, 'kernel.shared.network_type.{{val}}')
+
+export const NetworkStrategyOptions = defineOptions(
+  NetworkStrategy,
+  'kernel.shared.network_strategy.{{val}}',
 )

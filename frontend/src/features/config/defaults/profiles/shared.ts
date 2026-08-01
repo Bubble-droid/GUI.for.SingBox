@@ -1,3 +1,6 @@
+import type { DomainStrategy, NetworkStrategy } from '@/enums'
+import type { Dialer, DnsRouteOptions, DomainResolver } from '@/features/config/types'
+
 export const DefaultOutboundIds = {
   Select: 'outbound-select',
   Urltest: 'outbound-urltest',
@@ -28,3 +31,42 @@ export const DefaultDnsServersIds = {
   LocalDnsResolver: 'Local-DNS-Resolver',
   RemoteDnsResolver: 'Remote-DNS-Resolver',
 } as const
+
+export const createDefaultDnsRouteOptions = (): DnsRouteOptions => ({
+  disable_cache: false,
+  disable_optimistic_cache: false,
+  rewrite_ttl: 0,
+  timeout: '',
+  client_subnet: '',
+})
+
+export const createDefaultDomainResolver = (): DomainResolver => ({
+  ...createDefaultDnsRouteOptions(),
+  server: '',
+  strategy: '' as DomainStrategy,
+})
+
+export const createDefaultDialer = (): Dialer => ({
+  detour: '',
+  bind_interface: '',
+  inet4_bind_address: '',
+  inet6_bind_address: '',
+  bind_address_no_port: false,
+  protect_path: '',
+  routing_mark: 0,
+  reuse_addr: false,
+  netns: '',
+  connect_timeout: '',
+  tcp_fast_open: false,
+  tcp_multi_path: false,
+  disable_tcp_keep_alive: false,
+  tcp_keep_alive: '',
+  tcp_keep_alive_interval: '',
+  udp_fragment: false,
+  domain_resolver: createDefaultDomainResolver(),
+  network_strategy: '' as NetworkStrategy,
+  network_type: [],
+  fallback_network_type: [],
+  fallback_delay: '',
+  network_fallback_delay: '',
+})

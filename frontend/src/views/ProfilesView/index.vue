@@ -30,6 +30,7 @@ const pluginsStore = usePluginsStore()
 const menuList: App.Menu[] = [
   'profile.step.name',
   'profile.step.log',
+  'profile.step.ntp',
   'profile.step.experimental',
   'profile.step.inbounds',
   'profile.step.outbounds',
