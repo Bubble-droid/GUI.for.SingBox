@@ -49,7 +49,6 @@ var Env = &EnvResult{
 	AppDataPath:     "",
 	AppConfigPath:   "",
 	AppCachePath:    "",
-	AppCorePath:     "",
 }
 
 // NewApp creates a new App application struct
@@ -91,7 +90,6 @@ func CreateApp(fs embed.FS) *App {
 	Env.AppDataPath = paths.AppDataPath
 	Env.AppConfigPath = paths.AppConfigPath
 	Env.AppCachePath = paths.AppCachePath
-	Env.AppCorePath = paths.AppCorePath
 
 	loadConfig()
 
@@ -167,7 +165,6 @@ func (a *App) GetEnv(key string) any {
 		AppDataPath:     Env.AppDataPath,
 		AppConfigPath:   Env.AppConfigPath,
 		AppCachePath:    Env.AppCachePath,
-		AppCorePath:     Env.AppCorePath,
 	}
 }
 

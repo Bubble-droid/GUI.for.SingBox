@@ -23,7 +23,6 @@ export const useEnvStore = defineStore('env', () => {
     appDataPath: '',
     appConfigPath: '',
     appCachePath: '',
-    appCorePath: '',
   })
 
   const systemProxy = ref(false)
