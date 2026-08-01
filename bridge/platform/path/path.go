@@ -9,7 +9,6 @@ type AppPaths struct {
 	AppDataPath   string
 	AppConfigPath string
 	AppCachePath  string
-	AppCorePath   string
 }
 
 var basePath string
@@ -21,7 +20,6 @@ func initPortable(base string) AppPaths {
 		AppDataPath:   baseDataDir,
 		AppConfigPath: baseDataDir,
 		AppCachePath:  filepath.Join(baseDataDir, ".cache"),
-		AppCorePath:   filepath.Join(baseDataDir, "sing-box"),
 	}
 }
 

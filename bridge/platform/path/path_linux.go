@@ -20,7 +20,6 @@ func InitResolver(appName string, basePath string) AppPaths {
 	appDataPath := filepath.Join(xdg.DataHome, appName)
 	appConfigPath := filepath.Join(xdg.ConfigHome, appName)
 	appCachePath := filepath.Join(xdg.CacheHome, appName)
-	appCorePath := filepath.Join(appDataPath, "sing-box")
 
 	dataDir = appDataPath
 	configDir = appConfigPath
@@ -30,7 +29,6 @@ func InitResolver(appName string, basePath string) AppPaths {
 		AppDataPath:   appDataPath,
 		AppConfigPath: appConfigPath,
 		AppCachePath:  appCachePath,
-		AppCorePath:   appCorePath,
 	}
 }
 

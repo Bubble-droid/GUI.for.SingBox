@@ -401,7 +401,7 @@ export const processMagicVariables = (str: string) => {
   const { env } = useEnvStore()
   let result = str
   Object.entries({
-    $CORE_BASE_PATH: env.appCorePath,
+    $CORE_BASE_PATH: `${env.appDataPath}/sing-box`,
   }).forEach(([source, target]) => {
     result = result.replaceAll(source, target)
   })

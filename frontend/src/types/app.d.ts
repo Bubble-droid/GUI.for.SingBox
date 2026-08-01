@@ -27,7 +27,6 @@ declare namespace App {
     appDataPath: string
     appConfigPath: string
     appCachePath: string
-    appCorePath: string
   }
 
   interface TrayContent {

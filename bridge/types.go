@@ -32,7 +32,6 @@ type EnvResult struct {
 	AppDataPath     string `json:"appDataPath"`
 	AppConfigPath   string `json:"appConfigPath"`
 	AppCachePath    string `json:"appCachePath"`
-	AppCorePath     string `json:"appCorePath"`
 }
 
 type RequestOptions struct {
