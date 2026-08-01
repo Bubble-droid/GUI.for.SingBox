@@ -1,4 +1,4 @@
-import { DefaultDnsServer } from '@/constant'
+import { createDnsServer } from '@/constant'
 import { DnsServer } from '@/enums'
 
 import type { DnsServerConfig } from '@/features/config/types'
@@ -10,7 +10,7 @@ export const restoreDnsServers = (
 ): DnsServerConfig[] => {
   return servers.flatMap((raw) => {
     if (!raw.type) return []
-    const server = DefaultDnsServer()
+    const server = createDnsServer()
     server.id = DnsServersIds[raw.tag]
     server.tag = raw.tag
     server.type = raw.type

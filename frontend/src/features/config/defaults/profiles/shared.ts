@@ -32,7 +32,7 @@ export const DefaultDnsServersIds = {
   RemoteDnsResolver: 'Remote-DNS-Resolver',
 } as const
 
-export const createDefaultDnsRouteOptions = (): DnsRouteOptions => ({
+export const createDnsRouteOptions = (): DnsRouteOptions => ({
   disable_cache: false,
   disable_optimistic_cache: false,
   rewrite_ttl: 0,
@@ -40,13 +40,13 @@ export const createDefaultDnsRouteOptions = (): DnsRouteOptions => ({
   client_subnet: '',
 })
 
-export const createDefaultDomainResolver = (): DomainResolver => ({
-  ...createDefaultDnsRouteOptions(),
+export const createDomainResolver = (): DomainResolver => ({
+  ...createDnsRouteOptions(),
   server: '',
   strategy: '' as DomainStrategy,
 })
 
-export const createDefaultDialer = (): Dialer => ({
+export const createDialer = (): Dialer => ({
   detour: '',
   bind_interface: '',
   inet4_bind_address: '',
@@ -63,7 +63,7 @@ export const createDefaultDialer = (): Dialer => ({
   tcp_keep_alive: '',
   tcp_keep_alive_interval: '',
   udp_fragment: false,
-  domain_resolver: createDefaultDomainResolver(),
+  domain_resolver: createDomainResolver(),
   network_strategy: '' as NetworkStrategy,
   network_type: [],
   fallback_network_type: [],

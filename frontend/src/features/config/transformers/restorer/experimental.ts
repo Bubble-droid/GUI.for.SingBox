@@ -1,4 +1,4 @@
-import { createDefaultExperimental } from '@/constant'
+import { createExperimental } from '@/constant'
 import { ensureArray } from '@/features/utils'
 
 import type { ExperimentalConfig, SingBoxExperimental } from '@/features/config/types'
@@ -9,7 +9,7 @@ export const restoreExperimental = (
   raw: SingBoxExperimental = {},
   maps: IdMaps,
 ): ExperimentalConfig => {
-  const template = createDefaultExperimental()
+  const template = createExperimental()
   const { clash_api, cache_file } = raw
 
   return {

@@ -4,7 +4,7 @@ import type { InboundConfig } from '@/features/config/types'
 
 import { DefaultInboundIds } from '../shared'
 
-export const DefaultInboundSocks = (): NonNullable<InboundConfig['socks']> => ({
+export const createInboundSocks = (): NonNullable<InboundConfig['socks']> => ({
   listen: {
     listen: '127.0.0.1',
     listen_port: 20120,
@@ -15,7 +15,7 @@ export const DefaultInboundSocks = (): NonNullable<InboundConfig['socks']> => ({
   users: [],
 })
 
-export const DefaultInboundHttp = (): NonNullable<InboundConfig['http']> => ({
+export const createInboundHttp = (): NonNullable<InboundConfig['http']> => ({
   listen: {
     listen: '127.0.0.1',
     listen_port: 20121,
@@ -26,7 +26,7 @@ export const DefaultInboundHttp = (): NonNullable<InboundConfig['http']> => ({
   users: [],
 })
 
-export const DefaultInboundMixed = (): NonNullable<InboundConfig['mixed']> => ({
+export const createInboundMixed = (): NonNullable<InboundConfig['mixed']> => ({
   listen: {
     listen: '127.0.0.1',
     listen_port: 20122,
@@ -37,7 +37,7 @@ export const DefaultInboundMixed = (): NonNullable<InboundConfig['mixed']> => ({
   users: [],
 })
 
-export const DefaultInboundDirect = (): NonNullable<InboundConfig['direct']> => ({
+export const createInboundDirect = (): NonNullable<InboundConfig['direct']> => ({
   listen: {
     listen: '127.0.0.1',
     listen_port: 20119,
@@ -48,7 +48,7 @@ export const DefaultInboundDirect = (): NonNullable<InboundConfig['direct']> => 
   network: '',
 })
 
-export const DefaultInboundTun = (): NonNullable<InboundConfig['tun']> => ({
+export const createInboundTun = (): NonNullable<InboundConfig['tun']> => ({
   interface_name: '',
   address: ['172.18.0.1/30', 'fdfe:dcba:9876::1/126'],
   mtu: 0,
@@ -60,19 +60,19 @@ export const DefaultInboundTun = (): NonNullable<InboundConfig['tun']> => ({
   stack: TunStack.Mixed,
 })
 
-export const DefaultInbounds = (): InboundConfig[] => [
+export const createInbounds = (): InboundConfig[] => [
   {
     id: DefaultInboundIds.MixedIn,
     type: Inbound.Mixed,
     tag: 'mixed-in',
     enable: true,
-    mixed: DefaultInboundMixed(),
+    mixed: createInboundMixed(),
   },
   {
     id: DefaultInboundIds.Tun,
     type: Inbound.Tun,
     tag: 'tun-in',
     enable: false,
-    tun: DefaultInboundTun(),
+    tun: createInboundTun(),
   },
 ]

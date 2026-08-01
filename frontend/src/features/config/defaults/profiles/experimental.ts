@@ -5,7 +5,7 @@ import type { ExperimentalConfig } from '@/features/config/types'
 
 import { DefaultOutboundIds } from './shared'
 
-export const createDefaultExperimental = (): ExperimentalConfig => ({
+export const createExperimental = (): ExperimentalConfig => ({
   clash_api: {
     external_controller: '127.0.0.1:20123',
     external_ui: '',

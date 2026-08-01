@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
 import { DnsServerTypeOptions } from '@/constant/kernel'
-import { DefaultDnsServer } from '@/constant/profile'
+import { createDnsServer } from '@/constant/profile'
 import { DnsServer } from '@/enums/kernel'
 import { generateDnsServerURL } from '@/features/config/transformers'
 import { useBool } from '@/hooks'
@@ -24,7 +24,7 @@ const props = defineProps<Props>()
 const model = defineModel<DnsServerConfig[]>({ required: true })
 
 let serverId = 0
-const fields = ref<DnsServerConfig>(DefaultDnsServer())
+const fields = ref<DnsServerConfig>(createDnsServer())
 
 const isSupportDetourAndDomainResolver = computed(() => {
   return [
@@ -59,7 +59,7 @@ const [showEditModal] = useBool(false)
 
 const handleAdd = () => {
   serverId = -1
-  fields.value = DefaultDnsServer()
+  fields.value = createDnsServer()
   showEditModal.value = true
 }
 

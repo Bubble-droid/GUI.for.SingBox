@@ -1,4 +1,4 @@
-import { DefaultRouteRuleset } from '@/constant'
+import { createRouteRuleset } from '@/constant'
 import { RuleSetType } from '@/enums'
 import { useEnvStore, useRulesetsStore } from '@/stores'
 
@@ -12,7 +12,7 @@ export const restoreRouteRuleset = (
   const { env } = useEnvStore()
   const rulesetsStore = useRulesetsStore()
   return rulesets.flatMap((raw) => {
-    const ruleset = DefaultRouteRuleset()
+    const ruleset = createRouteRuleset()
     ruleset.id = RouteRuleSetIds[raw.tag]
     ruleset.type = raw.type
     ruleset.tag = raw.tag

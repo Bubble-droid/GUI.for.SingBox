@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
 import { RuleSetFormatOptions, RuleSetTypeOptions } from '@/constant/kernel'
-import { DefaultRouteRuleset } from '@/constant/profile'
+import { createRouteRuleset } from '@/constant/profile'
 import { RuleSetFormat, RuleSetType } from '@/enums/kernel'
 import { useBool } from '@/hooks'
 import { useRulesetsStore } from '@/stores'
@@ -21,7 +21,7 @@ defineProps<Props>()
 const model = defineModel<RuleSetConfig[]>({ required: true })
 
 let rulesetId = 0
-const fields = ref<RuleSetConfig>(DefaultRouteRuleset())
+const fields = ref<RuleSetConfig>(createRouteRuleset())
 
 const { t } = useI18n()
 const [showEditModal] = useBool(false)
@@ -29,7 +29,7 @@ const rulesetsStore = useRulesetsStore()
 
 const handleAdd = () => {
   rulesetId = -1
-  fields.value = DefaultRouteRuleset()
+  fields.value = createRouteRuleset()
   showEditModal.value = true
 }
 

@@ -21,7 +21,7 @@ import {
   CorePidFilePath,
   CoreWorkingDirectory,
 } from '@/constant/kernel'
-import { DefaultInboundMixed } from '@/constant/profile'
+import { createInboundMixed } from '@/constant/profile'
 import { Branch } from '@/enums/app'
 import { Inbound, RuleSetType, TunStack } from '@/enums/kernel'
 import {
@@ -179,7 +179,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       if (inbound) {
         inbound[type]!.listen.listen_port = port
       } else {
-        const _type = DefaultInboundMixed()!
+        const _type = createInboundMixed()!
         _type.listen.listen_port = port
         inbound = {
           id: type + '-in',

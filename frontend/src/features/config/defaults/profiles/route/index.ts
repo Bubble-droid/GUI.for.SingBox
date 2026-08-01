@@ -17,7 +17,7 @@ import {
   DefaultDnsServersIds,
 } from '../shared'
 
-export const DefaultRouteRule = (): RouteRuleConfig => ({
+export const createRouteRule = (): RouteRuleConfig => ({
   id: sampleID(),
   type: RouteRuleType.RuleSet,
   enable: true,
@@ -30,7 +30,7 @@ export const DefaultRouteRule = (): RouteRuleConfig => ({
   server: '',
 })
 
-export const DefaultRouteRuleset = (): RuleSetConfig => ({
+export const createRouteRuleset = (): RuleSetConfig => ({
   id: sampleID(),
   type: RuleSetType.Local,
   tag: '',
@@ -42,7 +42,7 @@ export const DefaultRouteRuleset = (): RuleSetConfig => ({
   path: '',
 })
 
-export const DefaultRoute = (): RouteConfig => ({
+export const createRoute = (): RouteConfig => ({
   rules: [
     {
       id: sampleID(),

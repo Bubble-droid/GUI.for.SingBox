@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
 import { OutboundOptions, BuiltInOutbound } from '@/constant/kernel'
-import { DefaultOutbound } from '@/constant/profile'
+import { createOutbound } from '@/constant/profile'
 import { Outbound } from '@/enums/kernel'
 import { useSubscribesStore } from '@/stores'
 import { deepClone, message } from '@/utils'
@@ -35,14 +35,14 @@ const proxyGroup = ref([
   },
 ])
 
-const fields = ref<OutboundConfig>(DefaultOutbound())
+const fields = ref<OutboundConfig>(createOutbound())
 
 const { t } = useI18n()
 const subscribesStore = useSubscribesStore()
 
 const handleAdd = () => {
   updateGroupId = -1
-  fields.value = DefaultOutbound()
+  fields.value = createOutbound()
   showEditModal.value = true
 }
 

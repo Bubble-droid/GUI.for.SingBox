@@ -1,4 +1,4 @@
-import { createDefaultProfile, ProfileSchemaVersion } from '@/constant'
+import { createProfile, ProfileSchemaVersion } from '@/constant'
 import { RequestProxyMode } from '@/enums/app'
 
 import type { Profile } from '@/features/config/types'
@@ -41,7 +41,7 @@ export const migrateProfiles = async (
     }, new Set<string>())
   }
 
-  const template = createDefaultProfile()
+  const template = createProfile()
 
   for (const [i, p] of profiles.entries()) {
     const subIds = getSubIds(p)

@@ -1,4 +1,4 @@
-import { DefaultOutbound } from '@/constant'
+import { createOutbound } from '@/constant'
 import { Outbound } from '@/enums'
 import { useSubscribesStore } from '@/stores'
 import { createTextMatcher } from '@/utils'
@@ -43,7 +43,7 @@ export const restoreOutbounds = (
     if (![Outbound.Selector, Outbound.UrlTest].includes(raw.type)) {
       return []
     }
-    const outbound = DefaultOutbound()
+    const outbound = createOutbound()
     outbound.id = OutboundsIds[raw.tag]
     outbound.tag = raw.tag
     outbound.type = raw.type
