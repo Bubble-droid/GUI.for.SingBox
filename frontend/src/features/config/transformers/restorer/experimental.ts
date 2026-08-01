@@ -1,5 +1,5 @@
 import { createDefaultExperimental } from '@/constant'
-import { ensureArray } from '@/features/config/utils'
+import { ensureArray } from '@/features/utils'
 
 import type { ExperimentalConfig, SingBoxExperimental } from '@/features/config/types'
 

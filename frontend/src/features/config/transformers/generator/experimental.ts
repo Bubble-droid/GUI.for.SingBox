@@ -1,4 +1,4 @@
-import { filterInvalidProps } from '@/features/config/utils'
+import { filterInvalidProps } from '@/features/utils'
 
 import type { ExperimentalConfig, SingBoxExperimental } from '@/features/config/types'
 
