@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	platformexec "guiforcores/bridge/platform/exec"
+	platform_exec "guiforcores/bridge/platform/exec"
 
 	"github.com/shirou/gopsutil/v3/process"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -32,7 +32,7 @@ func (a *App) Exec(path string, args []string, options ExecOptions) FlagResult {
 	}
 
 	cmd := exec.Command(exePath, args...)
-	platformexec.SetCmdWindowHidden(cmd)
+	platform_exec.SetCmdWindowHidden(cmd)
 
 	if options.WorkingDirectory != "" {
 		cmd.Dir = resolvePath(options.WorkingDirectory)
@@ -45,7 +45,7 @@ func (a *App) Exec(path string, args []string, options ExecOptions) FlagResult {
 
 	out, err := cmd.CombinedOutput()
 
-	output := strings.TrimSpace(platformexec.DecodeCommandOutput(out))
+	output := strings.TrimSpace(platform_exec.DecodeCommandOutput(out))
 
 	if err != nil {
 		if output == "" {
@@ -75,7 +75,7 @@ func (a *App) ExecBackground(path string, args []string, outEvent string, endEve
 	done := make(chan struct{})
 	outputDone := make(chan struct{})
 	cmd := exec.Command(exePath, args...)
-	platformexec.SetCmdWindowHidden(cmd)
+	platform_exec.SetCmdWindowHidden(cmd)
 
 	if options.WorkingDirectory != "" {
 		cmd.Dir = resolvePath(options.WorkingDirectory)
@@ -122,7 +122,7 @@ func (a *App) ExecBackground(path string, args []string, outEvent string, endEve
 
 	if pidPath != "" {
 		if err := os.WriteFile(pidPath, []byte(pid), os.ModePerm); err != nil {
-			_ = platformexec.SendExitSignal(cmd.Process)
+			_ = platform_exec.SendExitSignal(cmd.Process)
 			_ = waitForProcessExitWithTimeout(cmd.Process, 10)
 			_ = cmd.Wait()
 			return FlagResult{false, err.Error()}
@@ -232,7 +232,7 @@ func (a *App) KillProcess(pid int, timeout int) FlagResult {
 		return FlagResult{false, err.Error()}
 	}
 
-	if err := platformexec.SendExitSignal(process); err != nil {
+	if err := platform_exec.SendExitSignal(process); err != nil {
 		log.Printf("SendExitSignal Err: %s", err.Error())
 	}
 
@@ -259,7 +259,7 @@ func waitForProcessExitWithTimeout(process *os.Process, timeoutSeconds int) erro
 			return nil
 
 		default:
-			alive, err := platformexec.IsProcessAlive(process)
+			alive, err := platform_exec.IsProcessAlive(process)
 			if err != nil {
 				return fmt.Errorf("failed to check status of process %d: %w", process.Pid, err)
 			}
@@ -304,7 +304,7 @@ func scanAndEmitOutput(a *App, reader io.Reader, outEvent string, options ExecOp
 	stopOutput := false
 
 	for scanner.Scan() {
-		text := platformexec.DecodeCommandOutput(scanner.Bytes())
+		text := platform_exec.DecodeCommandOutput(scanner.Bytes())
 
 		if !stopOutput {
 			runtime.EventsEmit(a.Ctx, outEvent, text)
@@ -327,7 +327,7 @@ func tailAndEmitLogFile(a *App, path string, outEvent string, options ExecOption
 	defer ticker.Stop()
 
 	emitLine := func(text string) bool {
-		text = platformexec.DecodeCommandOutput([]byte(text))
+		text = platform_exec.DecodeCommandOutput([]byte(text))
 		text = strings.TrimRight(text, "\r")
 
 		if text == "" {

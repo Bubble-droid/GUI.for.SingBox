@@ -1,6 +1,6 @@
-//go:build !linux
+//go:build linux && non_xdg
 
-package resolver
+package path
 
 func InitResolver(appName string, basePath string) AppPaths {
 	return initPortable(basePath)

@@ -1,4 +1,4 @@
-package resolver
+package path
 
 import (
 	"log"

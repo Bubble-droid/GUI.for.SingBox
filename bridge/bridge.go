@@ -3,8 +3,7 @@ package bridge
 import (
 	"context"
 	"embed"
-	"guiforcores/bridge/platform/lifecycle"
-	"guiforcores/bridge/platform/resolver"
+
 	"log"
 	"net"
 	"os"
@@ -13,7 +12,9 @@ import (
 	"slices"
 	"strings"
 
-	platformexec "guiforcores/bridge/platform/exec"
+	platform_exec "guiforcores/bridge/platform/exec"
+	platform_lifecycle "guiforcores/bridge/platform/lifecycle"
+	platform_path "guiforcores/bridge/platform/path"
 	sysruntime "runtime"
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -72,7 +73,7 @@ func CreateApp(fs embed.FS) *App {
 		Env.FromTaskSch = true
 	}
 
-	if priv, err := platformexec.IsPrivileged(); err == nil {
+	if priv, err := platform_exec.IsPrivileged(); err == nil {
 		Env.IsPrivileged = priv
 	}
 
@@ -82,10 +83,10 @@ func CreateApp(fs embed.FS) *App {
 		Env.AppVersion = AppVersion
 	}
 
-	Env.IsSystemPackage = lifecycle.IsSystemPackage(exePath)
-	Env.IsBundled = lifecycle.IsBundled(Env.IsSystemPackage, AppName)
+	Env.IsSystemPackage = platform_lifecycle.IsSystemPackage(exePath)
+	Env.IsBundled = platform_lifecycle.IsBundled(Env.IsSystemPackage, AppName)
 
-	paths := resolver.InitResolver(AppName, Env.BasePath)
+	paths := platform_path.InitResolver(AppName, Env.BasePath)
 
 	Env.AppDataPath = paths.AppDataPath
 	Env.AppConfigPath = paths.AppConfigPath
@@ -102,16 +103,16 @@ func (a *App) Startup(ctx context.Context) {
 
 	log.Printf("Build Version: %s", Env.AppVersion)
 
-	lifecycle.LogPackageInfo(Env.IsSystemPackage, Env.IsBundled, SingBoxVersion, SingBoxAlphaVersion)
-	lifecycle.SetupPlatformIntegration(Env.IsSystemPackage, Env.IsBundled, AppName)
+	platform_lifecycle.LogPackageInfo(Env.IsSystemPackage, Env.IsBundled, SingBoxVersion, SingBoxAlphaVersion)
+	platform_lifecycle.SetupPlatformIntegration(Env.IsSystemPackage, Env.IsBundled, AppName)
 
-	resolver.LogStorageMode()
+	platform_path.LogStorageMode()
 
 	log.Printf("App Data Path: %s", Env.AppDataPath)
 	log.Printf("App Config Path: %s", Env.AppConfigPath)
 	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
-	if webviewPath := lifecycle.OnStartup(a.Ctx, a.AppMenu, AppName, resolvePath); webviewPath != "" {
+	if webviewPath := platform_lifecycle.OnStartup(a.Ctx, a.AppMenu, AppName, resolvePath); webviewPath != "" {
 		Env.WebviewPath = webviewPath
 	}
 
@@ -137,7 +138,7 @@ func (a *App) RestartApp() FlagResult {
 	exePath := resolvePath(Env.AppName)
 
 	cmd := exec.Command(exePath)
-	platformexec.SetCmdWindowHidden(cmd)
+	platform_exec.SetCmdWindowHidden(cmd)
 
 	if err := cmd.Start(); err != nil {
 		return FlagResult{false, err.Error()}
