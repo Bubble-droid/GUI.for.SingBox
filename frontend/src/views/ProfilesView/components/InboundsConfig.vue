@@ -4,11 +4,11 @@ import { useI18n } from 'vue-i18n'
 import { DraggableOptions } from '@/constant/app'
 import { NetworkOptions, TunStackOptions } from '@/constant/kernel'
 import {
-  DefaultInboundMixed,
-  DefaultInboundHttp,
-  DefaultInboundSocks,
-  DefaultInboundTun,
-  DefaultInboundDirect,
+  createInboundMixed,
+  createInboundHttp,
+  createInboundSocks,
+  createInboundTun,
+  createInboundDirect,
 } from '@/constant/profile'
 import { Inbound } from '@/enums/kernel'
 import { picker, sampleID } from '@/utils'
@@ -32,7 +32,7 @@ const inbounds = [
         tag: 'direct-in',
         type: Inbound.Direct,
         enable: true,
-        direct: DefaultInboundDirect(),
+        direct: createInboundDirect(),
       })
     },
   },
@@ -44,7 +44,7 @@ const inbounds = [
         tag: 'mixed-in',
         type: Inbound.Mixed,
         enable: true,
-        mixed: DefaultInboundMixed(),
+        mixed: createInboundMixed(),
       })
     },
   },
@@ -56,7 +56,7 @@ const inbounds = [
         tag: 'http-in',
         type: Inbound.Http,
         enable: true,
-        http: DefaultInboundHttp(),
+        http: createInboundHttp(),
       })
     },
   },
@@ -68,7 +68,7 @@ const inbounds = [
         tag: 'socks-in',
         type: Inbound.Socks,
         enable: true,
-        socks: DefaultInboundSocks(),
+        socks: createInboundSocks(),
       })
     },
   },
@@ -80,7 +80,7 @@ const inbounds = [
         tag: 'tun-in',
         type: Inbound.Tun,
         enable: true,
-        tun: DefaultInboundTun(),
+        tun: createInboundTun(),
       })
     },
   },

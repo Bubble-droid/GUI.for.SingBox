@@ -1,11 +1,11 @@
 import type { NtpConfig } from '@/features/config/types'
 
-import { createDefaultDialer } from './shared'
+import { createDialer } from './shared'
 
-export const createDefaultNtp = (): NtpConfig => ({
+export const createNtp = (): NtpConfig => ({
   enabled: false,
   server: '',
   server_port: 123,
   interval: '',
-  dialer: createDefaultDialer(),
+  dialer: createDialer(),
 })

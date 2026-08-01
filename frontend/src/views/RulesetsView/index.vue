@@ -5,7 +5,7 @@ import { useI18n, I18nT } from 'vue-i18n'
 import { RemoveFile, WriteFile, OpenURI } from '@/bridge'
 import { DraggableOptions, ViewOptions } from '@/constant/app'
 import { BuiltInOutbound, EmptyRuleSet } from '@/constant/kernel'
-import { DefaultRouteRule, DefaultRouteRuleset } from '@/constant/profile'
+import { createRouteRule, createRouteRuleset } from '@/constant/profile'
 import { View } from '@/enums/app'
 import { RuleSetFormat, RuleSetType, RouteRuleType } from '@/enums/kernel'
 import { useRulesetsStore, useAppSettingsStore, useProfilesStore } from '@/stores'
@@ -178,7 +178,7 @@ const handleAddRulesetToProfile = async (id: string) => {
     let rulesetReferenceId = profileRuleset?.id
     if (!rulesetReferenceId) {
       const rulesetReference = {
-        ...DefaultRouteRuleset(),
+        ...createRouteRuleset(),
         tag: ruleset.name,
         format: ruleset.format,
         path: ruleset.id,
@@ -188,7 +188,7 @@ const handleAddRulesetToProfile = async (id: string) => {
     }
 
     nextProfile.route.rules.splice(insertionPointIndex + 1, 0, {
-      ...DefaultRouteRule(),
+      ...createRouteRule(),
       payload: rulesetReferenceId,
       outbound: target,
     })

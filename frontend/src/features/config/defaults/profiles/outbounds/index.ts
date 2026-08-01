@@ -9,7 +9,7 @@ import { DefaultOutboundIds } from '../shared'
 
 const { t } = i18n.global
 
-export const DefaultOutbound = (): OutboundConfig => ({
+export const createOutbound = (): OutboundConfig => ({
   id: sampleID(),
   tag: '',
   type: Outbound.Selector,
@@ -24,7 +24,7 @@ export const DefaultOutbound = (): OutboundConfig => ({
   hidden: false,
 })
 
-export const DefaultOutbounds = (): OutboundConfig[] => [
+export const createOutbounds = (): OutboundConfig[] => [
   {
     id: DefaultOutboundIds.Select,
     tag: t('outbound.select'),

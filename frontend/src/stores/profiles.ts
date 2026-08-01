@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { parse } from 'yaml'
 
 import { ReadFile, WriteFile } from '@/bridge'
-import { createDefaultProfile } from '@/constant'
+import { createProfile } from '@/constant'
 import { ProfilesFilePath } from '@/constant/app'
 import { useAppSettingsStore } from '@/stores'
 import { ignoredError, eventBus, stringifyNoFolding, migrateProfiles } from '@/utils'
@@ -70,7 +70,7 @@ export const useProfilesStore = defineStore('profiles', () => {
 
   const getProfileById = (id: string) => profiles.value.find((v) => v.id === id)
 
-  const getProfileTemplate = (name = ''): Profile => createDefaultProfile(name)
+  const getProfileTemplate = (name = ''): Profile => createProfile(name)
 
   return {
     profiles,

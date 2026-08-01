@@ -1,12 +1,14 @@
-import { DefaultOutbounds, DefaultRoute, DefaultDns } from '@/constant'
 import { sampleID } from '@/utils'
 
 import type { MixinConfig, Profile, ScriptConfig } from '@/features/config/types'
 
-import { createDefaultExperimental } from './experimental'
-import { DefaultInbounds } from './inbounds'
-import { createDefaultLog } from './log'
-import { createDefaultNtp } from './ntp'
+import { createDns } from './dns'
+import { createExperimental } from './experimental'
+import { createInbounds } from './inbounds'
+import { createLog } from './log'
+import { createNtp } from './ntp'
+import { createOutbounds } from './outbounds'
+import { createRoute } from './route'
 
 export * from './shared'
 export * from './log'
@@ -19,25 +21,25 @@ export * from './dns'
 
 export const ProfileSchemaVersion = 'v0.2.0'
 
-export const DefaultMixin = (): MixinConfig => {
+export const createMixin = (): MixinConfig => {
   return { priority: 'mixin', format: 'json', config: '{}' }
 }
 
-export const DefaultScript = (): ScriptConfig => {
+export const createScript = (): ScriptConfig => {
   return { code: `const onGenerate = async (config) => {\n  return config\n}` }
 }
 
-export const createDefaultProfile = (name = ''): Profile => ({
+export const createProfile = (name = ''): Profile => ({
   id: sampleID(),
   name,
   schema: ProfileSchemaVersion,
-  log: createDefaultLog(),
-  ntp: createDefaultNtp(),
-  experimental: createDefaultExperimental(),
-  inbounds: DefaultInbounds(),
-  outbounds: DefaultOutbounds(),
-  route: DefaultRoute(),
-  dns: DefaultDns(),
-  mixin: DefaultMixin(),
-  script: DefaultScript(),
+  log: createLog(),
+  ntp: createNtp(),
+  experimental: createExperimental(),
+  inbounds: createInbounds(),
+  outbounds: createOutbounds(),
+  route: createRoute(),
+  dns: createDns(),
+  mixin: createMixin(),
+  script: createScript(),
 })

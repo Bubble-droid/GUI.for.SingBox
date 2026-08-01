@@ -9,7 +9,7 @@ import {
   DnsRejectMethodOptions,
   DomainStrategyOptions,
 } from '@/constant/kernel'
-import { DefaultDnsRule } from '@/constant/profile'
+import { createDnsRule } from '@/constant/profile'
 import {
   DnsRuleType,
   ClashMode,
@@ -36,7 +36,7 @@ const props = defineProps<Props>()
 const model = defineModel<DnsRuleConfig[]>({ required: true })
 
 let ruleId = 0
-const fields = ref<DnsRuleConfig>(DefaultDnsRule())
+const fields = ref<DnsRuleConfig>(createDnsRule())
 
 const isInsertionPointMissing = computed(
   () => model.value.findIndex((rule) => rule.type === DnsRuleType.InsertionPoint) === -1,
@@ -47,7 +47,7 @@ const [showEditModal] = useBool(false)
 
 const handleAdd = () => {
   ruleId = -1
-  fields.value = DefaultDnsRule()
+  fields.value = createDnsRule()
   showEditModal.value = true
 }
 

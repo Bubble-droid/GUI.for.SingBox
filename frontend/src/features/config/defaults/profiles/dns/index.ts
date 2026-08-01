@@ -5,7 +5,7 @@ import type { DnsConfig, DnsRuleConfig, DnsServerConfig } from '@/features/confi
 
 import { DefaultDnsServersIds, DefaultOutboundIds, DefaultRulesetIds } from '../shared'
 
-export const DefaultDnsServer = (): DnsServerConfig => ({
+export const createDnsServer = (): DnsServerConfig => ({
   id: sampleID(),
   tag: '',
   type: DnsServer.Local,
@@ -21,7 +21,7 @@ export const DefaultDnsServer = (): DnsServerConfig => ({
   predefined: {},
 })
 
-export const DefaultDnsServers = (): DnsServerConfig[] => [
+export const createDnsServers = (): DnsServerConfig[] => [
   {
     id: DefaultDnsServersIds.FakeIP,
     tag: DefaultDnsServersIds.FakeIP,
@@ -99,7 +99,7 @@ export const DefaultDnsServers = (): DnsServerConfig[] => [
   },
 ]
 
-export const DefaultFakeIPDnsRule = () => ({
+export const createFakeIPDnsRule = () => ({
   __is_fake_ip: true,
   type: 'logical',
   mode: 'and',
@@ -125,7 +125,7 @@ export const DefaultFakeIPDnsRule = () => ({
   ],
 })
 
-export const DefaultDnsRule = (): DnsRuleConfig => ({
+export const createDnsRule = (): DnsRuleConfig => ({
   id: sampleID(),
   type: DnsRuleType.RuleSet,
   enable: true,
@@ -140,7 +140,7 @@ export const DefaultDnsRule = (): DnsRuleConfig => ({
   client_subnet: '',
 })
 
-export const DefaultDnsRules = (): DnsRuleConfig[] => [
+export const createDnsRules = (): DnsRuleConfig[] => [
   {
     id: sampleID(),
     type: DnsRuleType.ClashMode,
@@ -193,7 +193,7 @@ export const DefaultDnsRules = (): DnsRuleConfig[] => [
     id: sampleID(),
     type: DnsRuleType.Inline,
     enable: false,
-    payload: JSON.stringify(DefaultFakeIPDnsRule(), null, 2),
+    payload: JSON.stringify(createFakeIPDnsRule(), null, 2),
     action: DnsRuleAction.Route,
     server: DefaultDnsServersIds.FakeIP,
     invert: false,
@@ -215,9 +215,9 @@ export const DefaultDnsRules = (): DnsRuleConfig[] => [
   },
 ]
 
-export const DefaultDns = (): DnsConfig => ({
-  servers: DefaultDnsServers(),
-  rules: DefaultDnsRules(),
+export const createDns = (): DnsConfig => ({
+  servers: createDnsServers(),
+  rules: createDnsRules(),
   disable_cache: false,
   disable_expire: false,
   independent_cache: false,

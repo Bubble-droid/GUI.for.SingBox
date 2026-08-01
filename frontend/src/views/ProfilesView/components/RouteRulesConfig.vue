@@ -10,7 +10,7 @@ import {
   SniffProtocolOptions,
   RouteRuleTypeOptions,
 } from '@/constant/kernel'
-import { DefaultRouteRule } from '@/constant/profile'
+import { createRouteRule } from '@/constant/profile'
 import {
   RouteRuleAction,
   RuleSetFormat,
@@ -36,14 +36,14 @@ const props = defineProps<Props>()
 const model = defineModel<RouteRuleConfig[]>({ required: true })
 
 let ruleId = 0
-const fields = ref<RouteRuleConfig>(DefaultRouteRule())
+const fields = ref<RouteRuleConfig>(createRouteRule())
 
 const { t } = useI18n()
 const [showEditModal] = useBool(false)
 
 const handleAdd = () => {
   ruleId = -1
-  fields.value = DefaultRouteRule()
+  fields.value = createRouteRule()
   showEditModal.value = true
 }
 

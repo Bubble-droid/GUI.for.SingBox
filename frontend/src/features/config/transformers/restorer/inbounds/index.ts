@@ -1,4 +1,4 @@
-import { DefaultInboundTun, DefaultInboundDirect, DefaultInboundMixed } from '@/constant'
+import { createInboundTun, createInboundDirect, createInboundMixed } from '@/constant'
 import { Inbound } from '@/enums'
 
 import type { InboundConfig } from '@/features/config/types'
@@ -20,7 +20,7 @@ export const restoreInbounds = (
       enable: true,
     }
     if (raw.type === Inbound.Tun) {
-      const template = DefaultInboundTun()
+      const template = createInboundTun()
       inbound.tun = {
         interface_name: raw.interface_name ?? template.interface_name,
         address: raw.address ?? template.address,
@@ -34,7 +34,7 @@ export const restoreInbounds = (
       }
     }
     if (raw.type === Inbound.Direct) {
-      const template = DefaultInboundDirect()
+      const template = createInboundDirect()
       inbound.direct = {
         listen: {
           listen: raw.listen ?? template.listen.listen,
@@ -47,7 +47,7 @@ export const restoreInbounds = (
       }
     }
     if ([Inbound.Mixed, Inbound.Http, Inbound.Socks].includes(raw.type)) {
-      const template = DefaultInboundMixed()
+      const template = createInboundMixed()
       inbound[raw.type as Exclude<Inbound, typeof Inbound.Tun | typeof Inbound.Direct>] = {
         listen: {
           listen: raw.listen ?? template.listen.listen,

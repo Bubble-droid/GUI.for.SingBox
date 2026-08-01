@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import { HttpGet } from '@/bridge'
 import { BuiltInOutbound } from '@/constant/kernel'
-import { DefaultRouteRule, DefaultRouteRuleset } from '@/constant/profile'
+import { createRouteRule, createRouteRuleset } from '@/constant/profile'
 import { RuleSetFormat, RuleSetType, RouteRuleType } from '@/enums/kernel'
 import { useProfilesStore, useRulesetsStore } from '@/stores'
 import { alert, deepClone, message, picker } from '@/utils'
@@ -131,7 +131,7 @@ const handleAddRulesetToProfile = async (
     let rulesetReferenceId = profileRuleset?.id
     if (!rulesetReferenceId) {
       const rulesetReference = {
-        ...DefaultRouteRuleset(),
+        ...createRouteRuleset(),
         type: RuleSetType.Remote,
         tag: `${ruleset.name}-${ruleset.type}${suffix}`,
         format,
@@ -142,7 +142,7 @@ const handleAddRulesetToProfile = async (
     }
 
     nextProfile.route.rules.splice(insertionPointIndex + 1, 0, {
-      ...DefaultRouteRule(),
+      ...createRouteRule(),
       payload: rulesetReferenceId,
       outbound: target,
     })

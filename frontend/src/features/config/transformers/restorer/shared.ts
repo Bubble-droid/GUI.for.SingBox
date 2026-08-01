@@ -1,5 +1,5 @@
 import { RouteRuleType, DnsRuleType } from '@/enums'
-import { createDefaultDialer, createDefaultDomainResolver } from '@/features/config/defaults'
+import { createDialer, createDomainResolver } from '@/features/config/defaults'
 import { extractProps, ensureArray } from '@/features/utils'
 
 import type {
@@ -38,7 +38,7 @@ export const restoreDomainResolver = (
   raw: SingBoxDomainResolver | string | undefined,
   maps: IdMaps,
 ): DomainResolver => {
-  const template = createDefaultDomainResolver()
+  const template = createDomainResolver()
   const normalizedResolver = !raw
     ? template
     : typeof raw === 'string'
@@ -59,7 +59,7 @@ export const restoreDialer = <T extends object>(
   dialer: Dialer
   rest: Omit<T, keyof Dialer>
 } => {
-  const template = createDefaultDialer()
+  const template = createDialer()
   const result = extractProps(raw, template)
   const owned = result.owned as SingBoxDialer
   const resolver = restoreDomainResolver(owned.domain_resolver, maps)

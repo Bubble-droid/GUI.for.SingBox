@@ -1,4 +1,4 @@
-import { DefaultDnsRule } from '@/constant'
+import { createDnsRule } from '@/constant'
 import { DnsRuleAction, RouteRuleType } from '@/enums'
 import { supportedRuleTypes } from '@/features/config/transformers/restorer/shared'
 
@@ -11,7 +11,7 @@ export const restoreDnsRules = (
   DnsServersIds: Recordable,
 ): DnsRuleConfig[] => {
   return rules.flatMap((raw: Recordable, i) => {
-    const rule = DefaultDnsRule()
+    const rule = createDnsRule()
     rule.id = 'rule-' + i
     rule.action = raw.action || DnsRuleAction.Route
 

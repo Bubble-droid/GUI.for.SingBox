@@ -1,4 +1,4 @@
-import { createDefaultLog, DefaultMixin, DefaultScript, ProfileSchemaVersion } from '@/constant'
+import { createLog, createMixin, createScript, ProfileSchemaVersion } from '@/constant'
 import { useProfilesStore } from '@/stores'
 import { sampleID, restoreExperimental } from '@/utils'
 
@@ -58,7 +58,7 @@ export const restoreProfile = (
     id: profile?.id || sampleID(),
     name,
     schema: ProfileSchemaVersion,
-    log: { ...createDefaultLog(), ...config.log },
+    log: { ...createLog(), ...config.log },
     ntp: restoreNtp(config.ntp, idMaps),
     experimental: restoreExperimental(config.experimental, idMaps),
     inbounds: restoreInbounds(config.inbounds || [], InboundsIds),
@@ -101,7 +101,7 @@ export const restoreProfile = (
       servers: restoreDnsServers(config.dns?.servers || [], DnsServersIds, OutboundsIds),
       rules: restoreDnsRules(config.dns?.rules || [], InboundsIds, RouteRuleSetIds, DnsServersIds),
     },
-    mixin: profile?.mixin || DefaultMixin(),
-    script: profile?.script || DefaultScript(),
+    mixin: profile?.mixin || createMixin(),
+    script: profile?.script || createScript(),
   }
 }
