@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
-	"guiforcores/bridge/platform/resolver"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -12,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	platform_path "guiforcores/bridge/platform/path"
 )
 
 type requestTransportKey struct {
@@ -31,7 +32,7 @@ func resolvePath(rawPath string) string {
 		return cleanPath
 	}
 
-	return resolver.Resolve(cleanPath)
+	return platform_path.Resolve(cleanPath)
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {

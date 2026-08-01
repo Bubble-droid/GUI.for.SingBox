@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	platformexec "guiforcores/bridge/platform/exec"
+	platform_exec "guiforcores/bridge/platform/exec"
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
 )
@@ -78,7 +78,7 @@ func ProcessFixedWebView2Runtime(resolvePathFunc func(string) string) string {
 	log.Printf("Found CAB file: %s\n", cabFile)
 
 	cmd := exec.Command("expand.exe", "-F:*", cabFile, webviewDir)
-	platformexec.SetCmdWindowHidden(cmd)
+	platform_exec.SetCmdWindowHidden(cmd)
 
 	log.Println("Extracting WebView2 Runtime...")
 	if err := cmd.Run(); err != nil {
