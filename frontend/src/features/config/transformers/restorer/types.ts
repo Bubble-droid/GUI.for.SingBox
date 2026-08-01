@@ -1,7 +1,11 @@
-import type { Profile } from '@/features/config/types'
+import type { OutboundConfig, Profile } from '@/features/config/types'
+
+export type GuiOutbound = Pick<OutboundConfig, 'exclude' | 'include' | 'hidden' | 'icon' | 'tag'>
 
 export interface RestoreProfileOptions {
-  profile?: Profile
+  profile?: Pick<Profile, 'id' | 'mixin' | 'script'> & {
+    outbounds: GuiOutbound[]
+  }
   subscriptionIds?: string[]
 }
 

@@ -1,11 +1,11 @@
-import { ProfileSchemaVersion } from '@/constant'
+import { createDefaultProfile, ProfileSchemaVersion } from '@/constant'
 import { RequestProxyMode } from '@/enums/app'
 
 import type { Profile } from '@/features/config/types'
 
-import { generateConfig, legacyGenerateConfig } from './generator'
+import { legacyGenerateConfig } from './generator'
 import { message } from './interaction'
-import { normalizeErrorMessage } from './others'
+import { deepAssign, normalizeErrorMessage } from './others'
 import { restoreProfile } from './restorer'
 
 export const migrateProfiles = async (
@@ -29,20 +29,41 @@ export const migrateProfiles = async (
     })
   })
 
+  const getSubIds = (profile: Profile | App.Profile) => {
+    return profile.outbounds.reduce((p, c) => {
+      c.outbounds.forEach((outbound) => {
+        if (outbound.type !== 'Built-in') {
+          const id = outbound.type === 'Subscription' ? outbound.id : outbound.type
+          p.add(id)
+        }
+      })
+      return p
+    }, new Set<string>())
+  }
+
+  const template = createDefaultProfile()
+
   for (const [i, p] of profiles.entries()) {
-    let newConfig: Recordable
+    const subIds = getSubIds(p)
     try {
       if (!('schema' in p)) {
-        newConfig = await legacyGenerateConfig(p)
-      } else if (p.schema !== ProfileSchemaVersion) {
-        newConfig = await generateConfig(p)
-      } else {
+        const newConfig = await legacyGenerateConfig(p)
+        const newProfile = restoreProfile(newConfig, p.name, {
+          profile: p,
+          subscriptionIds: [...subIds],
+        })
+
+        profiles[i] = newProfile
+        needSync = true
         continue
       }
 
-      const newProfile = restoreProfile(newConfig)
-      profiles[i] = newProfile
-      needSync = true
+      if (p.schema !== ProfileSchemaVersion) {
+        const newProfile = deepAssign(template, p)
+        newProfile.schema = ProfileSchemaVersion
+        profiles[i] = newProfile
+        needSync = true
+      }
     } catch (error) {
       message.error(
         `Failed to migrate profile [${p.name || p.id}]: ${normalizeErrorMessage(error)}`,

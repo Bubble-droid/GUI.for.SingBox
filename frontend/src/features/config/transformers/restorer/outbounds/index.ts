@@ -5,17 +5,19 @@ import { createTextMatcher } from '@/utils'
 
 import type { OutboundConfig, ProxyConfig } from '@/features/config/types'
 
+import type { GuiOutbound } from '../types'
+
 export const restoreOutbounds = (
   outbounds: Recordable[],
   OutboundsIds: Recordable,
-  originalOutbounds: OutboundConfig[],
+  originalOutbounds: GuiOutbound[],
   subscriptionIds: string[],
 ): OutboundConfig[] => {
   const subscribesStore = useSubscribesStore()
 
   const subscriptionCache = new Map<string, App.Subscription>()
   const proxyToSubMap = new Map<string, { sub: string; id: string }>()
-  const originalOutboundMap = new Map<string, OutboundConfig>()
+  const originalOutboundMap = new Map<string, GuiOutbound>()
 
   const groupTags = new Set(
     outbounds
