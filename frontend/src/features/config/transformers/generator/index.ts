@@ -11,11 +11,13 @@ import { _adaptToStableBranch } from './adapter'
 import { generateDns } from './dns'
 import { generateExperimental } from './experimental'
 import { generateInbounds } from './inbounds'
+import { generateNtp } from './ntp'
 import { generateOutbounds } from './outbounds'
 import { generateRoute } from './route'
 import type { GenerateConfigOptions, TagMaps } from './types'
 
 export * from './shared'
+export * from './ntp'
 export * from './inbounds'
 export * from './outbounds'
 export * from './route'
@@ -46,11 +48,13 @@ export const generateConfig = async (
 
   const tagMaps: TagMaps = {
     outbounds: buildIdTagMapping(profile.outbounds),
+    dnsServers: buildIdTagMapping(profile.dns.servers),
   }
 
   // step 1
   let config: Recordable = {
     log: filterInvalidProps(profile.log),
+    ntp: generateNtp(profile.ntp, tagMaps),
     experimental: generateExperimental(profile.experimental, tagMaps),
     inbounds: generateInbounds(profile.inbounds),
     outbounds: await generateOutbounds(profile.outbounds),

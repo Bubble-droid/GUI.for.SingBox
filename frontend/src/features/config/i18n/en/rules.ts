@@ -26,6 +26,17 @@ export const rules = {
     inline: 'Inline',
   },
   action: {
+    title: 'Rule Action Configuration',
+    name: 'Rule Action',
+    'route-options': {
+      title: 'Route Options Configuration',
+      name: 'Route Option Settings',
+      disable_cache: 'Disable DNS Cache',
+      disable_optimistic_cache: 'Disable Optimistic Cache',
+      rewrite_ttl: 'Rewrite TTL',
+      timeout: 'Query Timeout',
+      client_subnet: 'Client Subnet',
+    },
     reject: {
       name: 'Reject Connection',
       method: {

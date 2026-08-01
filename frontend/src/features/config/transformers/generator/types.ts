@@ -7,4 +7,5 @@ export interface GenerateConfigOptions {
 
 export interface TagMaps {
   outbounds: Map<string, string>
+  dnsServers: Map<string, string>
 }

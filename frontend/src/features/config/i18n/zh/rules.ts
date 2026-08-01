@@ -24,6 +24,17 @@ export const rules = {
     inline: '内联(Inline)',
   },
   action: {
+    title: '规则动作配置',
+    name: '规则动作',
+    'route-options': {
+      title: '路由选项配置',
+      name: '路由设置选项',
+      disable_cache: '禁用 DNS 缓存',
+      disable_optimistic_cache: '禁用乐观缓存',
+      rewrite_ttl: '重写 TTL',
+      timeout: '查询超时',
+      client_subnet: '客户端子网',
+    },
     reject: {
       name: '拒绝连接',
       method: {

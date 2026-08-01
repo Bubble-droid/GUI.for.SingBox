@@ -201,6 +201,7 @@ export default {
     step: {
       name: 'Name',
       log: 'Log',
+      ntp: 'NTP',
       experimental: 'Experimental',
       inbounds: 'Inbounds',
       outbounds: 'Outbounds',

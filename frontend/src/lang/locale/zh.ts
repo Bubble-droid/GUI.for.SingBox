@@ -198,6 +198,7 @@ export default {
     step: {
       name: '名称设置',
       log: '日志设置',
+      ntp: 'NTP 设置',
       experimental: '实验性设置',
       inbounds: '入站设置',
       outbounds: '出站设置',

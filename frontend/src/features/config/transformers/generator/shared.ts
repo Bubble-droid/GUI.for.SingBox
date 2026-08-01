@@ -1,12 +1,37 @@
 import { RouteRuleType, DnsRuleType } from '@/enums'
+import { filterInvalidProps } from '@/features/utils'
 import { deepAssign } from '@/utils'
 
 import type {
+  Dialer,
   DnsRuleConfig,
+  DomainResolver,
   InboundConfig,
   RouteRuleConfig,
   RuleSetConfig,
+  SingBoxDialer,
+  SingBoxDomainResolver,
 } from '@/features/config/types'
+
+import type { TagMaps } from './types'
+
+export const generateDomainResolver = (
+  resolver: DomainResolver,
+  maps: TagMaps,
+): SingBoxDomainResolver => {
+  return filterInvalidProps({
+    ...(resolver as SingBoxDomainResolver),
+    server: maps.dnsServers.get(resolver.server)!,
+  })
+}
+
+export const generateDialer = (dialer: Dialer, maps: TagMaps): SingBoxDialer => {
+  return {
+    ...(dialer as SingBoxDialer),
+    detour: maps.outbounds.get(dialer.detour)!,
+    domain_resolver: generateDomainResolver(dialer.domain_resolver, maps),
+  }
+}
 
 export const _generateRule = (
   rule: RouteRuleConfig | DnsRuleConfig,
