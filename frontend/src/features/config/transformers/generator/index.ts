@@ -1,7 +1,7 @@
 import { parse } from 'yaml'
 
 import { Branch } from '@/enums/app'
-import { filterInvalidProps } from '@/features/config/utils'
+import { filterInvalidProps } from '@/features/utils'
 import { useAppSettingsStore, usePluginsStore } from '@/stores'
 import { deepAssign, deepClone } from '@/utils'
 
