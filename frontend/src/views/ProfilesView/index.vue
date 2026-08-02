@@ -32,6 +32,7 @@ const menuList: App.Menu[] = [
   'profile.step.log',
   'profile.step.ntp',
   'profile.step.experimental',
+  'profile.step.endpoints',
   'profile.step.inbounds',
   'profile.step.outbounds',
   'profile.step.route',

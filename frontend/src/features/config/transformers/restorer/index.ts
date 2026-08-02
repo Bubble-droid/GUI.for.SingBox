@@ -6,6 +6,7 @@ import type { Profile } from '@/features/config/types'
 
 import { restoreDnsServers } from './dns'
 import { restoreDnsRules } from './dns/rules'
+import { restoreEndpoints } from './endpoints'
 import { restoreInbounds } from './inbounds'
 import { restoreNtp } from './ntp'
 import { restoreOutbounds } from './outbounds'
@@ -47,10 +48,12 @@ export const restoreProfile = (
   const RouteRuleSetIds = legacyBuildTagIdMapping('ruleset-', config.route?.rule_set)
   const DnsServersIds = legacyBuildTagIdMapping('dns-', config.dns?.servers)
 
+  const endpointIds = buildTagIdMapping('ep-', config.endpoints)
   const outboundIds = buildTagIdMapping('out-', config.outbounds)
 
   const idMaps: IdMaps = {
-    outbounds: outboundIds,
+    endpoints: endpointIds,
+    outbounds: new Map([...endpointIds, ...outboundIds]),
     dnsServers: buildTagIdMapping('dns-', config.dns?.servers),
   }
 
@@ -61,6 +64,7 @@ export const restoreProfile = (
     log: { ...createLog(), ...config.log },
     ntp: restoreNtp(config.ntp, idMaps),
     experimental: restoreExperimental(config.experimental, idMaps),
+    endpoints: restoreEndpoints(config.endpoints, idMaps),
     inbounds: restoreInbounds(config.inbounds || [], InboundsIds),
     outbounds: restoreOutbounds(
       config.outbounds || [],

@@ -1,6 +1,8 @@
 import type {
   SingBoxDialer,
   SingBoxDomainResolver,
+  SingBoxEndpoint,
+  SingBoxEndpointOf,
   SingBoxLogConfig,
 } from '@/features/config/types'
 import type { ValueOf } from '@/features/types'
@@ -24,6 +26,16 @@ export const ClashMode = {
 } as const
 
 export type ClashMode = ValueOf<typeof ClashMode>
+
+export const Endpoint = {
+  WireGuard: 'wireguard',
+  Tailscale: 'tailscale',
+  OpenConnect: 'openconnect',
+  OpenVpnClient: 'openvpn-client',
+  OpenVpnServer: 'openvpn-server',
+} as const satisfies Recordable<SingBoxEndpoint['type'] | 'openconnect'>
+
+export type Endpoint = ValueOf<typeof Endpoint>
 
 export const Inbound = {
   Direct: 'direct',
@@ -210,3 +222,11 @@ export const NetworkStrategy = {
 } as const satisfies Recordable<SingBoxDialer['network_strategy']>
 
 export type NetworkStrategy = ValueOf<typeof NetworkStrategy>
+
+export const UdpNatBehavior = {
+  EndpointIndependent: 'endpoint_independent',
+  AddressDependent: 'address_dependent',
+  AddressAndPortDependent: 'address_and_port_dependent',
+} as const satisfies Recordable<SingBoxEndpointOf<'wireguard'>['udp_mapping']>
+
+export type UdpNatBehavior = ValueOf<typeof UdpNatBehavior>

@@ -1,5 +1,5 @@
 import { RouteRuleType, DnsRuleType } from '@/enums'
-import { createDialer, createDomainResolver } from '@/features/config/defaults'
+import { createDialer, createDomainResolver, createUdpNat } from '@/features/config/defaults'
 import { extractProps, ensureArray } from '@/features/utils'
 
 import type {
@@ -7,6 +7,8 @@ import type {
   DomainResolver,
   Dialer,
   SingBoxDialer,
+  UdpNat,
+  SingBoxUdpNat,
 } from '@/features/config/types'
 
 import type { IdMaps } from './types'
@@ -72,4 +74,17 @@ export const restoreDialer = <T extends object>(
     domain_resolver: resolver,
   }
   return { dialer, rest: result.rest }
+}
+
+export const restoreUdpNat = <T extends object>(
+  raw: T,
+): { udpNat: UdpNat; rest: Omit<T, keyof UdpNat> } => {
+  const template = createUdpNat()
+  const result = extractProps(raw, template)
+  const owned = result.owned as SingBoxUdpNat
+  const udpNat = {
+    ...template,
+    ...owned,
+  } as UdpNat
+  return { udpNat, rest: result.rest }
 }

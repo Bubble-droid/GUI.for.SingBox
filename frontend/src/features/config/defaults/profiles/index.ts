@@ -14,12 +14,13 @@ export * from './shared'
 export * from './log'
 export * from './ntp'
 export * from './experimental'
+export * from './endpoints'
 export * from './inbounds'
 export * from './outbounds'
 export * from './route'
 export * from './dns'
 
-export const ProfileSchemaVersion = 'v0.2.0'
+export const ProfileSchemaVersion = 'v0.3.0'
 
 export const createMixin = (): MixinConfig => {
   return { priority: 'mixin', format: 'json', config: '{}' }
@@ -36,6 +37,7 @@ export const createProfile = (name = ''): Profile => ({
   log: createLog(),
   ntp: createNtp(),
   experimental: createExperimental(),
+  endpoints: [],
   inbounds: createInbounds(),
   outbounds: createOutbounds(),
   route: createRoute(),

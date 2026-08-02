@@ -1,0 +1,31 @@
+export const endpoints = {
+  title: '端点',
+  type: {
+    title: '端点类型',
+    wireguard: 'WireGuard',
+    tailscale: 'Tailscale',
+    openconnect: 'OpenConnect 客户端',
+    'openvpn-client': 'OpenVPN 客户端',
+    'openvpn-server': 'OpenVPN 服务器',
+  },
+  tag: '端点标签',
+  wireguard: {
+    system: '系统接口',
+    name: '接口名称',
+    mtu: 'MTU',
+    address: '接口地址',
+    private_key: '私钥',
+    listen_port: '监听端口',
+    peers: {
+      title: '对等节点',
+      address: '对端地址',
+      port: '对端端口',
+      public_key: '对端公钥',
+      pre_shared_key: '预共享密钥',
+      allowed_ips: '允许的 IP',
+      persistent_keepalive_interval: '保活间隔',
+      reserved: '保留字节',
+    },
+    workers: '工作线程数',
+  },
+}

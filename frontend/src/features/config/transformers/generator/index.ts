@@ -9,6 +9,7 @@ import type { Profile, TagItem } from '@/features/config/types'
 
 import { _adaptToStableBranch } from './adapter'
 import { generateDns } from './dns'
+import { generateEndpoints } from './endpoints'
 import { generateExperimental } from './experimental'
 import { generateInbounds } from './inbounds'
 import { generateNtp } from './ntp'
@@ -18,6 +19,7 @@ import type { GenerateConfigOptions, TagMaps } from './types'
 
 export * from './shared'
 export * from './ntp'
+export * from './endpoints'
 export * from './inbounds'
 export * from './outbounds'
 export * from './route'
@@ -47,7 +49,7 @@ export const generateConfig = async (
   const profile = deepClone(originalProfile)
 
   const tagMaps: TagMaps = {
-    outbounds: buildIdTagMapping(profile.outbounds),
+    outbounds: buildIdTagMapping([...profile.endpoints, ...profile.outbounds]),
     dnsServers: buildIdTagMapping(profile.dns.servers),
   }
 
@@ -56,6 +58,7 @@ export const generateConfig = async (
     log: filterInvalidProps(profile.log),
     ntp: generateNtp(profile.ntp, tagMaps),
     experimental: generateExperimental(profile.experimental, tagMaps),
+    endpoints: generateEndpoints(profile.endpoints, tagMaps),
     inbounds: generateInbounds(profile.inbounds),
     outbounds: await generateOutbounds(profile.outbounds),
     route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns),

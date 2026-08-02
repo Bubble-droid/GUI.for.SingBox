@@ -62,4 +62,16 @@ export const shared = {
     cellular_only: '仅蜂窝网络',
     ethernet_only: '仅以太网',
   },
+  udp_nat: {
+    title: 'UDP NAT 配置',
+    udp_timeout: 'UDP NAT 超时时间',
+    udp_mapping: 'UDP NAT 映射行为',
+    udp_filtering: 'UDP NAT 过滤行为',
+    udp_nat_max: 'UDP NAT 最大会话数',
+    behavior: {
+      endpoint_independent: '端点无关',
+      address_dependent: '地址相关',
+      address_and_port_dependent: '地址与端口相关',
+    },
+  },
 }

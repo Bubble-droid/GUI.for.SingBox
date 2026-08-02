@@ -203,6 +203,7 @@ export default {
       log: 'Log',
       ntp: 'NTP',
       experimental: 'Experimental',
+      endpoints: 'Endpoints',
       inbounds: 'Inbounds',
       outbounds: 'Outbounds',
       route: 'Route',

@@ -1,5 +1,6 @@
 import type { MessageSchema } from '../types'
 import { dns } from './dns'
+import { endpoints } from './endpoints'
 import { experimental } from './experimental'
 import { inbounds } from './inbounds'
 import { log } from './log'
@@ -22,6 +23,7 @@ export const kernel = {
   experimental,
   clash_api: experimental.clash_api,
   cache_file: experimental.cache_file,
+  endpoints,
   inbounds,
   outbounds,
   rules,

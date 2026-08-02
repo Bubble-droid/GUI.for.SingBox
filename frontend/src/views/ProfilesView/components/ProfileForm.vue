@@ -9,6 +9,7 @@ import Button from '@/components/Button/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'
 
 import type { Profile } from '@/features/config/types'
+import type { ComponentOption } from '@/features/types'
 
 interface Props {
   id?: string
@@ -20,11 +21,12 @@ enum Step {
   Log = 1,
   Ntp = 2,
   Experimental = 3,
-  Inbounds = 4,
-  Outbounds = 5,
-  Route = 6,
-  Dns = 7,
-  MixinScript = 8,
+  Endpoints = 4,
+  Inbounds = 5,
+  Outbounds = 6,
+  Route = 7,
+  Dns = 8,
+  MixinScript = 9,
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,7 +35,12 @@ const props = withDefaults(defineProps<Props>(), {
   step: Step.Name,
 })
 
-import { ExperimentalConfig, LogConfig, NtpConfig } from '@/features/config/views/ProfilesView'
+import {
+  EndpointsConfig,
+  ExperimentalConfig,
+  LogConfig,
+  NtpConfig,
+} from '@/features/config/views/ProfilesView'
 
 import DnsConfig from './DnsConfig.vue'
 import InboundsConfig from './InboundsConfig.vue'
@@ -42,6 +49,7 @@ import OutboundsConfig from './OutboundsConfig.vue'
 import RouteConfig from './RouteConfig.vue'
 
 const { t } = useI18n()
+const endpointsRef = useTemplateRef('endpointsRef')
 const inboundsRef = useTemplateRef('inboundsRef')
 const outboundsRef = useTemplateRef('outboundsRef')
 const routeRef = useTemplateRef('routeRef')
@@ -56,6 +64,7 @@ const stepItems = [
   { title: 'profile.step.log' },
   { title: 'profile.step.ntp' },
   { title: 'profile.step.experimental' },
+  { title: 'profile.step.endpoints' },
   { title: 'profile.step.inbounds' },
   { title: 'profile.step.outbounds' },
   { title: 'profile.step.route' },
@@ -65,12 +74,18 @@ const stepItems = [
 
 const profile = ref<Profile>(profilesStore.getProfileTemplate())
 
-const inboundOptions = computed(() =>
-  profile.value.inbounds.map((v) => ({ label: v.tag, value: v.id })),
+const inboundOptions = computed<ComponentOption[]>(() =>
+  [...profile.value.endpoints, ...profile.value.inbounds].map((v) => ({
+    label: v.tag,
+    value: v.id,
+  })),
 )
 
-const outboundOptions = computed(() =>
-  profile.value.outbounds.map((v) => ({ label: v.tag, value: v.id })),
+const outboundOptions = computed<ComponentOption[]>(() =>
+  [...profile.value.endpoints, ...profile.value.outbounds].map((v) => ({
+    label: v.tag,
+    value: v.id,
+  })),
 )
 
 const serverOptions = computed(() =>
@@ -110,6 +125,7 @@ const handleSave = async () => {
 
 const handleAdd = () => {
   const map: Record<number, Ref> = {
+    [Step.Endpoints]: endpointsRef,
     [Step.Inbounds]: inboundsRef,
     [Step.Outbounds]: outboundsRef,
     [Step.Route]: routeRef,
@@ -179,7 +195,9 @@ const modalSlots = {
       type: 'text',
       icon: 'add',
       style: {
-        display: [Step.Inbounds, Step.Outbounds, Step.Route, Step.Dns].includes(currentStep.value)
+        display: [Step.Endpoints, Step.Inbounds, Step.Outbounds, Step.Route, Step.Dns].includes(
+          currentStep.value,
+        )
           ? ''
           : 'none',
       },
@@ -253,6 +271,15 @@ defineExpose({ modalSlots })
     </div>
     <div v-if="currentStep === Step.Experimental">
       <ExperimentalConfig v-model="profile.experimental" :outbound-options="outboundOptions" />
+    </div>
+    <div v-if="currentStep === Step.Endpoints">
+      <EndpointsConfig
+        ref="endpointsRef"
+        v-model="profile.endpoints"
+        :inbound-options="inboundOptions"
+        :outbound-options="outboundOptions"
+        :dns-server-options="serverOptions"
+      />
     </div>
     <div v-if="currentStep === Step.Inbounds">
       <InboundsConfig ref="inboundsRef" v-model="profile.inbounds" />
