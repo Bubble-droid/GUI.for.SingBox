@@ -24,6 +24,11 @@ export type SingBoxDomainResolver = Extract<
 
 export type SingBoxDialer = Omit<SingBoxOutboundOf<'direct'>, 'tag' | 'type'>
 
+export type SingBoxUdpNat = Pick<
+  SingBoxEndpointOf<'wireguard'>,
+  'udp_timeout' | 'udp_mapping' | 'udp_filtering' | 'udp_nat_max'
+>
+
 export type SingBoxNtp = NonNullable<SingBoxConfig['ntp']>
 
 export type SingBoxOutbound = Extract<
@@ -33,5 +38,15 @@ export type SingBoxOutbound = Extract<
 
 export type SingBoxOutboundOf<T extends SingBoxOutbound['type']> = Extract<
   SingBoxOutbound,
+  { type: T }
+>
+
+export type SingBoxEndpoint = Extract<
+  UnpackArray<NonNullable<SingBoxConfig['endpoints']>>,
+  { type: unknown }
+>
+
+export type SingBoxEndpointOf<T extends SingBoxEndpoint['type']> = Extract<
+  SingBoxEndpoint,
   { type: T }
 >

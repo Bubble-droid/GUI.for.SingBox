@@ -1,4 +1,4 @@
-import type { DomainStrategy, NetworkStrategy, NetworkType } from '@/enums'
+import type { DomainStrategy, NetworkStrategy, NetworkType, UdpNatBehavior } from '@/enums'
 
 export type OutboundId = string
 export type DnsServerId = string
@@ -6,6 +6,14 @@ export type DnsServerId = string
 export interface TagItem {
   id: string
   tag: string
+}
+
+export interface ProfileBase extends TagItem {
+  fields: string
+}
+
+export interface Switchable extends ProfileBase {
+  enable: boolean
 }
 
 export interface DnsRouteOptions {
@@ -44,4 +52,11 @@ export interface Dialer {
   fallback_network_type: NetworkType[]
   fallback_delay: string
   network_fallback_delay: string
+}
+
+export interface UdpNat {
+  udp_timeout: string
+  udp_mapping: UdpNatBehavior
+  udp_filtering: UdpNatBehavior
+  udp_nat_max: number
 }

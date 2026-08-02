@@ -1,5 +1,16 @@
+import { sampleID } from '@/utils'
+
+import type { UdpNatBehavior } from '@/enums'
 import type { DomainStrategy, NetworkStrategy } from '@/enums'
-import type { Dialer, DnsRouteOptions, DomainResolver } from '@/features/config/types'
+import type {
+  Dialer,
+  DnsRouteOptions,
+  DomainResolver,
+  ProfileBase,
+  Switchable,
+  TagItem,
+  UdpNat,
+} from '@/features/config/types'
 
 export const DefaultOutboundIds = {
   Select: 'outbound-select',
@@ -31,6 +42,21 @@ export const DefaultDnsServersIds = {
   LocalDnsResolver: 'Local-DNS-Resolver',
   RemoteDnsResolver: 'Remote-DNS-Resolver',
 } as const
+
+export const createTagItem = (): TagItem => ({
+  id: sampleID(),
+  tag: '',
+})
+
+export const createProfileBase = (): ProfileBase => ({
+  ...createTagItem(),
+  fields: '{}',
+})
+
+export const createSwitchable = (): Switchable => ({
+  ...createProfileBase(),
+  enable: true,
+})
 
 export const createDnsRouteOptions = (): DnsRouteOptions => ({
   disable_cache: false,
@@ -69,4 +95,11 @@ export const createDialer = (): Dialer => ({
   fallback_network_type: [],
   fallback_delay: '',
   network_fallback_delay: '',
+})
+
+export const createUdpNat = (): UdpNat => ({
+  udp_timeout: '',
+  udp_mapping: '' as UdpNatBehavior,
+  udp_filtering: '' as UdpNatBehavior,
+  udp_nat_max: 0,
 })

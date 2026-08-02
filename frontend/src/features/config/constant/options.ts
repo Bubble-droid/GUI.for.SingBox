@@ -20,6 +20,8 @@ import {
   DnsRuleType,
   NetworkStrategy,
   NetworkType,
+  Endpoint,
+  UdpNatBehavior,
 } from './kernel'
 
 type FormatString<
@@ -108,6 +110,8 @@ export const PredefinedNtpServerOptions = [
   },
 ] satisfies ComponentOption[]
 
+export const EndpointOptions = defineOptions(Endpoint, 'kernel.endpoints.type.{{val}}')
+
 export const InboundOptions = defineOptions(Inbound, '{{val}}')
 
 export const OutboundOptions = defineOptions(Outbound, 'kernel.outbounds.{{val}}')
@@ -161,4 +165,9 @@ export const NetworkTypeOptions = defineOptions(NetworkType, 'kernel.shared.netw
 export const NetworkStrategyOptions = defineOptions(
   NetworkStrategy,
   'kernel.shared.network_strategy.{{val}}',
+)
+
+export const UdpNatBehaviorOptions = defineOptions(
+  UdpNatBehavior,
+  'kernel.shared.udp_nat.behavior.{{val}}',
 )

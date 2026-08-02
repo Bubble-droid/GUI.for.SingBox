@@ -200,6 +200,7 @@ export default {
       log: '日志设置',
       ntp: 'NTP 设置',
       experimental: '实验性设置',
+      endpoints: '端点设置',
       inbounds: '入站设置',
       outbounds: '出站设置',
       route: '路由设置',

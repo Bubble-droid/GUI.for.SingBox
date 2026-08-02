@@ -11,6 +11,8 @@ import type {
   RuleSetConfig,
   SingBoxDialer,
   SingBoxDomainResolver,
+  SingBoxUdpNat,
+  UdpNat,
 } from '@/features/config/types'
 
 import type { TagMaps } from './types'
@@ -31,6 +33,10 @@ export const generateDialer = (dialer: Dialer, maps: TagMaps): SingBoxDialer => 
     detour: maps.outbounds.get(dialer.detour)!,
     domain_resolver: generateDomainResolver(dialer.domain_resolver, maps),
   }
+}
+
+export const generateUdpNat = (udpNat: UdpNat): SingBoxUdpNat => {
+  return { ...(udpNat as SingBoxUdpNat) }
 }
 
 export const _generateRule = (

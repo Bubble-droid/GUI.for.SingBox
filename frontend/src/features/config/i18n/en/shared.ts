@@ -64,4 +64,16 @@ export const shared = {
     cellular_only: 'Cellular Only',
     ethernet_only: 'Ethernet Only',
   },
+  udp_nat: {
+    title: 'UDP NAT Configuration',
+    udp_timeout: 'UDP NAT Timeout',
+    udp_mapping: 'UDP NAT Mapping Behavior',
+    udp_filtering: 'UDP NAT Filtering Behavior',
+    udp_nat_max: 'Max UDP NAT Sessions',
+    behavior: {
+      endpoint_independent: 'Endpoint Independent',
+      address_dependent: 'Address Dependent',
+      address_and_port_dependent: 'Address and Port Dependent',
+    },
+  },
 } satisfies MessageSchema['shared']
