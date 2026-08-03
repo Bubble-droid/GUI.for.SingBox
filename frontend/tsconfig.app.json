@@ -9,8 +9,18 @@
     "lib": ["ESNext", "DOM"],
 
     "paths": {
-      "@/*": ["./src/*"],
-      "@wails/*": ["./src/bridge/wailsjs/*"]
+      "@wails/*": ["./src/bridge/wailsjs/*"],
+      "@defaults": ["./src/features/defaults"],
+      "@defaults/*": ["./src/features/defaults/*"],
+      "@generator": ["./src/features/transformers/generator"],
+      "@generator/*": ["./src/features/transformers/generator/*"],
+      "@restorer": ["./src/features/transformers/restorer"],
+      "@restorer/*": ["./src/features/transformers/restorer/*"],
+      "@profiles": ["./src/features/types/profiles"],
+      "@profiles/*": ["./src/features/types/profiles/*"],
+      "@views/*": ["./src/features/views/*"],
+      "@features/*": ["./src/features/*"],
+      "@/*": ["./src/*"]
     },
 
     // Style Options

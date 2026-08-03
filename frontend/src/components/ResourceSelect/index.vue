@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { Profile } from '@profiles'
 import { computed, nextTick, onMounted, type SetupContext, type Slot } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -10,8 +11,6 @@ import {
   useSubscribesStore,
 } from '@/stores'
 import { message, modal } from '@/utils'
-
-import type { Profile } from '@/features/config/types'
 
 type ResourceType = 'profile' | 'subscription' | 'ruleset' | 'plugin' | 'scheduledtask'
 type ResourceItem = Profile | App.Subscription | App.RuleSet | App.Plugin | App.ScheduledTask

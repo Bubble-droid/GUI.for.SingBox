@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { generateConfig } from '@generator'
+import type { Profile } from '@profiles'
 import { useI18n, I18nT } from 'vue-i18n'
 
 import { ClipboardSetText } from '@/bridge'
@@ -12,9 +14,8 @@ import {
   usePluginsStore,
   useAppStore,
 } from '@/stores'
-import { debounce, deepClone, generateConfig, message, sampleID, alert, modal } from '@/utils'
-
-import type { Profile } from '@/features/config/types'
+import { alert, message, modal } from '@/utils/interaction.ts'
+import { deepClone, sampleID, debounce } from '@/utils/others.ts'
 
 import ProfileEditor from './components/ProfileEditor.vue'
 import ProfileForm from './components/ProfileForm.vue'

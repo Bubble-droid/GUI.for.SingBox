@@ -1,6 +1,7 @@
+import { PredefinedClashModeOptions } from '@features/constant/options'
+
 import { RestartApp } from '@/bridge'
 import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { PredefinedClashModeOptions } from '@/constant/kernel'
 import { PluginTrigger, PluginTriggerEvent } from '@/enums/app'
 import useI18n from '@/lang'
 import {

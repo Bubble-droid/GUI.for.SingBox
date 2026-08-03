@@ -1,3 +1,7 @@
+import { createInboundMixed } from '@defaults/inbounds'
+import { Inbound, TunStack, RuleSetType } from '@features/constant/kernel'
+import type { Profile } from '@profiles'
+import { restoreProfile } from '@restorer'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -21,9 +25,7 @@ import {
   CorePidFilePath,
   CoreWorkingDirectory,
 } from '@/constant/kernel'
-import { createInboundMixed } from '@/constant/profile'
 import { Branch } from '@/enums/app'
-import { Inbound, RuleSetType, TunStack } from '@/enums/kernel'
 import {
   useAppSettingsStore,
   useProfilesStore,
@@ -38,7 +40,6 @@ import {
   updateTrayAndMenus,
   getKernelFileName,
   normalizeProxyHost,
-  restoreProfile,
   deepClone,
   message,
   getKernelRuntimeArgs,
@@ -47,7 +48,6 @@ import {
   sleep,
 } from '@/utils'
 
-import type { Profile } from '@/features/config/types'
 import type { CoreApiConfig, CoreApiProxy } from '@/types/kernel'
 
 export type ProxyType = 'mixed' | 'http' | 'socks'

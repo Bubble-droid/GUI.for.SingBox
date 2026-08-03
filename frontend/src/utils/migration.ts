@@ -1,12 +1,12 @@
-import { createProfile, ProfileSchemaVersion } from '@/constant'
-import { RequestProxyMode } from '@/enums/app'
+import { createProfile, ProfileSchemaVersion } from '@defaults'
+import type { Profile } from '@profiles'
+import { restoreProfile } from '@restorer'
 
-import type { Profile } from '@/features/config/types'
+import { RequestProxyMode } from '@/enums/app'
 
 import { legacyGenerateConfig } from './generator'
 import { message } from './interaction'
 import { deepAssign, normalizeErrorMessage } from './others'
-import { restoreProfile } from './restorer'
 
 export const migrateProfiles = async (
   profiles: (Profile | App.Profile)[],

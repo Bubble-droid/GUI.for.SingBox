@@ -1,5 +1,0 @@
-export { default as PortInput } from './PortInput.vue'
-export { default as DnsRouteOptionsConfig } from './DnsRouteOptionsConfig.vue'
-export { default as DomainResolverConfig } from './DomainResolverConfig.vue'
-export { default as DialerConfig } from './DialerConfig.vue'
-export { default as UdpNatConfig } from './UdpNatConfig.vue'

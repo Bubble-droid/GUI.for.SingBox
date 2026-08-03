@@ -1,3 +1,4 @@
+import type { Profile } from '@profiles'
 import { render, h, type VNode } from 'vue'
 
 import i18n from '@/lang'
@@ -16,7 +17,6 @@ import type { MessageIcon } from '@/components/Message/index.vue'
 import type { Props as ModalProps, Slots as ModalSlots } from '@/components/Modal/index.vue'
 import type { PickerItem } from '@/components/Picker/index.vue'
 import type { ResourceSelectProps } from '@/components/ResourceSelect/index.vue'
-import type { Profile } from '@/features/config/types'
 
 const ContainerCssText = `
     position: fixed;

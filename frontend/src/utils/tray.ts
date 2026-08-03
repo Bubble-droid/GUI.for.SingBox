@@ -1,3 +1,5 @@
+import { PredefinedClashModeOptions } from '@features/constant/options'
+
 import {
   Notify,
   RestartApp,
@@ -7,7 +9,6 @@ import {
   UpdateTrayAndMenus,
 } from '@/bridge'
 import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { PredefinedClashModeOptions } from '@/constant/kernel'
 import { OS } from '@/enums/app'
 import i18n from '@/lang'
 import {

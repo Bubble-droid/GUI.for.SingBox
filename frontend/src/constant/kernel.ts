@@ -1,6 +1,4 @@
-import { Outbound } from '@/enums/kernel'
-
-export * from '@/features/config/constant/options'
+import { Outbound } from '@features/constant/kernel'
 
 export const CoreWorkingDirectory = 'data/sing-box'
 export const CorePidFilePath = CoreWorkingDirectory + '/pid.txt'

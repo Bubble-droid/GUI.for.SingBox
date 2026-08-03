@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { TunStackOptions } from '@features/constant/options'
 import { useI18n } from 'vue-i18n'
 
-import { TunStackOptions } from '@/constant/kernel'
 import { useKernelApiStore } from '@/stores'
 import { message } from '@/utils'
 
