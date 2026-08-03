@@ -3,7 +3,8 @@ import { useRoute } from 'vue-router'
 
 import { useAppSettingsStore } from '@/stores'
 
-import { NavigationBar, TitleBar } from '@/components'
+import NavigationBar from './NavigationBar.vue'
+import TitleBar from './TitleBar.vue'
 
 const route = useRoute()
 const appSettings = useAppSettingsStore()

@@ -28,7 +28,7 @@ import {
   APP_IDENTIFIER,
 } from '@/utils'
 
-import { AboutView } from '@/components'
+import AboutView from '@/components/_common/AboutView.vue'
 
 import type { GitHubApiRelease } from '@/types/github'
 
