@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { RuleSetFormat } from '@features/constant/kernel'
+import { RuleSetFormatOptions } from '@features/constant/options'
 import { ref, inject, watch, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { RuleSetFormatOptions } from '@/constant/kernel'
-import { RuleSetFormat } from '@/enums/kernel'
 import { useRulesetsStore } from '@/stores'
 import { deepClone, message, sampleID } from '@/utils'
 

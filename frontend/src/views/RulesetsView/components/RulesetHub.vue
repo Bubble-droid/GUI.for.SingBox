@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { createRouteRuleset, createRouteRule } from '@defaults/route'
+import { RuleSetFormat, RouteRuleType, RuleSetType } from '@features/constant/kernel'
 import { computed, h, inject, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { HttpGet } from '@/bridge'
 import { BuiltInOutbound } from '@/constant/kernel'
-import { createRouteRule, createRouteRuleset } from '@/constant/profile'
-import { RuleSetFormat, RuleSetType, RouteRuleType } from '@/enums/kernel'
 import { useProfilesStore, useRulesetsStore } from '@/stores'
 import { alert, deepClone, message, picker } from '@/utils'
 

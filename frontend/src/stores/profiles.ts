@@ -1,14 +1,13 @@
+import { createProfile } from '@defaults'
+import type { Profile } from '@profiles'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { parse } from 'yaml'
 
 import { ReadFile, WriteFile } from '@/bridge'
-import { createProfile } from '@/constant'
 import { ProfilesFilePath } from '@/constant/app'
 import { useAppSettingsStore } from '@/stores'
 import { ignoredError, eventBus, stringifyNoFolding, migrateProfiles } from '@/utils'
-
-import type { Profile } from '@/features/config/types'
 
 export const useProfilesStore = defineStore('profiles', () => {
   const appSettingsStore = useAppSettingsStore()

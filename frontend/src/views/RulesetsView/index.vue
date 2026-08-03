@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { createRouteRuleset, createRouteRule } from '@defaults/route.ts'
+import { RuleSetFormat, RouteRuleType, RuleSetType } from '@features/constant/kernel.ts'
 import { computed } from 'vue'
 import { useI18n, I18nT } from 'vue-i18n'
 
 import { RemoveFile, WriteFile, OpenURI } from '@/bridge'
 import { DraggableOptions, ViewOptions } from '@/constant/app'
 import { BuiltInOutbound, EmptyRuleSet } from '@/constant/kernel'
-import { createRouteRule, createRouteRuleset } from '@/constant/profile'
 import { View } from '@/enums/app'
-import { RuleSetFormat, RuleSetType, RouteRuleType } from '@/enums/kernel'
 import { useRulesetsStore, useAppSettingsStore, useProfilesStore } from '@/stores'
 import {
   debounce,

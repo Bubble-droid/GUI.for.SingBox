@@ -1,3 +1,4 @@
+import type { Profile } from '@profiles'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { parse } from 'yaml'
@@ -18,8 +19,6 @@ import {
   readonly,
   base64Encode,
 } from '@/utils'
-
-import type { Profile } from '@/features/config/types'
 
 interface PluginRuntimeCache {
   plugin: App.Plugin

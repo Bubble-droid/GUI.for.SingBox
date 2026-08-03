@@ -1,15 +1,26 @@
 <script setup lang="ts">
+import type { ComponentOption } from '@features/types/views.ts'
+import { generateConfig } from '@generator'
+import type { Profile } from '@profiles'
+import DnsConfig from '@views/DnsConfig.vue'
+import EndpointsConfig from '@views/EndpointsConfig/EndpointsConfig.vue'
+import ExperimentalConfig from '@views/ExperimentalConfig.vue'
+import InboundsConfig from '@views/InboundsConfig.vue'
+import LogConfig from '@views/LogConfig.vue'
+import NtpConfig from '@views/NtpConfig.vue'
+import OutboundsConfig from '@views/OutboundsConfig.vue'
+import RouteConfig from '@views/RouteConfig.vue'
 import { ref, inject, computed, useTemplateRef, type Ref, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useProfilesStore } from '@/stores'
-import { deepClone, generateConfig, message, alert } from '@/utils'
+import { alert, message } from '@/utils/interaction.ts'
+import { deepClone } from '@/utils/others.ts'
 
 import Button from '@/components/Button/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'
 
-import type { Profile } from '@/features/config/types'
-import type { ComponentOption } from '@/features/types'
+import MixinAndScriptConfig from './MixinAndScriptConfig.vue'
 
 interface Props {
   id?: string
@@ -34,19 +45,6 @@ const props = withDefaults(defineProps<Props>(), {
   isUpdate: false,
   step: Step.Name,
 })
-
-import {
-  EndpointsConfig,
-  ExperimentalConfig,
-  LogConfig,
-  NtpConfig,
-} from '@/features/config/views/ProfilesView'
-
-import DnsConfig from './DnsConfig.vue'
-import InboundsConfig from './InboundsConfig.vue'
-import MixinAndScript from './MixinAndScriptConfig.vue'
-import OutboundsConfig from './OutboundsConfig.vue'
-import RouteConfig from './RouteConfig.vue'
 
 const { t } = useI18n()
 const endpointsRef = useTemplateRef('endpointsRef')
@@ -306,7 +304,7 @@ defineExpose({ modalSlots })
       />
     </div>
     <div v-if="currentStep === Step.MixinScript">
-      <MixinAndScript v-model="mixinAndScriptConfig" />
+      <MixinAndScriptConfig v-model="mixinAndScriptConfig" />
     </div>
   </div>
 </template>

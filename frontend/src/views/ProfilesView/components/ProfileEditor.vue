@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import { generateConfig } from '@generator'
+import type { Profile } from '@profiles'
+import { restoreProfile } from '@restorer'
 import { ref, inject, h, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useProfilesStore } from '@/stores'
-import { generateConfig, message, restoreProfile } from '@/utils'
+import { message } from '@/utils'
 
 import Button from '@/components/Button/index.vue'
-
-import type { Profile } from '@/features/config/types'
 
 interface Props {
   profile: Profile

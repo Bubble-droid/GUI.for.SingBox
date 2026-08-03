@@ -1,20 +1,21 @@
+import {
+  RouteRuleType,
+  DnsRuleType,
+  Inbound,
+  Outbound,
+  RouteRuleAction,
+  DomainStrategy,
+  RuleSetType,
+  DnsServer,
+  DnsRuleAction,
+} from '@features/constant/kernel'
+import { generateConfig } from '@generator'
+import type { Profile } from '@profiles'
 import { parse } from 'yaml'
 
 import { ReadFile, WriteFile } from '@/bridge'
 import { CoreConfigFilePath } from '@/constant/kernel'
 import { Branch } from '@/enums/app'
-import {
-  DnsServer,
-  Inbound,
-  Outbound,
-  RouteRuleAction,
-  RuleSetType,
-  RouteRuleType,
-  DomainStrategy,
-  DnsRuleType,
-  DnsRuleAction,
-} from '@/enums/kernel'
-import { generateConfig } from '@/features/config/transformers'
 import {
   useAppSettingsStore,
   useEnvStore,
@@ -23,10 +24,6 @@ import {
   useSubscribesStore,
 } from '@/stores'
 import { deepAssign, deepClone, APP_TITLE, createTextMatcher } from '@/utils'
-
-import type { Profile } from '@/features/config/types'
-
-export * from '@/features/config/transformers/generator'
 
 const _generateRule = (
   rule: App.Rule | App.DnsRule,
