@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const shared = {
+export default {
   domain_resolver: {
     title: 'Domain Resolver Configuration',
     server: 'Resolver Server',

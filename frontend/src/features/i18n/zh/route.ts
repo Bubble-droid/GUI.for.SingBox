@@ -1,4 +1,4 @@
-export const route = {
+export default {
   tab: {
     common: '通用',
     rules: '规则',

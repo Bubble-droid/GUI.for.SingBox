@@ -1,4 +1,4 @@
-export const shared = {
+export default {
   domain_resolver: {
     title: '域名解析配置',
     server: '解析服务器',

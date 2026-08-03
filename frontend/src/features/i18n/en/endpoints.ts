@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const endpoints = {
+export default {
   title: 'Endpoints',
   type: {
     title: 'Endpoint Type',

@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const experimental = {
+export default {
   clash_api: {
     title: 'Clash API Configuration',
     external_controller: 'Clash API Listen Address',

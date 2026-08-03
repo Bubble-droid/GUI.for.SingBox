@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const inbounds = {
+export default {
   enable: 'Enable',
   tag: 'Tag',
   users: 'Http/Socks users',

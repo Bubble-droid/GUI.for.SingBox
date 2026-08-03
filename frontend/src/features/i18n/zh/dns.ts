@@ -1,4 +1,4 @@
-export const dns = {
+export default {
   tab: {
     common: '通用',
     servers: '服务器',

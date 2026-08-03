@@ -1,4 +1,4 @@
-export const rules = {
+export default {
   type: {
     name: '类型',
     inbound: '入站(inbound)',
