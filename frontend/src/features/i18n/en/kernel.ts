@@ -1,16 +1,16 @@
 import type { MessageSchema } from '../types'
-import { dns } from './dns'
-import { endpoints } from './endpoints'
-import { experimental } from './experimental'
-import { inbounds } from './inbounds'
-import { log } from './log'
-import { ntp } from './ntp'
-import { outbounds } from './outbounds'
-import { route } from './route'
-import { rules } from './rules'
-import { shared } from './shared'
+import dns from './dns'
+import endpoints from './endpoints'
+import experimental from './experimental'
+import inbounds from './inbounds'
+import log from './log'
+import ntp from './ntp'
+import outbounds from './outbounds'
+import route from './route'
+import rules from './rules'
+import shared from './shared'
 
-export const kernel = {
+export default {
   rule: 'Rule',
   global: 'Global',
   direct: 'Direct',
@@ -21,8 +21,6 @@ export const kernel = {
   log,
   ntp,
   experimental,
-  clash_api: experimental.clash_api,
-  cache_file: experimental.cache_file,
   endpoints,
   inbounds,
   outbounds,

@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const rules = {
+export default {
   type: {
     name: 'Type',
     inbound: 'inbound',

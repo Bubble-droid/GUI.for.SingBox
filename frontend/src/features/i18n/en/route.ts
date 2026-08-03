@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const route = {
+export default {
   tab: {
     common: 'Common',
     rules: 'Rules',

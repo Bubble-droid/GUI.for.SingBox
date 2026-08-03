@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const outbounds = {
+export default {
   name: 'Outbound',
   tag: 'Tag',
   type: 'Type',

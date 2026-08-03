@@ -1,4 +1,4 @@
-export const log = {
+export default {
   disabled: '禁用日志',
   output: '日志输出路径',
   timestamp: '显示时间戳',

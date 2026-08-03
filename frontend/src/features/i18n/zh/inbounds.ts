@@ -1,4 +1,4 @@
-export const inbounds = {
+export default {
   enable: '启用',
   tag: '名称',
   users: 'Http/Socks验证用户',

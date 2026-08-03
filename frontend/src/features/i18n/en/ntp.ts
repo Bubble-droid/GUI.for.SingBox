@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const ntp = {
+export default {
   enabled: 'Enable NTP Server',
   server: {
     title: 'NTP Server Address',

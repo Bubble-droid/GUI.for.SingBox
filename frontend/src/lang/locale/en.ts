@@ -1,6 +1,5 @@
+import kernel from '@features/i18n/en/kernel'
 import type { DefineLocaleMessage } from 'vue-i18n'
-
-import { kernel } from '@/features/i18n/en/kernel'
 
 export default {
   common: {

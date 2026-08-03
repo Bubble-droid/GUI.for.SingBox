@@ -1,4 +1,4 @@
-export const endpoints = {
+export default {
   title: '端点',
   type: {
     title: '端点类型',

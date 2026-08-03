@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const dns = {
+export default {
   tab: {
     common: 'Common',
     servers: 'Servers',

@@ -1,4 +1,4 @@
-export const experimental = {
+export default {
   clash_api: {
     title: 'Clash API 配置',
     external_controller: 'Clash API 监听地址',

@@ -1,6 +1,6 @@
 import type { MessageSchema } from '../types'
 
-export const log = {
+export default {
   disabled: 'Disable Log',
   output: 'Log Output Path',
   timestamp: 'Show Timestamp',

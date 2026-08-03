@@ -1,4 +1,4 @@
-export const outbounds = {
+export default {
   name: '出站',
   tag: '名称',
   type: '类型',

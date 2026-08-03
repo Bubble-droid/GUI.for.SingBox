@@ -1,4 +1,4 @@
-export const ntp = {
+export default {
   enabled: '启用 NTP 服务器',
   server: {
     title: 'NTP 服务器地址',

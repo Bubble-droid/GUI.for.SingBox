@@ -1,4 +1,4 @@
-import { kernel } from '@features/i18n/zh/kernel'
+import kernel from '@features/i18n/zh/kernel'
 
 export default {
   common: {
