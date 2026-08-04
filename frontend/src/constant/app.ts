@@ -197,3 +197,30 @@ export const DefaultConcurrencyLimit = 20
 export const DefaultCardColumns = 5
 
 export const DefaultControllerSensitivity = 2
+
+export const ProfileSteps = [
+  'Name',
+  'Log',
+  'Ntp',
+  'Experimental',
+  'Endpoints',
+  'Inbounds',
+  'Outbounds',
+  'Route',
+  'Dns',
+  'MixinScript',
+] as const
+
+export const ProfileStep = Object.fromEntries(
+  ProfileSteps.map((step, index) => [step, index]),
+) as Record<(typeof ProfileSteps)[number], number>
+
+export const ProfileMenuList = ProfileSteps.map((step) => {
+  if (step === 'MixinScript') {
+    return 'profile.step.mixin-script'
+  } else {
+    return `profile.step.${step.toLowerCase()}`
+  }
+}) as `profile.step.${Lowercase<(typeof ProfileSteps)[number]>}`[]
+
+export const ProfileStepItems = ProfileMenuList.map((v) => ({ title: v }))

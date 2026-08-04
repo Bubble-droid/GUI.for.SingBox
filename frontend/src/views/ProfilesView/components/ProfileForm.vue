@@ -13,6 +13,7 @@ import RouteConfig from '@views/RouteConfig.vue'
 import { ref, inject, computed, useTemplateRef, type Ref, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { ProfileStep, ProfileStepItems } from '@/constant/app.ts'
 import { useProfilesStore } from '@/stores'
 import { alert, message } from '@/utils/interaction.ts'
 import { deepClone } from '@/utils/others.ts'
@@ -27,23 +28,10 @@ interface Props {
   step?: number
 }
 
-enum Step {
-  Name = 0,
-  Log = 1,
-  Ntp = 2,
-  Experimental = 3,
-  Endpoints = 4,
-  Inbounds = 5,
-  Outbounds = 6,
-  Route = 7,
-  Dns = 8,
-  MixinScript = 9,
-}
-
 const props = withDefaults(defineProps<Props>(), {
   id: '',
   isUpdate: false,
-  step: Step.Name,
+  step: ProfileStep.Name,
 })
 
 const { t } = useI18n()
@@ -56,19 +44,6 @@ const profilesStore = useProfilesStore()
 
 const loading = ref(false)
 const currentStep = ref(props.step)
-
-const stepItems = [
-  { title: 'profile.step.name' },
-  { title: 'profile.step.log' },
-  { title: 'profile.step.ntp' },
-  { title: 'profile.step.experimental' },
-  { title: 'profile.step.endpoints' },
-  { title: 'profile.step.inbounds' },
-  { title: 'profile.step.outbounds' },
-  { title: 'profile.step.route' },
-  { title: 'profile.step.dns' },
-  { title: 'profile.step.mixin-script' },
-] as const
 
 const profile = ref<Profile>(profilesStore.getProfileTemplate())
 
@@ -123,11 +98,11 @@ const handleSave = async () => {
 
 const handleAdd = () => {
   const map: Record<number, Ref> = {
-    [Step.Endpoints]: endpointsRef,
-    [Step.Inbounds]: inboundsRef,
-    [Step.Outbounds]: outboundsRef,
-    [Step.Route]: routeRef,
-    [Step.Dns]: dnsRef,
+    [ProfileStep.Endpoints]: endpointsRef,
+    [ProfileStep.Inbounds]: inboundsRef,
+    [ProfileStep.Outbounds]: outboundsRef,
+    [ProfileStep.Route]: routeRef,
+    [ProfileStep.Dns]: dnsRef,
   }
   map[currentStep.value]!.value.handleAdd()
 }
@@ -160,7 +135,7 @@ const modalSlots = {
             {
               class: 'font-bold',
             },
-            `${t(stepItems[currentStep.value]!.title)} （${currentStep.value + 1} / ${stepItems.length}）`,
+            `${t(ProfileStepItems[currentStep.value]!.title)} （${currentStep.value + 1} / ${ProfileStepItems.length}）`,
           ),
         overlay: () =>
           h(
@@ -168,7 +143,7 @@ const modalSlots = {
             {
               class: 'p-4 flex flex-col',
             },
-            stepItems.map((step, index) =>
+            ProfileStepItems.map((step, index) =>
               h(
                 Button,
                 {
@@ -193,9 +168,13 @@ const modalSlots = {
       type: 'text',
       icon: 'add',
       style: {
-        display: [Step.Endpoints, Step.Inbounds, Step.Outbounds, Step.Route, Step.Dns].includes(
-          currentStep.value,
-        )
+        display: [
+          ProfileStep.Endpoints,
+          ProfileStep.Inbounds,
+          ProfileStep.Outbounds,
+          ProfileStep.Route,
+          ProfileStep.Dns,
+        ].includes(currentStep.value)
           ? ''
           : 'none',
       },
@@ -206,7 +185,7 @@ const modalSlots = {
     h(
       Button,
       {
-        disabled: currentStep.value === Step.Name,
+        disabled: currentStep.value === ProfileStep.Name,
         onClick: handlePrevStep,
       },
       () => t('common.prevStep'),
@@ -215,7 +194,7 @@ const modalSlots = {
       Button,
       {
         class: 'mr-auto',
-        disabled: !profile.value.name || currentStep.value === stepItems.length - 1,
+        disabled: !profile.value.name || currentStep.value === ProfileStepItems.length - 1,
         onClick: handleNextStep,
       },
       () => t('common.nextStep'),
@@ -248,7 +227,7 @@ defineExpose({ modalSlots })
 
 <template>
   <div>
-    <div v-if="currentStep === Step.Name">
+    <div v-if="currentStep === ProfileStep.Name">
       <Input
         v-model="profile.name"
         autofocus
@@ -257,20 +236,20 @@ defineExpose({ modalSlots })
         class="w-full"
       />
     </div>
-    <div v-if="currentStep === Step.Log">
+    <div v-if="currentStep === ProfileStep.Log">
       <LogConfig v-model="profile.log" />
     </div>
-    <div v-if="currentStep === Step.Ntp">
+    <div v-if="currentStep === ProfileStep.Ntp">
       <NtpConfig
         v-model="profile.ntp"
         :outbound-options="outboundOptions"
         :server-options="serverOptions"
       />
     </div>
-    <div v-if="currentStep === Step.Experimental">
+    <div v-if="currentStep === ProfileStep.Experimental">
       <ExperimentalConfig v-model="profile.experimental" :outbound-options="outboundOptions" />
     </div>
-    <div v-if="currentStep === Step.Endpoints">
+    <div v-if="currentStep === ProfileStep.Endpoints">
       <EndpointsConfig
         ref="endpointsRef"
         v-model="profile.endpoints"
@@ -279,13 +258,13 @@ defineExpose({ modalSlots })
         :dns-server-options="serverOptions"
       />
     </div>
-    <div v-if="currentStep === Step.Inbounds">
+    <div v-if="currentStep === ProfileStep.Inbounds">
       <InboundsConfig ref="inboundsRef" v-model="profile.inbounds" />
     </div>
-    <div v-if="currentStep === Step.Outbounds">
+    <div v-if="currentStep === ProfileStep.Outbounds">
       <OutboundsConfig ref="outboundsRef" v-model="profile.outbounds" />
     </div>
-    <div v-if="currentStep === Step.Route">
+    <div v-if="currentStep === ProfileStep.Route">
       <RouteConfig
         ref="routeRef"
         v-model="profile.route"
@@ -294,7 +273,7 @@ defineExpose({ modalSlots })
         :server-options="serverOptions"
       />
     </div>
-    <div v-if="currentStep === Step.Dns">
+    <div v-if="currentStep === ProfileStep.Dns">
       <DnsConfig
         ref="dnsRef"
         v-model="profile.dns"
@@ -303,7 +282,7 @@ defineExpose({ modalSlots })
         :rule-set="profile.route.rule_set"
       />
     </div>
-    <div v-if="currentStep === Step.MixinScript">
+    <div v-if="currentStep === ProfileStep.MixinScript">
       <MixinAndScriptConfig v-model="mixinAndScriptConfig" />
     </div>
   </div>
