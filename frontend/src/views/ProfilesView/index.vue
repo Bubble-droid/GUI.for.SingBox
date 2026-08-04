@@ -4,7 +4,7 @@ import type { Profile } from '@profiles'
 import { useI18n, I18nT } from 'vue-i18n'
 
 import { ClipboardSetText } from '@/bridge'
-import { DraggableOptions, ViewOptions } from '@/constant/app'
+import { DraggableOptions, ProfileMenuList, ViewOptions } from '@/constant/app'
 import { View } from '@/enums/app'
 import {
   useProfilesStore,
@@ -28,18 +28,7 @@ const appSettingsStore = useAppSettingsStore()
 const kernelApiStore = useKernelApiStore()
 const pluginsStore = usePluginsStore()
 
-const menuList: App.Menu[] = [
-  'profile.step.name',
-  'profile.step.log',
-  'profile.step.ntp',
-  'profile.step.experimental',
-  'profile.step.endpoints',
-  'profile.step.inbounds',
-  'profile.step.outbounds',
-  'profile.step.route',
-  'profile.step.dns',
-  'profile.step.mixin-script',
-].map((v, i) => {
+const menuList: App.Menu[] = ProfileMenuList.map((v, i) => {
   return {
     label: v,
     handler: (id: string) => {
