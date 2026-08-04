@@ -1,9 +1,16 @@
 import { Endpoint } from '@features/constant/kernel'
 import type { SingBoxEndpointOf, SingBoxEndpoint } from '@features/types/sing-box'
 import { filterInvalidProps } from '@features/utils/helper'
-import type { EndpointWireGuard, EndpointConfig, EndpointTailscale } from '@profiles/endpoints'
+import type {
+  EndpointWireGuard,
+  EndpointConfig,
+  EndpointTailscale,
+  EndpointOpenConnect,
+  EndpointOpenVpnClient,
+  EndpointOpenVpnServer,
+} from '@profiles/endpoints'
 
-import { generateDialer, generateUdpNat } from './shared'
+import { generateDialer, generateUdpNat, generateListen } from './shared'
 import type { TagMaps } from './types'
 
 export const generateEndpoints = (
@@ -19,6 +26,12 @@ export const generateEndpoints = (
           return [generateWireGuard(ep, maps)]
         case Endpoint.Tailscale:
           return [generateTailscale(ep, maps)]
+        case Endpoint.OpenConnect:
+          return [generateOpenConnect(ep, maps)]
+        case Endpoint.OpenVpnClient:
+          return [generateOpenVpnClient(ep, maps)]
+        case Endpoint.OpenVpnServer:
+          return [generateOpenVpnServer(ep, maps)]
         default:
           throw `Unexpected endpoint type: ${type as string}`
       }
@@ -60,4 +73,86 @@ export const generateTailscale = (
       ? { ...filterInvalidProps(rest.ssh_server), enabled: true }
       : undefined,
   }
+}
+
+export const generateOpenConnect = (
+  openconnect: EndpointOpenConnect,
+  maps: TagMaps,
+): SingBoxEndpointOf<typeof Endpoint.OpenConnect> => {
+  const { type, tag, config } = openconnect
+  const { dialer, udpNat, ...rest } = config
+
+  return {
+    ...rest,
+    ...generateDialer(dialer, maps),
+    ...generateUdpNat(udpNat),
+    token: filterInvalidProps(rest.token),
+    mobile: filterInvalidProps(rest.mobile),
+    csd: filterInvalidProps(rest.csd),
+    hip: filterInvalidProps(rest.hip),
+    tncc: filterInvalidProps({
+      ...rest.tncc,
+      certificates: rest.tncc.certificates
+        .map(filterInvalidProps)
+        .filter((c) => Object.keys(c).length > 0),
+    }),
+    fortinet_host_check: filterInvalidProps(rest.fortinet_host_check),
+    tls: filterInvalidProps(rest.tls),
+    form_entries: rest.form_entries
+      .map(filterInvalidProps)
+      .filter((f) => Object.keys(f).length > 0),
+    type,
+    tag,
+  } as SingBoxEndpointOf<typeof Endpoint.OpenConnect>
+}
+
+export const generateOpenVpnClient = (
+  openvpn: EndpointOpenVpnClient,
+  maps: TagMaps,
+): SingBoxEndpointOf<typeof Endpoint.OpenVpnClient> => {
+  const { type, tag, config } = openvpn
+  const { dialer, udpNat, ...rest } = config
+
+  return {
+    ...rest,
+    ...generateDialer(dialer, maps),
+    ...generateUdpNat(udpNat),
+    servers: rest.servers.map(filterInvalidProps).filter((s) => Object.keys(s).length > 0),
+    pull_filters: rest.pull_filters
+      .map(filterInvalidProps)
+      .filter((f) => Object.keys(f).length > 0),
+    tls: filterInvalidProps({
+      ...rest.tls,
+      control_wrap: filterInvalidProps(rest.tls.control_wrap),
+    }),
+    type,
+    tag,
+  } as SingBoxEndpointOf<typeof Endpoint.OpenVpnClient>
+}
+
+export const generateOpenVpnServer = (
+  openvpn: EndpointOpenVpnServer,
+  maps: TagMaps,
+): SingBoxEndpointOf<typeof Endpoint.OpenVpnServer> => {
+  const { type, tag, config } = openvpn
+  const { listen, udpNat, ...rest } = config
+
+  return {
+    ...rest,
+    ...generateListen(listen, maps),
+    ...generateUdpNat(udpNat),
+    users: rest.users.map(filterInvalidProps).filter((u) => Object.keys(u).length > 0),
+    tls: filterInvalidProps({
+      ...rest.tls,
+      control_wrap: filterInvalidProps(rest.tls.control_wrap),
+    }),
+    push: filterInvalidProps({
+      ...rest.push,
+      dns_servers: rest.push.dns_servers
+        .map(filterInvalidProps)
+        .filter((d) => Object.keys(d).length > 0),
+    }),
+    type,
+    tag,
+  } as unknown as SingBoxEndpointOf<typeof Endpoint.OpenVpnServer>
 }

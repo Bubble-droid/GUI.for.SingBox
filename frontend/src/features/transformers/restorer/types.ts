@@ -12,6 +12,7 @@ export interface RestoreProfileOptions {
 
 export interface IdMaps {
   endpoints: Map<string, string>
+  inbounds: Map<string, string>
   outbounds: Map<string, string>
   dnsServers: Map<string, string>
 }

@@ -43,10 +43,12 @@ export const restoreProfile = (
   const DnsServersIds = legacyBuildTagIdMapping('dns-', config.dns?.servers)
 
   const endpointIds = buildTagIdMapping('ep-', config.endpoints)
+  const inboundsIds = buildTagIdMapping('in-', config.inbounds)
   const outboundIds = buildTagIdMapping('out-', config.outbounds)
 
   const idMaps: IdMaps = {
     endpoints: endpointIds,
+    inbounds: new Map([...endpointIds, ...inboundsIds]),
     outbounds: new Map([...endpointIds, ...outboundIds]),
     dnsServers: buildTagIdMapping('dns-', config.dns?.servers),
   }

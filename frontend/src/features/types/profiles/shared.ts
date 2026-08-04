@@ -5,6 +5,7 @@ import type {
   UdpNatBehavior,
 } from '@features/constant/kernel'
 
+export type InboundId = string
 export type OutboundId = string
 export type DnsServerId = string
 
@@ -19,6 +20,23 @@ export interface ProfileBase extends TagItem {
 
 export interface Switchable extends ProfileBase {
   enable: boolean
+}
+
+export interface Listen {
+  listen: string
+  listen_port: number
+  bind_interface: string
+  routing_mark: number
+  reuse_addr: boolean
+  netns: string
+  tcp_fast_open: boolean
+  tcp_multi_path: boolean
+  disable_tcp_keep_alive: boolean
+  tcp_keep_alive: string
+  tcp_keep_alive_interval: string
+  udp_fragment: boolean
+  udp_timeout: string
+  detour: InboundId
 }
 
 export interface DnsRouteOptions {

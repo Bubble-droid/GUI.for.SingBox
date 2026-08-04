@@ -41,6 +41,7 @@ export const generateConfig = async (
   const profile = deepClone(originalProfile)
 
   const tagMaps: TagMaps = {
+    inbounds: buildIdTagMapping([...profile.endpoints, ...profile.inbounds]),
     outbounds: buildIdTagMapping([...profile.endpoints, ...profile.outbounds]),
     dnsServers: buildIdTagMapping(profile.dns.servers),
   }
