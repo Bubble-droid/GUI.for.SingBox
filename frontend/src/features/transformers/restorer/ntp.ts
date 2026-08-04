@@ -5,9 +5,10 @@ import type { NtpConfig } from '@profiles/ntp'
 import { restoreDialer } from './shared'
 import type { IdMaps } from './types'
 
-export const restoreNtp = (raw: SingBoxNtp, maps: IdMaps): NtpConfig => {
+export const restoreNtp = (raw: SingBoxNtp | undefined, maps: IdMaps): NtpConfig => {
   const template = createNtp()
-  const { dialer, rest } = restoreDialer(raw ?? {}, maps)
+  if (!raw) return template
+  const { dialer, rest } = restoreDialer(raw, maps)
   return {
     ...template,
     ...rest,
