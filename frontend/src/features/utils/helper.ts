@@ -41,3 +41,9 @@ export const extractProps = <T extends object, M extends object>(
   }
   return { owned, rest } as ExtractResult<T, M>
 }
+
+export const assertNever = (value: never, message?: string): never => {
+  throw new Error(
+    message ?? `Unexpected value: ${typeof value === 'string' ? value : JSON.stringify(value)}`,
+  )
+}

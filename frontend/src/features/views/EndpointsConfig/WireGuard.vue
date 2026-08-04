@@ -1,16 +1,9 @@
 <script lang="ts" setup>
 import { createWireGuardPeer } from '@defaults/endpoints'
-import type { ComponentOption } from '@features/types/views'
 import type { EndpointWireGuard } from '@profiles/endpoints'
 import PortInput from '@views/Shared/PortInput.vue'
 import { useI18n } from 'vue-i18n'
 
-interface Props {
-  outboundOptions: ComponentOption[]
-  dnsServerOptions: ComponentOption[]
-}
-
-defineProps<Props>()
 const model = defineModel<EndpointWireGuard['config']>({ required: true })
 const { t } = useI18n()
 
