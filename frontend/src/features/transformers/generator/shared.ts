@@ -1,10 +1,15 @@
 import { RouteRuleType, DnsRuleType } from '@features/constant/kernel'
-import type { SingBoxDomainResolver, SingBoxDialer, SingBoxUdpNat } from '@features/types/sing-box'
+import type {
+  SingBoxDomainResolver,
+  SingBoxDialer,
+  SingBoxUdpNat,
+  SingBoxListen,
+} from '@features/types/sing-box'
 import { filterInvalidProps } from '@features/utils/helper'
 import type { DnsRuleConfig } from '@profiles/dns'
 import type { InboundConfig } from '@profiles/inbounds'
 import type { RouteRuleConfig, RuleSetConfig } from '@profiles/route'
-import type { DomainResolver, Dialer, UdpNat } from '@profiles/shared'
+import type { DomainResolver, Dialer, UdpNat, Listen } from '@profiles/shared'
 
 import { deepAssign } from '@/utils'
 
@@ -30,6 +35,13 @@ export const generateDialer = (dialer: Dialer, maps: TagMaps): SingBoxDialer => 
 
 export const generateUdpNat = (udpNat: UdpNat): SingBoxUdpNat => {
   return { ...(udpNat as SingBoxUdpNat) }
+}
+
+export const generateListen = (listen: Listen, maps: TagMaps): SingBoxListen => {
+  return filterInvalidProps({
+    ...(listen as SingBoxListen),
+    detour: maps.inbounds?.get(listen.detour),
+  })
 }
 
 export const _generateRule = (

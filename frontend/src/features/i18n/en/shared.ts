@@ -1,6 +1,22 @@
 import type { MessageSchema } from '../types'
 
 export default {
+  listen: {
+    title: 'Listen Configuration',
+    listen: 'Listen Address',
+    listen_port: 'Listen Port',
+    bind_interface: 'Bind Interface',
+    routing_mark: 'Routing Mark',
+    reuse_addr: 'Reuse Address',
+    netns: 'Network Namespace',
+    tcp_fast_open: 'TCP Fast Open',
+    tcp_multi_path: 'TCP Multi Path',
+    disable_tcp_keep_alive: 'Disable TCP Keep-Alive',
+    tcp_keep_alive: 'TCP Keep-Alive Period',
+    tcp_keep_alive_interval: 'TCP Keep-Alive Interval',
+    udp_fragment: 'UDP Fragmentation',
+    detour: 'Forwarded Inbound',
+  },
   domain_resolver: {
     title: 'Domain Resolver Configuration',
     server: 'Resolver Server',

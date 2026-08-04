@@ -5,6 +5,7 @@ import { EndpointOptions } from '@features/constant/options'
 import type { ComponentOption } from '@features/types/views'
 import type { EndpointConfig } from '@profiles/endpoints'
 import DialerConfig from '@views/Shared/DialerConfig.vue'
+import ListenConfig from '@views/Shared/ListenConfig.vue'
 import UdpNatConfig from '@views/Shared/UdpNatConfig.vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -13,6 +14,9 @@ import { DraggableOptions } from '@/constant/app'
 import { useBool } from '@/hooks'
 import { deepClone, message } from '@/utils'
 
+import OpenConnect from './OpenConnect.vue'
+import OpenVpnClient from './OpenVpnClient.vue'
+import OpenVpnServer from './OpenVpnServer.vue'
 import TailScale from './TailScale.vue'
 import WireGuard from './WireGuard.vue'
 
@@ -113,7 +117,21 @@ const onTypeChange = (newType: Endpoint) => {
 
     <WireGuard v-if="fields.type === Endpoint.WireGuard" :model-value="fields.config" />
     <TailScale v-else-if="fields.type === Endpoint.Tailscale" :model-value="fields.config" />
+    <OpenConnect v-else-if="fields.type === Endpoint.OpenConnect" :model-value="fields.config" />
+    <OpenVpnClient
+      v-else-if="fields.type === Endpoint.OpenVpnClient"
+      :model-value="fields.config"
+    />
+    <OpenVpnServer
+      v-else-if="fields.type === Endpoint.OpenVpnServer"
+      :model-value="fields.config"
+    />
 
+    <ListenConfig
+      v-if="'listen' in fields.config"
+      v-model="fields.config.listen"
+      :inbound-options="inboundOptions"
+    />
     <DialerConfig
       v-if="'dialer' in fields.config"
       v-model="fields.config.dialer"

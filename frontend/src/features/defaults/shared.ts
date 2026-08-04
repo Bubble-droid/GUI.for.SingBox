@@ -7,6 +7,7 @@ import type {
   DomainResolver,
   Dialer,
   UdpNat,
+  Listen,
 } from '@profiles/shared'
 
 import { sampleID } from '@/utils'
@@ -101,4 +102,21 @@ export const createUdpNat = (): UdpNat => ({
   udp_mapping: '' as UdpNatBehavior,
   udp_filtering: '' as UdpNatBehavior,
   udp_nat_max: 0,
+})
+
+export const createListen = (): Listen => ({
+  listen: '',
+  listen_port: 0,
+  bind_interface: '',
+  routing_mark: 0,
+  reuse_addr: false,
+  netns: '',
+  tcp_fast_open: false,
+  tcp_multi_path: false,
+  disable_tcp_keep_alive: false,
+  tcp_keep_alive: '',
+  tcp_keep_alive_interval: '',
+  udp_fragment: false,
+  udp_timeout: '',
+  detour: '',
 })

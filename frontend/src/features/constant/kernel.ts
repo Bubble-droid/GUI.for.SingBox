@@ -33,7 +33,7 @@ export const Endpoint = {
   OpenConnect: 'openconnect',
   OpenVpnClient: 'openvpn-client',
   OpenVpnServer: 'openvpn-server',
-} as const satisfies Recordable<SingBoxEndpoint['type'] | 'openconnect'>
+} as const satisfies Recordable<SingBoxEndpoint['type']>
 
 export type Endpoint = ValueOf<typeof Endpoint>
 
@@ -230,3 +230,221 @@ export const UdpNatBehavior = {
 } as const satisfies Recordable<SingBoxEndpointOf<'wireguard'>['udp_mapping']>
 
 export type UdpNatBehavior = ValueOf<typeof UdpNatBehavior>
+
+export const OpenConnectFlavor = {
+  AnyConnect: 'anyconnect',
+  Gp: 'gp',
+  Fortinet: 'fortinet',
+  F5: 'f5',
+  Pulse: 'pulse',
+  Nc: 'nc',
+} as const
+
+export type OpenConnectFlavor = ValueOf<typeof OpenConnectFlavor>
+
+export const OpenConnectTokenMode = {
+  Totp: 'totp',
+  Hotp: 'hotp',
+  Stoken: 'stoken',
+  Oidc: 'oidc',
+} as const
+
+export type OpenConnectTokenMode = ValueOf<typeof OpenConnectTokenMode>
+
+export const OpenConnectReportedOs = {
+  Linux: 'linux',
+  Linux64: 'linux-64',
+  Win: 'win',
+  MacIntel: 'mac-intel',
+  Android: 'android',
+  AppleIos: 'apple-ios',
+} as const
+
+export type OpenConnectReportedOs = ValueOf<typeof OpenConnectReportedOs>
+
+export const OpenConnectCompressionMode = {
+  Stateless: 'stateless',
+  All: 'all',
+} as const
+
+export type OpenConnectCompressionMode = ValueOf<typeof OpenConnectCompressionMode>
+
+export const OpenVpnMode = {
+  Tls: 'tls',
+  StaticKey: 'static_key',
+} as const
+
+export type OpenVpnMode = ValueOf<typeof OpenVpnMode>
+
+export const OpenVpnNetwork = {
+  Udp: 'udp',
+  Tcp: 'tcp',
+} as const
+
+export type OpenVpnNetwork = ValueOf<typeof OpenVpnNetwork>
+
+export const OpenVpnTopology = {
+  Subnet: 'subnet',
+  P2p: 'p2p',
+  Net30: 'net30',
+} as const
+
+export type OpenVpnTopology = ValueOf<typeof OpenVpnTopology>
+
+export const OpenVpnAuthRetry = {
+  None: 'none',
+  Nointeract: 'nointeract',
+  Interact: 'interact',
+} as const
+
+export type OpenVpnAuthRetry = ValueOf<typeof OpenVpnAuthRetry>
+
+export const OpenVpnKeyDirection = {
+  Server: 'server',
+  Client: 'client',
+} as const
+
+export type OpenVpnKeyDirection = ValueOf<typeof OpenVpnKeyDirection>
+
+export const OpenVpnCertNameType = {
+  Name: 'name',
+  Subject: 'subject',
+  NamePrefix: 'name-prefix',
+} as const
+
+export type OpenVpnCertNameType = ValueOf<typeof OpenVpnCertNameType>
+
+export const OpenVpnRemoteCertTls = {
+  Server: 'server',
+  Client: 'client',
+  None: 'none',
+} as const
+
+export type OpenVpnRemoteCertTls = ValueOf<typeof OpenVpnRemoteCertTls>
+
+export const OpenVpnCertProfile = {
+  Legacy: 'legacy',
+  Insecure: 'insecure',
+  Preferred: 'preferred',
+  Suiteb: 'suiteb',
+} as const
+
+export type OpenVpnCertProfile = ValueOf<typeof OpenVpnCertProfile>
+
+export const OpenVpnNsCertType = {
+  Server: 'server',
+  Client: 'client',
+} as const
+
+export type OpenVpnNsCertType = ValueOf<typeof OpenVpnNsCertType>
+
+export const OpenVpnControlWrapType = {
+  TlsCrypt: 'tls_crypt',
+  TlsAuth: 'tls_auth',
+  TlsCryptV2: 'tls_crypt_v2',
+} as const
+
+export type OpenVpnControlWrapType = ValueOf<typeof OpenVpnControlWrapType>
+
+export const OpenVpnMssFixMode = {
+  Mtu: 'mtu',
+  Fixed: 'fixed',
+} as const
+
+export type OpenVpnMssFixMode = ValueOf<typeof OpenVpnMssFixMode>
+
+export const OpenVpnCompression = {
+  Disabled: 'disabled',
+  None: 'none',
+  No: 'no',
+  Lz4: 'lz4',
+  Lz4V2: 'lz4-v2',
+  Stub: 'stub',
+  StubV2: 'stub-v2',
+  Off: 'off',
+} as const
+
+export type OpenVpnCompression = ValueOf<typeof OpenVpnCompression>
+
+export const OpenVpnCompressionLzo = {
+  Disabled: 'disabled',
+  None: 'none',
+  No: 'no',
+  Yes: 'yes',
+  Adaptive: 'adaptive',
+  Asym: 'asym',
+  Off: 'off',
+} as const
+
+export type OpenVpnCompressionLzo = ValueOf<typeof OpenVpnCompressionLzo>
+
+export const OpenVpnAllowCompression = {
+  No: 'no',
+  Asym: 'asym',
+  Yes: 'yes',
+} as const
+
+export type OpenVpnAllowCompression = ValueOf<typeof OpenVpnAllowCompression>
+
+export const OpenVpnPullFilterAction = {
+  Ignore: 'ignore',
+  Accept: 'accept',
+  Reject: 'reject',
+} as const
+
+export type OpenVpnPullFilterAction = ValueOf<typeof OpenVpnPullFilterAction>
+
+export const OpenVpnVerifyClientCert = {
+  Require: 'require',
+  Optional: 'optional',
+  None: 'none',
+} as const
+
+export type OpenVpnVerifyClientCert = ValueOf<typeof OpenVpnVerifyClientCert>
+
+export const OpenVpnDnsSec = {
+  Yes: 'yes',
+  Optional: 'optional',
+  No: 'no',
+} as const
+
+export type OpenVpnDnsSec = ValueOf<typeof OpenVpnDnsSec>
+
+export const OpenVpnDnsTransport = {
+  Plain: 'plain',
+  Dot: 'dot',
+  Doh: 'doh',
+} as const
+
+export type OpenVpnDnsTransport = ValueOf<typeof OpenVpnDnsTransport>
+
+export const TlsVersion = {
+  '1.0': '1.0',
+  '1.1': '1.1',
+  '1.2': '1.2',
+  '1.3': '1.3',
+} as const
+
+export type TlsVersion = ValueOf<typeof TlsVersion>
+
+export const CipherSuites = {
+  TLS_RSA_WITH_AES_128_CBC_SHA: 'TLS_RSA_WITH_AES_128_CBC_SHA',
+  TLS_RSA_WITH_AES_256_CBC_SHA: 'TLS_RSA_WITH_AES_256_CBC_SHA',
+  TLS_RSA_WITH_AES_128_GCM_SHA256: 'TLS_RSA_WITH_AES_128_GCM_SHA256',
+  TLS_RSA_WITH_AES_256_GCM_SHA384: 'TLS_RSA_WITH_AES_256_GCM_SHA384',
+  TLS_AES_128_GCM_SHA256: 'TLS_AES_128_GCM_SHA256',
+  TLS_AES_256_GCM_SHA384: 'TLS_AES_256_GCM_SHA384',
+  TLS_CHACHA20_POLY1305_SHA256: 'TLS_CHACHA20_POLY1305_SHA256',
+  TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA: 'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA',
+  TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA: 'TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA',
+  TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA: 'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA',
+  TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA: 'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA',
+  TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256: 'TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256',
+  TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384: 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384',
+  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256: 'TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256',
+  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384: 'TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384',
+  TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256: 'TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256',
+  TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256: 'TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256',
+} as const
+
+export type CipherSuites = ValueOf<typeof CipherSuites>

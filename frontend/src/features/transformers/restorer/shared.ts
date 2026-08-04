@@ -1,8 +1,13 @@
-import { createDomainResolver, createDialer, createUdpNat } from '@defaults/shared'
+import { createDomainResolver, createDialer, createUdpNat, createListen } from '@defaults/shared'
 import { RouteRuleType, DnsRuleType } from '@features/constant/kernel'
-import type { SingBoxDomainResolver, SingBoxDialer, SingBoxUdpNat } from '@features/types/sing-box'
+import type {
+  SingBoxDomainResolver,
+  SingBoxDialer,
+  SingBoxUdpNat,
+  SingBoxListen,
+} from '@features/types/sing-box'
 import { extractProps, ensureArray } from '@features/utils/helper'
-import type { DomainResolver, Dialer, UdpNat } from '@profiles/shared'
+import type { DomainResolver, Dialer, UdpNat, Listen } from '@profiles/shared'
 
 import type { IdMaps } from './types'
 
@@ -50,10 +55,7 @@ export const restoreDomainResolver = (
 export const restoreDialer = <T extends object>(
   raw: T,
   maps: IdMaps,
-): {
-  dialer: Dialer
-  rest: Omit<T, keyof Dialer>
-} => {
+): { dialer: Dialer; rest: Omit<T, keyof Dialer> } => {
   const template = createDialer()
   const result = extractProps(raw, template)
   const owned = result.owned as SingBoxDialer
@@ -80,4 +82,19 @@ export const restoreUdpNat = <T extends object>(
     ...owned,
   } as UdpNat
   return { udpNat, rest: result.rest }
+}
+
+export const restoreListen = <T extends object>(
+  raw: T,
+  maps: IdMaps,
+): { listen: Listen; rest: Omit<T, keyof Listen> } => {
+  const template = createListen()
+  const result = extractProps(raw, template)
+  const owned = result.owned as unknown as SingBoxListen
+  const listen: Listen = {
+    ...template,
+    ...owned,
+    detour: maps.inbounds?.get(owned.detour!) ?? '',
+  }
+  return { listen, rest: result.rest }
 }

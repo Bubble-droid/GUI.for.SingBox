@@ -22,6 +22,8 @@ export type SingBoxDomainResolver = Extract<
   object
 >
 
+export type SingBoxListen = Omit<SingBoxInboundOf<'redirect'>, 'tag' | 'type'>
+
 export type SingBoxDialer = Omit<SingBoxOutboundOf<'direct'>, 'tag' | 'type'>
 
 export type SingBoxUdpNat = Pick<
@@ -31,20 +33,27 @@ export type SingBoxUdpNat = Pick<
 
 export type SingBoxNtp = NonNullable<SingBoxConfig['ntp']>
 
-export type SingBoxOutbound = Extract<
-  UnpackArray<NonNullable<SingBoxConfig['outbounds']>>,
-  { type: unknown }
+export type SingBoxInbound = UnpackArray<NonNullable<SingBoxConfig['inbounds']>>
+
+export type SingBoxInboundOf<T extends SingBoxInbound['type']> = Extract<
+  SingBoxInbound,
+  { type: T }
 >
+
+type UnionOutbound = UnpackArray<NonNullable<SingBoxConfig['outbounds']>>
+
+export type SingBoxOutbound = Extract<UnionOutbound, { type: unknown }>
 
 export type SingBoxOutboundOf<T extends SingBoxOutbound['type']> = Extract<
   SingBoxOutbound,
   { type: T }
 >
 
-export type SingBoxEndpoint = Extract<
-  UnpackArray<NonNullable<SingBoxConfig['endpoints']>>,
-  { type: unknown }
->
+type UnionEndpoint = UnpackArray<NonNullable<SingBoxConfig['endpoints']>>
+
+export type SingBoxEndpoint =
+  | Extract<UnionEndpoint, { type: unknown }>
+  | (Extract<UnionEndpoint, { flavor?: unknown }> & { type: 'openconnect' })
 
 export type SingBoxEndpointOf<T extends SingBoxEndpoint['type']> = Extract<
   SingBoxEndpoint,

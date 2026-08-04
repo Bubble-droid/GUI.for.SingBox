@@ -22,6 +22,30 @@ import {
   NetworkType,
   Endpoint,
   UdpNatBehavior,
+  OpenConnectCompressionMode,
+  OpenConnectFlavor,
+  OpenConnectReportedOs,
+  OpenConnectTokenMode,
+  OpenVpnAllowCompression,
+  OpenVpnAuthRetry,
+  OpenVpnCertNameType,
+  OpenVpnCertProfile,
+  OpenVpnCompression,
+  OpenVpnCompressionLzo,
+  OpenVpnControlWrapType,
+  OpenVpnDnsTransport,
+  OpenVpnKeyDirection,
+  OpenVpnMode,
+  OpenVpnMssFixMode,
+  OpenVpnNetwork,
+  OpenVpnNsCertType,
+  OpenVpnPullFilterAction,
+  OpenVpnRemoteCertTls,
+  OpenVpnTopology,
+  OpenVpnVerifyClientCert,
+  OpenVpnDnsSec,
+  TlsVersion,
+  CipherSuites,
 } from './kernel'
 
 type FormatString<
@@ -171,3 +195,117 @@ export const UdpNatBehaviorOptions = defineOptions(
   UdpNatBehavior,
   'kernel.shared.udp_nat.behavior.{{val}}',
 )
+
+export const OpenConnectFlavorOptions = defineOptions(
+  OpenConnectFlavor,
+  'kernel.endpoints.openconnect.flavor.{{val}}',
+)
+
+export const OpenConnectTokenModeOptions = defineOptions(
+  OpenConnectTokenMode,
+  'kernel.endpoints.openconnect.token.mode.{{val}}',
+)
+
+export const OpenConnectReportedOsOptions = defineOptions(
+  OpenConnectReportedOs,
+  'kernel.endpoints.openconnect.reported_os.{{val}}',
+)
+
+export const OpenConnectCompressionModeOptions = defineOptions(
+  OpenConnectCompressionMode,
+  'kernel.endpoints.openconnect.compression_mode.{{val}}',
+)
+
+export const OpenVpnModeOptions = defineOptions(
+  OpenVpnMode,
+  'kernel.endpoints.openvpn.mode.{{val}}',
+)
+
+export const OpenVpnNetworkOptions = defineOptions(
+  OpenVpnNetwork,
+  'kernel.endpoints.openvpn.network.{{val}}',
+)
+
+export const OpenVpnTopologyOptions = defineOptions(
+  OpenVpnTopology,
+  'kernel.endpoints.openvpn.topology.{{val}}',
+)
+
+export const OpenVpnAuthRetryOptions = defineOptions(
+  OpenVpnAuthRetry,
+  'kernel.endpoints.openvpn.auth_retry.{{val}}',
+)
+
+export const OpenVpnKeyDirectionOptions = defineOptions(
+  OpenVpnKeyDirection,
+  'kernel.endpoints.openvpn.key_direction.{{val}}',
+)
+
+export const OpenVpnCertNameTypeOptions = defineOptions(
+  OpenVpnCertNameType,
+  'kernel.endpoints.openvpn.cert_name_type.{{val}}',
+)
+
+export const OpenVpnRemoteCertTlsOptions = defineOptions(
+  OpenVpnRemoteCertTls,
+  'kernel.endpoints.openvpn.remote_cert_tls.{{val}}',
+)
+
+export const OpenVpnCertProfileOptions = defineOptions(
+  OpenVpnCertProfile,
+  'kernel.endpoints.openvpn.cert_profile.{{val}}',
+)
+
+export const OpenVpnNsCertTypeOptions = defineOptions(
+  OpenVpnNsCertType,
+  'kernel.endpoints.openvpn.ns_cert_type.{{val}}',
+)
+
+export const OpenVpnControlWrapTypeOptions = defineOptions(
+  OpenVpnControlWrapType,
+  'kernel.endpoints.openvpn.control_wrap_type.{{val}}',
+)
+
+export const OpenVpnMssFixModeOptions = defineOptions(
+  OpenVpnMssFixMode,
+  'kernel.endpoints.openvpn.mss_fix_mode.{{val}}',
+)
+
+export const OpenVpnCompressionOptions = defineOptions(
+  OpenVpnCompression,
+  'kernel.endpoints.openvpn.compression.{{val}}',
+)
+
+export const OpenVpnCompressionLzoOptions = defineOptions(
+  OpenVpnCompressionLzo,
+  'kernel.endpoints.openvpn.compression_lzo.{{val}}',
+)
+
+export const OpenVpnAllowCompressionOptions = defineOptions(
+  OpenVpnAllowCompression,
+  'kernel.endpoints.openvpn.allow_compression.{{val}}',
+)
+
+export const OpenVpnPullFilterActionOptions = defineOptions(
+  OpenVpnPullFilterAction,
+  'kernel.endpoints.openvpn.pull_filters.action.{{val}}',
+)
+
+export const OpenVpnVerifyClientCertOptions = defineOptions(
+  OpenVpnVerifyClientCert,
+  'kernel.endpoints.openvpn.verify_client_cert.{{val}}',
+)
+
+export const OpenVpnDnsSecOptions = defineOptions(
+  OpenVpnDnsSec,
+  'kernel.endpoints.openvpn.push.dns_servers.dnssec.{{val}}',
+)
+
+export const OpenVpnDnsTransportOptions = defineOptions(
+  OpenVpnDnsTransport,
+  'kernel.endpoints.openvpn.push.dns_servers.transport.{{val}}',
+)
+
+export const TlsVersionOptions = defineOptions(TlsVersion, '{{val}}')
+
+export const CipherSuitesOptions = defineOptions(CipherSuites, '{{val}}')

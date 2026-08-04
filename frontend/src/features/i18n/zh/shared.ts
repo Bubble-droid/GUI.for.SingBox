@@ -1,4 +1,20 @@
 export default {
+  listen: {
+    title: '监听配置',
+    listen: '监听地址',
+    listen_port: '监听端口',
+    bind_interface: '绑定网卡',
+    routing_mark: '路由标记',
+    reuse_addr: '重用地址',
+    netns: '网络命名空间',
+    tcp_fast_open: 'TCP 快速打开',
+    tcp_multi_path: 'TCP 多路径',
+    disable_tcp_keep_alive: '禁用 TCP 保活',
+    tcp_keep_alive: 'TCP 保活周期',
+    tcp_keep_alive_interval: 'TCP 保活间隔',
+    udp_fragment: 'UDP 分段',
+    detour: '转发入站',
+  },
   domain_resolver: {
     title: '域名解析配置',
     server: '解析服务器',
