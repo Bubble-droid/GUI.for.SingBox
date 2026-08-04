@@ -13,6 +13,7 @@ import { DraggableOptions } from '@/constant/app'
 import { useBool } from '@/hooks'
 import { deepClone, message } from '@/utils'
 
+import TailScale from './TailScale.vue'
 import WireGuard from './WireGuard.vue'
 
 interface Props {
@@ -109,22 +110,16 @@ const onTypeChange = (newType: Endpoint) => {
       {{ t('kernel.endpoints.tag') }}
       <Input v-model="fields.tag" autofocus clearable />
     </div>
-    <template v-if="fields.type === Endpoint.WireGuard">
-      <WireGuard
-        :model-value="fields.config"
-        :outbound-options="outboundOptions"
-        :dns-server-options="dnsServerOptions"
-      />
-    </template>
-    <template v-if="'dialer' in fields.config">
-      <DialerConfig
-        v-model="fields.config.dialer"
-        :outbound-options="outboundOptions"
-        :server-options="dnsServerOptions"
-      />
-    </template>
-    <template v-if="'udpNat' in fields.config">
-      <UdpNatConfig v-model="fields.config.udpNat" />
-    </template>
+
+    <WireGuard v-if="fields.type === Endpoint.WireGuard" :model-value="fields.config" />
+    <TailScale v-else-if="fields.type === Endpoint.Tailscale" :model-value="fields.config" />
+
+    <DialerConfig
+      v-if="'dialer' in fields.config"
+      v-model="fields.config.dialer"
+      :outbound-options="outboundOptions"
+      :server-options="dnsServerOptions"
+    />
+    <UdpNatConfig v-if="'udpNat' in fields.config" v-model="fields.config.udpNat" />
   </Modal>
 </template>

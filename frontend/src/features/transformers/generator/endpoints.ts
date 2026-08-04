@@ -1,10 +1,30 @@
 import { Endpoint } from '@features/constant/kernel'
 import type { SingBoxEndpointOf, SingBoxEndpoint } from '@features/types/sing-box'
 import { filterInvalidProps } from '@features/utils/helper'
-import type { EndpointWireGuard, EndpointConfig } from '@profiles/endpoints'
+import type { EndpointWireGuard, EndpointConfig, EndpointTailscale } from '@profiles/endpoints'
 
 import { generateDialer, generateUdpNat } from './shared'
 import type { TagMaps } from './types'
+
+export const generateEndpoints = (
+  endpoints: EndpointConfig[],
+  maps: TagMaps,
+): SingBoxEndpoint[] => {
+  return endpoints
+    .flatMap((ep): SingBoxEndpoint[] => {
+      const { enable, type } = ep
+      if (!enable) return []
+      switch (type) {
+        case Endpoint.WireGuard:
+          return [generateWireGuard(ep, maps)]
+        case Endpoint.Tailscale:
+          return [generateTailscale(ep, maps)]
+        default:
+          throw `Unexpected endpoint type: ${type as string}`
+      }
+    })
+    .map(filterInvalidProps)
+}
 
 export const generateWireGuard = (
   wireguard: EndpointWireGuard,
@@ -24,21 +44,20 @@ export const generateWireGuard = (
   }
 }
 
-export const generateEndpoints = (
-  endpoints: EndpointConfig[],
+export const generateTailscale = (
+  tailscale: EndpointTailscale,
   maps: TagMaps,
-): SingBoxEndpoint[] => {
-  return endpoints
-    .flatMap((ep): SingBoxEndpoint[] => {
-      const { enable, type } = ep
-      if (!enable) return []
-      switch (type) {
-        case Endpoint.WireGuard:
-          return [generateWireGuard(ep, maps)]
-
-        default:
-          throw `Unexpected endpoint type: ${type}`
-      }
-    })
-    .map(filterInvalidProps)
+): SingBoxEndpointOf<typeof Endpoint.Tailscale> => {
+  const { type, tag, config } = tailscale
+  const { dialer, ...rest } = config
+  return {
+    ...rest,
+    ...generateDialer(dialer, maps),
+    type,
+    tag,
+    udp_timeout: rest.udp_timeout as any,
+    ssh_server: rest.ssh_server.enabled
+      ? { ...filterInvalidProps(rest.ssh_server), enabled: true }
+      : undefined,
+  }
 }
