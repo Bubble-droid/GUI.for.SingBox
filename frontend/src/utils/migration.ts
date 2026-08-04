@@ -1,4 +1,5 @@
 import { createProfile, ProfileSchemaVersion } from '@defaults'
+import { generateConfig } from '@generator'
 import type { Profile } from '@profiles'
 import { restoreProfile } from '@restorer'
 
@@ -59,8 +60,11 @@ export const migrateProfiles = async (
       }
 
       if (p.schema !== ProfileSchemaVersion) {
-        const newProfile = deepAssign(template, p)
-        newProfile.schema = ProfileSchemaVersion
+        const newConfig = await generateConfig(deepAssign(template, p))
+        const newProfile = restoreProfile(newConfig, p.name, {
+          profile: p,
+          subscriptionIds: [...subIds],
+        })
         profiles[i] = newProfile
         needSync = true
       }
