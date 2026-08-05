@@ -45,9 +45,14 @@ import {
   OpenVpnVerifyClientCert,
   OpenVpnDnsSec,
   TlsVersion,
-  CipherSuites,
   NetnsType,
   CertificateStore,
+  TlsCipherSuite,
+  TlsClientAuthentication,
+  TlsCurvePreference,
+  TlsEngine,
+  TlsSpoofMethod,
+  UtlsFingerprint,
 } from './kernel'
 
 type FormatString<
@@ -135,6 +140,11 @@ export const PredefinedNtpServerOptions = [
     value: 'custom',
   },
 ] satisfies ComponentOption[]
+
+export const CertificateStoreOptions = defineOptions(
+  CertificateStore,
+  'kernel.certificate.store.{{val}}',
+)
 
 export const NetnsTypeOptions = defineOptions(NetnsType, 'kernel.netns.type.{{val}}')
 
@@ -310,11 +320,16 @@ export const OpenVpnDnsTransportOptions = defineOptions(
   'kernel.endpoints.openvpn.push.dns_servers.transport.{{val}}',
 )
 
-export const TlsVersionOptions = defineOptions(TlsVersion, '{{val}}')
-
-export const CipherSuitesOptions = defineOptions(CipherSuites, '{{val}}')
-
-export const CertificateStoreOptions = defineOptions(
-  CertificateStore,
-  'kernel.certificate.store.{{val}}',
+export const TlsEngineOptions = defineOptions(TlsEngine, 'kernel.shard.tls.engine.{{val}}')
+export const TlsVersionOptions = defineOptions(TlsVersion, 'kernel.shard.tls.version.{{val}}')
+export const TlsCipherSuiteOptions = defineOptions(TlsCipherSuite, '{{val}}')
+export const TlsCurvePreferenceOptions = defineOptions(TlsCurvePreference, '{{val}}')
+export const TlsClientAuthenticationOptions = defineOptions(
+  TlsClientAuthentication,
+  'kernel.shard.tls.client_authentication.{{val}}',
 )
+export const TlsSpoofMethodOptions = defineOptions(
+  TlsSpoofMethod,
+  'kernel.shard.tls.spoof_method.{{val}}',
+)
+export const UtlsFingerprintOptions = defineOptions(UtlsFingerprint, '{{val}}')

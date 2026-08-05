@@ -4,12 +4,21 @@ import type {
   SingBoxDialer,
   SingBoxUdpNat,
   SingBoxListen,
+  SingBoxInboundTls,
+  SingBoxOutboundTls,
 } from '@features/types/sing-box'
 import { filterInvalidProps } from '@features/utils/helper'
 import type { DnsRuleConfig } from '@profiles/dns'
 import type { InboundConfig } from '@profiles/inbounds'
 import type { RouteRuleConfig, RuleSetConfig } from '@profiles/route'
-import type { DomainResolver, Dialer, UdpNat, Listen } from '@profiles/shared'
+import type {
+  DomainResolver,
+  Dialer,
+  UdpNat,
+  Listen,
+  InboundTlsConfig,
+  OutboundTlsConfig,
+} from '@profiles/shared'
 
 import { deepAssign } from '@/utils'
 
@@ -77,4 +86,40 @@ export const _generateRule = (
     }
   }
   return extra
+}
+
+export const generateInboundTls = (
+  tls: InboundTlsConfig,
+  maps: TagMaps,
+): SingBoxInboundTls | undefined => {
+  if (!tls.enabled) return undefined
+  const { enabled: _, ech, reality, ...rest } = tls
+  return filterInvalidProps({
+    enabled: true,
+    ...rest,
+    ech: ech.enabled ? filterInvalidProps(ech) : undefined,
+    reality: reality.enabled
+      ? filterInvalidProps({
+          ...reality,
+          handshake: filterInvalidProps({
+            server: reality.handshake.server,
+            server_port: reality.handshake.server_port || undefined,
+            ...generateDialer(reality.handshake.dialer, maps),
+          }),
+        })
+      : undefined,
+    certificate_provider: maps.certProviders.get(rest.certificate_provider),
+  } as SingBoxInboundTls)
+}
+
+export const generateOutboundTls = (tls: OutboundTlsConfig): SingBoxOutboundTls | undefined => {
+  if (!tls.enabled) return undefined
+  const { enabled: _, ech, utls, reality, ...rest } = tls
+  return filterInvalidProps({
+    enabled: true,
+    ...rest,
+    ech: ech.enabled ? filterInvalidProps(ech) : undefined,
+    utls: utls.enabled ? filterInvalidProps(utls) : undefined,
+    reality: reality.enabled ? filterInvalidProps(reality) : undefined,
+  } as SingBoxOutboundTls)
 }

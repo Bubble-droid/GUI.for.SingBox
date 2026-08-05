@@ -17,7 +17,7 @@ import {
   OpenVpnAllowCompressionOptions,
   OpenVpnPullFilterActionOptions,
   TlsVersionOptions,
-  CipherSuitesOptions,
+  TlsCipherSuiteOptions,
 } from '@features/constant/options'
 import type { EndpointOpenVpnClient } from '@profiles/endpoints'
 import PortInput from '@views/Shared/PortInput.vue'
@@ -229,7 +229,7 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.cipher') }}
-    <Select v-model="model.tls.cipher" :options="CipherSuitesOptions" clearable />
+    <Select v-model="model.tls.cipher" :options="TlsCipherSuiteOptions" clearable />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.groups') }}

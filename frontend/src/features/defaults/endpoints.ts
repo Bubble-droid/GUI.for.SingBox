@@ -21,8 +21,8 @@ import type {
   OpenVpnVerifyClientCert,
   OpenVpnDnsTransport,
   OpenVpnDnsSec,
-  CipherSuites,
   TlsVersion,
+  TlsCipherSuite,
 } from '@features/constant/kernel'
 import { Endpoint } from '@features/constant/kernel'
 import type {
@@ -291,7 +291,7 @@ export const createOpenVpnClient = (): EndpointOpenVpnClient => {
         ns_certificate_type: '' as OpenVpnNsCertType,
         version_min: '' as TlsVersion,
         version_max: '' as TlsVersion,
-        cipher: '' as CipherSuites,
+        cipher: '' as TlsCipherSuite,
         groups: '',
         control_wrap: {
           type: '' as OpenVpnControlWrapType,
@@ -396,7 +396,7 @@ export const createOpenVpnServer = (): EndpointOpenVpnServer => {
         ns_certificate_type: '' as OpenVpnNsCertType,
         version_min: '' as TlsVersion,
         version_max: '' as TlsVersion,
-        cipher: '' as CipherSuites,
+        cipher: '' as TlsCipherSuite,
         groups: '',
         control_wrap: {
           type: '' as OpenVpnControlWrapType,

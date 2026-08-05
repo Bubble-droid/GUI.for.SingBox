@@ -1,13 +1,29 @@
-import { createDomainResolver, createDialer, createUdpNat, createListen } from '@defaults/shared'
+import {
+  createDomainResolver,
+  createDialer,
+  createUdpNat,
+  createListen,
+  createInboundTls,
+  createOutboundTls,
+} from '@defaults/shared'
 import { RouteRuleType, DnsRuleType } from '@features/constant/kernel'
 import type {
   SingBoxDomainResolver,
   SingBoxDialer,
   SingBoxUdpNat,
   SingBoxListen,
+  SingBoxInboundTls,
+  SingBoxOutboundTls,
 } from '@features/types/sing-box'
 import { extractProps, ensureArray } from '@features/utils/helper'
-import type { DomainResolver, Dialer, UdpNat, Listen } from '@profiles/shared'
+import type {
+  DomainResolver,
+  Dialer,
+  UdpNat,
+  Listen,
+  InboundTlsConfig,
+  OutboundTlsConfig,
+} from '@profiles/shared'
 
 import type { IdMaps } from './types'
 
@@ -94,7 +110,75 @@ export const restoreListen = <T extends object>(
   const listen: Listen = {
     ...template,
     ...owned,
-    detour: maps.inbounds?.get(owned.detour!) ?? '',
+    detour: maps.inbounds.get(owned.detour!) ?? '',
   }
   return { listen, rest: result.rest }
+}
+
+export const restoreInboundTls = (raw: SingBoxInboundTls, maps: IdMaps): InboundTlsConfig => {
+  const template = createInboundTls()
+  if (!raw) return template
+
+  const { dialer, rest: handshakeRest } = restoreDialer(raw.reality?.handshake ?? {}, maps)
+
+  return {
+    ...template,
+    ...raw,
+    enabled: raw.enabled ?? true,
+    alpn: ensureArray(raw.alpn),
+    cipher_suites: ensureArray(raw.cipher_suites),
+    curve_preferences: ensureArray(raw.curve_preferences),
+    certificate: ensureArray(raw.certificate),
+    client_certificate: ensureArray(raw.client_certificate),
+    client_certificate_path: ensureArray(raw.client_certificate_path),
+    client_certificate_public_key_sha256: ensureArray(raw.client_certificate_public_key_sha256),
+    key: ensureArray(raw.key),
+    certificate_provider: maps.certProviders.get(raw.certificate_provider as string) ?? '',
+    ech: {
+      ...template.ech,
+      ...raw.ech,
+      key: ensureArray(raw.ech?.key),
+    },
+    reality: {
+      ...template.reality,
+      ...raw.reality,
+      short_id: ensureArray(raw.reality?.short_id),
+      handshake: {
+        ...template.reality.handshake,
+        ...handshakeRest,
+        dialer,
+      },
+    },
+  }
+}
+
+export const restoreOutboundTls = (raw: SingBoxOutboundTls): OutboundTlsConfig => {
+  const template = createOutboundTls()
+  if (!raw) return template
+
+  return {
+    ...template,
+    ...raw,
+    enabled: raw.enabled ?? true,
+    alpn: ensureArray(raw.alpn),
+    cipher_suites: ensureArray(raw.cipher_suites),
+    curve_preferences: ensureArray(raw.curve_preferences),
+    certificate: ensureArray(raw.certificate),
+    certificate_public_key_sha256: ensureArray(raw.certificate_public_key_sha256),
+    client_certificate: ensureArray(raw.client_certificate),
+    client_key: ensureArray(raw.client_key),
+    ech: {
+      ...template.ech,
+      ...raw.ech,
+      config: ensureArray(raw.ech?.config),
+    },
+    utls: {
+      ...template.utls,
+      ...raw.utls,
+    },
+    reality: {
+      ...template.reality,
+      ...raw.reality,
+    },
+  }
 }

@@ -11,7 +11,7 @@ import DomainResolverConfig from './DomainResolverConfig.vue'
 interface Props {
   netnsOptions: ComponentOption[]
   outboundOptions: ComponentOption[]
-  serverOptions: ComponentOption[]
+  dnsServerOptions: ComponentOption[]
 }
 
 defineProps<Props>()
@@ -122,5 +122,5 @@ const [showDialer, toggleShow] = useBool(false)
       <Input v-model="model.network_fallback_delay" editable clearable />
     </div>
   </div>
-  <DomainResolverConfig v-model="model.domain_resolver" :server-options="serverOptions" />
+  <DomainResolverConfig v-model="model.domain_resolver" :dns-server-options="dnsServerOptions" />
 </template>

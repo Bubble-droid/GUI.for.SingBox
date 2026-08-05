@@ -2,9 +2,17 @@ import type {
   DomainStrategy,
   NetworkStrategy,
   NetworkType,
+  TlsCipherSuite,
+  TlsClientAuthentication,
+  TlsCurvePreference,
+  TlsEngine,
+  TlsSpoofMethod,
+  TlsVersion,
   UdpNatBehavior,
+  UtlsFingerprint,
 } from '@features/constant/kernel'
 
+export type CertProviderId = string
 export type InboundId = string
 export type OutboundId = string
 export type DnsServerId = string
@@ -82,4 +90,97 @@ export interface UdpNat {
   udp_mapping: UdpNatBehavior
   udp_filtering: UdpNatBehavior
   udp_nat_max: number
+}
+
+export interface InboundTlsEch {
+  enabled: boolean
+  key: string[]
+  key_path: string
+}
+
+export interface InboundTlsRealityHandshake {
+  server: string
+  server_port: number
+  dialer: Dialer
+}
+
+export interface InboundTlsReality {
+  enabled: boolean
+  handshake: InboundTlsRealityHandshake
+  private_key: string
+  short_id: string[]
+  max_time_difference: string
+}
+
+export interface InboundTlsConfig {
+  enabled: boolean
+  server_name: string
+  alpn: string[]
+  min_version: TlsVersion
+  max_version: TlsVersion
+  cipher_suites: TlsCipherSuite[]
+  curve_preferences: TlsCurvePreference[]
+  certificate: string[]
+  certificate_path: string
+  client_authentication: TlsClientAuthentication
+  client_certificate: string[]
+  client_certificate_path: string[]
+  client_certificate_public_key_sha256: string[]
+  key: string[]
+  key_path: string
+  kernel_tx: boolean
+  kernel_rx: boolean
+  handshake_timeout: string
+  certificate_provider: CertProviderId
+  ech: InboundTlsEch
+  reality: InboundTlsReality
+}
+
+export interface OutboundTlsEch {
+  enabled: boolean
+  config: string[]
+  config_path: string
+  query_server_name: string
+}
+
+export interface OutboundUtls {
+  enabled: boolean
+  fingerprint: UtlsFingerprint
+}
+
+export interface OutboundTlsReality {
+  enabled: boolean
+  public_key: string
+  short_id: string
+}
+
+export interface OutboundTlsConfig {
+  enabled: boolean
+  engine: TlsEngine
+  disable_sni: boolean
+  server_name: string
+  insecure: boolean
+  alpn: string[]
+  min_version: TlsVersion
+  max_version: TlsVersion
+  cipher_suites: TlsCipherSuite[]
+  curve_preferences: TlsCurvePreference[]
+  certificate: string[]
+  certificate_path: string
+  certificate_public_key_sha256: string[]
+  client_certificate: string[]
+  client_certificate_path: string
+  client_key: string[]
+  client_key_path: string
+  fragment: boolean
+  fragment_fallback_delay: string
+  record_fragment: boolean
+  spoof: string
+  spoof_method: TlsSpoofMethod
+  kernel_tx: boolean
+  kernel_rx: boolean
+  handshake_timeout: string
+  ech: OutboundTlsEch
+  utls: OutboundUtls
+  reality: OutboundTlsReality
 }

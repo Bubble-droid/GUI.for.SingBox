@@ -139,7 +139,7 @@ const onTypeChange = (newType: Endpoint) => {
       v-model="fields.config.dialer"
       :netns-options="netnsOptions"
       :outbound-options="outboundOptions"
-      :server-options="dnsServerOptions"
+      :dns-server-options="dnsServerOptions"
     />
     <UdpNatConfig v-if="'udpNat' in fields.config" v-model="fields.config.udpNat" />
   </Modal>

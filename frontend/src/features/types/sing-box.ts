@@ -42,6 +42,10 @@ export type SingBoxUdpNat = Pick<
   'udp_timeout' | 'udp_mapping' | 'udp_filtering' | 'udp_nat_max'
 >
 
+export type SingBoxOutboundTls = NonNullable<SingBoxOutboundOf<'http'>['tls']>
+
+export type SingBoxInboundTls = NonNullable<SingBoxInboundOf<'http'>['tls']>
+
 export type SingBoxInbound = UnpackArray<NonNullable<SingBoxConfig['inbounds']>>
 
 export type SingBoxInboundOf<T extends SingBoxInbound['type']> = Extract<

@@ -1,4 +1,13 @@
-import type { DomainStrategy, NetworkStrategy, UdpNatBehavior } from '@features/constant/kernel'
+import type {
+  DomainStrategy,
+  NetworkStrategy,
+  TlsClientAuthentication,
+  TlsEngine,
+  TlsSpoofMethod,
+  TlsVersion,
+  UdpNatBehavior,
+  UtlsFingerprint,
+} from '@features/constant/kernel'
 import type {
   TagItem,
   ProfileBase,
@@ -8,6 +17,8 @@ import type {
   Dialer,
   UdpNat,
   Listen,
+  InboundTlsConfig,
+  OutboundTlsConfig,
 } from '@profiles/shared'
 
 import { sampleID } from '@/utils'
@@ -119,4 +130,85 @@ export const createListen = (): Listen => ({
   udp_fragment: false,
   udp_timeout: '',
   detour: '',
+})
+
+export const createInboundTls = (): InboundTlsConfig => ({
+  enabled: false,
+  server_name: '',
+  alpn: [],
+  min_version: '' as TlsVersion,
+  max_version: '' as TlsVersion,
+  cipher_suites: [],
+  curve_preferences: [],
+  certificate: [],
+  certificate_path: '',
+  client_authentication: '' as TlsClientAuthentication,
+  client_certificate: [],
+  client_certificate_path: [],
+  client_certificate_public_key_sha256: [],
+  key: [],
+  key_path: '',
+  kernel_tx: false,
+  kernel_rx: false,
+  handshake_timeout: '',
+  certificate_provider: '',
+  ech: {
+    enabled: false,
+    key: [],
+    key_path: '',
+  },
+  reality: {
+    enabled: false,
+    handshake: {
+      server: '',
+      server_port: 0,
+      dialer: createDialer(),
+    },
+    private_key: '',
+    short_id: [],
+    max_time_difference: '',
+  },
+})
+
+export const createOutboundTls = (): OutboundTlsConfig => ({
+  enabled: false,
+  engine: '' as TlsEngine,
+  disable_sni: false,
+  server_name: '',
+  insecure: false,
+  alpn: [],
+  min_version: '' as TlsVersion,
+  max_version: '' as TlsVersion,
+  cipher_suites: [],
+  curve_preferences: [],
+  certificate: [],
+  certificate_path: '',
+  certificate_public_key_sha256: [],
+  client_certificate: [],
+  client_certificate_path: '',
+  client_key: [],
+  client_key_path: '',
+  fragment: false,
+  fragment_fallback_delay: '',
+  record_fragment: false,
+  spoof: '',
+  spoof_method: '' as TlsSpoofMethod,
+  kernel_tx: false,
+  kernel_rx: false,
+  handshake_timeout: '',
+  ech: {
+    enabled: false,
+    config: [],
+    config_path: '',
+    query_server_name: '',
+  },
+  utls: {
+    enabled: false,
+    fingerprint: '' as UtlsFingerprint,
+  },
+  reality: {
+    enabled: false,
+    public_key: '',
+    short_id: '',
+  },
 })

@@ -273,7 +273,7 @@ defineExpose({ modalSlots })
         v-model="profile.ntp"
         :netns-options="netnsOptions"
         :outbound-options="outboundOptions"
-        :server-options="dnsServerOptions"
+        :dns-server-options="dnsServerOptions"
       />
     </div>
     <div v-if="currentStep === ProfileStep.Certificate">

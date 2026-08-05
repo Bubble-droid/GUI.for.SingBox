@@ -15,7 +15,7 @@ import {
   OpenVpnDnsSecOptions,
   OpenVpnDnsTransportOptions,
   TlsVersionOptions,
-  CipherSuitesOptions,
+  TlsCipherSuiteOptions,
 } from '@features/constant/options'
 import type { EndpointOpenVpnServer } from '@profiles/endpoints'
 import PortInput from '@views/Shared/PortInput.vue'
@@ -216,7 +216,7 @@ const deletePushDnsServer = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.cipher') }}
-    <Select v-model="model.tls.cipher" :options="CipherSuitesOptions" clearable />
+    <Select v-model="model.tls.cipher" :options="TlsCipherSuiteOptions" clearable />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.groups') }}

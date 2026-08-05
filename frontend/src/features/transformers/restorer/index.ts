@@ -51,6 +51,7 @@ export const restoreProfile = (
   const outboundIds = buildTagIdMapping('out-', config.outbounds)
 
   const idMaps: IdMaps = {
+    certProviders: new Map(),
     netns: buildTagIdMapping('ns-', config.network_namespaces),
     endpoints: endpointIds,
     inbounds: new Map([...endpointIds, ...inboundsIds]),
