@@ -17,6 +17,8 @@ import {
 import { alert, message, modal } from '@/utils/interaction.ts'
 import { deepClone, sampleID, debounce } from '@/utils/others.ts'
 
+import CodeViewer from '@/components/CodeViewer/index.vue'
+
 import ProfileEditor from './components/ProfileEditor.vue'
 import ProfileForm from './components/ProfileForm.vue'
 
@@ -86,9 +88,21 @@ const secondaryMenusList: App.Menu[] = [
       const p = profilesStore.getProfileById(id)!
       try {
         const config = await generateConfig(p)
-        alert(p.name, JSON.stringify(config, null, 2))
-      } catch (error: any) {
-        message.error(error.message || error)
+        const m = modal({
+          title: p.name,
+          cancelText: 'common.close',
+          height: '90',
+          width: '90',
+          submit: false,
+          maskClosable: true,
+        })
+        m.setContent(CodeViewer, {
+          modelValue: JSON.stringify(config, null, 2),
+          lang: 'json',
+          copyable: true,
+        }).open()
+      } catch (error) {
+        message.error(error)
       }
     },
   },
