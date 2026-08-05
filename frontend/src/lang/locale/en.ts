@@ -202,6 +202,7 @@ export default {
       log: 'Log',
       ntp: 'NTP',
       experimental: 'Experimental',
+      netns: 'Network Namespaces',
       endpoints: 'Endpoints',
       inbounds: 'Inbounds',
       outbounds: 'Outbounds',

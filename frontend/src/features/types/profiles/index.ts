@@ -4,6 +4,7 @@ import type { ExperimentalConfig } from './experimental'
 import type { InboundConfig } from './inbounds'
 import type { LogConfig } from './log'
 import type { MixinConfig, ScriptConfig } from './mixin-script'
+import type { NetnsConfig } from './netns'
 import type { NtpConfig } from './ntp'
 import type { OutboundConfig } from './outbounds'
 import type { RouteConfig } from './route'
@@ -15,6 +16,7 @@ export interface Profile {
   log: LogConfig
   ntp: NtpConfig
   experimental: ExperimentalConfig
+  network_namespaces: NetnsConfig[]
   endpoints: EndpointConfig[]
   inbounds: InboundConfig[]
   outbounds: OutboundConfig[]

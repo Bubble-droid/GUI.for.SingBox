@@ -4,6 +4,7 @@ import type {
   SingBoxDomainResolver,
   SingBoxDialer,
   SingBoxEndpointOf,
+  SingBoxNetns,
 } from '@features/types/sing-box'
 import type { ValueOf } from '@features/types/utils'
 
@@ -26,6 +27,13 @@ export const ClashMode = {
 } as const
 
 export type ClashMode = ValueOf<typeof ClashMode>
+
+export const NetnsType = {
+  Default: 'default',
+  Unshare: 'unshare',
+} as const satisfies Recordable<SingBoxNetns['type']>
+
+export type NetnsType = ValueOf<typeof NetnsType>
 
 export const Endpoint = {
   WireGuard: 'wireguard',

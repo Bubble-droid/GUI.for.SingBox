@@ -11,6 +11,7 @@ import { restoreDnsServers, restoreDnsRules } from './dns'
 import { restoreEndpoints } from './endpoints'
 import { restoreExperimental } from './experimental'
 import { restoreInbounds } from './inbounds'
+import { restoreNetns } from './netns'
 import { restoreNtp } from './ntp'
 import { restoreOutbounds } from './outbounds'
 import { restoreRouteRuleset, restoreRouteRules } from './route'
@@ -49,6 +50,7 @@ export const restoreProfile = (
   const outboundIds = buildTagIdMapping('out-', config.outbounds)
 
   const idMaps: IdMaps = {
+    netns: buildTagIdMapping('ns-', config.network_namespaces),
     endpoints: endpointIds,
     inbounds: new Map([...endpointIds, ...inboundsIds]),
     outbounds: new Map([...endpointIds, ...outboundIds]),
@@ -62,6 +64,7 @@ export const restoreProfile = (
     log: { ...createLog(), ...(config.log as LogConfig) },
     ntp: restoreNtp(config.ntp, idMaps),
     experimental: restoreExperimental(config.experimental, idMaps),
+    network_namespaces: restoreNetns(config.network_namespaces, idMaps),
     endpoints: restoreEndpoints(config.endpoints as SingBoxEndpoint[], idMaps),
     inbounds: restoreInbounds(config.inbounds || [], InboundsIds),
     outbounds: restoreOutbounds(

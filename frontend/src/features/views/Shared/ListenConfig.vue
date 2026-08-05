@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { useBool } from '@/hooks'
 
 interface Props {
+  netnsOptions: ComponentOption[]
   inboundOptions: ComponentOption[]
 }
 
@@ -46,7 +47,7 @@ const [showListen, toggleShow] = useBool(false)
     </div>
     <div class="form-item">
       {{ t('kernel.shared.listen.netns') }}
-      <Input v-model="model.netns" editable clearable />
+      <Select v-model="model.netns" :options="netnsOptions" clearable />
     </div>
     <div class="form-item">
       {{ t('kernel.shared.listen.tcp_fast_open') }}

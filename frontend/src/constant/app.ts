@@ -203,6 +203,7 @@ export const ProfileSteps = [
   'Log',
   'Ntp',
   'Experimental',
+  'Netns',
   'Endpoints',
   'Inbounds',
   'Outbounds',

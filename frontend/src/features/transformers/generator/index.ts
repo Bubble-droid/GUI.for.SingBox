@@ -12,6 +12,7 @@ import { generateDns } from './dns'
 import { generateEndpoints } from './endpoints'
 import { generateExperimental } from './experimental'
 import { generateInbounds } from './inbounds'
+import { generateNetns } from './netns'
 import { generateNtp } from './ntp'
 import { generateOutbounds } from './outbounds'
 import { generateRoute } from './route'
@@ -47,16 +48,17 @@ export const generateConfig = async (
   }
 
   // step 1
-  let config: Recordable = {
+  let config: Recordable = filterInvalidProps({
     log: filterInvalidProps(profile.log),
     ntp: generateNtp(profile.ntp, tagMaps),
     experimental: generateExperimental(profile.experimental, tagMaps),
+    network_namespaces: generateNetns(profile.network_namespaces),
     endpoints: generateEndpoints(profile.endpoints, tagMaps),
     inbounds: generateInbounds(profile.inbounds),
     outbounds: await generateOutbounds(profile.outbounds),
     route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns),
     dns: generateDns(profile.dns, profile.route.rule_set, profile.inbounds, profile.outbounds),
-  }
+  })
 
   // adapt to stable branch
   if (enableStableConfigCompat) {

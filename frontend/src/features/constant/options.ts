@@ -46,6 +46,7 @@ import {
   OpenVpnDnsSec,
   TlsVersion,
   CipherSuites,
+  NetnsType,
 } from './kernel'
 
 type FormatString<
@@ -133,6 +134,8 @@ export const PredefinedNtpServerOptions = [
     value: 'custom',
   },
 ] satisfies ComponentOption[]
+
+export const NetnsTypeOptions = defineOptions(NetnsType, 'kernel.netns.type.{{val}}')
 
 export const EndpointOptions = defineOptions(Endpoint, 'kernel.endpoints.type.{{val}}')
 
