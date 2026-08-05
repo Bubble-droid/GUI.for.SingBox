@@ -26,6 +26,7 @@ import (
 var (
 	AppName             = "gui-for-singbox"
 	AppVersion          = "dev"
+	IsDev               = AppVersion == "dev"
 	SingBoxVersion      = "unknown"
 	SingBoxAlphaVersion = "unknown"
 )

@@ -6,7 +6,6 @@ import { restoreProfile } from '@restorer'
 import { RequestProxyMode } from '@/enums/app'
 
 import { legacyGenerateConfig } from './generator'
-import { message } from './interaction'
 import { deepAssign, normalizeErrorMessage } from './others'
 
 export const migrateProfiles = async (
@@ -69,9 +68,9 @@ export const migrateProfiles = async (
         needSync = true
       }
     } catch (error) {
-      message.error(
-        `Failed to migrate profile [${p.name || p.id}]: ${normalizeErrorMessage(error)}`,
-      )
+      const msg = `Failed to migrate profile [${p.name || p.id}]: ${normalizeErrorMessage(error)}`
+      console.error(msg)
+      throw msg
     }
   }
 
