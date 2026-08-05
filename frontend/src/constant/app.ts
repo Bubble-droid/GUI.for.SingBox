@@ -202,6 +202,7 @@ export const ProfileSteps = [
   'Name',
   'Log',
   'Ntp',
+  'Certificate',
   'Experimental',
   'Netns',
   'Endpoints',

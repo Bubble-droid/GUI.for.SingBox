@@ -17,6 +17,10 @@ export type SingBoxConfig = typebox<
   string
 >
 
+export type SingBoxNtp = NonNullable<SingBoxConfig['ntp']>
+
+export type SingBoxCert = NonNullable<SingBoxConfig['certificate']>
+
 export type SingBoxNetns = UnpackArray<NonNullable<SingBoxConfig['network_namespaces']>>
 
 export type SingBoxNetnsOf<T extends NonNullable<SingBoxNetns['type']>> = Extract<
@@ -37,8 +41,6 @@ export type SingBoxUdpNat = Pick<
   SingBoxEndpointOf<'wireguard'>,
   'udp_timeout' | 'udp_mapping' | 'udp_filtering' | 'udp_nat_max'
 >
-
-export type SingBoxNtp = NonNullable<SingBoxConfig['ntp']>
 
 export type SingBoxInbound = UnpackArray<NonNullable<SingBoxConfig['inbounds']>>
 

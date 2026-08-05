@@ -5,6 +5,7 @@ import type {
   SingBoxDialer,
   SingBoxEndpointOf,
   SingBoxNetns,
+  SingBoxCert,
 } from '@features/types/sing-box'
 import type { ValueOf } from '@features/types/utils'
 
@@ -456,3 +457,12 @@ export const CipherSuites = {
 } as const
 
 export type CipherSuites = ValueOf<typeof CipherSuites>
+
+export const CertificateStore = {
+  System: 'system',
+  Mozilla: 'mozilla',
+  Chrome: 'chrome',
+  None: 'none',
+} as const satisfies Recordable<NonNullable<SingBoxCert['store']>>
+
+export type CertificateStore = ValueOf<typeof CertificateStore>

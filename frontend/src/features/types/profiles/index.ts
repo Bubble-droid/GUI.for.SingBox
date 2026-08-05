@@ -1,3 +1,4 @@
+import type { CertificateConfig } from './certificate'
 import type { DnsConfig } from './dns'
 import type { EndpointConfig } from './endpoints'
 import type { ExperimentalConfig } from './experimental'
@@ -15,6 +16,7 @@ export interface Profile {
   schema: string
   log: LogConfig
   ntp: NtpConfig
+  certificate: CertificateConfig
   experimental: ExperimentalConfig
   network_namespaces: NetnsConfig[]
   endpoints: EndpointConfig[]

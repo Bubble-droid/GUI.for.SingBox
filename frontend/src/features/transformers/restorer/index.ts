@@ -7,6 +7,7 @@ import type { LogConfig } from '@profiles/log'
 import { useProfilesStore } from '@/stores'
 import { sampleID } from '@/utils'
 
+import { restoreCertificate } from './certificate'
 import { restoreDnsServers, restoreDnsRules } from './dns'
 import { restoreEndpoints } from './endpoints'
 import { restoreExperimental } from './experimental'
@@ -63,6 +64,7 @@ export const restoreProfile = (
     schema: ProfileSchemaVersion,
     log: { ...createLog(), ...(config.log as LogConfig) },
     ntp: restoreNtp(config.ntp, idMaps),
+    certificate: restoreCertificate(config.certificate),
     experimental: restoreExperimental(config.experimental, idMaps),
     network_namespaces: restoreNetns(config.network_namespaces, idMaps),
     endpoints: restoreEndpoints(config.endpoints as SingBoxEndpoint[], idMaps),

@@ -3,6 +3,7 @@ import type { MixinConfig, ScriptConfig } from '@profiles/mixin-script'
 
 import { sampleID } from '@/utils'
 
+import { createCertificate } from './certificate'
 import { createDns } from './dns'
 import { createExperimental } from './experimental'
 import { createInbounds } from './inbounds'
@@ -11,7 +12,7 @@ import { createNtp } from './ntp'
 import { createOutbounds } from './outbounds'
 import { createRoute } from './route'
 
-export const ProfileSchemaVersion = 'v0.5.0'
+export const ProfileSchemaVersion = 'v0.6.0'
 
 export const createMixin = (): MixinConfig => {
   return { priority: 'mixin', format: 'json', config: '{}' }
@@ -27,6 +28,7 @@ export const createProfile = (name = ''): Profile => ({
   schema: ProfileSchemaVersion,
   log: createLog(),
   ntp: createNtp(),
+  certificate: createCertificate(),
   experimental: createExperimental(),
   network_namespaces: [],
   endpoints: [],
