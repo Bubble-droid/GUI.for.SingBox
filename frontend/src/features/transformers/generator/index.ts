@@ -8,6 +8,7 @@ import { useAppSettingsStore, usePluginsStore } from '@/stores'
 import { deepClone, deepAssign } from '@/utils'
 
 import { _adaptToStableBranch } from './adapter'
+import { generateCertificate } from './certificate'
 import { generateDns } from './dns'
 import { generateEndpoints } from './endpoints'
 import { generateExperimental } from './experimental'
@@ -51,6 +52,7 @@ export const generateConfig = async (
   let config: Recordable = filterInvalidProps({
     log: filterInvalidProps(profile.log),
     ntp: generateNtp(profile.ntp, tagMaps),
+    certificate: generateCertificate(profile.certificate),
     experimental: generateExperimental(profile.experimental, tagMaps),
     network_namespaces: generateNetns(profile.network_namespaces),
     endpoints: generateEndpoints(profile.endpoints, tagMaps),

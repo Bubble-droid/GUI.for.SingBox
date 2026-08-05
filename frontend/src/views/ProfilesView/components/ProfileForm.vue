@@ -2,6 +2,7 @@
 import type { ComponentOption } from '@features/types/views.ts'
 import { generateConfig } from '@generator'
 import type { Profile } from '@profiles'
+import CertificateConfig from '@views/CertificateConfig.vue'
 import DnsConfig from '@views/DnsConfig.vue'
 import EndpointsConfig from '@views/EndpointsConfig/EndpointsConfig.vue'
 import ExperimentalConfig from '@views/ExperimentalConfig.vue'
@@ -274,6 +275,9 @@ defineExpose({ modalSlots })
         :outbound-options="outboundOptions"
         :server-options="dnsServerOptions"
       />
+    </div>
+    <div v-if="currentStep === ProfileStep.Certificate">
+      <CertificateConfig v-model="profile.certificate" />
     </div>
     <div v-if="currentStep === ProfileStep.Experimental">
       <ExperimentalConfig v-model="profile.experimental" :outbound-options="outboundOptions" />

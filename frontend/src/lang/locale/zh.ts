@@ -199,6 +199,7 @@ export default {
       name: '名称设置',
       log: '日志设置',
       ntp: 'NTP 设置',
+      certificate: '证书设置',
       experimental: '实验性设置',
       netns: '网络命名空间设置',
       endpoints: '端点设置',

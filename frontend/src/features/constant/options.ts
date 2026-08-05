@@ -47,6 +47,7 @@ import {
   TlsVersion,
   CipherSuites,
   NetnsType,
+  CertificateStore,
 } from './kernel'
 
 type FormatString<
@@ -312,3 +313,8 @@ export const OpenVpnDnsTransportOptions = defineOptions(
 export const TlsVersionOptions = defineOptions(TlsVersion, '{{val}}')
 
 export const CipherSuitesOptions = defineOptions(CipherSuites, '{{val}}')
+
+export const CertificateStoreOptions = defineOptions(
+  CertificateStore,
+  'kernel.certificate.store.{{val}}',
+)

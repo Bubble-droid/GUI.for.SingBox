@@ -201,6 +201,7 @@ export default {
       name: 'Name',
       log: 'Log',
       ntp: 'NTP',
+      certificate: 'Certificate',
       experimental: 'Experimental',
       netns: 'Network Namespaces',
       endpoints: 'Endpoints',
