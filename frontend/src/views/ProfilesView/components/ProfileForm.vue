@@ -48,20 +48,22 @@ const currentStep = ref(props.step)
 const profile = ref<Profile>(profilesStore.getProfileTemplate())
 
 const inboundOptions = computed<ComponentOption[]>(() =>
-  [...profile.value.endpoints, ...profile.value.inbounds].map((v) => ({
-    label: v.tag,
-    value: v.id,
-  })),
+  [...profile.value.endpoints, ...profile.value.inbounds]
+    .filter((v) => v.enable)
+    .map((v) => ({
+      label: v.tag,
+      value: v.id,
+    })),
 )
 
 const outboundOptions = computed<ComponentOption[]>(() =>
-  [...profile.value.endpoints, ...profile.value.outbounds].map((v) => ({
+  [...profile.value.endpoints.filter((v) => v.enable), ...profile.value.outbounds].map((v) => ({
     label: v.tag,
     value: v.id,
   })),
 )
 
-const serverOptions = computed(() =>
+const dnsServerOptions = computed(() =>
   profile.value.dns.servers.map((v) => ({ label: v.tag, value: v.id })),
 )
 
@@ -243,7 +245,7 @@ defineExpose({ modalSlots })
       <NtpConfig
         v-model="profile.ntp"
         :outbound-options="outboundOptions"
-        :server-options="serverOptions"
+        :server-options="dnsServerOptions"
       />
     </div>
     <div v-if="currentStep === ProfileStep.Experimental">
@@ -255,7 +257,7 @@ defineExpose({ modalSlots })
         v-model="profile.endpoints"
         :inbound-options="inboundOptions"
         :outbound-options="outboundOptions"
-        :dns-server-options="serverOptions"
+        :dns-server-options="dnsServerOptions"
       />
     </div>
     <div v-if="currentStep === ProfileStep.Inbounds">
@@ -270,7 +272,7 @@ defineExpose({ modalSlots })
         v-model="profile.route"
         :inbound-options="inboundOptions"
         :outbound-options="outboundOptions"
-        :server-options="serverOptions"
+        :server-options="dnsServerOptions"
       />
     </div>
     <div v-if="currentStep === ProfileStep.Dns">
