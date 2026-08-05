@@ -7,7 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { useBool } from '@/hooks'
 
 interface Props {
-  inboundOptions?: ComponentOption[]
+  inboundOptions: ComponentOption[]
 }
 
 defineProps<Props>()
@@ -76,7 +76,7 @@ const [showListen, toggleShow] = useBool(false)
       {{ t('kernel.shared.listen.udp_timeout') }}
       <Input v-model="model.udp_timeout" editable clearable />
     </div>
-    <div v-if="inboundOptions?.length" class="form-item">
+    <div class="form-item">
       {{ t('kernel.shared.listen.detour') }}
       <Select v-model="model.detour" :options="inboundOptions" clearable />
     </div>
