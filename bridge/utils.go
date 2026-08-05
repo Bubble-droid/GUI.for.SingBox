@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
+	"log"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -32,7 +33,12 @@ func resolvePath(rawPath string) string {
 		return cleanPath
 	}
 
-	return platform_path.Resolve(cleanPath)
+	resolvedPath := platform_path.Resolve(cleanPath)
+	if IsDev {
+		log.Printf("Real Path: %s", resolvedPath)
+	}
+
+	return resolvedPath
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {
