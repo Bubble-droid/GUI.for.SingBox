@@ -9,7 +9,7 @@ import { useBool } from '@/hooks'
 import DnsRouteOptionsConfig from './DnsRouteOptionsConfig.vue'
 
 interface Props {
-  serverOptions: ComponentOption[]
+  dnsServerOptions: ComponentOption[]
   title?: string
 }
 
@@ -30,7 +30,7 @@ const [showResolver, toggleShow] = useBool(false)
     <DnsRouteOptionsConfig v-model="model" />
     <div class="form-item">
       {{ t('kernel.shared.domain_resolver.server') }}
-      <Select v-model="model.server" :options="serverOptions" clearable />
+      <Select v-model="model.server" :options="dnsServerOptions" clearable />
     </div>
     <div class="form-item">
       {{ t('kernel.shared.domain_resolver.strategy.title') }}

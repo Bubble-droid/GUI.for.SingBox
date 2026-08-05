@@ -11,6 +11,7 @@ export interface RestoreProfileOptions {
 }
 
 export interface IdMaps {
+  certProviders: Map<string, string>
   netns: Map<string, string>
   endpoints: Map<string, string>
   inbounds: Map<string, string>

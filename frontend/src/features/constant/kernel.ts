@@ -29,6 +29,13 @@ export const ClashMode = {
 
 export type ClashMode = ValueOf<typeof ClashMode>
 
+export const CertificateStore = {
+  System: 'system',
+  Mozilla: 'mozilla',
+  Chrome: 'chrome',
+  None: 'none',
+} as const satisfies Recordable<NonNullable<SingBoxCert['store']>>
+
 export const NetnsType = {
   Default: 'default',
   Unshare: 'unshare',
@@ -427,16 +434,26 @@ export const OpenVpnDnsTransport = {
 
 export type OpenVpnDnsTransport = ValueOf<typeof OpenVpnDnsTransport>
 
+export type CertificateStore = ValueOf<typeof CertificateStore>
+
+export const TlsEngine = {
+  Go: 'go',
+  Apple: 'apple',
+  Windows: 'windows',
+} as const
+
+export type TlsEngine = ValueOf<typeof TlsEngine>
+
 export const TlsVersion = {
-  '1.0': '1.0',
-  '1.1': '1.1',
-  '1.2': '1.2',
-  '1.3': '1.3',
+  V1_0: '1.0',
+  V1_1: '1.1',
+  V1_2: '1.2',
+  V1_3: '1.3',
 } as const
 
 export type TlsVersion = ValueOf<typeof TlsVersion>
 
-export const CipherSuites = {
+export const TlsCipherSuite = {
   TLS_RSA_WITH_AES_128_CBC_SHA: 'TLS_RSA_WITH_AES_128_CBC_SHA',
   TLS_RSA_WITH_AES_256_CBC_SHA: 'TLS_RSA_WITH_AES_256_CBC_SHA',
   TLS_RSA_WITH_AES_128_GCM_SHA256: 'TLS_RSA_WITH_AES_128_GCM_SHA256',
@@ -456,13 +473,49 @@ export const CipherSuites = {
   TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256: 'TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256',
 } as const
 
-export type CipherSuites = ValueOf<typeof CipherSuites>
+export type TlsCipherSuite = ValueOf<typeof TlsCipherSuite>
 
-export const CertificateStore = {
-  System: 'system',
-  Mozilla: 'mozilla',
+export const TlsCurvePreference = {
+  P256: 'P256',
+  P384: 'P384',
+  P521: 'P521',
+  X25519: 'X25519',
+  X25519MLKEM768: 'X25519MLKEM768',
+} as const
+
+export type TlsCurvePreference = ValueOf<typeof TlsCurvePreference>
+
+export const TlsClientAuthentication = {
+  No: 'no',
+  Request: 'request',
+  RequireAny: 'require-any',
+  VerifyIfGiven: 'verify-if-given',
+  RequireAndVerify: 'require-and-verify',
+} as const
+
+export type TlsClientAuthentication = ValueOf<typeof TlsClientAuthentication>
+
+export const TlsSpoofMethod = {
+  WrongSequence: 'wrong-sequence',
+  WrongChecksum: 'wrong-checksum',
+  WrongAck: 'wrong-ack',
+  WrongMd5: 'wrong-md5',
+  WrongTimestamp: 'wrong-timestamp',
+} as const
+
+export type TlsSpoofMethod = ValueOf<typeof TlsSpoofMethod>
+
+export const UtlsFingerprint = {
   Chrome: 'chrome',
-  None: 'none',
-} as const satisfies Recordable<NonNullable<SingBoxCert['store']>>
+  Firefox: 'firefox',
+  Edge: 'edge',
+  Safari: 'safari',
+  360: '360',
+  Qq: 'qq',
+  Ios: 'ios',
+  Android: 'android',
+  Random: 'random',
+  Randomized: 'randomized',
+} as const
 
-export type CertificateStore = ValueOf<typeof CertificateStore>
+export type UtlsFingerprint = ValueOf<typeof UtlsFingerprint>

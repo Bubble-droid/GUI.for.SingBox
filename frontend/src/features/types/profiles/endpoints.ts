@@ -23,7 +23,7 @@ import type {
   OpenVpnDnsTransport,
   OpenVpnDnsSec,
   TlsVersion,
-  CipherSuites,
+  TlsCipherSuite,
 } from '@features/constant/kernel'
 
 import type { Switchable, Dialer, UdpNat, Listen } from './shared'
@@ -229,7 +229,7 @@ export interface OpenVpnClientTls {
   ns_certificate_type: OpenVpnNsCertType
   version_min: TlsVersion
   version_max: TlsVersion
-  cipher: CipherSuites
+  cipher: TlsCipherSuite
   groups: string
   control_wrap: OpenVpnControlWrap
 }
@@ -354,7 +354,7 @@ export interface OpenVpnServerTls {
   ns_certificate_type: OpenVpnNsCertType
   version_min: TlsVersion
   version_max: TlsVersion
-  cipher: CipherSuites
+  cipher: TlsCipherSuite
   groups: string
   control_wrap: OpenVpnControlWrap
 }
