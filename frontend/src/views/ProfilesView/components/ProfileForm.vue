@@ -16,10 +16,11 @@ import { useI18n } from 'vue-i18n'
 
 import { ProfileStep, ProfileStepItems } from '@/constant/app.ts'
 import { useProfilesStore } from '@/stores'
-import { alert, message } from '@/utils/interaction.ts'
+import { message, modal } from '@/utils/interaction.ts'
 import { deepClone } from '@/utils/others.ts'
 
 import Button from '@/components/Button/index.vue'
+import CodeViewer from '@/components/CodeViewer/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'
 
 import MixinAndScriptConfig from './MixinAndScriptConfig.vue'
@@ -124,9 +125,21 @@ const handleAdd = () => {
 const handlePreview = async () => {
   try {
     const config = await generateConfig(profile.value)
-    alert(profile.value.name, JSON.stringify(config, null, 2))
-  } catch (error: any) {
-    message.error(error.message || error)
+    const m = modal({
+      title: profile.value.name,
+      cancelText: 'common.close',
+      height: '90',
+      width: '90',
+      submit: false,
+      maskClosable: true,
+    })
+    m.setContent(CodeViewer, {
+      modelValue: JSON.stringify(config, null, 2),
+      lang: 'json',
+      copyable: true,
+    }).open()
+  } catch (error) {
+    message.error(error)
   }
 }
 
