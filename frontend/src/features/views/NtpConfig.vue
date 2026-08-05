@@ -8,9 +8,9 @@ import { useI18n } from 'vue-i18n'
 import DialerConfig from './Shared/DialerConfig.vue'
 
 interface Props {
+  netnsOptions: ComponentOption[]
   outboundOptions: ComponentOption[]
   serverOptions: ComponentOption[]
-  modelValue?: NtpConfig
 }
 
 defineProps<Props>()
@@ -65,6 +65,7 @@ const isCustomServer = computed(() => serverSelect.value === 'custom')
     </div>
     <DialerConfig
       v-model="model.dialer"
+      :netns-options="netnsOptions"
       :outbound-options="outboundOptions"
       :server-options="serverOptions"
     />

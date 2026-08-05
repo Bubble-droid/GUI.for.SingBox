@@ -11,6 +11,7 @@ export interface RestoreProfileOptions {
 }
 
 export interface IdMaps {
+  netns: Map<string, string>
   endpoints: Map<string, string>
   inbounds: Map<string, string>
   outbounds: Map<string, string>

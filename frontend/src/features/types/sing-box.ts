@@ -17,6 +17,13 @@ export type SingBoxConfig = typebox<
   string
 >
 
+export type SingBoxNetns = UnpackArray<NonNullable<SingBoxConfig['network_namespaces']>>
+
+export type SingBoxNetnsOf<T extends NonNullable<SingBoxNetns['type']>> = Extract<
+  SingBoxNetns,
+  { type?: T }
+>
+
 export type SingBoxDomainResolver = Extract<
   NonNullable<SingBoxOutboundOf<'direct'>['domain_resolver']>,
   object

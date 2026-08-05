@@ -7,6 +7,7 @@ import EndpointsConfig from '@views/EndpointsConfig/EndpointsConfig.vue'
 import ExperimentalConfig from '@views/ExperimentalConfig.vue'
 import InboundsConfig from '@views/InboundsConfig.vue'
 import LogConfig from '@views/LogConfig.vue'
+import NetnsConfig from '@views/NetnsConfig/NetnsConfig.vue'
 import NtpConfig from '@views/NtpConfig.vue'
 import OutboundsConfig from '@views/OutboundsConfig.vue'
 import RouteConfig from '@views/RouteConfig.vue'
@@ -35,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { t } = useI18n()
+const netnsRef = useTemplateRef('netnsRef')
 const endpointsRef = useTemplateRef('endpointsRef')
 const inboundsRef = useTemplateRef('inboundsRef')
 const outboundsRef = useTemplateRef('outboundsRef')
@@ -46,6 +48,15 @@ const loading = ref(false)
 const currentStep = ref(props.step)
 
 const profile = ref<Profile>(profilesStore.getProfileTemplate())
+
+const netnsOptions = computed<ComponentOption[]>(() =>
+  profile.value.network_namespaces
+    .filter((ns) => ns.enable)
+    .map((ns) => ({
+      label: ns.tag,
+      value: ns.id,
+    })),
+)
 
 const inboundOptions = computed<ComponentOption[]>(() =>
   [...profile.value.endpoints, ...profile.value.inbounds]
@@ -100,6 +111,7 @@ const handleSave = async () => {
 
 const handleAdd = () => {
   const map: Record<number, Ref> = {
+    [ProfileStep.Netns]: netnsRef,
     [ProfileStep.Endpoints]: endpointsRef,
     [ProfileStep.Inbounds]: inboundsRef,
     [ProfileStep.Outbounds]: outboundsRef,
@@ -171,6 +183,7 @@ const modalSlots = {
       icon: 'add',
       style: {
         display: [
+          ProfileStep.Netns,
           ProfileStep.Endpoints,
           ProfileStep.Inbounds,
           ProfileStep.Outbounds,
@@ -244,6 +257,7 @@ defineExpose({ modalSlots })
     <div v-if="currentStep === ProfileStep.Ntp">
       <NtpConfig
         v-model="profile.ntp"
+        :netns-options="netnsOptions"
         :outbound-options="outboundOptions"
         :server-options="dnsServerOptions"
       />
@@ -251,10 +265,14 @@ defineExpose({ modalSlots })
     <div v-if="currentStep === ProfileStep.Experimental">
       <ExperimentalConfig v-model="profile.experimental" :outbound-options="outboundOptions" />
     </div>
+    <div v-if="currentStep === ProfileStep.Netns">
+      <NetnsConfig ref="netnsRef" v-model="profile.network_namespaces" />
+    </div>
     <div v-if="currentStep === ProfileStep.Endpoints">
       <EndpointsConfig
         ref="endpointsRef"
         v-model="profile.endpoints"
+        :netns-options="netnsOptions"
         :inbound-options="inboundOptions"
         :outbound-options="outboundOptions"
         :dns-server-options="dnsServerOptions"

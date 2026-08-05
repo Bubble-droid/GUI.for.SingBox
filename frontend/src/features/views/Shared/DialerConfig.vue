@@ -9,6 +9,7 @@ import { useBool } from '@/hooks'
 import DomainResolverConfig from './DomainResolverConfig.vue'
 
 interface Props {
+  netnsOptions: ComponentOption[]
   outboundOptions: ComponentOption[]
   serverOptions: ComponentOption[]
 }
@@ -66,7 +67,7 @@ const [showDialer, toggleShow] = useBool(false)
     </div>
     <div class="form-item">
       {{ t('kernel.shared.dialer.netns') }}
-      <Input v-model="model.netns" editable clearable />
+      <Select v-model="model.netns" :options="netnsOptions" clearable />
     </div>
     <div class="form-item">
       {{ t('kernel.shared.dialer.connect_timeout') }}

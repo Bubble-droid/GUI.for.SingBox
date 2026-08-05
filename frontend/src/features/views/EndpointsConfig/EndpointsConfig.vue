@@ -21,6 +21,7 @@ import TailScale from './TailScale.vue'
 import WireGuard from './WireGuard.vue'
 
 interface Props {
+  netnsOptions: ComponentOption[]
   inboundOptions: ComponentOption[]
   outboundOptions: ComponentOption[]
   dnsServerOptions: ComponentOption[]
@@ -130,11 +131,13 @@ const onTypeChange = (newType: Endpoint) => {
     <ListenConfig
       v-if="'listen' in fields.config"
       v-model="fields.config.listen"
+      :netns-options="netnsOptions"
       :inbound-options="inboundOptions"
     />
     <DialerConfig
       v-if="'dialer' in fields.config"
       v-model="fields.config.dialer"
+      :netns-options="netnsOptions"
       :outbound-options="outboundOptions"
       :server-options="dnsServerOptions"
     />

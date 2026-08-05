@@ -3,6 +3,7 @@ import endpoints from './endpoints'
 import experimental from './experimental'
 import inbounds from './inbounds'
 import log from './log'
+import netns from './netns'
 import ntp from './ntp'
 import outbounds from './outbounds'
 import route from './route'
@@ -20,6 +21,7 @@ export default {
   log,
   ntp,
   experimental,
+  netns,
   endpoints,
   inbounds,
   outbounds,
