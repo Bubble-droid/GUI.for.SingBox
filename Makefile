@@ -42,7 +42,7 @@ _APP_VERSION_RAW = $(shell git describe --tags --always 2>/dev/null || echo "v0.
 APP_VERSION = $(eval APP_VERSION := $(_APP_VERSION_RAW))$(APP_VERSION)
 
 TAR_VERSION = $(patsubst v%,%,$(APP_VERSION))
-PKG_VERSION = $(subst -,~,$(TAR_VERSION))
+DEB_VERSION = $(subst -,~,$(TAR_VERSION))
 
 DEB_ARCH = $(ARCH)
 RPM_ARCH = $(if $(filter amd64,$(ARCH)),x86_64,$(if $(filter arm64,$(ARCH)),aarch64,$(ARCH)))
@@ -51,6 +51,8 @@ DEB_OPTS = $(shell cat $(FPM_DIR)/.fpm_systemd)
 DEB_OPTS_FULL = $(shell cat $(FPM_DIR)/.fpm_systemd_full)
 PACMAN_OPTS = $(shell cat $(FPM_DIR)/.fpm_pacman)
 PACMAN_OPTS_FULL = $(shell cat $(FPM_DIR)/.fpm_pacman_full)
+RPM_OPTS = $(shell cat $(FPM_DIR)/.fpm_rpm)
+RPM_OPTS_FULL = $(shell cat $(FPM_DIR)/.fpm_rpm_full)
 
 LDFLAGS_BASE = -X '$(GO_MODULE)/bridge.AppVersion=$(APP_VERSION)'
 LDFLAGS_LINUX = $(LDFLAGS_BASE) \
@@ -139,32 +141,32 @@ check-binary:
 package-deb: check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging Debian (.deb) for $(ARCH)..."
-	FPMOPTS='$(DEB_OPTS)' fpm -t deb -a "$(DEB_ARCH)" -v "$(PKG_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(DEB_ARCH).deb"
+	FPMOPTS='$(DEB_OPTS)' fpm -t deb -a "$(DEB_ARCH)" -v "$(DEB_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(DEB_ARCH).deb"
 
 package-rpm: check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging RPM (.rpm) for $(ARCH)..."
-	FPMOPTS='$(DEB_OPTS)' fpm -t rpm -a "$(RPM_ARCH)" -v "$(PKG_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(RPM_ARCH).rpm"
+	FPMOPTS='$(RPM_OPTS)' fpm -t rpm -a "$(RPM_ARCH)" -v "$(TAR_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(RPM_ARCH).rpm"
 
 package-pacman: check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging Pacman (.pkg.tar.zst) for $(ARCH)..."
-	FPMOPTS='$(PACMAN_OPTS)' fpm -t pacman -a "$(RPM_ARCH)" -v "$(PKG_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(RPM_ARCH).pkg.tar.zst"
+	FPMOPTS='$(PACMAN_OPTS)' fpm -t pacman -a "$(RPM_ARCH)" -v "$(TAR_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(RPM_ARCH).pkg.tar.zst"
 
 package-deb-full: fetch-cores check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging Debian Full (.deb) for $(ARCH)..."
-	FPMOPTS='$(DEB_OPTS_FULL)' fpm -t deb -a "$(DEB_ARCH)" -v "$(PKG_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(DEB_ARCH)$(BUNDLE_SUFFIX).deb"
+	FPMOPTS='$(DEB_OPTS_FULL)' fpm -t deb -a "$(DEB_ARCH)" -v "$(DEB_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(DEB_ARCH)$(BUNDLE_SUFFIX).deb"
 
 package-rpm-full: fetch-cores check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging RPM Full (.rpm) for $(ARCH)..."
-	FPMOPTS='$(DEB_OPTS_FULL)' fpm -t rpm -a "$(RPM_ARCH)" -v "$(PKG_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(RPM_ARCH)$(BUNDLE_SUFFIX).rpm"
+	FPMOPTS='$(RPM_OPTS_FULL)' fpm -t rpm -a "$(RPM_ARCH)" -v "$(TAR_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(RPM_ARCH)$(BUNDLE_SUFFIX).rpm"
 
 package-pacman-full: fetch-cores check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging Pacman Full (.pkg.tar.zst) for $(ARCH)..."
-	FPMOPTS='$(PACMAN_OPTS_FULL)' fpm -t pacman -a "$(RPM_ARCH)" -v "$(PKG_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(RPM_ARCH)$(BUNDLE_SUFFIX).pkg.tar.zst"
+	FPMOPTS='$(PACMAN_OPTS_FULL)' fpm -t pacman -a "$(RPM_ARCH)" -v "$(TAR_VERSION)" -p "$(PKGS_DIR)/$(APP_NAME)_$(TAR_VERSION)_linux_$(RPM_ARCH)$(BUNDLE_SUFFIX).pkg.tar.zst"
 
 package-deb-all: package-deb package-deb-full
 package-rpm-all: package-rpm package-rpm-full
