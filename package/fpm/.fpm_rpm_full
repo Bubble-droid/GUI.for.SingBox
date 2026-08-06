@@ -9,6 +9,7 @@
 --provides gui-for-singbox
 --conflicts gui-for-singbox
 --conflicts gui.for.singbox
+--conflicts gui-for-singbox-bin
 --conflicts gui-for-singbox-xdg
 --after-install package/linux/postinst.sh
 
