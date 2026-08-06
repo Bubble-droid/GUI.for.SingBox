@@ -1,0 +1,23 @@
+-s dir
+--name gui-for-singbox-xdg-full
+--maintainer "Bubble-droid"
+--url "https://github.com/Bubble-droid/GUI.for.SingBox"
+--license GPL3
+--description "A GUI client application for sing-box with bundled cores (XDG support)"
+--depends webkit2gtk4.1
+--depends libcap
+--provides gui-for-singbox
+--conflicts gui-for-singbox
+--conflicts gui.for.singbox
+--conflicts gui-for-singbox-xdg
+--after-install package/linux/postinst.sh
+
+build/bin/gui-for-singbox=/usr/bin/gui-for-singbox
+package/linux/gui-for-singbox.desktop=/usr/share/applications/gui-for-singbox.desktop
+package/linux/gui-for-singbox.rules=/usr/share/polkit-1/rules.d/50-gui-for-singbox.rules
+build/appicon.png=/usr/share/icons/hicolor/512x512/apps/gui-for-singbox.png
+
+package/cores/sing-box=/usr/lib/gui-for-singbox/cores/sing-box
+package/cores/sing-box-alpha=/usr/lib/gui-for-singbox/cores/sing-box-alpha
+
+LICENSE=/usr/share/licenses/gui-for-singbox/LICENSE
