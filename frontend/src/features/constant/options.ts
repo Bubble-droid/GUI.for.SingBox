@@ -53,6 +53,8 @@ import {
   TlsEngine,
   TlsSpoofMethod,
   UtlsFingerprint,
+  HttpEngine,
+  HttpVersion,
 } from './kernel'
 
 type FormatString<
@@ -145,6 +147,14 @@ export const CertificateStoreOptions = defineOptions(
   CertificateStore,
   'kernel.certificate.store.{{val}}',
 )
+
+export const HttpEngineOptions = defineOptions(HttpEngine, 'kernel.http_clients.engine.{{val}}')
+
+export const HttpVersionOptions = [
+  { label: 'HTTP/1.1 (1)', value: HttpVersion.V1 },
+  { label: 'HTTP/2 (2)', value: HttpVersion.V2 },
+  { label: 'HTTP/3 (3)', value: HttpVersion.V3 },
+]
 
 export const NetnsTypeOptions = defineOptions(NetnsType, 'kernel.netns.type.{{val}}')
 
@@ -320,16 +330,16 @@ export const OpenVpnDnsTransportOptions = defineOptions(
   'kernel.endpoints.openvpn.push.dns_servers.transport.{{val}}',
 )
 
-export const TlsEngineOptions = defineOptions(TlsEngine, 'kernel.shard.tls.engine.{{val}}')
-export const TlsVersionOptions = defineOptions(TlsVersion, 'kernel.shard.tls.version.{{val}}')
+export const TlsEngineOptions = defineOptions(TlsEngine, 'kernel.shared.tls.engine.{{val}}')
+export const TlsVersionOptions = defineOptions(TlsVersion, '{{val}}')
 export const TlsCipherSuiteOptions = defineOptions(TlsCipherSuite, '{{val}}')
 export const TlsCurvePreferenceOptions = defineOptions(TlsCurvePreference, '{{val}}')
 export const TlsClientAuthenticationOptions = defineOptions(
   TlsClientAuthentication,
-  'kernel.shard.tls.client_authentication.{{val}}',
+  'kernel.shared.tls.client_authentication.{{val}}',
 )
 export const TlsSpoofMethodOptions = defineOptions(
   TlsSpoofMethod,
-  'kernel.shard.tls.spoof_method.{{val}}',
+  'kernel.shared.tls.spoof_method.{{val}}',
 )
 export const UtlsFingerprintOptions = defineOptions(UtlsFingerprint, '{{val}}')

@@ -19,6 +19,8 @@ import type {
   Listen,
   InboundTlsConfig,
   OutboundTlsConfig,
+  Http2Options,
+  QuicOptions,
 } from '@profiles/shared'
 
 import { sampleID } from '@/utils'
@@ -211,4 +213,18 @@ export const createOutboundTls = (): OutboundTlsConfig => ({
     public_key: '',
     short_id: '',
   },
+})
+
+export const createHttp2Options = (): Http2Options => ({
+  idle_timeout: '',
+  keep_alive_period: '',
+  stream_receive_window: '',
+  connection_receive_window: '',
+  max_concurrent_streams: 0,
+})
+
+export const createQuicOptions = (): QuicOptions => ({
+  ...createHttp2Options(),
+  initial_packet_size: 0,
+  disable_path_mtu_discovery: false,
 })

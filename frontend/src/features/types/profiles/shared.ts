@@ -184,3 +184,16 @@ export interface OutboundTlsConfig {
   utls: OutboundUtls
   reality: OutboundTlsReality
 }
+
+export interface Http2Options {
+  idle_timeout: string
+  keep_alive_period: string
+  stream_receive_window: string
+  connection_receive_window: string
+  max_concurrent_streams: number
+}
+
+export interface QuicOptions extends Http2Options {
+  initial_packet_size: number
+  disable_path_mtu_discovery: boolean
+}

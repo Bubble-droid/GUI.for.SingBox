@@ -83,6 +83,19 @@ export default {
       max_time_difference: 'Max Time Difference',
     },
   },
+  http2: {
+    title: 'HTTP/2 Configuration',
+    idle_timeout: 'Idle Connection Timeout',
+    keep_alive_period: 'Keep-Alive Period',
+    stream_receive_window: 'Stream Receive Window Size',
+    connection_receive_window: 'Connection Receive Window Size',
+    max_concurrent_streams: 'Max Concurrent Streams',
+  },
+  quic: {
+    title: 'QUIC Configuration',
+    initial_packet_size: 'Initial QUIC Packet Size',
+    disable_path_mtu_discovery: 'Disable Path MTU Discovery',
+  },
   listen: {
     title: 'Listen Configuration',
     listen: 'Listen Address',

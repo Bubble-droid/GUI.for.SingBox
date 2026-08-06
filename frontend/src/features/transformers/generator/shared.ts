@@ -6,6 +6,8 @@ import type {
   SingBoxListen,
   SingBoxInboundTls,
   SingBoxOutboundTls,
+  SingBoxHttp2,
+  SingBoxQuic,
 } from '@features/types/sing-box'
 import { filterInvalidProps } from '@features/utils/helper'
 import type { DnsRuleConfig } from '@profiles/dns'
@@ -18,6 +20,8 @@ import type {
   Listen,
   InboundTlsConfig,
   OutboundTlsConfig,
+  Http2Options,
+  QuicOptions,
 } from '@profiles/shared'
 
 import { deepAssign } from '@/utils'
@@ -122,4 +126,21 @@ export const generateOutboundTls = (tls: OutboundTlsConfig): SingBoxOutboundTls 
     utls: utls.enabled ? filterInvalidProps(utls) : undefined,
     reality: reality.enabled ? filterInvalidProps(reality) : undefined,
   } as SingBoxOutboundTls)
+}
+
+export const generateHttp2Options = (http2: Http2Options): SingBoxHttp2 => {
+  return filterInvalidProps({
+    ...http2,
+    idle_timeout: http2.idle_timeout as any,
+    keep_alive_period: http2.keep_alive_period as any,
+  })
+}
+
+export const generateQuicOptions = (quic: QuicOptions): SingBoxQuic => {
+  const { initial_packet_size, disable_path_mtu_discovery, ...rest } = quic
+  return filterInvalidProps({
+    ...generateHttp2Options(rest),
+    initial_packet_size,
+    disable_path_mtu_discovery,
+  })
 }

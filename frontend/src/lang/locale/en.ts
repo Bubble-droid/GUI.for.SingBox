@@ -203,6 +203,7 @@ export default {
       ntp: 'NTP',
       certificate: 'Certificate',
       experimental: 'Experimental',
+      http_clients: 'HTTP Clients',
       netns: 'Network Namespaces',
       endpoints: 'Endpoints',
       inbounds: 'Inbounds',

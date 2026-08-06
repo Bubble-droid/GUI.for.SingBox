@@ -6,6 +6,7 @@ import type {
   SingBoxEndpointOf,
   SingBoxNetns,
   SingBoxCert,
+  SingBoxHttpClient,
 } from '@features/types/sing-box'
 import type { ValueOf } from '@features/types/utils'
 
@@ -35,6 +36,21 @@ export const CertificateStore = {
   Chrome: 'chrome',
   None: 'none',
 } as const satisfies Recordable<NonNullable<SingBoxCert['store']>>
+
+export const HttpEngine = {
+  Go: 'go',
+  Apple: 'apple',
+} as const satisfies Recordable<SingBoxHttpClient['engine']>
+
+export type HttpEngine = ValueOf<typeof HttpEngine>
+
+export const HttpVersion = {
+  V1: 1,
+  V2: 2,
+  V3: 3,
+} as const satisfies Recordable<SingBoxHttpClient['version']>
+
+export type HttpVersion = ValueOf<typeof HttpVersion>
 
 export const NetnsType = {
   Default: 'default',

@@ -201,6 +201,7 @@ export default {
       ntp: 'NTP 设置',
       certificate: '证书设置',
       experimental: '实验性设置',
+      http_clients: 'HTTP 客户端设置',
       netns: '网络命名空间设置',
       endpoints: '端点设置',
       inbounds: '入站设置',
