@@ -3,6 +3,9 @@ import {
   createEndpoint,
   createOpenConnectTnccCert,
   createOpenConnectFormEntry,
+  createOpenVpnServerRemoteItem,
+  createOpenVpnPullFilter,
+  createOpenVpnPushDnsServer,
 } from '@defaults/endpoints'
 import { Endpoint } from '@features/constant/kernel'
 import type { SingBoxEndpointOf, SingBoxEndpoint } from '@features/types/sing-box'
@@ -111,7 +114,8 @@ export const restoreTailscale = (
       ...template.config,
       ...reset1,
       advertise_routes: ensureArray(reset1.advertise_routes),
-      advertise_tags: ensureArray((reset1 as any).advertise_tags),
+      advertise_tags:
+        'advertise_tags' in reset1 ? ensureArray(reset1.advertise_tags as string) : [],
       relay_server_static_endpoints: ensureArray(reset1.relay_server_static_endpoints),
       ssh_server: restoreSshServer(reset1.ssh_server, template.config),
       dialer,
@@ -163,6 +167,8 @@ export const restoreOpenConnect = (
   const { dialer, rest: reset1 } = restoreDialer(rest, maps)
   const { udpNat, rest: final } = restoreUdpNat(reset1)
 
+  const { tncc = {}, tls = {} } = final
+
   return {
     ...template,
     ...base,
@@ -175,19 +181,20 @@ export const restoreOpenConnect = (
       hip: { ...template.config.hip, ...final.hip },
       tncc: {
         ...template.config.tncc,
-        ...final.tncc,
-        certificates: restoreTnccCerts((final.tncc as any)?.certificates),
+        ...tncc,
+        certificates: 'certificates' in tncc ? restoreTnccCerts(tncc.certificates) : [],
       },
       fortinet_host_check: { ...template.config.fortinet_host_check, ...final.fortinet_host_check },
       tls: {
         ...template.config.tls,
-        ...final.tls,
-        peer_fingerprint: ensureArray(final.tls?.peer_fingerprint),
-        certificate_authority: ensureArray((final.tls as any)?.certificate_authority),
-        client_certificate: ensureArray((final.tls as any)?.client_certificate),
-        client_key: ensureArray((final.tls as any)?.client_key),
-        mca_certificate: ensureArray((final.tls as any)?.mca_certificate),
-        mca_key: ensureArray((final.tls as any)?.mca_key),
+        ...tls,
+        peer_fingerprint: ensureArray(tls?.peer_fingerprint),
+        certificate_authority:
+          'certificate_authority' in tls ? ensureArray(tls.certificate_authority) : [],
+        client_certificate: 'client_certificate' in tls ? ensureArray(tls.client_certificate) : [],
+        client_key: 'client_key' in tls ? ensureArray(tls.client_key) : [],
+        mca_certificate: 'mca_certificate' in tls ? ensureArray(tls.mca_certificate) : [],
+        mca_key: 'mca_key' in tls ? ensureArray(tls.mca_key) : [],
       },
       form_entries: restoreFormEntries(final.form_entries),
       dialer,
@@ -200,7 +207,7 @@ export const restoreOpenVpnClient = (
   openvpn: SingBoxEndpointOf<typeof Endpoint.OpenVpnClient>,
   maps: IdMaps,
 ): EndpointOpenVpnClient => {
-  const { type, tag, ...rest } = openvpn as any
+  const { type, tag, ...rest } = openvpn
   const id = maps.endpoints.get(tag) ?? sampleID()
   const base = {
     id,
@@ -211,31 +218,47 @@ export const restoreOpenVpnClient = (
   const { dialer, rest: reset1 } = restoreDialer(rest, maps)
   const { udpNat, rest: final } = restoreUdpNat(reset1)
 
+  const servers = createOpenVpnServerRemoteItem()
+  const pullFilter = createOpenVpnPullFilter()
+
+  const tls = final.tls ?? {}
+
   return {
     ...template,
     ...base,
     config: {
       ...template.config,
       ...final,
-      servers: ensureArray(final.servers),
+      servers:
+        'servers' in final
+          ? (final.servers as Recordable[]).map((v) => ({
+              ...servers,
+              ...v,
+            }))
+          : [],
       address: ensureArray(final.address),
       static_key: ensureArray(final.static_key),
       data_ciphers: ensureArray(final.data_ciphers),
       routes: ensureArray(final.routes),
       redirect_gateway_flags: ensureArray(final.redirect_gateway_flags),
-      pull_filters: ensureArray(final.pull_filters),
+      pull_filters:
+        final.pull_filters?.map((v) => ({
+          ...pullFilter,
+          ...v,
+        })) ?? [],
       tls: {
         ...template.config.tls,
-        ...final.tls,
-        certificate: ensureArray(final.tls?.certificate),
-        client_certificate: ensureArray(final.tls?.client_certificate),
-        client_key: ensureArray(final.tls?.client_key),
-        peer_fingerprint: ensureArray(final.tls?.peer_fingerprint),
-        remote_certificate_ku: ensureArray(final.tls?.remote_certificate_ku),
+        ...tls,
+        certificate: 'certificate' in tls ? ensureArray(tls.certificate) : [],
+        client_certificate: 'client_certificate' in tls ? ensureArray(tls.client_certificate) : [],
+        client_key: 'client_key' in tls ? ensureArray(tls.client_key) : [],
+        peer_fingerprint: ensureArray(final.tls.peer_fingerprint),
+        remote_certificate_ku: ensureArray(final.tls.remote_certificate_ku),
         control_wrap: {
           ...template.config.tls.control_wrap,
-          ...final.tls?.control_wrap,
-          key: ensureArray(final.tls?.control_wrap?.key),
+          ...tls.control_wrap,
+          key:
+            tls.control_wrap && 'key' in tls.control_wrap ? ensureArray(tls.control_wrap.key) : [],
         },
       },
       dialer,
@@ -248,7 +271,7 @@ export const restoreOpenVpnServer = (
   openvpn: SingBoxEndpointOf<typeof Endpoint.OpenVpnServer>,
   maps: IdMaps,
 ): EndpointOpenVpnServer => {
-  const { type, tag, ...rest } = openvpn as any
+  const { type, tag, ...rest } = openvpn
   const id = maps.endpoints.get(tag) ?? sampleID()
   const base = {
     id,
@@ -258,6 +281,10 @@ export const restoreOpenVpnServer = (
   const template = createEndpoint(Endpoint.OpenVpnServer)
   const { listen, rest: reset1 } = restoreListen(rest, maps)
   const { udpNat, rest: final } = restoreUdpNat(reset1)
+
+  const { tls = {}, push = {} } = final
+
+  const pushDnsServer = createOpenVpnPushDnsServer()
 
   return {
     ...template,
@@ -271,31 +298,34 @@ export const restoreOpenVpnServer = (
       data_ciphers: ensureArray(final.data_ciphers),
       tls: {
         ...template.config.tls,
-        ...final.tls,
-        certificate: ensureArray(final.tls?.certificate),
-        key: ensureArray(final.tls?.key),
-        client_certificate: ensureArray(final.tls?.client_certificate),
-        peer_fingerprint: ensureArray(final.tls?.peer_fingerprint),
-        remote_certificate_ku: ensureArray(final.tls?.remote_certificate_ku),
+        ...tls,
+        certificate: 'certificate' in tls ? ensureArray(tls.certificate) : [],
+        key: 'key' in tls ? ensureArray(tls.key) : [],
+        client_certificate: 'client_certificate' in tls ? ensureArray(tls.client_certificate) : [],
+        peer_fingerprint: ensureArray(tls.peer_fingerprint),
+        remote_certificate_ku: ensureArray(tls.remote_certificate_ku),
         control_wrap: {
           ...template.config.tls.control_wrap,
-          ...final.tls?.control_wrap,
-          key: ensureArray(final.tls?.control_wrap?.key),
+          ...tls?.control_wrap,
+          key:
+            tls.control_wrap && 'key' in tls.control_wrap ? ensureArray(tls.control_wrap.key) : [],
         },
       },
       push: {
         ...template.config.push,
-        ...final.push,
-        routes: ensureArray(final.push?.routes),
-        dns: ensureArray(final.push?.dns),
-        dns_servers: ensureArray(final.push?.dns_servers).map((d) => ({
-          ...d,
-          addresses: ensureArray(d?.addresses),
-          resolve_domains: ensureArray(d?.resolve_domains),
-        })),
-        search_domains: ensureArray(final.push?.search_domains),
-        dhcp_options: ensureArray(final.push?.dhcp_options),
-        redirect_gateway_flags: ensureArray(final.push?.redirect_gateway_flags),
+        ...push,
+        routes: ensureArray(push.routes),
+        dns: ensureArray(push.dns),
+        dns_servers:
+          push.dns_servers?.map((d) => ({
+            ...pushDnsServer,
+            ...d,
+            addresses: ensureArray(d.addresses),
+            resolve_domains: ensureArray(d.resolve_domains),
+          })) ?? [],
+        search_domains: ensureArray(push.search_domains),
+        dhcp_options: ensureArray(push.dhcp_options),
+        redirect_gateway_flags: ensureArray(push.redirect_gateway_flags),
       },
       listen,
       udpNat,
