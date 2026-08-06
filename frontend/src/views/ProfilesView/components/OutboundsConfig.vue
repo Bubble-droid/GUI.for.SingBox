@@ -109,7 +109,7 @@ const handleAddProxy = (groupID: string, proxyID: string, proxyName: string) => 
   }
 }
 
-const isInuse = (groupID: string, proxyID: string) => {
+const isInuse = (_groupID: string, proxyID: string) => {
   return fields.value.outbounds.find((outbound) => outbound.id === proxyID)
 }
 

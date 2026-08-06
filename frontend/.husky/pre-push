@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Determine project root directory dynamically
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$ROOT_DIR" ]; then
+  ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+
+FRONTEND_DIR="$ROOT_DIR/frontend"
+
+echo "🔍 [Pre-push] Starting global static quality checks..."
+
+# 1. Frontend Vue / TypeScript type checking
+if [ -d "$FRONTEND_DIR" ]; then
+  echo "==> [Frontend] Checking Vue/TS type safety (vue-tsc)..."
+  if ! (cd "$FRONTEND_DIR" && pnpm type-check); then
+    echo "❌ [Frontend] Type check failed (vue-tsc errors). Aborting push!"
+    exit 1
+  fi
+else
+  echo "⚠️ [Frontend] Directory not found at $FRONTEND_DIR, skipping type check."
+fi
+
+# 2. Go backend static analysis
+echo "==> [Backend] Checking Go code logic (go vet)..."
+if ! (cd "$ROOT_DIR" && go vet ./...); then
+  echo "❌ [Backend] Go static check failed (go vet errors). Aborting push!"
+  exit 1
+fi
+
+echo "🎉 [Pre-push] All checks passed. Push allowed!"

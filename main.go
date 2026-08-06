@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"guiforcores/bridge"
+	"os"
 	"time"
 
 	"github.com/wailsapp/wails/v2"
@@ -34,7 +35,7 @@ func main() {
 		DisableResize:    false,
 		Menu:             app.AppMenu,
 		Title:            bridge.Env.AppName,
-		Frameless:        bridge.Env.OS != "darwin",
+		Frameless:        bridge.Env.OS != "darwin" && !bridge.Config.SystemTitleBar,
 		Width:            bridge.Config.Width,
 		Height:           bridge.Config.Height,
 		StartHidden:      bridge.Config.StartHidden,
@@ -66,8 +67,7 @@ func main() {
 			WebviewGpuPolicy:    linux.WebviewGpuPolicy(bridge.Config.WebviewGpuPolicy),
 		},
 		AssetServer: &assetserver.Options{
-			Assets:     assets,
-			Middleware: bridge.RollingRelease,
+			Assets: assets,
 		},
 		SingleInstanceLock: &options.SingleInstanceLock{
 			UniqueId: func() string {
@@ -77,14 +77,21 @@ func main() {
 				return bridge.Env.AppName
 			}(),
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
+				if bridge.IsQuitArg(data.Args) {
+					runtime.EventsEmit(app.Ctx, "onExitApp")
+					return
+				}
 				runtime.Show(app.Ctx)
 				runtime.EventsEmit(app.Ctx, "onLaunchApp", data.Args)
 			},
 		},
 		OnStartup: func(ctx context.Context) {
-			app.Ctx = ctx
+			app.Startup(ctx)
 			runtime.InitializeNotifications(ctx)
 			trayStart()
+			if bridge.IsQuitArg(os.Args) {
+				runtime.EventsEmit(ctx, "onExitApp")
+			}
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
 			if !bridge.Env.PreventExit {

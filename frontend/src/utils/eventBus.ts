@@ -1,4 +1,4 @@
-type EventMap = {
+interface EventMap {
   profileChange: { id: string }
   subscriptionChange: { id: string }
   subscriptionsChange: void

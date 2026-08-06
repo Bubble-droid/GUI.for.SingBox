@@ -2,6 +2,7 @@ package bridge
 
 import (
 	"context"
+	"embed"
 	"net/http"
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -11,6 +12,7 @@ import (
 type App struct {
 	Ctx     context.Context
 	AppMenu *menu.Menu
+	fs      embed.FS
 }
 
 type EnvResult struct {
@@ -24,6 +26,12 @@ type EnvResult struct {
 	OS           string `json:"os"`
 	ARCH         string `json:"arch"`
 	IsPrivileged bool   `json:"isPrivileged"`
+
+	IsSystemPackage bool   `json:"isSystemPackage"`
+	IsBundled       bool   `json:"isBundled"`
+	AppDataPath     string `json:"appDataPath"`
+	AppConfigPath   string `json:"appConfigPath"`
+	AppCachePath    string `json:"appCachePath"`
 }
 
 type RequestOptions struct {
@@ -91,8 +99,9 @@ type AppConfig struct {
 	Width             int  `yaml:"width"`
 	Height            int  `yaml:"height"`
 	MultipleInstance  bool `yaml:"multipleInstance"`
-	RollingRelease    bool `yaml:"rollingRelease" default:"true"`
 	StartHidden       bool
+
+	SystemTitleBar bool `yaml:"systemTitleBar"`
 }
 
 type TrayContent struct {

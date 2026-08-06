@@ -3,7 +3,7 @@ import { ref, unref } from 'vue'
 
 import useI18n from '@/lang'
 
-import { type Props as InputProps } from '@/components/Input/index.vue'
+import type { Props as InputProps } from '@/components/Input/index.vue'
 
 interface Props {
   title: string

@@ -19,9 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const model = defineModel<boolean>({ default: false })
 
-const emits = defineEmits<{
-  (e: 'change', val: boolean): void
-}>()
+const emits = defineEmits<(e: 'change', val: boolean) => void>()
 
 const { t } = i18n.global
 

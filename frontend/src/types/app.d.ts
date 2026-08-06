@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 declare namespace App {
   type OS = 'windows' | 'linux' | 'darwin'
   type Theme = 'auto' | 'light' | 'dark'
@@ -21,6 +22,11 @@ declare namespace App {
     os: OS
     arch: string
     isPrivileged: boolean
+    isSystemPackage: boolean
+    isBundled: boolean
+    appDataPath: string
+    appConfigPath: string
+    appCachePath: string
   }
 
   interface TrayContent {
@@ -47,13 +53,14 @@ declare namespace App {
     checkable?: boolean
   }
 
-  type AppSettings = {
+  interface AppSettings {
     lang: 'en' | 'zh' | string
     theme: Theme
     color: Color
     primaryColor: string
     secondaryColor: string
     fontFamily: string
+    systemTitleBar: boolean
     profilesView: View
     subscribesView: View
     rulesetsView: View
@@ -115,7 +122,6 @@ declare namespace App {
     githubDownloadAcceleration: boolean
     githubDownloadMirror: string
     multipleInstance: boolean
-    rollingRelease: boolean
     debugOutline: boolean
     debugNoAnimation: boolean
     debugNoRounded: boolean
@@ -287,7 +293,7 @@ declare namespace App {
   type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'panic'
   type ClashMode = 'global' | 'rule' | 'direct'
   type InboundType = 'direct' | 'mixed' | 'socks' | 'http' | 'tun'
-  type InboundListen = {
+  interface InboundListen {
     listen: string
     listen_port: number
     tcp_fast_open: boolean

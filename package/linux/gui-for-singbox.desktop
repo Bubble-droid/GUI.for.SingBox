@@ -1,0 +1,23 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=GUI.for.SingBox
+Name[zh_CN]=GUI for SingBox
+Comment=A GUI client application for sing-box
+Comment[zh_CN]=适用于 sing-box 的图形客户端
+Exec=gui-for-singbox %U
+Icon=gui-for-singbox
+Terminal=false
+StartupNotify=true
+StartupWMClass=gui-for-singbox
+Categories=Network;Utility;
+MimeType=application/x-sing-box-profile;x-scheme-handler/sing-box;
+Keywords=gfs;gui;sb;singbox;
+SingleMainWindow=true
+Actions=quit;
+
+[Desktop Action quit]
+Exec=gui-for-singbox --quit
+Name=Quit
+Name[zh_CN]=退出应用
+Icon=application-exit

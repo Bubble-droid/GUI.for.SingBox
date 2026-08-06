@@ -7,7 +7,7 @@ import {
   RuleType as RouteRuleType,
   DnsServer,
 } from '@/enums/kernel'
-import { useProfilesStore, useRulesetsStore, useSubscribesStore } from '@/stores'
+import { useEnvStore, useProfilesStore, useRulesetsStore, useSubscribesStore } from '@/stores'
 
 import { createTextMatcher, deepAssign, sampleID } from './others'
 
@@ -39,7 +39,7 @@ const buildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<strin
   return arr.reduce((p, c, i) => ((p[c.tag] = prefix + i), p), {})
 }
 
-type RestoreProfileOptions = {
+interface RestoreProfileOptions {
   profile?: App.Profile
   subscriptionIds?: string[]
 }
@@ -292,6 +292,7 @@ const restoreRouteRuleset = (
   RouteRuleSetIds: Recordable,
   OutboundsIds: Recordable,
 ): App.ProfileRuleSet[] => {
+  const { env } = useEnvStore()
   const rulesetsStore = useRulesetsStore()
   return rulesets.flatMap((raw) => {
     const ruleset = Defaults.DefaultRouteRuleset()
@@ -305,7 +306,9 @@ const restoreRouteRuleset = (
       }
     } else if (raw.type === RulesetType.Local) {
       if ('path' in raw) {
-        const r = rulesetsStore.rulesets.find((v) => v.path === raw.path.replace('../', 'data/'))
+        const r = rulesetsStore.rulesets.find(
+          (v) => v.path === raw.path.replace(`${env.appDataPath}/`, 'data/'),
+        )
         if (r) {
           ruleset.path = r.id
         } else {

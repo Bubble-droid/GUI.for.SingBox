@@ -6,12 +6,13 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	platform_path "guiforcores/bridge/platform/path"
 )
 
 type requestTransportKey struct {
@@ -21,11 +22,17 @@ type requestTransportKey struct {
 
 var requestTransportCache sync.Map
 
-func resolvePath(path string) string {
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(Env.BasePath, path)
+func resolvePath(rawPath string) string {
+	if rawPath == "" {
+		return ""
 	}
-	return filepath.ToSlash(filepath.Clean(path))
+
+	cleanPath := filepath.Clean(rawPath)
+	if filepath.IsAbs(cleanPath) {
+		return cleanPath
+	}
+
+	return platform_path.Resolve(cleanPath)
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {
@@ -164,33 +171,12 @@ func parseByteRange(s string, size int64) (start int64, end int64, err error) {
 	return 0, 0, errors.New("invalid range format")
 }
 
-func RollingRelease(next http.Handler) http.Handler {
-	isDevVersion := strings.Contains(Env.AppVersion, "dev")
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		url := r.URL.Path
-		isIndex := url == "/"
-
-		if isIndex {
-			w.Header().Set("Cache-Control", "no-cache")
-		} else {
-			w.Header().Set("Cache-Control", "max-age=31536000, immutable")
+func IsQuitArg(args []string) bool {
+	for _, arg := range args {
+		switch strings.ToLower(strings.TrimSpace(arg)) {
+		case "quit", "--quit", "-q":
+			return true
 		}
-
-		if isDevVersion || !Config.RollingRelease {
-			next.ServeHTTP(w, r)
-			return
-		}
-
-		if isIndex {
-			url = "/index.html"
-		}
-
-		filePath := resolvePath("data/rolling-release" + url)
-		if _, err := os.Stat(filePath); err != nil {
-			next.ServeHTTP(w, r)
-			return
-		}
-
-		http.ServeFile(w, r, filePath)
-	})
+	}
+	return false
 }

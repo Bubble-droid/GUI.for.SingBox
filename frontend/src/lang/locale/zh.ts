@@ -642,6 +642,7 @@ export default {
     },
     fontFamily: '字体',
     resetFont: '重置字体',
+    systemTitleBar: '系统标题栏',
     appFolder: {
       name: '应用程序文件夹',
       open: '打开应用程序文件夹',
@@ -703,7 +704,6 @@ export default {
     multipleInstance: '允许多APP实例运行',
     contentProtection: '窗口内容保护',
     contentProtectionTips: '防止屏幕录制/共享软件捕获窗口内容(重启生效)',
-    rollingRelease: '启用滚动发行',
     debugOutline: '组件轮廓',
     debugNoAnimation: '禁用动画',
     debugNoRounded: '禁用圆角',
@@ -765,6 +765,7 @@ export default {
     updateSuccessful: '更新完成',
     newVersion: '发现新版本',
     latestVersion: '已经是最新版本了',
+    updatesManagedByOS: '更新由您的操作系统管理',
   },
   titlebar: {
     resetSize: '重置窗口',

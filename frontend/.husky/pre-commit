@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Determine project root directory dynamically
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -z "$ROOT_DIR" ]; then
+  ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+
+FRONTEND_DIR="$ROOT_DIR/frontend"
+
+echo "🧹 [Pre-commit] Checking and formatting staged code..."
+
+# 1. Frontend formatting & linting
+if [ -d "$FRONTEND_DIR" ]; then
+  echo "==> [Frontend] Running lint-staged..."
+  if ! (cd "$FRONTEND_DIR" && pnpm lint-staged); then
+    echo "❌ [Frontend] lint-staged failed. Aborting commit!"
+    exit 1
+  fi
+else
+  echo "⚠️ [Frontend] Directory not found at $FRONTEND_DIR, skipping frontend lint-staged."
+fi
+
+# 2. Go formatting
+STAGED_GO_FILES=$(cd "$ROOT_DIR" && git diff --cached --name-only --diff-filter=ACMR | grep '\.go$' || true)
+
+if [ -n "$STAGED_GO_FILES" ]; then
+  echo "==> [Backend] Formatting staged Go files..."
+  (cd "$ROOT_DIR" && echo "$STAGED_GO_FILES" | xargs gofmt -w && echo "$STAGED_GO_FILES" | xargs git add)
+fi
+
+echo "✅ [Pre-commit] Formatting completed successfully!"

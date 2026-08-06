@@ -50,6 +50,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     primaryColor: '#000',
     secondaryColor: '#545454',
     fontFamily: DefaultFontFamily,
+    systemTitleBar: false,
     profilesView: View.Grid,
     subscribesView: View.Grid,
     rulesetsView: View.Grid,
@@ -102,7 +103,6 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     multipleInstance: false,
     addPluginToMenu: false,
     addGroupToMenu: false,
-    rollingRelease: true,
     debugOutline: false,
     debugNoAnimation: false,
     debugNoRounded: false,
@@ -177,6 +177,12 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     if (settings.debugUsePointer === undefined) {
       settings.debugUsePointer = false
     }
+
+    if ('rollingRelease' in settings) {
+      delete settings.rollingRelease
+    }
+
+    settings.systemTitleBar ??= false
 
     app.value = settings
     latestUserSettings = stringify(app.value)

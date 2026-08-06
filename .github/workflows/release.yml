@@ -1,175 +1,350 @@
 name: Build GUI.for.SingBox
 
 on:
+  workflow_dispatch:
+    inputs:
+      build_platform:
+        description: Target platform to build
+        required: true
+        type: choice
+        default: All
+        options:
+          - All
+          - Windows
+          - MacOS
+          - Linux
+      build_arch:
+        description: Target arch to build
+        required: true
+        type: choice
+        default: All
+        options:
+          - All
+          - amd64
+          - arm64
+          - '386'
   push:
     tags:
-      - "v*"
+      - v*
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ inputs.build_platform }}-${{ inputs.build_arch }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -eux -o pipefail {0}
 
 jobs:
-  Build-Frontend:
+  calculate_version:
+    name: Calculate Version & Matrix
     runs-on: ubuntu-latest
-    if: github.repository == 'GUI-for-Cores/GUI.for.SingBox'
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      win_matrix: ${{ steps.set_matrix.outputs.win_matrix }}
+      win_run: ${{ steps.set_matrix.outputs.win_run }}
+      macos_matrix: ${{ steps.set_matrix.outputs.macos_matrix }}
+      macos_run: ${{ steps.set_matrix.outputs.macos_run }}
+      linux_matrix: ${{ steps.set_matrix.outputs.linux_matrix }}
+      linux_run: ${{ steps.set_matrix.outputs.linux_run }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - name: Checkout
+        uses: &checkout actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Set Version
+        id: get_version
+        run: |
+          VERSION="${{ github.ref_name }}"
+          if [[ -z "$VERSION" || "$VERSION" == "main" || "$VERSION" == "xdg" ]]; then
+            VERSION=$(git describe --tags --always 2>/dev/null || echo "v0.0.0-dev")
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Calculate Build Matrices
+        id: set_matrix
+        run: |
+          PLATFORM="${{ inputs.build_platform || 'All' }}"
+          ARCH="${{ inputs.build_arch || 'All' }}"
+
+          if [[ "$PLATFORM" == "All" || "$PLATFORM" == "Windows" ]]; then
+            WIN_ALL='[{"arch":"amd64","runner":"windows-latest"},{"arch":"arm64","runner":"windows-11-arm"},{"arch":"386","runner":"windows-latest"}]'
+            if [[ "$ARCH" == "All" ]]; then
+              echo "win_matrix={\"include\":$WIN_ALL}" >> "$GITHUB_OUTPUT"
+              echo "win_run=true" >> "$GITHUB_OUTPUT"
+            else
+              FILTERED=$(echo "$WIN_ALL" | jq -c --arg a "$ARCH" '[.[] | select(.arch == $a)]')
+              if [[ "$FILTERED" != "[]" ]]; then
+                echo "win_matrix={\"include\":$FILTERED}" >> "$GITHUB_OUTPUT"
+                echo "win_run=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "win_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+                echo "win_run=false" >> "$GITHUB_OUTPUT"
+              fi
+            fi
+          else
+            echo "win_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+            echo "win_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [[ "$PLATFORM" == "All" || "$PLATFORM" == "MacOS" ]]; then
+            MAC_ALL='[{"arch":"amd64","runner":"macos-26-intel"},{"arch":"arm64","runner":"macos-latest"}]'
+            if [[ "$ARCH" == "All" ]]; then
+              echo "macos_matrix={\"include\":$MAC_ALL}" >> "$GITHUB_OUTPUT"
+              echo "macos_run=true" >> "$GITHUB_OUTPUT"
+            else
+              FILTERED=$(echo "$MAC_ALL" | jq -c --arg a "$ARCH" '[.[] | select(.arch == $a)]')
+              if [[ "$FILTERED" != "[]" ]]; then
+                echo "macos_matrix={\"include\":$FILTERED}" >> "$GITHUB_OUTPUT"
+                echo "macos_run=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "macos_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+                echo "macos_run=false" >> "$GITHUB_OUTPUT"
+              fi
+            fi
+          else
+            echo "macos_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+            echo "macos_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [[ "$PLATFORM" == "All" || "$PLATFORM" == "Linux" ]]; then
+            LINUX_ALL='[{"arch":"amd64","runner":"ubuntu-latest"},{"arch":"arm64","runner":"ubuntu-26.04-arm"}]'
+            if [[ "$ARCH" == "All" ]]; then
+              echo "linux_matrix={\"include\":$LINUX_ALL}" >> "$GITHUB_OUTPUT"
+              echo "linux_run=true" >> "$GITHUB_OUTPUT"
+            else
+              FILTERED=$(echo "$LINUX_ALL" | jq -c --arg a "$ARCH" '[.[] | select(.arch == $a)]')
+              if [[ "$FILTERED" != "[]" ]]; then
+                echo "linux_matrix={\"include\":$FILTERED}" >> "$GITHUB_OUTPUT"
+                echo "linux_run=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "linux_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+                echo "linux_run=false" >> "$GITHUB_OUTPUT"
+              fi
+            fi
+          else
+            echo "linux_matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+            echo "linux_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  Build-Frontend:
+    name: Build Frontend
+    needs: calculate_version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: *checkout
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v6
         with:
           version: latest
-      - uses: actions/setup-node@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: "latest"
-          cache: "pnpm"
+          node-version: latest
+          cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
-      - run: |
-          cd frontend
-          pnpm install --frozen-lockfile
-          pnpm build-only
-      - uses: actions/upload-artifact@v6
+      - name: Build Frontend Dist
+        run: make build-frontend APP_VERSION=${{ needs.calculate_version.outputs.version }}
+      - name: Upload Frontend Dist
+        uses: &upload actions/upload-artifact@v7
         with:
           name: frontend-dist
           path: frontend/dist
 
   Build-Windows:
-    needs: Build-Frontend
-    runs-on: windows-latest
-    env:
-      APP_NAME: GUI.for.SingBox
+    name: Build Windows (${{ matrix.arch }})
+    needs: &build_needs [calculate_version, Build-Frontend]
+    if: needs.calculate_version.outputs.win_run == 'true'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.calculate_version.outputs.win_matrix) }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
+      - name: Checkout
+        uses: *checkout
+      - &setup_go
+        name: Setup Go
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           check-latest: true
-      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-      - uses: actions/download-artifact@v8
+          cache: true
+          cache-dependency-path: go.sum
+      - &install_wails
+        name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - &download_frontend_dist
+        name: Download Frontend Dist
+        uses: &download actions/download-artifact@v8
         with:
           name: frontend-dist
           path: frontend/dist
 
-      - name: Build & Pack Windows
-        shell: pwsh
-        run: |
-          function Build-And-Pack {
-            param([string]$arch)
-            $env:GOOS="windows"
-            $env:GOARCH=$arch
+      - name: Build Windows Binary
+        run: make build-windows ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
 
-            Write-Host "==> Building Windows $arch..."
-            ~/go/bin/wails build -m -s -trimpath -skipbindings -devtools -o "$env:APP_NAME.exe"
-
-            cd build/bin
-            $zipName = "$env:APP_NAME-windows-$arch.zip"
-            Compress-Archive -Path "$env:APP_NAME.exe" -DestinationPath $zipName -Force
-            cd ../..
-          }
-
-          $arches = @("amd64","arm64","386")
-          foreach ($arch in $arches) { Build-And-Pack $arch }
-
-      - uses: actions/upload-artifact@v6
+      - uses: *upload
+        name: Upload Windows Binary
         with:
-          name: windows-builds
+          name: binary-windows-${{ matrix.arch }}
           path: build/bin/*.zip
 
-  Build-macOS:
-    needs: Build-Frontend
-    runs-on: macos-latest
-    env:
-      APP_NAME: GUI.for.SingBox
+  Build-MacOS:
+    name: Build MacOS (${{ matrix.arch }})
+    needs: *build_needs
+    if: needs.calculate_version.outputs.macos_run == 'true'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.calculate_version.outputs.macos_matrix) }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
+      - name: Checkout
+        uses: *checkout
+      - *setup_go
+      - *install_wails
+      - *download_frontend_dist
+
+      - name: Build MacOS Binary
+        run: make build-macos ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+
+      - uses: *upload
+        name: Upload MacOS Binary
         with:
-          go-version-file: go.mod
-          check-latest: true
-      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-      - uses: actions/download-artifact@v8
-        with:
-          name: frontend-dist
-          path: frontend/dist
-      - run: |
-          go mod vendor
-          sed -i "" "s/\[NSApp setActivationPolicy:NSApplicationActivationPolicyRegular\]/[NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory]/g" vendor/github.com/wailsapp/wails/v2/internal/frontend/desktop/darwin/AppDelegate.m
-
-      - name: Build & Pack macOS
-        run: |
-          build_and_pack() {
-            arch=$1
-            export GOOS=darwin GOARCH=$arch
-
-            echo "==> Building macOS $arch..."
-            ~/go/bin/wails build -m -s -trimpath -skipbindings -devtools -o $APP_NAME.exe
-
-            cd build/bin
-            zip -q -r $APP_NAME-darwin-$arch.zip $APP_NAME.app
-            cd ../..
-          }
-
-          for arch in amd64 arm64; do build_and_pack $arch; done
-
-      - uses: actions/upload-artifact@v6
-        with:
-          name: macos-builds
-          path: build/bin/*.zip
+          name: binary-macos-${{ matrix.arch }}
+          path: build/bin/*.tar.gz
 
   Build-Linux:
-    needs: Build-Frontend
-    runs-on: ubuntu-latest
-    env:
-      APP_NAME: GUI.for.SingBox
+    name: Build Linux (${{ matrix.arch }})
+    needs: *build_needs
+    if: needs.calculate_version.outputs.linux_run == 'true'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.calculate_version.outputs.linux_matrix) }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          check-latest: true
-      - run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-      - uses: actions/download-artifact@v8
-        with:
-          name: frontend-dist
-          path: frontend/dist
-      - run: |
-          sudo apt-get update
-          sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev
+      - name: Checkout
+        uses: *checkout
+      - *setup_go
+      - *install_wails
+      - *download_frontend_dist
 
-      - name: Build & Pack Linux
+      - name: Install Dependencies
         run: |
-          build_and_pack() {
-            arch=$1
-            export GOOS=linux GOARCH=$arch
+          sudo apt-get update
+          sudo apt-get install -y tar libgtk-3-dev libwebkit2gtk-4.1-dev ruby-full rpm squashfs-tools libarchive-tools
+          sudo gem install fpm
 
-            echo "==> Building Linux $arch..."
-            ~/go/bin/wails build -m -s -trimpath -skipbindings -devtools -tags webkit2_41 -o $APP_NAME.exe
+      - name: Build Linux Binary
+        run: make build-linux ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
 
-            cd build/bin
-            mv $APP_NAME.exe $APP_NAME
-            zip $APP_NAME-linux-$arch.zip $APP_NAME
-            cd ../..
-          }
+      - name: Package DEB
+        run: make package-deb-all ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
 
-          build_and_pack amd64
+      - name: Package RPM
+        run: make package-rpm-all ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
 
-      - uses: actions/upload-artifact@v6
+      - name: Package Pacman
+        run: make package-pacman-all ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir -p dist
+          cp -f build/bin/*.tar.gz dist/
+          cp -f package/dist/* dist/
+
+      - uses: *upload
+        name: Upload Linux Binary & Packages
         with:
-          name: linux-builds
-          path: build/bin/*.zip
+          name: binary-linux-${{ matrix.arch }}
+          path: dist/*
+
+  # Generate-Release-Notes:
+  #   name: Generate Release Notes
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: *checkout
+  #       with:
+  #         fetch-depth: 0
+  #     - name: Generate Notes
+  #       run: |
+  #         TAG="${{ github.ref_name }}"
+  #         PREV_TAG=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || echo "")
+
+  #         mkdir -p release-notes
+
+  #         TAG_MSG=$(git tag -l --format='%(contents)' "$TAG" 2>/dev/null | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  #         if [ -z "$TAG_MSG" ]; then
+  #           TAG_MSG=$(git log -1 --format='%B' "$TAG" 2>/dev/null)
+  #         fi
+
+  #         {
+  #           if [ -n "$TAG_MSG" ]; then
+  #             echo "## 📝 Release Notes"
+  #             echo ""
+  #             echo "$TAG_MSG"
+  #             echo ""
+  #             echo "---"
+  #           fi
+
+  #           if [ -n "$PREV_TAG" ]; then
+  #             echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$PREV_TAG...$TAG"
+  #           else
+  #             echo "**Full Changelog**: First Release"
+  #           fi
+  #         } > release-notes/release_notes.md
+
+  #     - uses: *upload
+  #       name: Upload Release Notes
+  #       with:
+  #         name: release-notes
+  #         path: release-notes/release_notes.md
 
   Release:
-    needs: [Build-Windows, Build-macOS, Build-Linux]
+    name: Release Artifacts
+    needs: [calculate_version, Build-Windows, Build-MacOS, Build-Linux]
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v8
+      - name: Download builds
+        uses: *download
         with:
+          pattern: binary-*
           path: release-assets
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
+          merge-multiple: true
+
+      - name: Download release notes
+        uses: *download
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          files: release-assets/**/*.zip
-          draft: false
-          prerelease: ${{ contains(github.ref_name, 'dev') }}
-          body: |
-            Auto-generated release from GitHub Actions.
+          name: release-notes
+          path: release-assets
+
+      - name: Attest Build Provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: 'release-assets/**'
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.calculate_version.outputs.version }}
+          name: ${{ needs.calculate_version.outputs.version }}
+          files: |
+            release-assets/*.zip
+            release-assets/*.tar.gz
+            release-assets/*.deb
+            release-assets/*.rpm
+            release-assets/*.pkg.tar.zst
+          prerelease: ${{ contains(needs.calculate_version.outputs.version, 'dev') }}
+          # body_path: release-assets/release_notes.md
+          generate_release_notes: true

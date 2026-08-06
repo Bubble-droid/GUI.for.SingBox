@@ -1,4 +1,12 @@
 build/bin
 frontend/dist
+vendor
+
+package/dist
+package/cores
+package/temp
 
 .DS_Store
+
+tools
+dist

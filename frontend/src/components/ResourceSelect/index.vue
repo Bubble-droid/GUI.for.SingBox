@@ -13,7 +13,7 @@ import { message, modal } from '@/utils'
 
 type ResourceType = 'profile' | 'subscription' | 'ruleset' | 'plugin' | 'scheduledtask'
 type ResourceItem = App.Profile | App.Subscription | App.RuleSet | App.Plugin | App.ScheduledTask
-type ResourceConfig = {
+interface ResourceConfig {
   title: string
   list: ResourceItem[]
   getById: (id: string) => ResourceItem | undefined

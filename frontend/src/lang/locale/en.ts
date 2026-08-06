@@ -1,3 +1,5 @@
+import type { DefineLocaleMessage } from 'vue-i18n'
+
 export default {
   common: {
     grid: 'Grid',
@@ -643,6 +645,7 @@ export default {
     },
     fontFamily: 'Font-Family',
     resetFont: 'Reset Font-Family',
+    systemTitleBar: 'System Title Bar',
     appFolder: {
       name: 'App Folder',
       open: 'Open application folder',
@@ -704,7 +707,6 @@ export default {
     multipleInstance: 'Allow multiple app instances',
     contentProtection: 'Content Protection',
     contentProtectionTips: 'Blocks screen capture (Restart Required)',
-    rollingRelease: 'Enable Rolling Release',
     debugOutline: 'Show component outlines',
     debugNoAnimation: 'Disable animations',
     debugNoRounded: 'Disable rounded corners',
@@ -766,6 +768,7 @@ export default {
     updateSuccessful: 'Update completed',
     newVersion: 'New version found',
     latestVersion: 'Already the latest version',
+    updatesManagedByOS: 'Updates are managed by your OS',
   },
   titlebar: {
     resetSize: 'Reset Window',
@@ -810,4 +813,4 @@ export default {
     title: 'Commands',
     noMatching: 'No matching commands',
   },
-}
+} satisfies DefineLocaleMessage
