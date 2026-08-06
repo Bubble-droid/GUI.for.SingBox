@@ -81,6 +81,19 @@ export default {
       max_time_difference: '最大允许时间差',
     },
   },
+  http2: {
+    title: 'HTTP/2 配置',
+    idle_timeout: '空闲连接超时',
+    keep_alive_period: 'Keep-Alive 周期',
+    stream_receive_window: '流接收窗口大小',
+    connection_receive_window: '连接接收窗口大小',
+    max_concurrent_streams: '最大并发流数',
+  },
+  quic: {
+    title: 'QUIC 配置',
+    initial_packet_size: '初始 QUIC 数据包大小',
+    disable_path_mtu_discovery: '禁用路径 MTU 发现',
+  },
   listen: {
     title: '监听配置',
     listen: '监听地址',

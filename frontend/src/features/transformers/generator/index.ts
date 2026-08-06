@@ -12,6 +12,7 @@ import { generateCertificate } from './certificate'
 import { generateDns } from './dns'
 import { generateEndpoints } from './endpoints'
 import { generateExperimental } from './experimental'
+import { generateHttpClients } from './http_client'
 import { generateInbounds } from './inbounds'
 import { generateNetns } from './netns'
 import { generateNtp } from './ntp'
@@ -44,6 +45,7 @@ export const generateConfig = async (
 
   const tagMaps: TagMaps = {
     certProviders: new Map(),
+    httpClients: buildIdTagMapping(profile.http_clients),
     inbounds: buildIdTagMapping([...profile.endpoints, ...profile.inbounds]),
     outbounds: buildIdTagMapping([...profile.endpoints, ...profile.outbounds]),
     dnsServers: buildIdTagMapping(profile.dns.servers),
@@ -53,8 +55,9 @@ export const generateConfig = async (
   let config: Recordable = filterInvalidProps({
     log: filterInvalidProps(profile.log),
     ntp: generateNtp(profile.ntp, tagMaps),
-    certificate: generateCertificate(profile.certificate),
     experimental: generateExperimental(profile.experimental, tagMaps),
+    certificate: generateCertificate(profile.certificate),
+    http_clients: generateHttpClients(profile.http_clients, tagMaps),
     network_namespaces: generateNetns(profile.network_namespaces),
     endpoints: generateEndpoints(profile.endpoints, tagMaps),
     inbounds: generateInbounds(profile.inbounds),

@@ -2,6 +2,7 @@ import type { CertificateConfig } from './certificate'
 import type { DnsConfig } from './dns'
 import type { EndpointConfig } from './endpoints'
 import type { ExperimentalConfig } from './experimental'
+import type { HttpClientConfig } from './http_client'
 import type { InboundConfig } from './inbounds'
 import type { LogConfig } from './log'
 import type { MixinConfig, ScriptConfig } from './mixin-script'
@@ -16,8 +17,9 @@ export interface Profile {
   schema: string
   log: LogConfig
   ntp: NtpConfig
-  certificate: CertificateConfig
   experimental: ExperimentalConfig
+  certificate: CertificateConfig
+  http_clients: HttpClientConfig[]
   network_namespaces: NetnsConfig[]
   endpoints: EndpointConfig[]
   inbounds: InboundConfig[]

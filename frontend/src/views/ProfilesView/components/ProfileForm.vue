@@ -6,6 +6,7 @@ import CertificateConfig from '@views/CertificateConfig.vue'
 import DnsConfig from '@views/DnsConfig.vue'
 import EndpointsConfig from '@views/EndpointsConfig/EndpointsConfig.vue'
 import ExperimentalConfig from '@views/ExperimentalConfig.vue'
+import HttpClientsConfig from '@views/HttpClientsConfig.vue'
 import InboundsConfig from '@views/InboundsConfig.vue'
 import LogConfig from '@views/LogConfig.vue'
 import NetnsConfig from '@views/NetnsConfig/NetnsConfig.vue'
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { t } = useI18n()
+const httpClientsRef = useTemplateRef('httpClientsRef')
 const netnsRef = useTemplateRef('netnsRef')
 const endpointsRef = useTemplateRef('endpointsRef')
 const inboundsRef = useTemplateRef('inboundsRef')
@@ -113,6 +115,7 @@ const handleSave = async () => {
 
 const handleAdd = () => {
   const map: Record<number, Ref> = {
+    [ProfileStep.HttpClients]: httpClientsRef,
     [ProfileStep.Netns]: netnsRef,
     [ProfileStep.Endpoints]: endpointsRef,
     [ProfileStep.Inbounds]: inboundsRef,
@@ -197,6 +200,7 @@ const modalSlots = {
       icon: 'add',
       style: {
         display: [
+          ProfileStep.HttpClients,
           ProfileStep.Netns,
           ProfileStep.Endpoints,
           ProfileStep.Inbounds,
@@ -276,11 +280,20 @@ defineExpose({ modalSlots })
         :dns-server-options="dnsServerOptions"
       />
     </div>
+    <div v-if="currentStep === ProfileStep.Experimental">
+      <ExperimentalConfig v-model="profile.experimental" :outbound-options="outboundOptions" />
+    </div>
     <div v-if="currentStep === ProfileStep.Certificate">
       <CertificateConfig v-model="profile.certificate" />
     </div>
-    <div v-if="currentStep === ProfileStep.Experimental">
-      <ExperimentalConfig v-model="profile.experimental" :outbound-options="outboundOptions" />
+    <div v-if="currentStep === ProfileStep.HttpClients">
+      <HttpClientsConfig
+        ref="httpClientsRef"
+        v-model="profile.http_clients"
+        :netns-options="netnsOptions"
+        :outbound-options="outboundOptions"
+        :dns-server-options="dnsServerOptions"
+      />
     </div>
     <div v-if="currentStep === ProfileStep.Netns">
       <NetnsConfig ref="netnsRef" v-model="profile.network_namespaces" />

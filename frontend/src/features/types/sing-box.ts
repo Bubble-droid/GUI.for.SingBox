@@ -21,6 +21,23 @@ export type SingBoxNtp = NonNullable<SingBoxConfig['ntp']>
 
 export type SingBoxCert = NonNullable<SingBoxConfig['certificate']>
 
+export type SingBoxHttpClient = UnpackArray<NonNullable<SingBoxConfig['http_clients']>>
+
+export type SingBoxHttp2 = Pick<
+  Extract<SingBoxHttpClient, { version: 3 }>,
+  | 'idle_timeout'
+  | 'keep_alive_period'
+  | 'stream_receive_window'
+  | 'connection_receive_window'
+  | 'max_concurrent_streams'
+>
+
+export type SingBoxQuic = Pick<
+  Extract<SingBoxHttpClient, { version: 3 }>,
+  'initial_packet_size' | 'disable_path_mtu_discovery'
+> &
+  SingBoxHttp2
+
 export type SingBoxNetns = UnpackArray<NonNullable<SingBoxConfig['network_namespaces']>>
 
 export type SingBoxNetnsOf<T extends NonNullable<SingBoxNetns['type']>> = Extract<

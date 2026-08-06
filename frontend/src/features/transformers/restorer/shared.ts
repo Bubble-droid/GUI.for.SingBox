@@ -5,6 +5,8 @@ import {
   createListen,
   createInboundTls,
   createOutboundTls,
+  createHttp2Options,
+  createQuicOptions,
 } from '@defaults/shared'
 import { RouteRuleType, DnsRuleType } from '@features/constant/kernel'
 import type {
@@ -14,6 +16,8 @@ import type {
   SingBoxListen,
   SingBoxInboundTls,
   SingBoxOutboundTls,
+  SingBoxHttp2,
+  SingBoxQuic,
 } from '@features/types/sing-box'
 import { extractProps, ensureArray } from '@features/utils/helper'
 import type {
@@ -23,6 +27,8 @@ import type {
   Listen,
   InboundTlsConfig,
   OutboundTlsConfig,
+  Http2Options,
+  QuicOptions,
 } from '@profiles/shared'
 
 import type { IdMaps } from './types'
@@ -115,7 +121,10 @@ export const restoreListen = <T extends object>(
   return { listen, rest: result.rest }
 }
 
-export const restoreInboundTls = (raw: SingBoxInboundTls, maps: IdMaps): InboundTlsConfig => {
+export const restoreInboundTls = (
+  raw: SingBoxInboundTls | undefined,
+  maps: IdMaps,
+): InboundTlsConfig => {
   const template = createInboundTls()
   if (!raw) return template
 
@@ -152,7 +161,7 @@ export const restoreInboundTls = (raw: SingBoxInboundTls, maps: IdMaps): Inbound
   }
 }
 
-export const restoreOutboundTls = (raw: SingBoxOutboundTls): OutboundTlsConfig => {
+export const restoreOutboundTls = (raw: SingBoxOutboundTls | undefined): OutboundTlsConfig => {
   const template = createOutboundTls()
   if (!raw) return template
 
@@ -181,4 +190,30 @@ export const restoreOutboundTls = (raw: SingBoxOutboundTls): OutboundTlsConfig =
       ...raw.reality,
     },
   }
+}
+
+export const restoreHttp2Options = <T extends Record<string, unknown>>(
+  raw: T,
+): { http2: Http2Options; rest: Omit<T, keyof Http2Options> } => {
+  const template = createHttp2Options()
+  const result = extractProps(raw, template)
+  const owned = result.owned as SingBoxHttp2
+  const http2: Http2Options = {
+    ...template,
+    ...owned,
+  }
+  return { http2, rest: result.rest }
+}
+
+export const restoreQuicOptions = <T extends Record<string, unknown>>(
+  raw: T,
+): { quic: QuicOptions; rest: Omit<T, keyof QuicOptions> } => {
+  const template = createQuicOptions()
+  const result = extractProps(raw, template)
+  const owned = result.owned as SingBoxQuic
+  const quic: QuicOptions = {
+    ...template,
+    ...owned,
+  }
+  return { quic, rest: result.rest }
 }

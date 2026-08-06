@@ -11,6 +11,7 @@ import { restoreCertificate } from './certificate'
 import { restoreDnsServers, restoreDnsRules } from './dns'
 import { restoreEndpoints } from './endpoints'
 import { restoreExperimental } from './experimental'
+import { restoreHttpClients } from './http_client'
 import { restoreInbounds } from './inbounds'
 import { restoreNetns } from './netns'
 import { restoreNtp } from './ntp'
@@ -52,6 +53,7 @@ export const restoreProfile = (
 
   const idMaps: IdMaps = {
     certProviders: new Map(),
+    httpClients: buildTagIdMapping('http-', config.http_clients),
     netns: buildTagIdMapping('ns-', config.network_namespaces),
     endpoints: endpointIds,
     inbounds: new Map([...endpointIds, ...inboundsIds]),
@@ -65,8 +67,9 @@ export const restoreProfile = (
     schema: ProfileSchemaVersion,
     log: { ...createLog(), ...(config.log as LogConfig) },
     ntp: restoreNtp(config.ntp, idMaps),
-    certificate: restoreCertificate(config.certificate),
     experimental: restoreExperimental(config.experimental, idMaps),
+    certificate: restoreCertificate(config.certificate),
+    http_clients: restoreHttpClients(config.http_clients, idMaps),
     network_namespaces: restoreNetns(config.network_namespaces, idMaps),
     endpoints: restoreEndpoints(config.endpoints as SingBoxEndpoint[], idMaps),
     inbounds: restoreInbounds(config.inbounds || [], InboundsIds),

@@ -3,6 +3,7 @@ import certificate from './certificate'
 import dns from './dns'
 import endpoints from './endpoints'
 import experimental from './experimental'
+import http_clients from './http_clients'
 import inbounds from './inbounds'
 import log from './log'
 import netns from './netns'
@@ -24,6 +25,7 @@ export default {
   ntp,
   certificate,
   experimental,
+  http_clients,
   netns,
   endpoints,
   inbounds,
