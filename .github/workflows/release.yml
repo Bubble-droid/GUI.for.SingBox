@@ -25,16 +25,10 @@ on:
           - '386'
   push:
     tags:
-      - v*
+      - 'v*.*.*'
 
 permissions:
   contents: write
-  id-token: write
-  attestations: write
-  artifact-metadata: write
-
-env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ inputs.build_platform }}-${{ inputs.build_arch }}
@@ -151,6 +145,8 @@ jobs:
     name: Build Frontend
     needs: calculate_version
     runs-on: ubuntu-latest
+    env:
+      APP_VERSION: ${{ needs.calculate_version.outputs.version }}
     steps:
       - name: Checkout
         uses: *checkout
@@ -165,7 +161,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
       - name: Build Frontend Dist
-        run: make build-frontend APP_VERSION=${{ needs.calculate_version.outputs.version }}
+        run: make build-frontend
       - name: Upload Frontend Dist
         uses: &upload actions/upload-artifact@v7
         with:
@@ -177,6 +173,9 @@ jobs:
     needs: &build_needs [calculate_version, Build-Frontend]
     if: needs.calculate_version.outputs.win_run == 'true'
     runs-on: ${{ matrix.runner }}
+    env:
+      ARCH: ${{ matrix.arch }}
+      APP_VERSION: ${{ needs.calculate_version.outputs.version }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.calculate_version.outputs.win_matrix) }}
@@ -202,7 +201,7 @@ jobs:
           path: frontend/dist
 
       - name: Build Windows Binary
-        run: make build-windows ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+        run: make build-windows
 
       - uses: *upload
         name: Upload Windows Binary
@@ -215,6 +214,9 @@ jobs:
     needs: *build_needs
     if: needs.calculate_version.outputs.macos_run == 'true'
     runs-on: ${{ matrix.runner }}
+    env:
+      ARCH: ${{ matrix.arch }}
+      APP_VERSION: ${{ needs.calculate_version.outputs.version }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.calculate_version.outputs.macos_matrix) }}
@@ -226,7 +228,7 @@ jobs:
       - *download_frontend_dist
 
       - name: Build MacOS Binary
-        run: make build-macos ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+        run: make build-macos
 
       - uses: *upload
         name: Upload MacOS Binary
@@ -239,6 +241,11 @@ jobs:
     needs: *build_needs
     if: needs.calculate_version.outputs.linux_run == 'true'
     runs-on: ${{ matrix.runner }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PACKAGER: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+      ARCH: ${{ matrix.arch }}
+      APP_VERSION: ${{ needs.calculate_version.outputs.version }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.calculate_version.outputs.linux_matrix) }}
@@ -252,20 +259,25 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y tar libgtk-3-dev libwebkit2gtk-4.1-dev ruby-full rpm squashfs-tools libarchive-tools
-          sudo gem install fpm
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+
+      - name: Install nFPM from Fork
+        run: |
+          git clone -b feat/arch --depth=1 https://github.com/Bubble-droid/nfpm.git /tmp/nfpm-fork
+          cd /tmp/nfpm-fork
+          go install ./cmd/nfpm
 
       - name: Build Linux Binary
-        run: make build-linux ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+        run: make build-linux
 
       - name: Package DEB
-        run: make package-deb-all ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+        run: make package-deb-all
 
       - name: Package RPM
-        run: make package-rpm-all ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+        run: make package-rpm-all
 
       - name: Package Pacman
-        run: make package-pacman-all ARCH=${{ matrix.arch }} APP_VERSION=${{ needs.calculate_version.outputs.version }}
+        run: make package-pacman-all
 
       - name: Prepare Artifacts
         run: |
@@ -282,7 +294,11 @@ jobs:
   Release:
     name: Release Artifacts
     needs: [calculate_version, Build-Windows, Build-MacOS, Build-Linux]
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.ref_type == 'tag'
+    permissions:
+      id-token: write
+      attestations: write
+      artifact-metadata: write
     runs-on: ubuntu-latest
     steps:
       - name: Download builds
@@ -308,5 +324,6 @@ jobs:
             release-assets/*.deb
             release-assets/*.rpm
             release-assets/*.pkg.tar.zst
+          draft: true
           prerelease: ${{ needs.calculate_version.outputs.is_prerelease == 'true' }}
           generate_release_notes: true

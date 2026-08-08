@@ -4,7 +4,7 @@ vendor
 
 package/dist
 package/cores
-package/temp
+package/tmp
 
 .DS_Store
 
