@@ -4,5 +4,5 @@
     "eslint --fix --cache",
     "oxfmt --no-error-on-unmatched-pattern"
   ],
-  "*.{json,less,md,html}": ["oxfmt --no-error-on-unmatched-pattern"]
+  "!(*.js|*.ts|*.vue)": ["oxfmt --no-error-on-unmatched-pattern"]
 }
