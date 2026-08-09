@@ -4,9 +4,11 @@ import { useI18n } from 'vue-i18n'
 
 import { deepClone } from '@/utils'
 
+type SelectValue = string | number
+
 interface Props {
-  modelValue?: string | string[]
-  options?: { label: string; value: string }[]
+  modelValue?: SelectValue | SelectValue[]
+  options?: { label: string; value: SelectValue }[]
   multiple?: boolean
   border?: boolean
   size?: 'default' | 'small'
@@ -28,31 +30,46 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['change', 'update:modelValue'])
 
-const model = ref(props.multiple ? deepClone(props.modelValue || []) : props.modelValue)
+const model = ref<SelectValue | SelectValue[] | undefined>(
+  props.multiple ? deepClone(props.modelValue ?? []) : props.modelValue,
+)
 
 const { t } = useI18n()
 
-const innerClearable = computed(
-  () => props.clearable && (props.multiple ? (model.value as string[]).length !== 0 : model.value),
-)
+const innerClearable = computed(() => {
+  if (!props.clearable) return false
+  if (props.multiple) {
+    return Array.isArray(model.value) && model.value.length !== 0
+  }
+  return model.value !== undefined && model.value !== null && model.value !== ''
+})
 
 const optionsValueLabelMapping = computed(() =>
-  props.options.reduce((p, c) => {
-    p[c.value] = c.label ?? c.value
-    return p
-  }, {} as Recordable),
+  props.options.reduce(
+    (p, c) => {
+      p[c.value] = c.label ?? c.value
+      return p
+    },
+    {} as Record<string | number, SelectValue>,
+  ),
 )
 
 const displayLabel = computed(() => {
   if (props.multiple) {
-    const selected = model.value as string[]
+    const selected = (Array.isArray(model.value) ? model.value : []) as SelectValue[]
     if (selected.length === 0) {
-      return props.placeholder ?? 'common.none'
+      return props.placeholder || 'common.none'
     }
-    return selected.map((item) => t(optionsValueLabelMapping.value[item] ?? item)).join('、')
+    return selected
+      .map((item) => t(String(optionsValueLabelMapping.value[item] ?? item)))
+      .join('、')
   }
-  const label = props.options.find((v) => v.value === model.value)?.label ?? (model.value as string)
-  return (label || props.placeholder) ?? 'common.none'
+  const option = props.options.find((v) => v.value === model.value)
+  const label = option ? (option.label ?? option.value) : model.value
+  if (label !== undefined && label !== null && label !== '') {
+    return String(label)
+  }
+  return props.placeholder || 'common.none'
 })
 
 let internalUpdate = false
@@ -61,31 +78,32 @@ watch(
   () => props.modelValue,
   (val) => {
     if (!internalUpdate) {
-      model.value = val
+      model.value = props.multiple ? deepClone(val ?? []) : val
     }
     internalUpdate = false
   },
   { deep: true },
 )
 
-const isSelected = (val: string) => {
+const isSelected = (val: SelectValue) => {
   if (props.multiple) {
-    return (model.value as string[]).includes(val)
+    return Array.isArray(model.value) && model.value.includes(val)
   }
   return model.value === val
 }
 
-const handleSelect = (value: string) => {
+const handleSelect = (value: SelectValue) => {
   const oldModel = JSON.stringify(model.value)
   if (props.multiple) {
     if (!Array.isArray(model.value)) {
       model.value = []
     }
-    const idx = model.value?.indexOf(value) ?? -1
+    const list = model.value as SelectValue[]
+    const idx = list.indexOf(value)
     if (idx === -1) {
-      ;(model.value as string[]).push(value)
+      list.push(value)
     } else {
-      ;(model.value as string[]).splice(idx, 1)
+      list.splice(idx, 1)
     }
     if (oldModel !== JSON.stringify(model.value)) {
       emit('update:modelValue', model.value)
@@ -170,7 +188,7 @@ const handleClear = () => {
               <Icon icon="selected" :size="18" />
             </div>
             <div class="">
-              {{ t(o.label) }}
+              {{ t(o.label ?? String(o.value)) }}
             </div>
           </div>
         </Button>
