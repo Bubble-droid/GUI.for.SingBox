@@ -30,12 +30,13 @@ export const useAppBootstrap = () => {
 
     await Promise.all([
       appSettings.setupAppSettings(),
-      profilesStore.setupProfiles(),
       subscribesStore.setupSubscribes(),
       rulesetsStore.setupRulesets(),
       pluginsStore.setupPlugins(),
       scheduledTasksStore.setupScheduledTasks(),
     ])
+
+    await profilesStore.setupProfiles()
 
     const startTime = performance.now()
     percent.value = 20

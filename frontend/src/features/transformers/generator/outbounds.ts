@@ -35,7 +35,8 @@ export const generateOutbounds = async (outbounds: OutboundConfig[]) => {
           _outbound.outbounds.push(proxy.tag)
         } else {
           const subId = proxy.type === 'Subscription' ? proxy.id : proxy.type
-          if (!SubscriptionCache[subId]) {
+          const targetSub = SubscriptionCache[subId] ?? []
+          if (!targetSub) {
             const sub = subscribesStore.getSubscribeById(subId)
             if (sub) {
               const subStr = await ReadFile(sub.path)
@@ -45,11 +46,11 @@ export const generateOutbounds = async (outbounds: OutboundConfig[]) => {
           }
           if (proxy.type === 'Subscription') {
             _outbound.outbounds.push(
-              ...SubscriptionCache[subId]!.map((v) => v.tag).filter((tag) => isTagMatching(tag)),
+              ...targetSub?.map((v) => v.tag).filter((tag) => isTagMatching(tag)),
             )
-            SubscriptionCache[subId]!.forEach((v) => proxiesSet.add(v))
+            targetSub.forEach((v) => proxiesSet.add(v))
           } else {
-            const _proxy = SubscriptionCache[subId]!.find((v) => v.tag === proxy.tag)
+            const _proxy = targetSub.find((v) => v.tag === proxy.tag)
             if (_proxy && isTagMatching(_proxy.tag)) {
               _outbound.outbounds.push(_proxy.tag)
               proxiesSet.add(_proxy)
