@@ -70,7 +70,7 @@ export const migrateProfiles = async (
     } catch (error) {
       const msg = `Failed to migrate profile [${p.name || p.id}]: ${normalizeErrorMessage(error)}`
       console.error(msg)
-      throw msg
+      throw error
     }
   }
 
