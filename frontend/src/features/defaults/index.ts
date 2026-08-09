@@ -12,7 +12,7 @@ import { createNtp } from './ntp'
 import { createOutbounds } from './outbounds'
 import { createRoute } from './route'
 
-export const ProfileSchemaVersion = 'v0.7.0'
+export const ProfileSchemaVersion = 'v0.8.0'
 
 export const createMixin = (): MixinConfig => {
   return { priority: 'mixin', format: 'json', config: '{}' }
@@ -28,8 +28,9 @@ export const createProfile = (name = ''): Profile => ({
   schema: ProfileSchemaVersion,
   log: createLog(),
   ntp: createNtp(),
-  certificate: createCertificate(),
   experimental: createExperimental(),
+  certificate: createCertificate(),
+  certificate_providers: [],
   http_clients: [],
   network_namespaces: [],
   endpoints: [],

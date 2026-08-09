@@ -21,6 +21,18 @@ export type SingBoxNtp = NonNullable<SingBoxConfig['ntp']>
 
 export type SingBoxCert = NonNullable<SingBoxConfig['certificate']>
 
+export type SingBoxCertificateProvider = UnpackArray<
+  NonNullable<SingBoxConfig['certificate_providers']>
+>
+
+export type SingBoxCertificateProviderOf<T extends SingBoxCertificateProvider['type']> = Extract<
+  SingBoxCertificateProvider,
+  { type: T }
+>
+
+export type SingBoxDns01Challenge = NonNullable<
+  SingBoxCertificateProviderOf<'acme'>['dns01_challenge']
+>
 export type SingBoxHttpClient = UnpackArray<NonNullable<SingBoxConfig['http_clients']>>
 
 export type SingBoxHttp2 = Pick<

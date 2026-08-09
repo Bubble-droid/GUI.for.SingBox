@@ -8,6 +8,7 @@ import { useProfilesStore } from '@/stores'
 import { sampleID } from '@/utils'
 
 import { restoreCertificate } from './certificate'
+import { restoreCertificateProviders } from './certificate_provider'
 import { restoreDnsServers, restoreDnsRules } from './dns'
 import { restoreEndpoints } from './endpoints'
 import { restoreExperimental } from './experimental'
@@ -52,7 +53,7 @@ export const restoreProfile = (
   const outboundIds = buildTagIdMapping('out-', config.outbounds)
 
   const idMaps: IdMaps = {
-    certProviders: new Map(),
+    certProviders: buildTagIdMapping('cert-', config.certificate_providers),
     httpClients: buildTagIdMapping('http-', config.http_clients),
     netns: buildTagIdMapping('ns-', config.network_namespaces),
     endpoints: endpointIds,
@@ -69,6 +70,7 @@ export const restoreProfile = (
     ntp: restoreNtp(config.ntp, idMaps),
     experimental: restoreExperimental(config.experimental, idMaps),
     certificate: restoreCertificate(config.certificate),
+    certificate_providers: restoreCertificateProviders(config.certificate_providers, idMaps),
     http_clients: restoreHttpClients(config.http_clients, idMaps),
     network_namespaces: restoreNetns(config.network_namespaces, idMaps),
     endpoints: restoreEndpoints(config.endpoints as SingBoxEndpoint[], idMaps),

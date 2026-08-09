@@ -1,4 +1,4 @@
-export interface ComponentOption {
+export interface ComponentOption<T = string> {
   label: string
-  value: string
+  value: T
 }

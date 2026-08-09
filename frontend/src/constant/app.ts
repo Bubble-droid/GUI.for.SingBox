@@ -204,6 +204,7 @@ export const ProfileSteps = [
   'Ntp',
   'Experimental',
   'Certificate',
+  'CertProviders',
   'HttpClients',
   'Netns',
   'Endpoints',
@@ -219,7 +220,9 @@ export const ProfileStep = Object.fromEntries(
 ) as Record<(typeof ProfileSteps)[number], number>
 
 export const ProfileMenuList = ProfileSteps.map((step) => {
-  if (step === 'HttpClients') {
+  if (step === 'CertProviders') {
+    return 'profile.step.certificate_providers'
+  } else if (step === 'HttpClients') {
     return 'profile.step.http_clients'
   } else if (step === 'MixinScript') {
     return 'profile.step.mixin-script'

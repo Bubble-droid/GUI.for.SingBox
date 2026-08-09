@@ -8,6 +8,7 @@ import type {
   SingBoxOutboundTls,
   SingBoxHttp2,
   SingBoxQuic,
+  SingBoxDns01Challenge,
 } from '@features/types/sing-box'
 import { filterInvalidProps } from '@features/utils/helper'
 import type { DnsRuleConfig } from '@profiles/dns'
@@ -22,6 +23,7 @@ import type {
   OutboundTlsConfig,
   Http2Options,
   QuicOptions,
+  Dns01Challenge,
 } from '@profiles/shared'
 
 import { deepAssign } from '@/utils'
@@ -142,5 +144,15 @@ export const generateQuicOptions = (quic: QuicOptions): SingBoxQuic => {
     ...generateHttp2Options(rest),
     initial_packet_size,
     disable_path_mtu_discovery,
+  })
+}
+
+export const generateDns01Challenge = (
+  dns01: Dns01Challenge,
+  maps: TagMaps,
+): SingBoxDns01Challenge => {
+  return filterInvalidProps({
+    ...dns01,
+    resolvers: dns01.resolvers.map(maps.dnsServers.get).filter(Boolean),
   })
 }

@@ -1,4 +1,34 @@
 export default {
+  dns01: {
+    title: 'DNS01 质询配置',
+    ttl: '临时 TXT 记录 TTL',
+    propagation_delay: '传播检查前等待时长',
+    propagation_timeout: '传播检查超时时间 (-1 禁用)',
+    resolvers: '验证用 DNS 解析器',
+    override_domain: '覆盖质询域名',
+    provider: {
+      title: 'DNS 提供商',
+      alidns: '阿里云 DNS (Alibaba Cloud)',
+      cloudflare: 'Cloudflare',
+      acmedns: 'ACME-DNS',
+    },
+    alidns: {
+      access_key_id: 'AccessKey ID',
+      access_key_secret: 'AccessKey Secret',
+      region_id: 'Region ID',
+      security_token: 'STS 安全令牌',
+    },
+    cloudflare: {
+      api_token: 'API Token',
+      zone_token: 'Zone Token',
+    },
+    acmedns: {
+      username: '用户名',
+      password: '密码',
+      subdomain: '子域名',
+      server_url: '服务器 URL',
+    },
+  },
   tls: {
     title: 'TLS 配置',
     enabled: '启用 TLS',
