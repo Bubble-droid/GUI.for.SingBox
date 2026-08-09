@@ -7,6 +7,7 @@ import {
   createOutboundTls,
   createHttp2Options,
   createQuicOptions,
+  createDns01Challenge,
 } from '@defaults/shared'
 import { RouteRuleType, DnsRuleType } from '@features/constant/kernel'
 import type {
@@ -18,6 +19,7 @@ import type {
   SingBoxOutboundTls,
   SingBoxHttp2,
   SingBoxQuic,
+  SingBoxDns01Challenge,
 } from '@features/types/sing-box'
 import { extractProps, ensureArray } from '@features/utils/helper'
 import type {
@@ -29,6 +31,7 @@ import type {
   OutboundTlsConfig,
   Http2Options,
   QuicOptions,
+  Dns01Challenge,
 } from '@profiles/shared'
 
 import type { IdMaps } from './types'
@@ -216,4 +219,20 @@ export const restoreQuicOptions = <T extends Record<string, unknown>>(
     ...owned,
   }
   return { quic, rest: result.rest }
+}
+
+export const restoreDns01Challenge = (
+  raw: SingBoxDns01Challenge | undefined,
+  maps: IdMaps,
+): Dns01Challenge => {
+  const template = createDns01Challenge(raw?.provider)
+  if (!raw) return template
+
+  return {
+    ...template,
+    ...raw,
+    resolvers: ensureArray((raw as Dns01Challenge).resolvers)
+      .map(maps.dnsServers.get)
+      .filter(Boolean) as string[],
+  } as Dns01Challenge
 }

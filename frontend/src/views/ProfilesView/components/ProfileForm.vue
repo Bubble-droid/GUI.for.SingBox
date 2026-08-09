@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { Endpoint } from '@features/constant/kernel.ts'
 import type { ComponentOption } from '@features/types/views.ts'
 import { generateConfig } from '@generator'
 import type { Profile } from '@profiles'
 import CertificateConfig from '@views/CertificateConfig.vue'
+import CertificateProviderConfig from '@views/CertificateProviderConfig/CertificateProviderConfig.vue'
 import DnsConfig from '@views/DnsConfig.vue'
 import EndpointsConfig from '@views/EndpointsConfig/EndpointsConfig.vue'
 import ExperimentalConfig from '@views/ExperimentalConfig.vue'
@@ -39,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { t } = useI18n()
+const certProvidersRef = useTemplateRef('certProvidersRef')
 const httpClientsRef = useTemplateRef('httpClientsRef')
 const netnsRef = useTemplateRef('netnsRef')
 const endpointsRef = useTemplateRef('endpointsRef')
@@ -53,12 +56,30 @@ const currentStep = ref(props.step)
 
 const profile = ref<Profile>(profilesStore.getProfileTemplate())
 
+const httpClientOptions = computed<ComponentOption[]>(() =>
+  profile.value.http_clients
+    .filter((v) => v.enable)
+    .map((v) => ({
+      label: v.tag,
+      value: v.id,
+    })),
+)
+
 const netnsOptions = computed<ComponentOption[]>(() =>
   profile.value.network_namespaces
     .filter((ns) => ns.enable)
     .map((ns) => ({
       label: ns.tag,
       value: ns.id,
+    })),
+)
+
+const tailscaleOptions = computed<ComponentOption[]>(() =>
+  profile.value.endpoints
+    .filter((v) => v.enable && v.type === Endpoint.Tailscale)
+    .map((v) => ({
+      label: v.tag,
+      value: v.id,
     })),
 )
 
@@ -78,7 +99,7 @@ const outboundOptions = computed<ComponentOption[]>(() =>
   })),
 )
 
-const dnsServerOptions = computed(() =>
+const dnsServerOptions = computed<ComponentOption[]>(() =>
   profile.value.dns.servers.map((v) => ({ label: v.tag, value: v.id })),
 )
 
@@ -115,6 +136,7 @@ const handleSave = async () => {
 
 const handleAdd = () => {
   const map: Record<number, Ref> = {
+    [ProfileStep.CertProviders]: certProvidersRef,
     [ProfileStep.HttpClients]: httpClientsRef,
     [ProfileStep.Netns]: netnsRef,
     [ProfileStep.Endpoints]: endpointsRef,
@@ -200,6 +222,7 @@ const modalSlots = {
       icon: 'add',
       style: {
         display: [
+          ProfileStep.CertProviders,
           ProfileStep.HttpClients,
           ProfileStep.Netns,
           ProfileStep.Endpoints,
@@ -285,6 +308,15 @@ defineExpose({ modalSlots })
     </div>
     <div v-if="currentStep === ProfileStep.Certificate">
       <CertificateConfig v-model="profile.certificate" />
+    </div>
+    <div v-if="currentStep === ProfileStep.CertProviders">
+      <CertificateProviderConfig
+        ref="certProvidersRef"
+        v-model="profile.certificate_providers"
+        :http-client-options="httpClientOptions"
+        :tailscale-options="tailscaleOptions"
+        :dns-server-options="dnsServerOptions"
+      />
     </div>
     <div v-if="currentStep === ProfileStep.HttpClients">
       <HttpClientsConfig

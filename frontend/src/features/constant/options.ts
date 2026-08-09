@@ -55,14 +55,22 @@ import {
   UtlsFingerprint,
   HttpEngine,
   HttpVersion,
+  AcmeKeyType,
+  AcmeProvider,
+  CertificateProviderType,
+  CloudflareOriginCaRequestType,
+  CloudflareOriginCaValidity,
+  Dns01Provider,
 } from './kernel'
 
 type FormatString<
   Pattern extends string,
-  Val extends string,
+  Val extends string | number,
 > = Pattern extends `${infer Start}{{val}}${infer End}` ? `${Start}${Val}${End}` : Pattern
 
-type OptionItem<TValue extends string, TLabelPattern extends string> = TValue extends string
+type OptionItem<TValue extends string | number, TLabelPattern extends string> = TValue extends
+  | string
+  | number
   ? {
       value: TValue
       label: FormatString<TLabelPattern, TValue>
@@ -70,17 +78,17 @@ type OptionItem<TValue extends string, TLabelPattern extends string> = TValue ex
   : never
 
 const defineOptions = <
-  const TSource extends Record<string, string>,
+  const TSource extends Recordable<string | number>,
   const TLabelPattern extends string,
 >(
   source: TSource,
   pattern: TLabelPattern,
 ) => {
-  type TValue = TSource[keyof TSource] & string
+  type TValue = TSource[keyof TSource]
 
   return Object.values(source).map((v) => ({
     value: v,
-    label: pattern.replace('{{val}}', v),
+    label: pattern.replace('{{val}}', String(v)),
   })) as OptionItem<TValue, TLabelPattern>[]
 }
 
@@ -148,13 +156,43 @@ export const CertificateStoreOptions = defineOptions(
   'kernel.certificate.store.{{val}}',
 )
 
+export const CertificateProviderTypeOptions = defineOptions(
+  CertificateProviderType,
+  'kernel.certificate_providers.type.{{val}}',
+)
+
+export const AcmeKeyTypeOptions = defineOptions(
+  AcmeKeyType,
+  'kernel.certificate_providers.acme.key_type.{{val}}',
+)
+
+export const CloudflareOriginCaRequestTypeOptions = defineOptions(
+  CloudflareOriginCaRequestType,
+  'kernel.certificate_providers.cloudflare_origin_ca.request_type.{{val}}',
+)
+
+export const CloudflareOriginCaValidityOptions = defineOptions(
+  CloudflareOriginCaValidity,
+  'kernel.certificate_providers.cloudflare_origin_ca.requested_validity.{{val}}',
+)
+
+export const Dns01ProviderOptions = defineOptions(
+  Dns01Provider,
+  'kernel.shared.dns01.provider.{{val}}',
+)
+
+export const AcmeProviderOptions = defineOptions(
+  AcmeProvider,
+  'kernel.certificate_providers.acme.provider.{{val}}',
+)
+
 export const HttpEngineOptions = defineOptions(HttpEngine, 'kernel.http_clients.engine.{{val}}')
 
 export const HttpVersionOptions = [
   { label: 'HTTP/1.1 (1)', value: HttpVersion.V1 },
   { label: 'HTTP/2 (2)', value: HttpVersion.V2 },
   { label: 'HTTP/3 (3)', value: HttpVersion.V3 },
-]
+] satisfies ComponentOption<number>[]
 
 export const NetnsTypeOptions = defineOptions(NetnsType, 'kernel.netns.type.{{val}}')
 

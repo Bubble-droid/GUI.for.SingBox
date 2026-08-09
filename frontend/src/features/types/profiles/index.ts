@@ -1,4 +1,5 @@
 import type { CertificateConfig } from './certificate'
+import type { CertificateProviderConfig } from './certificate_provider'
 import type { DnsConfig } from './dns'
 import type { EndpointConfig } from './endpoints'
 import type { ExperimentalConfig } from './experimental'
@@ -19,6 +20,7 @@ export interface Profile {
   ntp: NtpConfig
   experimental: ExperimentalConfig
   certificate: CertificateConfig
+  certificate_providers: CertificateProviderConfig[]
   http_clients: HttpClientConfig[]
   network_namespaces: NetnsConfig[]
   endpoints: EndpointConfig[]

@@ -7,6 +7,8 @@ import type {
   SingBoxNetns,
   SingBoxCert,
   SingBoxHttpClient,
+  SingBoxCertificateProvider,
+  SingBoxCertificateProviderOf,
 } from '@features/types/sing-box'
 import type { ValueOf } from '@features/types/utils'
 
@@ -36,6 +38,75 @@ export const CertificateStore = {
   Chrome: 'chrome',
   None: 'none',
 } as const satisfies Recordable<NonNullable<SingBoxCert['store']>>
+
+export type CertificateStore = ValueOf<typeof CertificateStore>
+
+export const CertificateProviderType = {
+  Acme: 'acme',
+  Tailscale: 'tailscale',
+  CloudflareOriginCa: 'cloudflare-origin-ca',
+} as const satisfies Recordable<SingBoxCertificateProvider['type']>
+
+export type CertificateProviderType = ValueOf<typeof CertificateProviderType>
+
+export const AcmeKeyType = {
+  Ed25519: 'ed25519',
+  P256: 'p256',
+  P384: 'p384',
+  Rsa2048: 'rsa2048',
+  Rsa4096: 'rsa4096',
+} as const satisfies Recordable<
+  SingBoxCertificateProviderOf<typeof CertificateProviderType.Acme>['key_type']
+>
+
+export type AcmeKeyType = ValueOf<typeof AcmeKeyType>
+
+export const CloudflareOriginCaRequestType = {
+  OriginRsa: 'origin-rsa',
+  OriginEcc: 'origin-ecc',
+} as const satisfies Recordable<
+  SingBoxCertificateProviderOf<typeof CertificateProviderType.CloudflareOriginCa>['request_type']
+>
+
+export type CloudflareOriginCaRequestType = ValueOf<typeof CloudflareOriginCaRequestType>
+
+export const CloudflareOriginCaValidity = {
+  Days7: 7,
+  Days30: 30,
+  Days90: 90,
+  Days365: 365,
+  Days730: 730,
+  Days1095: 1095,
+  Days5475: 5475,
+} as const satisfies Recordable<
+  SingBoxCertificateProviderOf<
+    typeof CertificateProviderType.CloudflareOriginCa
+  >['requested_validity']
+>
+
+export type CloudflareOriginCaValidity = ValueOf<typeof CloudflareOriginCaValidity>
+
+export const Dns01Provider = {
+  AliDns: 'alidns',
+  Cloudflare: 'cloudflare',
+  AcmeDns: 'acmedns',
+} as const satisfies Recordable<
+  NonNullable<
+    SingBoxCertificateProviderOf<typeof CertificateProviderType.Acme>['dns01_challenge']
+  >['provider']
+>
+
+export type Dns01Provider = ValueOf<typeof Dns01Provider>
+
+export const AcmeProvider = {
+  LetsEncrypt: 'letsencrypt',
+  ZeroSSL: 'zerossl',
+  Custom: 'custom',
+} as const satisfies Recordable<
+  SingBoxCertificateProviderOf<typeof CertificateProviderType.Acme>['provider']
+>
+
+export type AcmeProvider = ValueOf<typeof AcmeProvider>
 
 export const HttpEngine = {
   Go: 'go',
@@ -449,8 +520,6 @@ export const OpenVpnDnsTransport = {
 } as const
 
 export type OpenVpnDnsTransport = ValueOf<typeof OpenVpnDnsTransport>
-
-export type CertificateStore = ValueOf<typeof CertificateStore>
 
 export const TlsEngine = {
   Go: 'go',

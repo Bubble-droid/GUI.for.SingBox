@@ -9,6 +9,7 @@ import { deepClone, deepAssign } from '@/utils'
 
 import { _adaptToStableBranch } from './adapter'
 import { generateCertificate } from './certificate'
+import { generateCertificateProviders } from './certificate_provider'
 import { generateDns } from './dns'
 import { generateEndpoints } from './endpoints'
 import { generateExperimental } from './experimental'
@@ -44,8 +45,9 @@ export const generateConfig = async (
   const profile = deepClone(originalProfile)
 
   const tagMaps: TagMaps = {
-    certProviders: new Map(),
+    certProviders: buildIdTagMapping(profile.certificate_providers),
     httpClients: buildIdTagMapping(profile.http_clients),
+    endpoints: buildIdTagMapping(profile.endpoints),
     inbounds: buildIdTagMapping([...profile.endpoints, ...profile.inbounds]),
     outbounds: buildIdTagMapping([...profile.endpoints, ...profile.outbounds]),
     dnsServers: buildIdTagMapping(profile.dns.servers),
@@ -57,6 +59,7 @@ export const generateConfig = async (
     ntp: generateNtp(profile.ntp, tagMaps),
     experimental: generateExperimental(profile.experimental, tagMaps),
     certificate: generateCertificate(profile.certificate),
+    certificate_providers: generateCertificateProviders(profile.certificate_providers, tagMaps),
     http_clients: generateHttpClients(profile.http_clients, tagMaps),
     network_namespaces: generateNetns(profile.network_namespaces),
     endpoints: generateEndpoints(profile.endpoints, tagMaps),

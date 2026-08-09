@@ -1,5 +1,6 @@
 import type { MessageSchema } from '../types'
 import certificate from './certificate'
+import certificate_providers from './certificate_providers'
 import dns from './dns'
 import endpoints from './endpoints'
 import experimental from './experimental'
@@ -23,8 +24,9 @@ export default {
   shared,
   log,
   ntp,
-  certificate,
   experimental,
+  certificate,
+  certificate_providers,
   http_clients,
   netns,
   endpoints,

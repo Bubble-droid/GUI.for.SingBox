@@ -1,6 +1,36 @@
 import type { MessageSchema } from '../types'
 
 export default {
+  dns01: {
+    title: 'DNS01 Challenge Configuration',
+    ttl: 'TXT Record TTL',
+    propagation_delay: 'Propagation Delay',
+    propagation_timeout: 'Propagation Timeout (-1 to disable)',
+    resolvers: 'DNS Resolvers',
+    override_domain: 'Override Challenge Domain',
+    provider: {
+      title: 'DNS Provider',
+      alidns: 'Alibaba Cloud DNS',
+      cloudflare: 'Cloudflare',
+      acmedns: 'ACME-DNS',
+    },
+    alidns: {
+      access_key_id: 'AccessKey ID',
+      access_key_secret: 'AccessKey Secret',
+      region_id: 'Region ID',
+      security_token: 'Security Token',
+    },
+    cloudflare: {
+      api_token: 'API Token',
+      zone_token: 'Zone Token',
+    },
+    acmedns: {
+      username: 'Username',
+      password: 'Password',
+      subdomain: 'Subdomain',
+      server_url: 'Server URL',
+    },
+  },
   tls: {
     title: 'TLS Configuration',
     enabled: 'Enable TLS',

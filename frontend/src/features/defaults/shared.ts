@@ -1,12 +1,13 @@
-import type {
-  DomainStrategy,
-  NetworkStrategy,
-  TlsClientAuthentication,
-  TlsEngine,
-  TlsSpoofMethod,
-  TlsVersion,
-  UdpNatBehavior,
-  UtlsFingerprint,
+import {
+  Dns01Provider,
+  type DomainStrategy,
+  type NetworkStrategy,
+  type TlsClientAuthentication,
+  type TlsEngine,
+  type TlsSpoofMethod,
+  type TlsVersion,
+  type UdpNatBehavior,
+  type UtlsFingerprint,
 } from '@features/constant/kernel'
 import type {
   TagItem,
@@ -21,6 +22,8 @@ import type {
   OutboundTlsConfig,
   Http2Options,
   QuicOptions,
+  Dns01Challenge,
+  Dns01ChallengeBase,
 } from '@profiles/shared'
 
 import { sampleID } from '@/utils'
@@ -228,3 +231,45 @@ export const createQuicOptions = (): QuicOptions => ({
   initial_packet_size: 0,
   disable_path_mtu_discovery: false,
 })
+
+export const createDns01Challenge = (provider?: Dns01Provider): Dns01Challenge => {
+  const base: Dns01ChallengeBase = {
+    ttl: '',
+    propagation_delay: '',
+    propagation_timeout: '',
+    resolvers: [],
+    override_domain: '',
+  }
+  switch (provider) {
+    case Dns01Provider.AliDns:
+      return {
+        ...base,
+        provider: Dns01Provider.AliDns,
+        access_key_id: '',
+        access_key_secret: '',
+        region_id: '',
+        security_token: '',
+      }
+    case Dns01Provider.Cloudflare:
+      return {
+        ...base,
+        provider: Dns01Provider.Cloudflare,
+        api_token: '',
+        zone_token: '',
+      }
+    case Dns01Provider.AcmeDns:
+      return {
+        ...base,
+        provider: Dns01Provider.AcmeDns,
+        username: '',
+        password: '',
+        subdomain: '',
+        server_url: '',
+      }
+    default:
+      return {
+        ...base,
+        provider: '' as Dns01Provider,
+      } as Dns01Challenge
+  }
+}

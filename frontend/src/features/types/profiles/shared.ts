@@ -1,4 +1,5 @@
 import type {
+  Dns01Provider,
   DomainStrategy,
   NetworkStrategy,
   NetworkType,
@@ -13,6 +14,9 @@ import type {
 } from '@features/constant/kernel'
 
 export type CertProviderId = string
+export type HttpClientId = string
+export type NetnsId = string
+export type EndpointId = string
 export type InboundId = string
 export type OutboundId = string
 export type DnsServerId = string
@@ -36,7 +40,7 @@ export interface Listen {
   bind_interface: string
   routing_mark: number
   reuse_addr: boolean
-  netns: string
+  netns: NetnsId
   tcp_fast_open: boolean
   tcp_multi_path: boolean
   disable_tcp_keep_alive: boolean
@@ -69,7 +73,7 @@ export interface Dialer {
   protect_path: string
   routing_mark: number
   reuse_addr: boolean
-  netns: string
+  netns: NetnsId
   connect_timeout: string
   tcp_fast_open: boolean
   tcp_multi_path: boolean
@@ -197,3 +201,35 @@ export interface QuicOptions extends Http2Options {
   initial_packet_size: number
   disable_path_mtu_discovery: boolean
 }
+
+export interface Dns01ChallengeBase {
+  ttl: string
+  propagation_delay: string
+  propagation_timeout: string
+  resolvers: DnsServerId[]
+  override_domain: string
+}
+
+export interface Dns01ChallengeAliDns extends Dns01ChallengeBase {
+  provider: typeof Dns01Provider.AliDns
+  access_key_id: string
+  access_key_secret: string
+  region_id: string
+  security_token: string
+}
+
+export interface Dns01ChallengeCloudflare extends Dns01ChallengeBase {
+  provider: typeof Dns01Provider.Cloudflare
+  api_token: string
+  zone_token: string
+}
+
+export interface Dns01ChallengeAcmeDns extends Dns01ChallengeBase {
+  provider: typeof Dns01Provider.AcmeDns
+  username: string
+  password: string
+  subdomain: string
+  server_url: string
+}
+
+export type Dns01Challenge = Dns01ChallengeAliDns | Dns01ChallengeCloudflare | Dns01ChallengeAcmeDns
