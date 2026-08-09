@@ -379,13 +379,6 @@ export const OpenVpnMode = {
 
 export type OpenVpnMode = ValueOf<typeof OpenVpnMode>
 
-export const OpenVpnNetwork = {
-  Udp: 'udp',
-  Tcp: 'tcp',
-} as const
-
-export type OpenVpnNetwork = ValueOf<typeof OpenVpnNetwork>
-
 export const OpenVpnTopology = {
   Subnet: 'subnet',
   P2p: 'p2p',

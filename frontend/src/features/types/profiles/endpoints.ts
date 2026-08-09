@@ -5,7 +5,6 @@ import type {
   OpenConnectReportedOs,
   OpenConnectCompressionMode,
   OpenVpnMode,
-  OpenVpnNetwork,
   OpenVpnTopology,
   OpenVpnAuthRetry,
   OpenVpnKeyDirection,
@@ -24,6 +23,7 @@ import type {
   OpenVpnDnsSec,
   TlsVersion,
   TlsCipherSuite,
+  Network,
 } from '@features/constant/kernel'
 
 import type { Switchable, Dialer, UdpNat, Listen } from './shared'
@@ -237,7 +237,7 @@ export interface OpenVpnClientTls {
 export interface OpenVpnServerRemoteItem {
   server: string
   server_port: number
-  network: OpenVpnNetwork
+  network: Network
 }
 
 export interface OpenVpnPullFilter {
@@ -256,7 +256,7 @@ export interface EndpointOpenVpnClient extends Switchable {
     server_port: number
     servers: OpenVpnServerRemoteItem[]
     remote_random: boolean
-    network: OpenVpnNetwork
+    network: Network
     address: string[]
     peer_address: string
     peer_address_ipv6: string
@@ -366,7 +366,7 @@ export interface EndpointOpenVpnServer extends Switchable {
     name: string
     mtu: number
     mode: OpenVpnMode
-    network: OpenVpnNetwork
+    network: Network
     remote: string
     remote_port: number
     max_clients: number

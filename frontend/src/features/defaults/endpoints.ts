@@ -4,7 +4,6 @@ import type {
   OpenConnectReportedOs,
   OpenConnectCompressionMode,
   OpenVpnMode,
-  OpenVpnNetwork,
   OpenVpnTopology,
   OpenVpnAuthRetry,
   OpenVpnKeyDirection,
@@ -23,6 +22,7 @@ import type {
   OpenVpnDnsSec,
   TlsVersion,
   TlsCipherSuite,
+  Network,
 } from '@features/constant/kernel'
 import { Endpoint } from '@features/constant/kernel'
 import type {
@@ -237,7 +237,7 @@ export const createOpenConnect = (): EndpointOpenConnect => {
 export const createOpenVpnServerRemoteItem = (): OpenVpnServerRemoteItem => ({
   server: '',
   server_port: 1194,
-  network: '' as OpenVpnNetwork,
+  network: '' as Network,
 })
 
 export const createOpenVpnPullFilter = (): OpenVpnPullFilter => ({
@@ -260,7 +260,7 @@ export const createOpenVpnClient = (): EndpointOpenVpnClient => {
       server_port: 0,
       servers: [],
       remote_random: false,
-      network: '' as OpenVpnNetwork,
+      network: '' as Network,
       address: [],
       peer_address: '',
       peer_address_ipv6: '',
@@ -364,7 +364,7 @@ export const createOpenVpnServer = (): EndpointOpenVpnServer => {
       name: '',
       mtu: 0,
       mode: '' as OpenVpnMode,
-      network: '' as OpenVpnNetwork,
+      network: '' as Network,
       remote: '',
       remote_port: 0,
       max_clients: 0,

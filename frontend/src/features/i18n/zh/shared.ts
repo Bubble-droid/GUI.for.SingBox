@@ -181,9 +181,6 @@ export default {
   },
   network: {
     default: '默认所有',
-    tcp: 'TCP',
-    udp: 'UDP',
-    icmp: 'ICMP',
   },
   network_type: {
     wifi: 'Wi-Fi',

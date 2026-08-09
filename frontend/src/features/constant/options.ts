@@ -37,7 +37,6 @@ import {
   OpenVpnKeyDirection,
   OpenVpnMode,
   OpenVpnMssFixMode,
-  OpenVpnNetwork,
   OpenVpnNsCertType,
   OpenVpnPullFilterAction,
   OpenVpnRemoteCertTls,
@@ -192,7 +191,7 @@ export const HttpVersionOptions = [
   { label: 'HTTP/1.1 (1)', value: HttpVersion.V1 },
   { label: 'HTTP/2 (2)', value: HttpVersion.V2 },
   { label: 'HTTP/3 (3)', value: HttpVersion.V3 },
-] satisfies ComponentOption<number>[]
+] as const satisfies ComponentOption<number>[]
 
 export const NetnsTypeOptions = defineOptions(NetnsType, 'kernel.netns.type.{{val}}')
 
@@ -204,7 +203,16 @@ export const OutboundOptions = defineOptions(Outbound, 'kernel.outbounds.{{val}}
 
 export const TunStackOptions = defineOptions(TunStack, 'kernel.inbounds.tun.{{val}}')
 
-export const NetworkOptions = defineOptions(Network, 'kernel.shared.network.{{val}}')
+export const NetworkOptions = [
+  {
+    label: 'TCP',
+    value: Network.Tcp,
+  },
+  {
+    label: 'UDP',
+    value: Network.Udp,
+  },
+] as const satisfies ComponentOption[]
 
 export const RuleSetTypeOptions = defineOptions(RuleSetType, 'kernel.route.rule_set.type.{{val}}')
 
@@ -281,11 +289,6 @@ export const OpenConnectCompressionModeOptions = defineOptions(
 export const OpenVpnModeOptions = defineOptions(
   OpenVpnMode,
   'kernel.endpoints.openvpn.mode.{{val}}',
-)
-
-export const OpenVpnNetworkOptions = defineOptions(
-  OpenVpnNetwork,
-  'kernel.endpoints.openvpn.network.{{val}}',
 )
 
 export const OpenVpnTopologyOptions = defineOptions(

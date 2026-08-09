@@ -183,9 +183,6 @@ export default {
   },
   network: {
     default: 'Default All',
-    tcp: 'TCP',
-    udp: 'UDP',
-    icmp: 'ICMP',
   },
   network_type: {
     wifi: 'Wi-Fi',
