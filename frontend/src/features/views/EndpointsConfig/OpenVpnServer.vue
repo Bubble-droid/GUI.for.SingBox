@@ -2,7 +2,6 @@
 import { createOpenVpnUser, createOpenVpnPushDnsServer } from '@defaults/endpoints'
 import {
   OpenVpnModeOptions,
-  OpenVpnNetworkOptions,
   OpenVpnTopologyOptions,
   OpenVpnKeyDirectionOptions,
   OpenVpnVerifyClientCertOptions,
@@ -16,6 +15,7 @@ import {
   OpenVpnDnsTransportOptions,
   TlsVersionOptions,
   TlsCipherSuiteOptions,
+  NetworkOptions,
 } from '@features/constant/options'
 import type { EndpointOpenVpnServer } from '@profiles/endpoints'
 import PortInput from '@views/Shared/PortInput.vue'
@@ -60,7 +60,7 @@ const deletePushDnsServer = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.network.title') }}
-    <Select v-model="model.network" :options="OpenVpnNetworkOptions" clearable />
+    <Select v-model="model.network" :options="NetworkOptions" clearable />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.remote') }}

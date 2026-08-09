@@ -2,7 +2,6 @@
 import { createOpenVpnServerRemoteItem, createOpenVpnPullFilter } from '@defaults/endpoints'
 import {
   OpenVpnModeOptions,
-  OpenVpnNetworkOptions,
   OpenVpnTopologyOptions,
   OpenVpnAuthRetryOptions,
   OpenVpnKeyDirectionOptions,
@@ -18,6 +17,7 @@ import {
   OpenVpnPullFilterActionOptions,
   TlsVersionOptions,
   TlsCipherSuiteOptions,
+  NetworkOptions,
 } from '@features/constant/options'
 import type { EndpointOpenVpnClient } from '@profiles/endpoints'
 import PortInput from '@views/Shared/PortInput.vue'
@@ -88,7 +88,7 @@ const deletePullFilter = (index: number) => {
       </div>
       <div class="form-item">
         {{ t('kernel.endpoints.openvpn.servers.network') }}
-        <Select v-model="item.network" :options="OpenVpnNetworkOptions" clearable />
+        <Select v-model="item.network" :options="NetworkOptions" clearable />
       </div>
     </Card>
   </div>
@@ -99,7 +99,7 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.network.title') }}
-    <Select v-model="model.network" :options="OpenVpnNetworkOptions" clearable />
+    <Select v-model="model.network" :options="NetworkOptions" clearable />
   </div>
   <div class="form-item" :class="{ 'items-start': !!model.address.length }">
     {{ t('kernel.endpoints.openvpn.address') }}
