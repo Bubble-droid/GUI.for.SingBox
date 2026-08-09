@@ -167,7 +167,7 @@ const handleAdd = async () => {
   m.setContent(comp).open()
 }
 
-const onEditEnd = async (id: string, text: string) => {
+const onEditEnd = async (id: string, text: string): Promise<boolean | void> => {
   let proxy: any
   try {
     proxy = JSON.parse(text)
