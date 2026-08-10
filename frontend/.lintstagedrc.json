@@ -1,6 +1,6 @@
 {
   "*.{js,ts,vue}": [
-    "oxlint --fix",
+    "oxlint --fix --fix-suggestions",
     "eslint --fix --cache",
     "oxfmt --no-error-on-unmatched-pattern"
   ],
