@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Endpoint } from '@features/constant/kernel.ts'
-import type { ComponentOption } from '@features/types/views.ts'
 import { generateConfig } from '@generator'
 import type { Profile } from '@profiles'
 import CertificateConfig from '@views/CertificateConfig.vue'
@@ -26,6 +25,8 @@ import { deepClone } from '@/utils/others.ts'
 import Button from '@/components/Button/index.vue'
 import CodeViewer from '@/components/CodeViewer/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'
+
+import type { ComponentOption } from '@/types/views.ts'
 
 import MixinAndScriptConfig from './MixinAndScriptConfig.vue'
 

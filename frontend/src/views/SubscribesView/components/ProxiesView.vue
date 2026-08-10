@@ -113,7 +113,7 @@ const menus: App.Menu[] = [
   {
     label: 'common.delete',
     handler: (record: Record<string, any>) => {
-      const idx = sub.value.proxies.findIndex((v) => v.tag === record.tag)
+      const idx = sub.value.proxies.findIndex((v) => v.tag === record['tag'])
       if (idx !== -1) {
         sub.value.proxies.splice(idx, 1)
       }

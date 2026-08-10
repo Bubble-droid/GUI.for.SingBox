@@ -29,7 +29,7 @@ interface Props {
   lang?: 'json' | 'javascript' | 'yaml'
   mode?: 'editor' | 'diff'
   placeholder?: string
-  plugin?: Record<string, any>
+  plugin?: Record<string, any> | undefined
 }
 
 const emit = defineEmits(['change', 'update:modelValue'])

@@ -1,23 +1,27 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends string | number | boolean = string | number | boolean">
 import { useI18n } from 'vue-i18n'
 
+import type { ComponentOption } from '@/types/views'
+
 interface Props {
-  options?: { label: string; value: string | number | boolean }[]
+  options?: readonly ComponentOption<T>[]
   size?: 'default' | 'small'
 }
 
-const model = defineModel<string | number | boolean>()
+const model = defineModel<T>({ required: true })
 
 withDefaults(defineProps<Props>(), {
   options: () => [],
   size: 'default',
 })
 
-const emits = defineEmits(['change'])
+const emits = defineEmits<{
+  change: [val: T, oldVal?: T]
+}>()
 
 const { t } = useI18n()
 
-const handleSelect = (val: string | number | boolean) => {
+const handleSelect = (val: T) => {
   const oldValue = model.value
   if (oldValue === val) {
     return
@@ -31,7 +35,7 @@ const handleSelect = (val: string | number | boolean) => {
   <div :class="[size]" class="gui-radio inline-flex rounded-full text-12 overflow-hidden">
     <div
       v-for="o in options"
-      :key="o.value.toString()"
+      :key="String(o.value)"
       v-tips.slow="o.label"
       :class="{ active: o.value === model }"
       class="gui-radio-button cursor-pointer px-12 py-6 duration-200 line-clamp-1 break-all"

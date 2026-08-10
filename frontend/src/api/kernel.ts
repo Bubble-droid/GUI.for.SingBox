@@ -16,8 +16,8 @@ interface WsChannel<K extends WsKey> {
   params?: Recordable
   handlers: ((data: CoreApiWsDataMap[K]) => void)[]
   isActive: boolean
-  connect?: () => void
-  disconnect?: () => void
+  connect?: (() => void) | undefined
+  disconnect?: (() => void) | undefined
 }
 
 export enum Api {

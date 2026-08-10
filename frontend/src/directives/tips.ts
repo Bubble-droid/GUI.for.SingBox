@@ -1,37 +1,47 @@
-import type { Directive, DirectiveBinding } from 'vue'
+import type { Directive } from 'vue'
 
 import { useAppStore } from '@/stores'
 import { debounce } from '@/utils'
 
-export default {
-  mounted(el: HTMLElement, binding: DirectiveBinding) {
-    const appStore = useAppStore()
+interface TipsElement extends HTMLElement {
+  _tipsValue?: string
+}
 
-    const delay = binding.modifiers.fast ? 200 : 500
+export default {
+  mounted(el: TipsElement, binding) {
+    const appStore = useAppStore()
+    el._tipsValue = binding.value
+
+    const delay = binding.modifiers['fast'] ? 200 : 500
 
     const show = debounce((x: number, y: number) => {
-      if (el.dataset.showTips === 'true') {
+      if (el.dataset['showTips'] === 'true') {
         appStore.tipsPosition = { x, y }
-        appStore.tipsMessage = binding.value
+        appStore.tipsMessage = el._tipsValue || ''
         appStore.tipsShow = true
       }
     }, delay)
 
-    el.onmouseenter = (e: MouseEvent) => {
-      if (binding.value) {
-        el.dataset.showTips = 'true'
+    el.onmouseenter = (e) => {
+      if (el._tipsValue) {
+        el.dataset['showTips'] = 'true'
         show(e.clientX, e.clientY)
       }
     }
 
     el.onmouseleave = () => {
       appStore.tipsShow = false
-      el.dataset.showTips = 'false'
+      el.dataset['showTips'] = 'false'
     }
   },
-  beforeUnmount(el: HTMLElement) {
+  updated(el: TipsElement, binding) {
+    el._tipsValue = binding.value
+  },
+  beforeUnmount(el: TipsElement) {
     const appStore = useAppStore()
     appStore.tipsShow = false
-    el.dataset.showTips = 'false'
+    el.dataset['showTips'] = 'false'
+    el.onmouseenter = null
+    el.onmouseleave = null
   },
-} as Directive
+} satisfies Directive<HTMLElement, string>

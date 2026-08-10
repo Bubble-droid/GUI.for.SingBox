@@ -154,7 +154,6 @@ export const restoreInboundTls = (
     reality: {
       ...template.reality,
       ...raw.reality,
-      short_id: ensureArray(raw.reality?.short_id),
       handshake: {
         ...template.reality.handshake,
         ...handshakeRest,

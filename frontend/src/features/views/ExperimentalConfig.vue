@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { PredefinedClashModeOptions } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { ExperimentalConfig } from '@profiles/experimental'
 import { useI18n } from 'vue-i18n'
 
 import { generateSecureKey, sampleID } from '@/utils'
+
+import type { ComponentOption } from '@/types/views'
 
 interface Props {
   outboundOptions: ComponentOption[]

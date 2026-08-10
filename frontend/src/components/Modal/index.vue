@@ -10,7 +10,7 @@ import { useAppStore } from '@/stores'
 import { message, sampleID } from '@/utils'
 
 export interface Props {
-  title?: string
+  title?: string | undefined
   footer?: boolean
   maxHeight?: string
   maxWidth?: string
@@ -25,7 +25,7 @@ export interface Props {
   cancelText?: string
   submitText?: string
   maskClosable?: boolean
-  class?: string
+  class?: string | undefined
   container?: string
   destroyOnClose?: boolean
   toolbar?: {
@@ -33,20 +33,20 @@ export interface Props {
     minimize?: boolean
     close?: boolean
   }
-  onOk?: () => MaybePromise<boolean | void>
-  onCancel?: () => MaybePromise<boolean | void>
-  beforeClose?: (isOk: boolean) => MaybePromise<boolean | void>
-  afterClose?: (isOk: boolean) => void
-  afterDestroy?: () => void
+  onOk?: (() => MaybePromise<boolean | void>) | undefined
+  onCancel?: (() => MaybePromise<boolean | void>) | undefined
+  beforeClose?: ((isOk: boolean) => MaybePromise<boolean | void>) | undefined
+  afterClose?: ((isOk: boolean) => void) | undefined
+  afterDestroy?: (() => void) | undefined
 }
 
 export interface Slots {
-  default?: () => any
-  title?: () => any
-  toolbar?: () => any
-  action?: () => any
-  cancel?: () => any
-  submit?: () => any
+  default?: (() => any) | undefined
+  title?: (() => any) | undefined
+  toolbar?: (() => any) | undefined
+  action?: (() => any) | undefined
+  cancel?: (() => any) | undefined
+  submit?: (() => any) | undefined
 }
 
 const slots = defineSlots<Slots>()

@@ -292,17 +292,17 @@ export const addToRuleSet = async (
   const { rules = [] } = JSON.parse(content)
   rules[0] = rules[0] || {}
   payloads.forEach((payload) => {
-    if (payload.domain) {
-      rules[0].domain = [...new Set((rules[0].domain || []).concat(payload.domain))]
-    } else if (payload.ip_cidr) {
-      rules[0].ip_cidr = [...new Set((rules[0].ip_cidr || []).concat(payload.ip_cidr))]
-    } else if (payload.process_path) {
+    if (payload['domain']) {
+      rules[0].domain = [...new Set((rules[0].domain || []).concat(payload['domain']))]
+    } else if (payload['ip_cidr']) {
+      rules[0].ip_cidr = [...new Set((rules[0].ip_cidr || []).concat(payload['ip_cidr']))]
+    } else if (payload['process_path']) {
       rules[0].process_path = [
-        ...new Set((rules[0].process_path || []).concat(payload.process_path)),
+        ...new Set((rules[0].process_path || []).concat(payload['process_path'])),
       ]
-    } else if (payload.domain_suffix) {
+    } else if (payload['domain_suffix']) {
       rules[0].domain_suffix = [
-        ...new Set((rules[0].domain_suffix || []).concat(payload.domain_suffix)),
+        ...new Set((rules[0].domain_suffix || []).concat(payload['domain_suffix'])),
       ]
     }
   })

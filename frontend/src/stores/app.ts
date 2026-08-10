@@ -1,4 +1,3 @@
-import type { GitHubApiRelease } from '@features/types/github'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -30,6 +29,8 @@ import {
 } from '@/utils'
 
 import AboutView from '@/components/_common/AboutView.vue'
+
+import type { GitHubApiRelease } from '@/types/github'
 
 import { useEnvStore } from './env'
 

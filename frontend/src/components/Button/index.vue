@@ -4,11 +4,11 @@ import type { IconName } from '@/components/Icon/icons'
 interface Props {
   type?: 'primary' | 'normal' | 'link' | 'text'
   size?: 'default' | 'small' | 'large'
-  iconSize?: number
-  iconColor?: string
-  icon?: IconName
-  loading?: boolean
-  disabled?: boolean
+  iconSize?: number | undefined
+  iconColor?: string | undefined
+  icon?: IconName | undefined
+  loading?: boolean | undefined
+  disabled?: boolean | undefined
 }
 
 withDefaults(defineProps<Props>(), {

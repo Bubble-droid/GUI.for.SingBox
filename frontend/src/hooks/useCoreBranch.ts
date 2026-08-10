@@ -30,6 +30,8 @@ import {
   getKernelAssetFileName,
 } from '@/utils'
 
+import type { GitHubApiRelease } from '@/types/github'
+
 const StableUrl = 'https://api.github.com/repos/SagerNet/sing-box/releases/latest'
 const AlphaUrl = 'https://api.github.com/repos/SagerNet/sing-box/releases?per_page=3'
 
@@ -77,14 +79,15 @@ export const useCoreBranch = (isAlpha = false) => {
     downloadProgress.value = ''
     cancelDownload.value = undefined
     try {
-      const { body } = await HttpGet<Record<string, any>>(releaseUrl, {
+      const { body } = await HttpGet<GitHubApiRelease | GitHubApiRelease[]>(releaseUrl, {
         Authorization: getGitHubApiAuthorization(),
       })
-      if (body.message) throw body.message
+      if (!Array.isArray(body) && 'message' in body) throw body.message
 
-      const release = isAlpha ? body.find((v: any) => v.prerelease === true) : body
+      const release =
+        isAlpha && Array.isArray(body) ? body.find((v) => v.prerelease === true) : body
       if (!release) throw 'Not Found'
-      const { assets, tag_name } = release
+      const { assets, tag_name } = release as GitHubApiRelease
       const assetName = getKernelAssetFileName(tag_name.replace('v', ''))
       const asset = assets.find((v: any) => v.name === assetName)
       if (!asset) throw 'Asset Not Found:' + assetName
@@ -170,12 +173,13 @@ export const useCoreBranch = (isAlpha = false) => {
   const getRemoteVersion = async (showTips = false) => {
     remoteVersionLoading.value = true
     try {
-      const { body } = await HttpGet<Record<string, any>>(releaseUrl, {
+      const { body } = await HttpGet<GitHubApiRelease | GitHubApiRelease[]>(releaseUrl, {
         Authorization: getGitHubApiAuthorization(),
       })
-      const release = isAlpha ? body.find((v: any) => v.prerelease === true) : body
+      const release =
+        isAlpha && Array.isArray(body) ? body.find((v) => v.prerelease === true) : body
       if (!release) throw 'Not Found'
-      const { tag_name } = release
+      const { tag_name } = release as GitHubApiRelease
       return tag_name.replace('v', '') as string
     } catch (error: any) {
       console.log(error)

@@ -25,7 +25,7 @@ interface PluginRuntimeCache {
   code?: string
   module?: {
     url: string
-    moduleDefault?: Recordable
+    moduleDefault?: Recordable | undefined
     modulePromise: Promise<
       {
         default?: MaybePromise<
@@ -329,7 +329,10 @@ export const usePluginsStore = defineStore('plugins', () => {
   }
 
   const getPluginMetadata = (id: string) => {
-    const lastConfiguration: Recordable = { time: 0, data: undefined }
+    const lastConfiguration: { time: number; data: Recordable | undefined } = {
+      time: 0,
+      data: undefined,
+    }
     const buildConfiguration = (plugin: App.Plugin) => {
       const now = performance.now()
       if (lastConfiguration.data && now - lastConfiguration.time < 1000) {

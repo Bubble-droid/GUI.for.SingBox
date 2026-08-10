@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { NetworkStrategyOptions, NetworkTypeOptions } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { Dialer } from '@profiles/shared'
 import { useI18n } from 'vue-i18n'
 
 import { useBool } from '@/hooks'
+
+import type { ComponentOption } from '@/types/views'
 
 import DomainResolverConfig from './DomainResolverConfig.vue'
 

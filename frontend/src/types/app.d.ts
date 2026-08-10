@@ -39,12 +39,12 @@ declare namespace App {
     label: string
     handler?: (...args: any) => void
     separator?: boolean
-    children?: Menu[]
+    children?: Menu[] | undefined
   }
 
   interface MenuItem {
     type: 'item' | 'separator'
-    text?: string
+    text?: string | undefined
     tooltip?: string
     event?: (() => void) | string
     children?: MenuItem[]
@@ -188,9 +188,9 @@ declare namespace App {
     disabled: boolean
     status: number // 0: Normal 1: Running 2: Stopped
     // Not Config
-    updating?: boolean
-    loading?: boolean
-    running?: boolean
+    updating?: boolean | undefined
+    loading?: boolean | undefined
+    running?: boolean | undefined
   }
 
   interface Subscription {

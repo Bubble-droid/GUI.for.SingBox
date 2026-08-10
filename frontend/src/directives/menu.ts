@@ -3,10 +3,10 @@ import type { Directive, DirectiveBinding } from 'vue'
 import { useAppStore } from '@/stores'
 import { sleep } from '@/utils'
 
-const updateMenus = (el: any, binding: DirectiveBinding) => {
+const updateMenus = (el: HTMLElement, binding: DirectiveBinding<App.Menu[]>) => {
   const appStore = useAppStore()
 
-  el.oncontextmenu = async (e: MouseEvent) => {
+  el.oncontextmenu = async (e) => {
     e.preventDefault()
     if (binding.value.length) {
       appStore.menuPosition = { x: e.clientX, y: e.clientY }
@@ -21,10 +21,13 @@ const updateMenus = (el: any, binding: DirectiveBinding) => {
 }
 
 export default {
-  mounted(el: any, binding: DirectiveBinding) {
+  mounted(el, binding) {
     updateMenus(el, binding)
   },
-  updated(el: any, binding: DirectiveBinding) {
+  updated(el, binding) {
     updateMenus(el, binding)
   },
-} as Directive
+  unmounted(el) {
+    el.oncontextmenu = null
+  },
+} satisfies Directive<HTMLElement, App.Menu[]>

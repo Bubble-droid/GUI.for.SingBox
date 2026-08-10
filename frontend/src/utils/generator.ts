@@ -126,20 +126,20 @@ const generateOutbounds = async (outbounds: App.Outbound[]) => {
       tag: outbound.tag,
     }
     if (outbound.type === Outbound.UrlTest) {
-      _outbound.url = outbound.url
-      _outbound.interval = outbound.interval
-      _outbound.tolerance = outbound.tolerance
+      _outbound['url'] = outbound.url
+      _outbound['interval'] = outbound.interval
+      _outbound['tolerance'] = outbound.tolerance
     }
     if (outbound.type === Outbound.Selector || outbound.type === Outbound.UrlTest) {
-      _outbound.interrupt_exist_connections = outbound.interrupt_exist_connections
-      _outbound.outbounds = []
+      _outbound['interrupt_exist_connections'] = outbound.interrupt_exist_connections
+      _outbound['outbounds'] = []
       const isTagMatching = createTextMatcher(outbound.include, outbound.exclude)
       for (const proxy of outbound.outbounds) {
         if (proxy.type === 'Built-in') {
           if ([Outbound.Direct, Outbound.Block].includes(proxy.id as any)) {
             builtInProxiesSet.add(proxy.id)
           }
-          _outbound.outbounds.push(proxy.tag)
+          _outbound['outbounds'].push(proxy.tag)
         } else {
           const subId = proxy.type === 'Subscription' ? proxy.id : proxy.type
           if (!SubscriptionCache[subId]) {
@@ -151,14 +151,14 @@ const generateOutbounds = async (outbounds: App.Outbound[]) => {
             }
           }
           if (proxy.type === 'Subscription') {
-            _outbound.outbounds.push(
+            _outbound['outbounds'].push(
               ...SubscriptionCache[subId]!.map((v) => v.tag).filter((tag) => isTagMatching(tag)),
             )
             SubscriptionCache[subId]!.forEach((v) => proxiesSet.add(v))
           } else {
             const _proxy = SubscriptionCache[subId]!.find((v) => v.tag === proxy.tag)
             if (_proxy && isTagMatching(_proxy.tag)) {
-              _outbound.outbounds.push(_proxy.tag)
+              _outbound['outbounds'].push(_proxy.tag)
               proxiesSet.add(_proxy)
             }
           }
@@ -189,7 +189,7 @@ const generateRoute = (
 
   const extra: Recordable = {}
   if (!route.auto_detect_interface) {
-    extra.default_interface = route.default_interface
+    extra['default_interface'] = route.default_interface
   }
   return {
     rules: route.rules.flatMap((rule) => {
@@ -202,40 +202,40 @@ const generateRoute = (
       const extra: Recordable = _generateRule(rule, route.rule_set, inbounds)
 
       if (rule.action === RouteRuleAction.Route) {
-        extra.outbound = getOutbound(rule.outbound)
+        extra['outbound'] = getOutbound(rule.outbound)
       } else if (rule.action === RouteRuleAction.RouteOptions) {
         deepAssign(extra, JSON.parse(rule.outbound))
       } else if (rule.action === RouteRuleAction.Reject) {
-        extra.method = rule.outbound
+        extra['method'] = rule.outbound
       } else if (rule.action === RouteRuleAction.Sniff) {
         if (rule.sniffer.length) {
-          extra.sniffer = rule.sniffer
+          extra['sniffer'] = rule.sniffer
         }
       } else if (rule.action === RouteRuleAction.Resolve) {
         if (rule.strategy !== DomainStrategy.Default) {
-          extra.strategy = rule.strategy
+          extra['strategy'] = rule.strategy
         }
-        extra.server = getDnsServer(rule.server)
+        extra['server'] = getDnsServer(rule.server)
       }
       if (rule.invert) {
-        extra.invert = true
+        extra['invert'] = true
       }
       return extra
     }),
     rule_set: route.rule_set.map((ruleset) => {
       const extra: Recordable = {}
       if (ruleset.type === RouteRuleType.Inline) {
-        extra.rules = JSON.parse(ruleset.rules)
+        extra['rules'] = JSON.parse(ruleset.rules)
       } else if (ruleset.type === RuleSetType.Local) {
         const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
-        extra.path = _ruleset?.path.replace(/^data\//, `${env.appDataPath}/`)
-        extra.format = ruleset.format
+        extra['path'] = _ruleset?.path.replace(/^data\//, `${env.appDataPath}/`)
+        extra['format'] = ruleset.format
       } else if (ruleset.type === RuleSetType.Remote) {
-        extra.url = ruleset.url
-        extra.format = ruleset.format
-        extra.download_detour = getOutbound(ruleset.download_detour)
+        extra['url'] = ruleset.url
+        extra['format'] = ruleset.format
+        extra['download_detour'] = getOutbound(ruleset.download_detour)
         if (ruleset.update_interval) {
-          extra.update_interval = ruleset.update_interval
+          extra['update_interval'] = ruleset.update_interval
         }
       }
       return {
@@ -264,10 +264,10 @@ const generateDns = (
   const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
   const extra: Recordable = {}
   if (dns.strategy !== DomainStrategy.Default) {
-    extra.strategy = dns.strategy
+    extra['strategy'] = dns.strategy
   }
   if (dns.client_subnet) {
-    extra.client_subnet = dns.client_subnet
+    extra['client_subnet'] = dns.client_subnet
   }
   return {
     servers: dns.servers.flatMap((server) => {
@@ -287,10 +287,10 @@ const generateDns = (
         if (server.detour) {
           const outbound = getOutbound(server.detour)
           if (outbound?.type !== Outbound.Direct) {
-            extra.detour = outbound?.tag
+            extra['detour'] = outbound?.tag
           }
         }
-        server.domain_resolver && (extra.domain_resolver = getDnsServer(server.domain_resolver))
+        server.domain_resolver && (extra['domain_resolver'] = getDnsServer(server.domain_resolver))
         if (
           [
             DnsServer.Tcp,
@@ -301,24 +301,24 @@ const generateDns = (
             DnsServer.H3,
           ].includes(server.type as any)
         ) {
-          server.server_port && (extra.server_port = Number(server.server_port))
-          extra.server = server.server
+          server.server_port && (extra['server_port'] = Number(server.server_port))
+          extra['server'] = server.server
           if ([DnsServer.Https, DnsServer.H3].includes(server.type as any)) {
-            server.path && (extra.path = server.path)
+            server.path && (extra['path'] = server.path)
           }
         }
       }
       if (server.type === DnsServer.Hosts) {
-        extra.path = server.hosts_path.reduce((p, c) => p.concat(c.split(',')), [] as string[])
-        extra.predefined = Object.entries(server.predefined).reduce(
+        extra['path'] = server.hosts_path.reduce((p, c) => p.concat(c.split(',')), [] as string[])
+        extra['predefined'] = Object.entries(server.predefined).reduce(
           (p, [k, v]) => ({ ...p, [k]: v.split(',') }),
           {},
         )
       } else if (server.type === DnsServer.Dhcp) {
-        server.interface && (extra.interface = server.interface)
+        server.interface && (extra['interface'] = server.interface)
       } else if (server.type === DnsServer.FakeIp) {
-        server.inet4_range && (extra.inet4_range = server.inet4_range)
-        server.inet6_range && (extra.inet6_range = server.inet6_range)
+        server.inet4_range && (extra['inet4_range'] = server.inet4_range)
+        server.inet6_range && (extra['inet6_range'] = server.inet6_range)
       }
       return {
         tag: server.tag,
@@ -335,13 +335,13 @@ const generateDns = (
         if (!dns.servers.find((v) => v.type === DnsServer.FakeIp)) {
           return []
         }
-        delete extra.__is_fake_ip
+        delete extra['__is_fake_ip']
       }
       if ([DnsRuleAction.Route, DnsRuleAction.RouteOptions].includes(rule.action as any)) {
-        rule.disable_cache && (extra.disable_cache = rule.disable_cache)
-        rule.client_subnet && (extra.client_subnet = rule.client_subnet)
+        rule.disable_cache && (extra['disable_cache'] = rule.disable_cache)
+        rule.client_subnet && (extra['client_subnet'] = rule.client_subnet)
         if (rule.action === DnsRuleAction.Route) {
-          extra.server = getDnsServer(rule.server)
+          extra['server'] = getDnsServer(rule.server)
           if (rule.strategy !== DomainStrategy.Default) {
             // extra.strategy = rule.strategy
           }
@@ -351,7 +351,7 @@ const generateDns = (
         deepAssign(extra, JSON.parse(rule.server))
       }
       if (rule.action === DnsRuleAction.Reject) {
-        extra.method = rule.server
+        extra['method'] = rule.server
       }
       return extra
     }),

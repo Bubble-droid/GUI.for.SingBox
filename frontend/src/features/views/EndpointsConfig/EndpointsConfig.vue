@@ -2,7 +2,6 @@
 import { createEndpoint } from '@defaults/endpoints'
 import { Endpoint } from '@features/constant/kernel'
 import { EndpointOptions } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { EndpointConfig } from '@profiles/endpoints'
 import DialerConfig from '@views/Shared/DialerConfig.vue'
 import ListenConfig from '@views/Shared/ListenConfig.vue'
@@ -13,6 +12,8 @@ import { useI18n } from 'vue-i18n'
 import { DraggableOptions } from '@/constant/app'
 import { useBool } from '@/hooks'
 import { deepClone, message } from '@/utils'
+
+import type { ComponentOption } from '@/types/views'
 
 import OpenConnect from './OpenConnect.vue'
 import OpenVpnClient from './OpenVpnClient.vue'

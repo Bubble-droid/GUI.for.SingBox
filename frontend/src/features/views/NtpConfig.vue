@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { PredefinedNtpServerOptions } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { NtpConfig } from '@profiles/ntp'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import type { ComponentOption } from '@/types/views'
 
 import DialerConfig from './Shared/DialerConfig.vue'
 

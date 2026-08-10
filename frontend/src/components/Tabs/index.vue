@@ -1,37 +1,41 @@
-<script setup lang="ts">
-import { computed, useSlots, type Component } from 'vue'
+<script setup lang="ts" generic="K extends string">
+import { computed, type Component, type VNodeChild } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-interface TabItemType {
-  key: string
+interface TabItemType<K extends string = string> {
+  key: K
   tab: string
   component?: Component
 }
 
-interface Props {
-  activeKey: string
-  items: readonly TabItemType[]
+interface Props<K extends string = string> {
+  activeKey: K
+  items: readonly TabItemType<K>[]
   tabPosition?: 'left' | 'top'
   tabWidth?: string
   contentWidth?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
+type Slots<K extends string = string> = {
+  extra?: () => VNodeChild
+} & Partial<Record<K, () => VNodeChild>>
+
+const props = withDefaults(defineProps<Props<K>>(), {
   tabPosition: 'left',
   tabWidth: '20%',
   contentWidth: '80%',
 })
 
-const emits = defineEmits(['update:activeKey'])
+const emits = defineEmits<(e: 'update:activeKey', key: K) => void>()
 
 const { t } = useI18n()
-const slots = useSlots()
+const slots = defineSlots<Slots<K>>()
 
 const isTop = computed(() => props.tabPosition === 'top')
 
-const handleChange = (key: string) => emits('update:activeKey', key)
+const handleChange = (key: K) => emits('update:activeKey', key)
 
-const isActive = ({ key }: TabItemType) => key === props.activeKey
+const isActive = (tab: TabItemType<K>) => tab.key === props.activeKey
 
 // NOTE:
 // - component tabs are cached via KeepAlive

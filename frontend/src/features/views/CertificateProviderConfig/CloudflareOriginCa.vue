@@ -3,9 +3,10 @@ import {
   CloudflareOriginCaRequestTypeOptions,
   CloudflareOriginCaValidityOptions,
 } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { CertificateProviderCloudflareOriginCa } from '@profiles/certificate_provider'
 import { useI18n } from 'vue-i18n'
+
+import type { ComponentOption } from '@/types/views'
 
 interface Props {
   httpClientOptions: ComponentOption[]

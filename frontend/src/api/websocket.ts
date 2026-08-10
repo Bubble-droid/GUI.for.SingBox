@@ -7,7 +7,7 @@ interface WebSocketsOptions {
 interface Options {
   url: string
   cb: (data: any) => void
-  params?: Record<string, any>
+  params?: Record<string, any> | undefined
 }
 
 export class WebSockets {

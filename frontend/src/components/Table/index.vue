@@ -19,7 +19,7 @@ interface Props {
   menu?: App.Menu[]
   columns: Column[]
   dataSource: Record<string, any>[]
-  sort?: string
+  sort?: string | undefined
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -101,7 +101,7 @@ const renderCell = (column: Column, record: Recordable) => {
       <tbody>
         <tr
           v-for="record in tableData"
-          :key="record.id"
+          :key="record['id']"
           v-menu="menu.map((v) => ({ ...v, handler: () => v.handler?.(record) }))"
           class="transition duration-200"
         >

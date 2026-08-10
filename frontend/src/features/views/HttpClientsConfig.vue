@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { createHttpClient } from '@defaults/http_client'
 import { HttpEngineOptions, HttpVersionOptions } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { HttpClientConfig } from '@profiles/http_client'
 import DialerConfig from '@views/Shared/DialerConfig.vue'
 import Http2Config from '@views/Shared/Http2Config.vue'
@@ -13,6 +12,8 @@ import { useI18n } from 'vue-i18n'
 import { DraggableOptions } from '@/constant/app'
 import { useBool } from '@/hooks'
 import { deepClone } from '@/utils'
+
+import type { ComponentOption } from '@/types/views'
 
 interface Props {
   netnsOptions: ComponentOption[]

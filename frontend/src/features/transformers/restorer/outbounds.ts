@@ -21,8 +21,8 @@ export const restoreOutbounds = (
 
   const groupTags = new Set(
     outbounds
-      .filter((o: Recordable) => [Outbound.Selector, Outbound.UrlTest].includes(o.type))
-      .map((o: Recordable) => o.tag),
+      .filter((o: Recordable) => [Outbound.Selector, Outbound.UrlTest].includes(o['type']))
+      .map((o: Recordable) => o['tag']),
   )
 
   subscriptionIds.forEach((id) => {
@@ -40,17 +40,17 @@ export const restoreOutbounds = (
   })
 
   return outbounds.flatMap((raw) => {
-    if (![Outbound.Selector, Outbound.UrlTest].includes(raw.type)) {
+    if (![Outbound.Selector, Outbound.UrlTest].includes(raw['type'])) {
       return []
     }
     const outbound = createOutbound()
-    outbound.id = OutboundsIds[raw.tag]
-    outbound.tag = raw.tag
-    outbound.type = raw.type
+    outbound.id = OutboundsIds[raw['tag']]
+    outbound.tag = raw['tag']
+    outbound.type = raw['type']
 
     let newOutbounds: ProxyConfig[] = []
 
-    raw.outbounds?.forEach((tag: string) => {
+    raw['outbounds']?.forEach((tag: string) => {
       const isBuiltIn = [Outbound.Direct, Outbound.Block].includes(tag as any)
       if (isBuiltIn) {
         newOutbounds.push({ id: tag, type: 'Built-in', tag })
@@ -104,17 +104,17 @@ export const restoreOutbounds = (
     outbound.outbounds = newOutbounds
 
     if ('interrupt_exist_connections' in raw) {
-      outbound.interrupt_exist_connections = raw.interrupt_exist_connections
+      outbound.interrupt_exist_connections = raw['interrupt_exist_connections']
     }
-    if (Outbound.UrlTest === raw.type) {
+    if (Outbound.UrlTest === raw['type']) {
       if ('url' in raw) {
-        outbound.url = raw.url
+        outbound.url = raw['url']
       }
       if ('interval' in raw) {
-        outbound.interval = raw.interval
+        outbound.interval = raw['interval']
       }
       if ('tolerance' in raw) {
-        outbound.tolerance = raw.tolerance
+        outbound.tolerance = raw['tolerance']
       }
     }
     return outbound

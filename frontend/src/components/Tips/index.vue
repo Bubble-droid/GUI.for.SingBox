@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<Props>(), {
   message: '',
 })
 
-const model = defineModel<boolean>()
+const model = defineModel<boolean>({ required: true })
 
 const domRef = useTemplateRef('domRef')
 const fixedPosition = ref({ x: 0, y: 0 })

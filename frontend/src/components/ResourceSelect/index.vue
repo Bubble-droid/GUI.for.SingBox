@@ -24,7 +24,7 @@ interface ResourceConfig {
 
 export interface ResourceSelectProps {
   type: ResourceType
-  title?: string
+  title?: string | undefined
   cols?: number
   max?: number
   min?: number
@@ -109,8 +109,8 @@ let defaultSlot: Slot | undefined
 let actionSlot: Slot | undefined
 
 const DefineTemplate = (_: unknown, { slots }: SetupContext) => {
-  defaultSlot = slots.default
-  actionSlot = slots.action
+  defaultSlot = slots['default']
+  actionSlot = slots['action']
   return null
 }
 

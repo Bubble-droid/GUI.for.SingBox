@@ -2,7 +2,6 @@
 import { createCertificateProvider } from '@defaults/certificate_provider'
 import { CertificateProviderType } from '@features/constant/kernel'
 import { CertificateProviderTypeOptions } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { CertificateProviderConfig } from '@profiles/certificate_provider'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -10,6 +9,8 @@ import { useI18n } from 'vue-i18n'
 import { DraggableOptions } from '@/constant/app'
 import { useBool } from '@/hooks'
 import { deepClone, message } from '@/utils'
+
+import type { ComponentOption } from '@/types/views'
 
 import AcmeCert from './AcmeCert.vue'
 import CloudflareOriginCa from './CloudflareOriginCa.vue'

@@ -7,8 +7,13 @@ import { debounce } from '@/utils'
 
 export interface Props {
   modelValue?: string | number | undefined
+  modelModifiers?: {
+    lazy?: boolean
+    trim?: boolean
+    [key: string]: boolean | undefined
+  }
   autoSize?: boolean
-  placeholder?: string
+  placeholder?: string | undefined
   type?: 'number' | 'text' | 'code'
   lang?: 'yaml' | 'json' | 'javascript'
   size?: 'default' | 'small'
@@ -16,8 +21,8 @@ export interface Props {
   clearable?: boolean
   allowPaste?: boolean
   autofocus?: boolean
-  min?: number
-  max?: number
+  min?: number | undefined
+  max?: number | undefined
   maxWidth?: boolean
   disabled?: boolean
   border?: boolean
@@ -26,6 +31,7 @@ export interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
+  modelModifiers: () => ({}),
   autoSize: false,
   placeholder: undefined,
   type: 'text',
@@ -73,7 +79,10 @@ const validate = (val: string | number) => {
 }
 
 const emitInput = debounce((e: any) => {
-  const val = validate(e.target.value)
+  let val = validate(e.target.value)
+  if (typeof val === 'string' && props.modelModifiers?.trim) {
+    val = val.trim()
+  }
   e.target.value = val
   emits('update:modelValue', val)
   emits('change', val)
@@ -81,6 +90,7 @@ const emitInput = debounce((e: any) => {
 
 const onInput = (e: any) => {
   if (isComposing.value || e.isComposing) return
+  if (props.modelModifiers?.lazy) return
   emitInput(e)
 }
 
@@ -120,8 +130,15 @@ const showInput = () => {
 }
 
 const onSubmit = (e: any) => {
-  const val = validate(e.target.value)
-  e.target.value = val
+  let val = validate(e.target.value)
+  if (typeof val === 'string' && props.modelModifiers?.trim) {
+    val = val.trim()
+    e.target.value = val
+  }
+  if (props.modelModifiers?.lazy) {
+    emits('update:modelValue', val)
+    emits('change', val)
+  }
   emits('submit', val)
   props.editable && (showEdit.value = false)
 }
@@ -188,7 +205,7 @@ defineExpose({
         @compositionend="onCompositionEnd"
         @blur="onSubmit"
         @keydown.enter="onKeydownEnter"
-        @keydown.esc.stop.prevent="inputRef?.blur"
+        @keydown.esc.stop.prevent="inputRef?.blur()"
       />
       <Button
         v-if="innerClearable"

@@ -7,7 +7,7 @@ import { deepClone } from '@/utils'
 type SelectValue = string | number
 
 interface Props {
-  modelValue?: SelectValue | SelectValue[]
+  modelValue?: SelectValue | SelectValue[] | undefined
   options?: { label: string; value: SelectValue }[]
   multiple?: boolean
   border?: boolean

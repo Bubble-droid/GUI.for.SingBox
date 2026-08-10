@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { DomainStrategyOptions } from '@features/constant/options.ts'
-import type { ComponentOption } from '@features/types/views.ts'
-import type { DomainResolver } from '@profiles/shared.ts'
+import type { DnsRouteOptions, DomainResolver } from '@profiles/shared'
 import { useI18n } from 'vue-i18n'
 
 import { useBool } from '@/hooks'
+
+import type { ComponentOption } from '@/types/views'
 
 import DnsRouteOptionsConfig from './DnsRouteOptionsConfig.vue'
 
@@ -27,7 +28,7 @@ const [showResolver, toggleShow] = useBool(false)
     <Button type="text" size="small" @click="toggleShow">{{ t(title) }}</Button>
   </Divider>
   <div v-show="showResolver">
-    <DnsRouteOptionsConfig v-model="model" />
+    <DnsRouteOptionsConfig v-model="model as DnsRouteOptions" />
     <div class="form-item">
       {{ t('kernel.shared.domain_resolver.server') }}
       <Select v-model="model.server" :options="dnsServerOptions" clearable />

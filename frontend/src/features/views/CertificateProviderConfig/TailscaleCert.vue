@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import type { ComponentOption } from '@features/types/views'
 import type { CertificateProviderTailscale } from '@profiles/certificate_provider'
 import { useI18n } from 'vue-i18n'
+
+import type { ComponentOption } from '@/types/views'
 
 interface Props {
   tailscaleOptions: ComponentOption[]

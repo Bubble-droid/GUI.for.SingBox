@@ -109,7 +109,6 @@ if (envStore.env.os === OS.Windows) {
           v-if="isAutoStart"
           v-model="appSettings.app.windowStartState"
           :options="WindowStateOptions"
-          type="number"
         />
         <Switch v-model="isAutoStart" class="ml-16" @change="onTaskSchChange" />
       </div>

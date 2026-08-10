@@ -22,7 +22,7 @@ import type { RestoreProfileOptions, IdMaps } from './types'
 
 const legacyBuildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<string> => {
   if (!arr) return {}
-  return arr.reduce((p, c, i) => ((p[c.tag] = prefix + i), p), {})
+  return arr.reduce((p, c, i) => ((p[c['tag']] = prefix + i), p), {})
 }
 
 const buildTagIdMapping = (prefix: string, arr: { tag?: string }[] = []): Map<string, string> => {

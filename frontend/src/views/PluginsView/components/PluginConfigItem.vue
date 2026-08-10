@@ -5,7 +5,7 @@ import { deepClone, message } from '@/utils'
 
 interface Props {
   plugin: App.Plugin
-  modelValue?: Recordable
+  modelValue?: Recordable | undefined
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -88,7 +88,7 @@ defineExpose({ reset: handleResetAll })
         />
       </template>
       <div class="mb-8 text-12">{{ conf.description }}</div>
-      <Component
+      <component
         :is="(conf.component as any) === 'CodeViewer' ? 'CodeEditor' : conf.component"
         :model-value="model[conf.key] ?? conf.value"
         :options="getOptions(conf.options)"

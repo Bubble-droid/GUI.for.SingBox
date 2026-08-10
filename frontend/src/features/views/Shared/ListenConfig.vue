@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import type { ComponentOption } from '@features/types/views'
 import type { Listen } from '@profiles/shared'
 import PortInput from '@views/Shared/PortInput.vue'
 import { useI18n } from 'vue-i18n'
 
 import { useBool } from '@/hooks'
+
+import type { ComponentOption } from '@/types/views'
 
 interface Props {
   netnsOptions: ComponentOption[]

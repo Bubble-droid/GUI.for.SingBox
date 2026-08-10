@@ -8,12 +8,9 @@ import { message } from '@/utils'
 const { t } = useI18n()
 const kernelApiStore = useKernelApiStore()
 
-const createValueWatcher = (
-  initialValue: number | string | boolean,
-  callback: (value: number | string | boolean) => Promise<void>,
-) => {
+const createValueWatcher = <T>(initialValue: T, callback: (value: T) => Promise<void>) => {
   let lastValue = initialValue
-  return (newValue: number | boolean) => {
+  return (newValue: T) => {
     if (newValue !== lastValue) {
       lastValue = newValue
       callback(newValue).catch((e) => message.error(e.message || e))

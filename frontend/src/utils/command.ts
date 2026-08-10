@@ -19,7 +19,7 @@ interface Command {
   label: string
   cmd: string
   desc?: string
-  handler?: () => Promise<any> | any
+  handler?: (() => Promise<any> | any) | undefined
   children?: Command[]
 }
 

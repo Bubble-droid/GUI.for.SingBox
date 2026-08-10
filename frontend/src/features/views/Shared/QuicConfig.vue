@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { QuicOptions } from '@profiles/shared'
+import type { Http2Options, QuicOptions } from '@profiles/shared'
 import Http2Config from '@views/Shared/Http2Config.vue'
 import { useI18n } from 'vue-i18n'
 
@@ -26,6 +26,6 @@ const [showQuic, toggleShow] = useBool(false)
       {{ t('kernel.shared.quic.disable_path_mtu_discovery') }}
       <Switch v-model="model.disable_path_mtu_discovery" />
     </div>
-    <Http2Config v-model="model" />
+    <Http2Config v-model="model as Http2Options" />
   </div>
 </template>

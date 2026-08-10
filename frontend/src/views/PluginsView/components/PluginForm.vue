@@ -329,7 +329,7 @@ defineExpose({ modalSlots })
                     : ''
                 "
               >
-                <Component
+                <component
                   :is="conf.component"
                   v-model="conf.value"
                   :options="getOptions(conf.options)"

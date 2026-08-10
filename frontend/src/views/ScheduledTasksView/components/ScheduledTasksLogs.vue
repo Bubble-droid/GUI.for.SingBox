@@ -42,9 +42,9 @@ const columns: Column[] = [
     title: 'scheduledtasks.duration',
     align: 'center',
     key: 'endTime',
-    sort: (a, b) => b.endTime - b.startTime - (a.endTime - a.startTime),
+    sort: (a, b) => b['endTime'] - b['startTime'] - (a['endTime'] - a['startTime']),
     customRender: ({ value, record }) => {
-      return ((value - record.startTime) / 1000).toFixed(2) + 's'
+      return ((value - record['startTime']) / 1000).toFixed(2) + 's'
     },
   },
   {
@@ -100,7 +100,7 @@ const clearLogs = () => logsStore.scheduledtasksLogs.splice(0)
     <Table v-else :columns="columns" :data-source="filteredLogs" sort="start" class="mt-8">
       <template #result="{ record }">
         <div class="flex flex-col gap-8 text-left">
-          <div v-for="item in record.result" :key="item">
+          <div v-for="item in record['result']" :key="item">
             <span :style="{ color: item.ok ? 'greenyellow' : 'red' }">●</span>
             {{ item.result }}
           </div>

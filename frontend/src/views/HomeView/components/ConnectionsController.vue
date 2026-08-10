@@ -36,24 +36,24 @@ const columns = computed(() =>
         align: 'center',
         key: 'metadata.type',
         hidden: !appSettingsStore.app.connections.visibility['metadata.type'],
-        sort: (a, b) => b.metadata.type.localeCompare(a.metadata.type),
+        sort: (a, b) => b['metadata'].type.localeCompare(a['metadata'].type),
         customRender: ({ value, record }) => {
-          return value + '(' + record.metadata.network + ')'
+          return value + '(' + record['metadata'].network + ')'
         },
       },
       {
         title: 'home.connections.processPath',
         key: 'metadata.processPath',
         hidden: !appSettingsStore.app.connections.visibility['metadata.processPath'],
-        sort: (a, b) => b.metadata.processPath.localeCompare(a.metadata.processPath),
+        sort: (a, b) => b['metadata'].processPath.localeCompare(a['metadata'].processPath),
       },
       {
         title: 'home.connections.host',
         key: 'metadata.host',
         hidden: !appSettingsStore.app.connections.visibility['metadata.host'],
-        sort: (a, b) => b.metadata.host.localeCompare(a.metadata.host),
+        sort: (a, b) => b['metadata'].host.localeCompare(a['metadata'].host),
         customRender: ({ value, record }) => {
-          return value || record.metadata.destinationIP
+          return value || record['metadata'].destinationIP
         },
       },
       {
@@ -61,9 +61,9 @@ const columns = computed(() =>
         align: 'center',
         key: 'metadata.sourceIP',
         hidden: !appSettingsStore.app.connections.visibility['metadata.sourceIP'],
-        sort: (a, b) => b.metadata.sourceIP.localeCompare(a.metadata.sourceIP),
+        sort: (a, b) => b['metadata'].sourceIP.localeCompare(a['metadata'].sourceIP),
         customRender: ({ value, record }) => {
-          return value + ':' + record.metadata.sourcePort
+          return value + ':' + record['metadata'].sourcePort
         },
       },
       {
@@ -71,9 +71,9 @@ const columns = computed(() =>
         align: 'center',
         key: 'metadata.destinationIP',
         hidden: !appSettingsStore.app.connections.visibility['metadata.destinationIP'],
-        sort: (a, b) => b.metadata.destinationIP.localeCompare(a.metadata.destinationIP),
+        sort: (a, b) => b['metadata'].destinationIP.localeCompare(a['metadata'].destinationIP),
         customRender: ({ value, record }) => {
-          return value + ':' + record.metadata.destinationPort
+          return value + ':' + record['metadata'].destinationPort
         },
       },
       {
@@ -81,16 +81,16 @@ const columns = computed(() =>
         align: 'center',
         key: 'rule',
         hidden: !appSettingsStore.app.connections.visibility['rule'],
-        sort: (a, b) => b.rule.localeCompare(a.rule),
+        sort: (a, b) => b['rule'].localeCompare(a['rule']),
         customRender: ({ value, record }) => {
-          return value + (record.rulePayload ? '::' + record.rulePayload : '')
+          return value + (record['rulePayload'] ? '::' + record['rulePayload'] : '')
         },
       },
       {
         title: 'home.connections.chains',
         key: 'chains',
         hidden: !appSettingsStore.app.connections.visibility['chains'],
-        sort: (a, b) => b.chains[0].localeCompare(a.chains[0]),
+        sort: (a, b) => b['chains'][0].localeCompare(a['chains'][0]),
         customRender: ({ value }) => value.slice().reverse().join(' :: '),
       },
       {
@@ -99,8 +99,8 @@ const columns = computed(() =>
         key: 'up',
         minWidth: '90px',
         hidden: !appSettingsStore.app.connections.visibility['up'],
-        sort: (a, b) => b.upload - b.up - (a.upload - a.up),
-        customRender: ({ value, record }) => formatBytes(record.upload - value) + '/s',
+        sort: (a, b) => b['upload'] - b['up'] - (a['upload'] - a['up']),
+        customRender: ({ value, record }) => formatBytes(record['upload'] - value) + '/s',
       },
       {
         title: 'home.connections.downSpeed',
@@ -108,15 +108,15 @@ const columns = computed(() =>
         key: 'down',
         minWidth: '90px',
         hidden: !appSettingsStore.app.connections.visibility['down'],
-        sort: (a, b) => b.download - b.down - (a.download - a.down),
-        customRender: ({ value, record }) => formatBytes(record.download - value) + '/s',
+        sort: (a, b) => b['download'] - b['down'] - (a['download'] - a['down']),
+        customRender: ({ value, record }) => formatBytes(record['download'] - value) + '/s',
       },
       {
         title: 'home.connections.upload',
         align: 'center',
         key: 'upload',
         hidden: !appSettingsStore.app.connections.visibility['upload'],
-        sort: (a, b) => b.upload - a.upload,
+        sort: (a, b) => b['upload'] - a['upload'],
         customRender: ({ value }) => formatBytes(value),
       },
       {
@@ -124,7 +124,7 @@ const columns = computed(() =>
         align: 'center',
         key: 'download',
         hidden: !appSettingsStore.app.connections.visibility['download'],
-        sort: (a, b) => b.download - a.download,
+        sort: (a, b) => b['download'] - a['download'],
         customRender: ({ value }) => formatBytes(value),
       },
       {
@@ -132,7 +132,7 @@ const columns = computed(() =>
         align: 'center',
         key: 'start',
         hidden: !appSettingsStore.app.connections.visibility['start'],
-        sort: (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+        sort: (a, b) => new Date(a['start']).getTime() - new Date(b['start']).getTime(),
         customRender: ({ value }) => formatRelativeTime(value),
       },
     ] as Column[]
@@ -164,7 +164,7 @@ const menu: App.Menu[] = [
     handler: async (record: Record<string, any>) => {
       if (!isActive.value) return
       try {
-        await deleteConnection(record.id)
+        await deleteConnection(record['id'])
       } catch (error: any) {
         console.log(error)
         message.error(error)
@@ -182,13 +182,13 @@ const menu: App.Menu[] = [
       label,
       handler: async (record: Record<string, any>) => {
         const options: PickerItem<Record<string, any>[]>[] = []
-        if (record.metadata.host) {
+        if (record['metadata'].host) {
           options.push({
             label: t('kernel.rules.type.domain'),
-            value: { domain: record.metadata.host } as any,
-            description: record.metadata.host,
+            value: { domain: record['metadata'].host } as any,
+            description: record['metadata'].host,
           })
-          getDomainSuffixes(record.metadata.host).forEach((suffix) => {
+          getDomainSuffixes(record['metadata'].host).forEach((suffix) => {
             options.push({
               label: t('kernel.rules.type.domain_suffix'),
               value: {
@@ -198,18 +198,18 @@ const menu: App.Menu[] = [
             })
           })
         }
-        if (record.metadata.destinationIP) {
+        if (record['metadata'].destinationIP) {
           options.push({
             label: t('kernel.rules.type.ip_cidr'),
-            value: { ip_cidr: record.metadata.destinationIP + '/32' } as any,
-            description: record.metadata.destinationIP,
+            value: { ip_cidr: record['metadata'].destinationIP + '/32' } as any,
+            description: record['metadata'].destinationIP,
           })
         }
-        if (record.metadata.processPath) {
+        if (record['metadata'].processPath) {
           options.push({
             label: t('kernel.rules.type.process_path'),
-            value: { process_path: record.metadata.processPath } as any,
-            description: record.metadata.processPath,
+            value: { process_path: record['metadata'].processPath } as any,
+            description: record['metadata'].processPath,
           })
         }
         const payloads = await picker.multi('rulesets.selectRuleType', options)
@@ -377,7 +377,7 @@ onUnmounted(() => {
       <Card v-for="column in appSettingsStore.app.connections.order" :key="column" class="mb-2">
         <div class="flex items-center justify-between py-2">
           <span class="font-bold">{{ t(columnTitleMap[column] || column) }}</span>
-          <Switch v-model="appSettingsStore.app.connections.visibility[column]" />
+          <Switch v-model="appSettingsStore.app.connections.visibility[column] as boolean" />
         </div>
       </Card>
     </div>

@@ -10,11 +10,11 @@ export const restoreDnsServers = (
   OutboundsIds: Recordable,
 ): DnsServerConfig[] => {
   return servers.flatMap((raw) => {
-    if (!raw.type) return []
+    if (!raw['type']) return []
     const server = createDnsServer()
-    server.id = DnsServersIds[raw.tag]
-    server.tag = raw.tag
-    server.type = raw.type
+    server.id = DnsServersIds[raw['tag']]
+    server.tag = raw['tag']
+    server.type = raw['type']
     if (
       [
         DnsServer.Local,
@@ -25,13 +25,13 @@ export const restoreDnsServers = (
         DnsServer.Https,
         DnsServer.H3,
         DnsServer.Dhcp,
-      ].includes(raw.type)
+      ].includes(raw['type'])
     ) {
       if ('detour' in raw) {
-        server.detour = OutboundsIds[raw.detour]
+        server.detour = OutboundsIds[raw['detour']]
       }
       if ('domain_resolver' in raw) {
-        server.domain_resolver = DnsServersIds[raw.domain_resolver]
+        server.domain_resolver = DnsServersIds[raw['domain_resolver']]
       }
       if (
         [
@@ -41,26 +41,26 @@ export const restoreDnsServers = (
           DnsServer.Quic,
           DnsServer.Https,
           DnsServer.H3,
-        ].includes(raw.type)
+        ].includes(raw['type'])
       ) {
         if ('server' in raw) {
-          server.server = raw.server
+          server.server = raw['server']
         }
         if ('server_port' in raw) {
-          server.server_port = raw.server_port
+          server.server_port = raw['server_port']
         }
-        if ([DnsServer.Https, DnsServer.H3].includes(raw.type)) {
+        if ([DnsServer.Https, DnsServer.H3].includes(raw['type'])) {
           if ('path' in raw) {
-            server.path = raw.path
+            server.path = raw['path']
           }
         }
       }
     } else if (DnsServer.Hosts === server.type) {
       if ('path' in raw) {
-        server.hosts_path = raw.path
+        server.hosts_path = raw['path']
       }
       if ('predefined' in raw) {
-        server.predefined = Object.entries<string[] | string>(raw.predefined).reduce(
+        server.predefined = Object.entries<string[] | string>(raw['predefined']).reduce(
           (p, [key, value]) => {
             p[key] = Array.isArray(value) ? value.join(',') : value
             return p
@@ -70,14 +70,14 @@ export const restoreDnsServers = (
       }
     } else if (DnsServer.Dhcp === server.type) {
       if ('interface' in raw) {
-        server.interface = raw.interface
+        server.interface = raw['interface']
       }
     } else if (DnsServer.FakeIp === server.type) {
       if ('inet4_range' in raw) {
-        server.inet4_range = raw.inet4_range
+        server.inet4_range = raw['inet4_range']
       }
       if ('inet6_range' in raw) {
-        server.inet6_range = raw.inet6_range
+        server.inet6_range = raw['inet6_range']
       }
     }
     return server
@@ -93,7 +93,7 @@ export const restoreDnsRules = (
   return rules.flatMap((raw: Recordable, i) => {
     const rule = createDnsRule()
     rule.id = 'rule-' + i
-    rule.action = raw.action || DnsRuleAction.Route
+    rule.action = raw['action'] || DnsRuleAction.Route
 
     const hits = supportedRuleTypes.filter((key) => key in raw)
     if (hits.length === 1) {
@@ -127,18 +127,18 @@ export const restoreDnsRules = (
         : String(raw[rule.type])
     }
 
-    if (DnsRuleAction.Route === raw.action) {
+    if (DnsRuleAction.Route === raw['action']) {
       if ('server' in raw) {
-        rule.server = DnsServersIds[raw.server]
+        rule.server = DnsServersIds[raw['server']]
       }
       if ('strategy' in raw) {
-        rule.strategy = raw.strategy
+        rule.strategy = raw['strategy']
       }
-    } else if (DnsRuleAction.Reject === raw.action) {
+    } else if (DnsRuleAction.Reject === raw['action']) {
       if ('method' in raw) {
-        rule.server = raw.method
+        rule.server = raw['method']
       }
-    } else if ([DnsRuleAction.RouteOptions, DnsRuleAction.Predefined].includes(raw.action)) {
+    } else if ([DnsRuleAction.RouteOptions, DnsRuleAction.Predefined].includes(raw['action'])) {
       rule.server = JSON.stringify(
         {
           ...raw,
@@ -154,16 +154,16 @@ export const restoreDnsRules = (
         2,
       )
     }
-    if ([DnsRuleAction.Route, DnsRuleAction.RouteOptions].includes(raw.action)) {
+    if ([DnsRuleAction.Route, DnsRuleAction.RouteOptions].includes(raw['action'])) {
       if ('disable_cache' in raw) {
-        rule.disable_cache = raw.disable_cache
+        rule.disable_cache = raw['disable_cache']
       }
       if ('client_subnet' in raw) {
-        rule.client_subnet = raw.client_subnet
+        rule.client_subnet = raw['client_subnet']
       }
     }
     if ('invert' in raw) {
-      rule.invert = raw.invert
+      rule.invert = raw['invert']
     }
     return rule
   })

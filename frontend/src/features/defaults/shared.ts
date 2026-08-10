@@ -170,7 +170,7 @@ export const createInboundTls = (): InboundTlsConfig => ({
       dialer: createDialer(),
     },
     private_key: '',
-    short_id: [],
+    short_id: '',
     max_time_difference: '',
   },
 })

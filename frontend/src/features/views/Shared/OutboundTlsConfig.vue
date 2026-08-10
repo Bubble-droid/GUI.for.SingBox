@@ -180,7 +180,7 @@ const [showTls, toggleShow] = useBool(false)
         </div>
         <div class="form-item">
           {{ t('kernel.shared.tls.reality.short_id') }}
-          <Input v-model="model.reality.short_id" editable clearable />
+          <Input v-model="model.reality.short_id" clearable />
         </div>
       </template>
     </template>

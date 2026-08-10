@@ -1,4 +1,4 @@
-import type { ComponentOption } from '@features/types/views'
+import type { ComponentOption } from '@/types/views'
 
 import {
   ClashMode,

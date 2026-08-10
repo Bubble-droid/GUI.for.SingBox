@@ -5,8 +5,8 @@ import { icons, type IconName } from './icons'
 
 interface Props {
   icon: IconName
-  size?: number
-  color?: string
+  size?: number | undefined
+  color?: string | undefined
 }
 
 const props = withDefaults(defineProps<Props>(), { size: 16, color: 'var(--color)' })

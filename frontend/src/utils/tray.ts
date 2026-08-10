@@ -103,7 +103,7 @@ const getTrayMenus = () => {
           v.name !== 'GLOBAL' &&
           !hiddenList.includes(v.name),
       )
-      .concat(proxies.GLOBAL || [])
+      .concat(proxies['GLOBAL'] || [])
       .map((group) => {
         const all = (group.all || [])
           .filter((proxy) => {

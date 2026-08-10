@@ -44,7 +44,7 @@ const handleExecCommand = async (index: number) => {
     message.error(error.message || error)
   }
   loading.value = false
-  nextTick(inputRef.value!.focus)
+  nextTick(inputRef.value!['focus'])
 }
 
 const onKeydown = async (ev: KeyboardEvent) => {
@@ -67,7 +67,7 @@ const onKeydown = async (ev: KeyboardEvent) => {
     if (hitCommand.value.length) {
       await handleExecCommand(selected.value)
     } else {
-      nextTick(inputRef.value!.focus)
+      nextTick(inputRef.value!['focus'])
     }
   }
 }

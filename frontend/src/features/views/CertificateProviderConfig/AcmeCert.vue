@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { AcmeProvider } from '@features/constant/kernel'
 import { AcmeProviderOptions, AcmeKeyTypeOptions } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { CertificateProviderAcme } from '@profiles/certificate_provider'
 import Dns01ChallengeConfig from '@views/Shared/Dns01ChallengeConfig.vue'
 import PortInput from '@views/Shared/PortInput.vue'
@@ -9,6 +8,8 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useBool } from '@/hooks'
+
+import type { ComponentOption } from '@/types/views'
 
 interface Props {
   httpClientOptions: ComponentOption[]

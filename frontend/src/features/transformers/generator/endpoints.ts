@@ -69,9 +69,9 @@ export const generateTailscale = (
     type,
     tag,
     udp_timeout: rest.udp_timeout as any,
-    ssh_server: rest.ssh_server.enabled
+    ssh_server: (rest.ssh_server.enabled
       ? { ...filterInvalidProps(rest.ssh_server), enabled: true }
-      : undefined,
+      : undefined) as NonNullable<SingBoxEndpointOf<typeof Endpoint.Tailscale>['ssh_server']>,
   }
 }
 

@@ -29,7 +29,7 @@ export const generateRoute = (
 
   const extra: Recordable = {}
   if (!route.auto_detect_interface) {
-    extra.default_interface = route.default_interface
+    extra['default_interface'] = route.default_interface
   }
   return {
     rules: route.rules.flatMap((rule) => {
@@ -42,40 +42,40 @@ export const generateRoute = (
       const extra: Recordable = _generateRule(rule, route.rule_set, inbounds)
 
       if (rule.action === RouteRuleAction.Route) {
-        extra.outbound = getOutbound(rule.outbound)
+        extra['outbound'] = getOutbound(rule.outbound)
       } else if (rule.action === RouteRuleAction.RouteOptions) {
         deepAssign(extra, JSON.parse(rule.outbound))
       } else if (rule.action === RouteRuleAction.Reject) {
-        extra.method = rule.outbound
+        extra['method'] = rule.outbound
       } else if (rule.action === RouteRuleAction.Sniff) {
         if (rule.sniffer.length) {
-          extra.sniffer = rule.sniffer
+          extra['sniffer'] = rule.sniffer
         }
       } else if (rule.action === RouteRuleAction.Resolve) {
         if (rule.strategy !== DomainStrategy.Default) {
-          extra.strategy = rule.strategy
+          extra['strategy'] = rule.strategy
         }
-        extra.server = getDnsServer(rule.server)
+        extra['server'] = getDnsServer(rule.server)
       }
       if (rule.invert) {
-        extra.invert = true
+        extra['invert'] = true
       }
       return extra
     }),
     rule_set: route.rule_set.map((ruleset) => {
       const extra: Recordable = {}
       if (ruleset.type === RouteRuleType.Inline) {
-        extra.rules = JSON.parse(ruleset.rules)
+        extra['rules'] = JSON.parse(ruleset.rules)
       } else if (ruleset.type === RuleSetType.Local) {
         const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
-        extra.path = _ruleset?.path.replace(/^data\//, `${env.appDataPath}/`)
-        extra.format = ruleset.format
+        extra['path'] = _ruleset?.path.replace(/^data\//, `${env.appDataPath}/`)
+        extra['format'] = ruleset.format
       } else if (ruleset.type === RuleSetType.Remote) {
-        extra.url = ruleset.url
-        extra.format = ruleset.format
-        extra.download_detour = getOutbound(ruleset.download_detour)
+        extra['url'] = ruleset.url
+        extra['format'] = ruleset.format
+        extra['download_detour'] = getOutbound(ruleset.download_detour)
         if (ruleset.update_interval) {
-          extra.update_interval = ruleset.update_interval
+          extra['update_interval'] = ruleset.update_interval
         }
       }
       return {

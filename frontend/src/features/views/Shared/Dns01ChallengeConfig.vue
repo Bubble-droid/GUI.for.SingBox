@@ -2,11 +2,12 @@
 import { createDns01Challenge } from '@defaults/shared'
 import { Dns01Provider } from '@features/constant/kernel'
 import { Dns01ProviderOptions } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { Dns01Challenge } from '@profiles/shared'
 import { useI18n } from 'vue-i18n'
 
 import { useBool } from '@/hooks'
+
+import type { ComponentOption } from '@/types/views'
 
 interface Props {
   dnsServerOptions: ComponentOption[]

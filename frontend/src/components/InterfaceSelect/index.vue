@@ -1,25 +1,27 @@
-<script lang="ts" setup>
+<script lang="ts" setup generic="M extends boolean = false">
 import { ref } from 'vue'
 
 import { GetInterfaces } from '@/bridge'
 
 interface Props {
   border?: boolean
-  multiple?: boolean
+  multiple?: M
 }
 
-const model = defineModel<string | string[]>()
+type ModelType = M extends true ? string[] : string
+
+const model = defineModel<ModelType>({ required: true })
 
 withDefaults(defineProps<Props>(), {
   border: true,
-  multiple: false,
+  multiple: false as any,
 })
 
-const emits = defineEmits(['change'])
+const emits = defineEmits<(e: 'change', val: ModelType) => void>()
 
-const options = ref<any>([])
+const options = ref<{ label: string; value: string }[]>([])
 
-const onChange = (val: string | string[]) => {
+const onChange = (val: ModelType) => {
   emits('change', val)
 }
 

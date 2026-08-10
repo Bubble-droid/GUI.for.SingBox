@@ -26,7 +26,9 @@ const settings = [
   },
 ] as const
 
-const activeKey = ref(settings[0].key)
+type TabKey = (typeof settings)[number]['key']
+
+const activeKey = ref<TabKey>(settings[0].key)
 
 const { t } = useI18n()
 const appStore = useAppStore()

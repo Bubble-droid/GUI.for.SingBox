@@ -22,14 +22,15 @@ const tabItems = [
 const MixinPriorityOptions = [
   { label: 'profile.mixinSettings.mixin', value: 'mixin' },
   { label: 'profile.mixinSettings.gui', value: 'gui' },
-]
+] as const
 
 const MixinFormatOptions = [
   { label: 'JSON', value: 'json' },
   { label: 'YAML', value: 'yaml' },
-]
+] as const
 
-const onFormatChange = (val: 'json' | 'yaml', old: 'json' | 'yaml') => {
+const onFormatChange = (val: 'json' | 'yaml' | Event, old?: 'json' | 'yaml') => {
+  if (typeof val !== 'string') return
   try {
     const config = parse(model.value.mixin.config)
     if (config) {
@@ -40,7 +41,9 @@ const onFormatChange = (val: 'json' | 'yaml', old: 'json' | 'yaml') => {
       }
     }
   } catch (e: any) {
-    model.value.mixin.format = old
+    if (old) {
+      model.value.mixin.format = old
+    }
     message.error(e.message || e)
   }
 }

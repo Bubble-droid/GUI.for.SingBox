@@ -5,13 +5,14 @@ import {
   TlsCurvePreferenceOptions,
   TlsClientAuthenticationOptions,
 } from '@features/constant/options'
-import type { ComponentOption } from '@features/types/views'
 import type { InboundTlsConfig } from '@profiles/shared'
 import DialerConfig from '@views/Shared/DialerConfig.vue'
 import PortInput from '@views/Shared/PortInput.vue'
 import { useI18n } from 'vue-i18n'
 
 import { useBool } from '@/hooks'
+
+import type { ComponentOption } from '@/types/views'
 
 interface Props {
   certProviderOptions: ComponentOption[]
@@ -167,7 +168,7 @@ const [showTls, toggleShow] = useBool(false)
         </div>
         <div class="form-item" :class="{ 'items-start': !!model.reality.short_id.length }">
           {{ t('kernel.shared.tls.reality.short_id') }}
-          <InputList v-model="model.reality.short_id" />
+          <Input v-model="model.reality.short_id" clearable />
         </div>
         <div class="form-item">
           {{ t('kernel.shared.tls.reality.max_time_difference') }}

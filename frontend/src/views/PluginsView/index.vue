@@ -376,7 +376,6 @@ const onSortUpdate = debounce(pluginsStore.savePlugins, 1000)
             :icon="p.hasUI ? 'sparkle' : undefined"
             type="primary"
             size="small"
-            auto-size
             class="ml-auto"
             @click="handleOnRun(p)"
           >

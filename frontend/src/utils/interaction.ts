@@ -116,8 +116,8 @@ class Message {
   public update = (id: string, content: unknown, icon?: MessageIcon) => {
     const instance = this.instances[id]
     if (instance) {
-      icon && (instance.vnode.component!.props.icon = icon)
-      content && (instance.vnode.component!.props.content = normalizeErrorMessage(content))
+      icon && (instance.vnode.component!.props['icon'] = icon)
+      content && (instance.vnode.component!.props['content'] = normalizeErrorMessage(content))
     }
   }
 
@@ -182,7 +182,7 @@ class Picker {
         title,
         renderSlot: false,
         openImmediate: true,
-        modelValue: initialValue,
+        modelValue: initialValue ?? [],
         onSubmit(ids, items) {
           resolve({ ids, items } as any)
           render(null, dom)
@@ -206,7 +206,7 @@ class Picker {
       const { t } = i18n.global
       const dom = document.createElement('div')
       dom.style.cssText = ContainerCssText
-      const vnode = h(PickerComp<ValueType, PickerType>, {
+      const vnode = h(PickerComp as any, {
         type,
         title,
         options,

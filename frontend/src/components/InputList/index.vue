@@ -41,14 +41,14 @@ const handleAdd = () => {
     innerList.value.push({ value: inputVal.value, id: sampleID() })
   }
   inputVal.value = ''
-  inputRef.value?.focus()
+  inputRef.value?.['focus']()
   emitUpdate()
 }
 
 const handleEdit = (item: Item) => {
   editItem.value = item
   inputVal.value = editItem.value.value
-  inputRef.value?.focus()
+  inputRef.value?.['focus']()
 }
 
 const handleDel = (item: Item) => {

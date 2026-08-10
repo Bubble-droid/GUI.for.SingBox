@@ -139,7 +139,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
 
     proxies = await pluginStore.onSubscribeTrigger(proxies, s)
 
-    if (proxies.some((proxy) => proxy.name && !proxy.tag) || proxies[0]?.base64) {
+    if (proxies.some((proxy) => proxy['name'] && !proxy['tag']) || proxies[0]?.['base64']) {
       throw 'You need to install the [节点转换] plugin first'
     }
 
@@ -150,24 +150,24 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       const r4 = s.excludeProtocol && buildSmartRegExp(s.excludeProtocol)
 
       proxies = proxies.filter((v) => {
-        const flag1 = r1 ? r1.test(v.tag) : true
-        const flag2 = r2 ? r2.test(v.tag) : false
-        const flag3 = r3 ? r3.test(v.type) : true
-        const flag4 = r4 ? r4.test(v.type) : false
+        const flag1 = r1 ? r1.test(v['tag']) : true
+        const flag2 = r2 ? r2.test(v['tag']) : false
+        const flag3 = r3 ? r3.test(v['type']) : true
+        const flag4 = r4 ? r4.test(v['type']) : false
         return flag1 && !flag2 && flag3 && !flag4
       })
 
       if (s.proxyPrefix) {
         proxies.forEach((v) => {
-          v.tag = v.tag.startsWith(s.proxyPrefix) ? v.tag : s.proxyPrefix + v.tag
+          v['tag'] = v['tag'].startsWith(s.proxyPrefix) ? v['tag'] : s.proxyPrefix + v['tag']
         })
       }
     }
 
-    s.upload = userInfo.upload ?? 0
-    s.download = userInfo.download ?? 0
-    s.total = userInfo.total ?? 0
-    s.expire = userInfo.expire * 1000
+    s.upload = userInfo['upload'] ?? 0
+    s.download = userInfo['download'] ?? 0
+    s.total = userInfo['total'] ?? 0
+    s.expire = userInfo['expire'] * 1000
     s.updateTime = Date.now()
     s.proxies = proxies.map(({ tag, type }) => {
       // Keep the original ID value of the proxy unchanged
