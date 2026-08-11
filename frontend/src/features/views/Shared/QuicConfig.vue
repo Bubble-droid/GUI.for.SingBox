@@ -3,7 +3,7 @@ import type { Http2Options, QuicOptions } from '@profiles/shared'
 import Http2Config from '@views/Shared/Http2Config.vue'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
+import { useBool } from '@/hooks/useBool'
 
 const model = defineModel<QuicOptions>({ required: true })
 const { t } = useI18n()

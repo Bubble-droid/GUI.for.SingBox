@@ -1,11 +1,15 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 
-import { HttpGet } from '@/bridge'
+import { HttpGet } from '@/bridge/net'
+
 import { DefaultTestTimeout, DefaultTestURL, RequestProxyModeOptions } from '@/constant/app'
 import { RequestProxyMode } from '@/enums/app'
-import { useAppSettingsStore } from '@/stores'
-import { APP_TITLE, APP_VERSION, GetRequestProxy, message, normalizeRequestProxy } from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { APP_TITLE, APP_VERSION } from '@/utils/env'
+import { GetRequestProxy } from '@/utils/helper'
+import { message } from '@/utils/interaction'
+import { normalizeRequestProxy } from '@/utils/others'
 
 const appSettings = useAppSettingsStore()
 

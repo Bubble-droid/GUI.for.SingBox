@@ -3,7 +3,7 @@ import { UdpNatBehaviorOptions } from '@features/constant/options'
 import type { UdpNat } from '@profiles/shared'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
+import { useBool } from '@/hooks/useBool'
 
 const model = defineModel<UdpNat>({ required: true })
 const { t } = useI18n()

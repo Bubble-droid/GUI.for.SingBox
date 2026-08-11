@@ -1,7 +1,7 @@
 <script lang="ts" setup generic="M extends boolean = false">
 import { ref } from 'vue'
 
-import { GetInterfaces } from '@/bridge'
+import { GetInterfaces } from '@/bridge/app'
 
 interface Props {
   border?: boolean

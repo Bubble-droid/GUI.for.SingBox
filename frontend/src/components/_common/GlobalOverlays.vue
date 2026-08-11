@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import * as Stores from '@/stores'
-import { message } from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { message } from '@/utils/interaction'
 
 interface Props {
   loading: boolean
@@ -8,8 +9,8 @@ interface Props {
 
 defineProps<Props>()
 
-const appStore = Stores.useAppStore()
-const kernelApiStore = Stores.useKernelApiStore()
+const appStore = useAppStore()
+const kernelApiStore = useKernelApiStore()
 
 const handleRestartCore = async () => {
   try {

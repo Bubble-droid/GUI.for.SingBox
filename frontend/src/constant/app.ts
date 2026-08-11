@@ -11,7 +11,7 @@ import {
   WebviewGpuPolicy,
   WindowStartState,
 } from '@/enums/app'
-import { APP_TITLE } from '@/utils'
+import { APP_TITLE } from '@/utils/env'
 
 export const LocalesFilePath = 'data/locales'
 

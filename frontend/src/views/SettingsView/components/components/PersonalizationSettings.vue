@@ -1,10 +1,13 @@
 <script lang="ts" setup>
-import { BrowserOpenURL, MakeDir, OpenDir } from '@/bridge'
+import { MakeDir, OpenDir } from '@/bridge/io'
+import { BrowserOpenURL } from '@wails/runtime/runtime'
+
 import { ColorOptions, DefaultFontFamily, LocalesFilePath, ThemeOptions } from '@/constant/app'
 import { Color, OS } from '@/enums/app'
 import routes from '@/router/routes'
-import { useAppSettingsStore, useAppStore } from '@/stores'
-import { APP_LOCALES_URL } from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { APP_LOCALES_URL } from '@/utils/env'
 
 const pages = routes.flatMap((route) => {
   if (route.meta?.hidden !== undefined) return []

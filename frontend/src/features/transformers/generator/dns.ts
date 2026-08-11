@@ -10,7 +10,7 @@ import type { InboundConfig } from '@profiles/inbounds'
 import type { OutboundConfig } from '@profiles/outbounds'
 import type { RuleSetConfig } from '@profiles/route'
 
-import { deepAssign } from '@/utils'
+import { deepAssign } from '@/utils/others'
 
 import { _generateRule } from './shared'
 

@@ -4,8 +4,10 @@ import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
 import { DefaultCoreConfig } from '@/constant/kernel'
-import { useAppSettingsStore } from '@/stores'
-import { deepClone, message, processMagicVariables } from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { processMagicVariables } from '@/utils/helper'
+import { message } from '@/utils/interaction'
+import { deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 

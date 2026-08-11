@@ -2,19 +2,16 @@
 import { h, resolveComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { ExitApp, RestartApp } from '@/bridge/app'
+import { BrowserOpenURL } from '@wails/runtime/runtime'
+
 import logo from '@/assets/logo'
-import { BrowserOpenURL, ExitApp, RestartApp } from '@/bridge'
 import { OS } from '@/enums/app'
-import { useAppStore, useEnvStore } from '@/stores'
-import {
-  APP_TITLE,
-  APP_VERSION,
-  PROJECT_URL,
-  TG_GROUP,
-  TG_CHANNEL,
-  message,
-  RunWithOsaScript,
-} from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { useEnvStore } from '@/stores/env'
+import { PROJECT_URL, TG_GROUP, TG_CHANNEL, APP_TITLE, APP_VERSION } from '@/utils/env'
+import { RunWithOsaScript } from '@/utils/helper'
+import { message } from '@/utils/interaction'
 
 const { t } = useI18n()
 const envStore = useEnvStore()

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { HttpGet, ReadFile } from '@/bridge'
-import { usePluginsStore } from '@/stores'
-import { ignoredError } from '@/utils'
+import { ReadFile } from '@/bridge/io'
+import { HttpGet } from '@/bridge/net'
+
+import { usePluginsStore } from '@/stores/plugins'
+import { ignoredError } from '@/utils/others'
 
 interface Props {
   id: string

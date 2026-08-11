@@ -7,7 +7,7 @@ import {
 } from '@features/constant/kernel'
 import type { DnsServerConfig, DnsRuleConfig, DnsConfig } from '@profiles/dns'
 
-import { sampleID } from '@/utils'
+import { sampleID } from '@/utils/others'
 
 import { DefaultDnsServersIds, DefaultOutboundIds, DefaultRulesetIds } from './shared'
 

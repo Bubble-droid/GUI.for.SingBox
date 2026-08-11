@@ -20,8 +20,9 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
-import { useBool } from '@/hooks'
-import { deepClone, message } from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { message } from '@/utils/interaction'
+import { deepClone } from '@/utils/others'
 
 interface Props {
   inboundOptions: { label: string; value: string }[]

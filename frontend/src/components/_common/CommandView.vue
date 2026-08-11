@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch, useTemplateRef } from 'vue'
 
-import { useAppSettingsStore, useAppStore, usePluginsStore } from '@/stores'
-import { debounce, message } from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { usePluginsStore } from '@/stores/plugins'
 import { getCommands } from '@/utils/command'
+import { message } from '@/utils/interaction'
+import { debounce } from '@/utils/others'
 
 import Input from '@/components/Input/index.vue'
 

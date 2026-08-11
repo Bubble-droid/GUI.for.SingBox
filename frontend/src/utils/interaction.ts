@@ -2,7 +2,6 @@ import type { Profile } from '@profiles'
 import { render, h, type VNode } from 'vue'
 
 import i18n from '@/lang'
-import { APP_TITLE, bindAppContext, normalizeErrorMessage, sampleID } from '@/utils'
 
 import ConfirmComp from '@/components/Confirm/index.vue'
 import MessageComp from '@/components/Message/index.vue'
@@ -17,6 +16,10 @@ import type { MessageIcon } from '@/components/Message/index.vue'
 import type { Props as ModalProps, Slots as ModalSlots } from '@/components/Modal/index.vue'
 import type { PickerItem } from '@/components/Picker/index.vue'
 import type { ResourceSelectProps } from '@/components/ResourceSelect/index.vue'
+
+import { bindAppContext } from './appContext'
+import { APP_TITLE } from './env'
+import { sampleID, normalizeErrorMessage } from './others'
 
 const ContainerCssText = `
     position: fixed;

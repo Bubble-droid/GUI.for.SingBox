@@ -3,9 +3,15 @@ import { PredefinedClashModeOptions } from '@features/constant/options.ts'
 import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ProcessMemory } from '@/bridge'
-import { useEnvStore, useAppStore, useKernelApiStore, useAppSettingsStore } from '@/stores'
-import { formatBytes, handleChangeMode, message, modal } from '@/utils'
+import { ProcessMemory } from '@/bridge/exec.ts'
+
+import { useAppStore } from '@/stores/app.ts'
+import { useAppSettingsStore } from '@/stores/appSettings.ts'
+import { useEnvStore } from '@/stores/env.ts'
+import { useKernelApiStore } from '@/stores/kernelApi.ts'
+import { formatBytes } from '@/utils/format.ts'
+import { handleChangeMode } from '@/utils/helper.ts'
+import { message, modal } from '@/utils/interaction.ts'
 
 import CommonController from './CommonController.vue'
 import ConnectionsController from './ConnectionsController.vue'

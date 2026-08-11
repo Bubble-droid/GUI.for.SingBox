@@ -8,8 +8,8 @@ import { computed, h, ref, type VNode } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
-import { useBool } from '@/hooks'
-import { deepClone } from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { deepClone } from '@/utils/others'
 
 import Tag from '@/components/Tag/index.vue'
 

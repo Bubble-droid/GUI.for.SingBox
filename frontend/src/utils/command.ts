@@ -1,21 +1,22 @@
 import { PredefinedClashModeOptions } from '@features/constant/options'
 
-import { RestartApp } from '@/bridge'
+import { RestartApp } from '@/bridge/app'
+
 import { ColorOptions, ThemeOptions } from '@/constant/app'
 import { PluginTrigger, PluginTriggerEvent } from '@/enums/app'
 import useI18n from '@/lang'
-import {
-  useAppSettingsStore,
-  useAppStore,
-  useEnvStore,
-  useKernelApiStore,
-  usePluginsStore,
-  useRulesetsStore,
-  useSubscribesStore,
-} from '@/stores'
-import { exitApp, handleChangeMode, message, reloadApp } from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useEnvStore } from '@/stores/env'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { usePluginsStore } from '@/stores/plugins'
+import { useRulesetsStore } from '@/stores/rulesets'
+import { useSubscribesStore } from '@/stores/subscribes'
 
 import type { Lang } from '@/enums/app'
+
+import { handleChangeMode, reloadApp, exitApp } from './helper'
+import { message } from './interaction'
 
 interface Command {
   label: string

@@ -1,34 +1,28 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { Exec } from '@/bridge/exec'
 import {
-  Download,
-  HttpCancel,
+  RemoveFile,
+  MakeDir,
+  MoveFile,
   UnzipZIPFile,
   UnzipTarGZFile,
-  HttpGet,
-  Exec,
-  MoveFile,
-  RemoveFile,
   AbsolutePath,
-  BrowserOpenURL,
-  MakeDir,
-  FileExists,
   OpenDir,
-} from '@/bridge'
+  FileExists,
+} from '@/bridge/io'
+import { HttpGet, HttpCancel, Download } from '@/bridge/net'
+import { BrowserOpenURL } from '@wails/runtime/runtime'
+
 import { CoreWorkingDirectory } from '@/constant/kernel'
 import { Branch, OS } from '@/enums/app'
-import { useAppSettingsStore, useEnvStore, useKernelApiStore } from '@/stores'
-import {
-  getGitHubApiAuthorization,
-  GrantTUNPermission,
-  ignoredError,
-  confirm,
-  message,
-  debounce,
-  getKernelFileName,
-  getKernelAssetFileName,
-} from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useEnvStore } from '@/stores/env'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { getKernelFileName, getKernelAssetFileName, GrantTUNPermission } from '@/utils/helper'
+import { confirm, message } from '@/utils/interaction'
+import { getGitHubApiAuthorization, ignoredError, debounce } from '@/utils/others'
 
 import type { GitHubApiRelease } from '@/types/github'
 

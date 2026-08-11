@@ -2,7 +2,8 @@
 import { ref, inject, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { HttpGet } from '@/bridge'
+import { HttpGet } from '@/bridge/net'
+
 import {
   DefaultTestTimeout,
   DefaultTestURL,
@@ -10,9 +11,12 @@ import {
   SubscriptionRequestProxyModeOptions,
 } from '@/constant/app'
 import { RequestProxyMode } from '@/enums/app'
-import { useBool } from '@/hooks'
-import { useAppSettingsStore, useSubscribesStore } from '@/stores'
-import { deepClone, GetRequestProxy, message } from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useSubscribesStore } from '@/stores/subscribes'
+import { GetRequestProxy } from '@/utils/helper'
+import { message } from '@/utils/interaction'
+import { deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 

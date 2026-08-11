@@ -10,8 +10,9 @@ import {
   type VNodeChild,
 } from 'vue'
 
-import { BrowserOpenURL } from '@/bridge'
-import { APP_TITLE, APP_VERSION } from '@/utils'
+import { BrowserOpenURL } from '@wails/runtime/runtime'
+
+import { APP_TITLE, APP_VERSION } from '@/utils/env'
 
 import CodeViewer from '@/components/CodeViewer/index.vue'
 import Divider from '@/components/Divider/index.vue'

@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import rawRoutes from '@/router/routes'
-import { useAppSettingsStore } from '@/stores'
+import { useAppSettingsStore } from '@/stores/appSettings'
 
 const { t } = useI18n()
 const appSettings = useAppSettingsStore()

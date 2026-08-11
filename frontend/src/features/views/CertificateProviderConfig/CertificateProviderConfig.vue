@@ -7,8 +7,9 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
-import { useBool } from '@/hooks'
-import { deepClone, message } from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { message } from '@/utils/interaction.ts'
+import { deepClone } from '@/utils/others.ts'
 
 import type { ComponentOption } from '@/types/views'
 

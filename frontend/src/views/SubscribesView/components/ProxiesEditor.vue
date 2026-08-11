@@ -2,9 +2,11 @@
 import { ref, inject, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ReadFile, WriteFile } from '@/bridge'
-import { useSubscribesStore } from '@/stores'
-import { deepClone, ignoredError, message, omitArray, sampleID } from '@/utils'
+import { WriteFile, ReadFile } from '@/bridge/io'
+
+import { useSubscribesStore } from '@/stores/subscribes'
+import { message } from '@/utils/interaction'
+import { deepClone, sampleID, omitArray, ignoredError } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 

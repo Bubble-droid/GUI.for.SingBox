@@ -2,8 +2,8 @@
 import { TunStackOptions } from '@features/constant/options'
 import { useI18n } from 'vue-i18n'
 
-import { useKernelApiStore } from '@/stores'
-import { message } from '@/utils'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { message } from '@/utils/interaction'
 
 const { t } = useI18n()
 const kernelApiStore = useKernelApiStore()

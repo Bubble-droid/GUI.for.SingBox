@@ -2,7 +2,7 @@
 import type { Http2Options } from '@profiles/shared'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
+import { useBool } from '@/hooks/useBool'
 
 const model = defineModel<Http2Options>({ required: true })
 const { t } = useI18n()

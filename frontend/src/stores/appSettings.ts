@@ -2,14 +2,14 @@ import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 import { parse, stringify } from 'yaml'
 
+import { GetSystemProxyBypass } from '@/bridge/app'
+import { WriteFile, ReadFile } from '@/bridge/io'
 import {
-  GetSystemProxyBypass,
-  ReadFile,
-  WriteFile,
   WindowSetSystemDefaultTheme,
-  WindowIsMaximised,
   WindowIsMinimised,
-} from '@/bridge'
+  WindowIsMaximised,
+} from '@wails/runtime/runtime'
+
 import {
   Colors,
   DefaultCardColumns,
@@ -34,8 +34,12 @@ import {
   RequestProxyMode,
 } from '@/enums/app'
 import i18n, { loadLocale } from '@/lang'
-import { useAppStore, useEnvStore } from '@/stores'
-import { debounce, updateTrayAndMenus, ignoredError, deepClone, message } from '@/utils'
+import { message } from '@/utils/interaction'
+import { debounce, ignoredError, deepClone } from '@/utils/others'
+import { updateTrayAndMenus } from '@/utils/tray'
+
+import { useAppStore } from './app'
+import { useEnvStore } from './env'
 
 export const useAppSettingsStore = defineStore('app-settings', () => {
   const appStore = useAppStore()

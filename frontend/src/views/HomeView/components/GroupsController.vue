@@ -12,16 +12,13 @@ import {
   DefaultTestURL,
 } from '@/constant/app'
 import { ControllerCloseMode } from '@/enums/app'
-import { useBool } from '@/hooks'
-import { useAppSettingsStore, useKernelApiStore, useProfilesStore } from '@/stores'
-import {
-  ignoredError,
-  sleep,
-  handleUseProxy,
-  message,
-  createAsyncPool,
-  buildSmartRegExp,
-} from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { useProfilesStore } from '@/stores/profiles'
+import { handleUseProxy } from '@/utils/helper'
+import { message } from '@/utils/interaction'
+import { buildSmartRegExp, createAsyncPool, sleep, ignoredError } from '@/utils/others'
 
 const expandedSet = ref<Set<string>>(new Set())
 const loadingSet = ref<Set<string>>(new Set())

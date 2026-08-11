@@ -13,7 +13,7 @@ import type {
   CertificateProviderCloudflareOriginCa,
 } from '@profiles/certificate_provider'
 
-import { sampleID } from '@/utils'
+import { sampleID } from '@/utils/others'
 
 import { restoreDns01Challenge } from './shared'
 import type { IdMaps } from './types'

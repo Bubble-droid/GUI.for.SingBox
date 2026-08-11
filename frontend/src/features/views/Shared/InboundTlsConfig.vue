@@ -10,7 +10,7 @@ import DialerConfig from '@views/Shared/DialerConfig.vue'
 import PortInput from '@views/Shared/PortInput.vue'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
+import { useBool } from '@/hooks/useBool'
 
 import type { ComponentOption } from '@/types/views'
 

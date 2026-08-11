@@ -2,7 +2,8 @@ import { createRouteRuleset, createRouteRule } from '@defaults/route'
 import { RuleSetType, RouteRuleAction, RouteRuleType } from '@features/constant/kernel'
 import type { RuleSetConfig, RouteRuleConfig } from '@profiles/route'
 
-import { useEnvStore, useRulesetsStore } from '@/stores'
+import { useEnvStore } from '@/stores/env'
+import { useRulesetsStore } from '@/stores/rulesets'
 
 import { supportedRuleTypes } from './shared'
 

@@ -3,7 +3,7 @@ import { DomainStrategyOptions } from '@features/constant/options.ts'
 import type { DnsRouteOptions, DomainResolver } from '@profiles/shared'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
+import { useBool } from '@/hooks/useBool.ts'
 
 import type { ComponentOption } from '@/types/views'
 

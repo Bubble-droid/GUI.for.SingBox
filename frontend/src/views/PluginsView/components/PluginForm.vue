@@ -4,9 +4,10 @@ import { useI18n } from 'vue-i18n'
 
 import { PluginsTriggerOptions, DraggableOptions } from '@/constant/app'
 import { PluginTrigger } from '@/enums/app'
-import { useBool } from '@/hooks'
-import { usePluginsStore } from '@/stores'
-import { deepClone, message, sampleID } from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { usePluginsStore } from '@/stores/plugins'
+import { message } from '@/utils/interaction'
+import { sampleID, deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 

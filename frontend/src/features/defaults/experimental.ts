@@ -1,7 +1,7 @@
 import { ClashMode } from '@features/constant/kernel'
 import type { ExperimentalConfig } from '@profiles/experimental'
 
-import { generateSecureKey, sampleID } from '@/utils'
+import { generateSecureKey, sampleID } from '@/utils/others'
 
 import { DefaultOutboundIds } from './shared'
 

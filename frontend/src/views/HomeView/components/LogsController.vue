@@ -3,17 +3,12 @@ import { LogLevelOptions } from '@features/constant/options'
 import { ref, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
-import { useKernelApiStore } from '@/stores'
-import {
-  addToRuleSet,
-  buildSmartRegExp,
-  getDomainSuffixes,
-  isValidIPv4,
-  isValidIPv6,
-  message,
-  picker,
-} from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { addToRuleSet } from '@/utils/helper'
+import { message, picker } from '@/utils/interaction'
+import { isValidIPv4, isValidIPv6 } from '@/utils/is'
+import { buildSmartRegExp, getDomainSuffixes } from '@/utils/others'
 
 import type { PickerItem } from '@/components/Picker/index.vue'
 

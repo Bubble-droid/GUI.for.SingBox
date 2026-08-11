@@ -1,7 +1,7 @@
 import type { Directive, DirectiveBinding } from 'vue'
 
-import { useAppStore } from '@/stores'
-import { sleep } from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { sleep } from '@/utils/others'
 
 const updateMenus = (el: HTMLElement, binding: DirectiveBinding<App.Menu[]>) => {
   const appStore = useAppStore()

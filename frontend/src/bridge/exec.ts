@@ -1,7 +1,7 @@
 import * as Bridge from '@wails/go/bridge/App'
 import { EventsOn, EventsOff } from '@wails/runtime/runtime'
 
-import { sampleID } from '@/utils'
+import { sampleID } from '@/utils/others'
 
 interface ExecOptions {
   PidFile?: string

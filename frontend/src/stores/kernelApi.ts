@@ -6,6 +6,9 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { ProcessInfo, ExecBackground, KillProcess } from '@/bridge/exec'
+import { ReadFile, RemoveFile } from '@/bridge/io'
+
 import {
   getProxies,
   getConfigs,
@@ -18,7 +21,6 @@ import {
   destroyWebsocket,
   probeApiAvailability,
 } from '@/api/kernel'
-import { ProcessInfo, KillProcess, ExecBackground, ReadFile, RemoveFile } from '@/bridge'
 import {
   CoreConfigFilePath,
   CoreLogFilePath,
@@ -26,29 +28,22 @@ import {
   CoreWorkingDirectory,
 } from '@/constant/kernel'
 import { Branch } from '@/enums/app'
-import {
-  useAppSettingsStore,
-  useProfilesStore,
-  useLogsStore,
-  useEnvStore,
-  usePluginsStore,
-  useSubscribesStore,
-  useRulesetsStore,
-} from '@/stores'
-import {
-  generateConfigFile,
-  updateTrayAndMenus,
-  getKernelFileName,
-  normalizeProxyHost,
-  deepClone,
-  message,
-  getKernelRuntimeArgs,
-  getKernelRuntimeEnv,
-  eventBus,
-  sleep,
-} from '@/utils'
+import { eventBus } from '@/utils/eventBus'
+import { generateConfigFile } from '@/utils/generator'
+import { getKernelFileName, getKernelRuntimeArgs, getKernelRuntimeEnv } from '@/utils/helper'
+import { message } from '@/utils/interaction'
+import { deepClone, sleep, normalizeProxyHost } from '@/utils/others'
+import { updateTrayAndMenus } from '@/utils/tray'
 
 import type { CoreApiConfig, CoreApiProxy } from '@/types/kernel'
+
+import { useAppSettingsStore } from './appSettings'
+import { useEnvStore } from './env'
+import { useLogsStore } from './logs'
+import { usePluginsStore } from './plugins'
+import { useProfilesStore } from './profiles'
+import { useRulesetsStore } from './rulesets'
+import { useSubscribesStore } from './subscribes'
 
 export type ProxyType = 'mixed' | 'http' | 'socks'
 export interface ProxyEndpoint {

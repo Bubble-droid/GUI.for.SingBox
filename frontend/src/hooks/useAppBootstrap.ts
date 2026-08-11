@@ -1,8 +1,17 @@
 import { ref } from 'vue'
 
-import { IsStartup } from '@/bridge'
-import * as Stores from '@/stores'
-import { message, sleep } from '@/utils'
+import { IsStartup } from '@/bridge/app'
+
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useEnvStore } from '@/stores/env'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { usePluginsStore } from '@/stores/plugins'
+import { useProfilesStore } from '@/stores/profiles'
+import { useRulesetsStore } from '@/stores/rulesets'
+import { useScheduledTasksStore } from '@/stores/scheduledtasks'
+import { useSubscribesStore } from '@/stores/subscribes'
+import { message } from '@/utils/interaction'
+import { sleep } from '@/utils/others'
 
 const MIN_SPLASH_DURATION = 1000
 
@@ -11,14 +20,14 @@ export const useAppBootstrap = () => {
   const percent = ref(0)
   const hasError = ref(false)
 
-  const envStore = Stores.useEnvStore()
-  const appSettings = Stores.useAppSettingsStore()
-  const profilesStore = Stores.useProfilesStore()
-  const subscribesStore = Stores.useSubscribesStore()
-  const rulesetsStore = Stores.useRulesetsStore()
-  const pluginsStore = Stores.usePluginsStore()
-  const scheduledTasksStore = Stores.useScheduledTasksStore()
-  const kernelApiStore = Stores.useKernelApiStore()
+  const envStore = useEnvStore()
+  const appSettings = useAppSettingsStore()
+  const profilesStore = useProfilesStore()
+  const subscribesStore = useSubscribesStore()
+  const rulesetsStore = useRulesetsStore()
+  const pluginsStore = usePluginsStore()
+  const scheduledTasksStore = useScheduledTasksStore()
+  const kernelApiStore = useKernelApiStore()
 
   const showError = (error: unknown) => {
     hasError.value = true

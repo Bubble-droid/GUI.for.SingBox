@@ -3,8 +3,9 @@ import { ref, inject, h, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { PluginTriggerEvent } from '@/enums/app'
-import { usePluginsStore, useAppSettingsStore } from '@/stores'
-import { message } from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings.ts'
+import { usePluginsStore } from '@/stores/plugins.ts'
+import { message } from '@/utils/interaction.ts'
 
 import Button from '@/components/Button/index.vue'
 

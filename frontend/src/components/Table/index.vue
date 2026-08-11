@@ -3,7 +3,7 @@ import { ref, computed, isVNode, h } from 'vue'
 
 import vMenu from '@/directives/menu'
 import useI18n from '@/lang'
-import { getValue } from '@/utils'
+import { getValue } from '@/utils/others'
 
 export interface Column {
   title: string

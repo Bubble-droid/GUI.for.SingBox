@@ -9,8 +9,9 @@ import type { InboundConfig } from '@profiles/inbounds'
 import type { OutboundConfig } from '@profiles/outbounds'
 import type { RouteConfig } from '@profiles/route'
 
-import { useEnvStore, useRulesetsStore } from '@/stores'
-import { deepAssign } from '@/utils'
+import { useEnvStore } from '@/stores/env'
+import { useRulesetsStore } from '@/stores/rulesets'
+import { deepAssign } from '@/utils/others'
 
 import { _generateRule } from './shared'
 

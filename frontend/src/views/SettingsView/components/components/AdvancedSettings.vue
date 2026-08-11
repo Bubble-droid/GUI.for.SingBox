@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import { OpenDir } from '@/bridge'
+import { OpenDir } from '@/bridge/io'
+
 import { OS } from '@/enums/app'
-import { useAppSettingsStore, useEnvStore } from '@/stores'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useEnvStore } from '@/stores/env'
 
 const appSettings = useAppSettingsStore()
 const envStore = useEnvStore()

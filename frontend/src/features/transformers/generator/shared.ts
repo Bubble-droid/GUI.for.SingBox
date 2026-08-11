@@ -26,7 +26,7 @@ import type {
   Dns01Challenge,
 } from '@profiles/shared'
 
-import { deepAssign } from '@/utils'
+import { deepAssign } from '@/utils/others'
 
 import type { TagMaps } from './types'
 

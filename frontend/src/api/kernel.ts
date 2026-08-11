@@ -1,7 +1,8 @@
 import { Request } from '@/api/request'
 import { WebSockets } from '@/api/websocket'
-import { useProfilesStore } from '@/stores'
-import { formatProxyHost, normalizeProxyHost } from '@/utils'
+import { useProfilesStore } from '@/stores/profiles'
+import { formatProxyHost } from '@/utils/format'
+import { normalizeProxyHost } from '@/utils/others'
 
 import type {
   CoreApiConfig,

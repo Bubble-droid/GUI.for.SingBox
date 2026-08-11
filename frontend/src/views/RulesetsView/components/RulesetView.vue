@@ -2,9 +2,12 @@
 import { ref, inject, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ReadFile, WriteFile } from '@/bridge'
-import { useRulesetsStore } from '@/stores'
-import { deepClone, ignoredError, isValidJson, message } from '@/utils'
+import { WriteFile, ReadFile } from '@/bridge/io'
+
+import { useRulesetsStore } from '@/stores/rulesets'
+import { message } from '@/utils/interaction'
+import { isValidJson } from '@/utils/is'
+import { deepClone, ignoredError } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 

@@ -1,9 +1,10 @@
 import { Outbound } from '@features/constant/kernel'
 import type { OutboundConfig } from '@profiles/outbounds'
 
-import { ReadFile } from '@/bridge'
-import { useSubscribesStore } from '@/stores'
-import { createTextMatcher } from '@/utils'
+import { ReadFile } from '@/bridge/io'
+
+import { useSubscribesStore } from '@/stores/subscribes'
+import { createTextMatcher } from '@/utils/others'
 
 export const generateOutbounds = async (outbounds: OutboundConfig[]) => {
   const result: Recordable[] = []

@@ -5,7 +5,7 @@ import { Dns01ProviderOptions } from '@features/constant/options'
 import type { Dns01Challenge } from '@profiles/shared'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
+import { useBool } from '@/hooks/useBool'
 
 import type { ComponentOption } from '@/types/views'
 

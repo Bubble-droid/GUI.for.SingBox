@@ -1,34 +1,23 @@
 import { PredefinedClashModeOptions } from '@features/constant/options'
 
-import {
-  Notify,
-  RestartApp,
-  EventsOn,
-  EventsOff,
-  ShowMainWindow,
-  UpdateTrayAndMenus,
-} from '@/bridge'
+import { Notify, ShowMainWindow, RestartApp, UpdateTrayAndMenus } from '@/bridge/app'
+import { EventsOff, EventsOn } from '@wails/runtime/runtime'
+
 import { ColorOptions, ThemeOptions } from '@/constant/app'
 import { OS } from '@/enums/app'
 import i18n from '@/lang'
-import {
-  useAppSettingsStore,
-  useKernelApiStore,
-  useEnvStore,
-  usePluginsStore,
-  useAppStore,
-  useProfilesStore,
-} from '@/stores'
-import {
-  debounce,
-  exitApp,
-  handleChangeMode,
-  APP_TITLE,
-  APP_VERSION,
-  handleUseProxy,
-} from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useEnvStore } from '@/stores/env'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { usePluginsStore } from '@/stores/plugins'
+import { useProfilesStore } from '@/stores/profiles'
 
 import type { Lang } from '@/enums/app'
+
+import { APP_TITLE, APP_VERSION } from './env'
+import { handleUseProxy, handleChangeMode, exitApp } from './helper'
+import { debounce } from './others'
 
 const getTrayIcons = () => {
   const envStore = useEnvStore()

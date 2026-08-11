@@ -4,10 +4,13 @@ import { RuleSetFormat, RouteRuleType, RuleSetType } from '@features/constant/ke
 import { computed, h, inject, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { HttpGet } from '@/bridge'
+import { HttpGet } from '@/bridge/net'
+
 import { BuiltInOutbound } from '@/constant/kernel'
-import { useProfilesStore, useRulesetsStore } from '@/stores'
-import { alert, deepClone, message, picker } from '@/utils'
+import { useProfilesStore } from '@/stores/profiles'
+import { useRulesetsStore } from '@/stores/rulesets'
+import { alert, message, picker } from '@/utils/interaction'
+import { deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 import Pagination from '@/components/Pagination/index.vue'

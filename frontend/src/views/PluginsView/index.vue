@@ -2,11 +2,14 @@
 import { computed } from 'vue'
 import { useI18n, I18nT } from 'vue-i18n'
 
-import { OpenURI } from '@/bridge'
+import { OpenURI } from '@/bridge/io.ts'
+
 import { DraggableOptions, ViewOptions } from '@/constant/app'
 import { PluginTriggerEvent, PluginTrigger, View } from '@/enums/app'
-import { usePluginsStore, useAppSettingsStore } from '@/stores'
-import { debounce, message, deepClone, modal } from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings.ts'
+import { usePluginsStore } from '@/stores/plugins.ts'
+import { message, modal } from '@/utils/interaction.ts'
+import { deepClone, debounce } from '@/utils/others.ts'
 
 import Button from '@/components/Button/index.vue'
 

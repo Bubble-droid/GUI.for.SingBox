@@ -1,10 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
-import { GetEnv, GetSystemProxy, SetSystemDNS, SetSystemProxy } from '@/bridge'
+import { GetEnv, GetSystemProxy, SetSystemProxy, SetSystemDNS } from '@/bridge/app'
+
 import { OS } from '@/enums/app'
-import { useAppSettingsStore, useKernelApiStore } from '@/stores'
-import { formatProxyHost, ignoredError, updateTrayAndMenus } from '@/utils'
+import { formatProxyHost } from '@/utils/format'
+import { ignoredError } from '@/utils/others'
+import { updateTrayAndMenus } from '@/utils/tray'
+
+import { useAppSettingsStore } from './appSettings'
+import { useKernelApiStore } from './kernelApi'
 
 export const useEnvStore = defineStore('env', () => {
   const appSettings = useAppSettingsStore()

@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 
-import { deepClone, message } from '@/utils'
+import { message } from '@/utils/interaction'
+import { deepClone } from '@/utils/others'
 
 interface Props {
   plugin: App.Plugin

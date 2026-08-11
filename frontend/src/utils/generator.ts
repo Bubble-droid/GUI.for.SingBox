@@ -13,17 +13,18 @@ import { generateConfig } from '@generator'
 import type { Profile } from '@profiles'
 import { parse } from 'yaml'
 
-import { ReadFile, WriteFile } from '@/bridge'
+import { ReadFile, WriteFile } from '@/bridge/io'
+
 import { CoreConfigFilePath } from '@/constant/kernel'
 import { Branch } from '@/enums/app'
-import {
-  useAppSettingsStore,
-  useEnvStore,
-  usePluginsStore,
-  useRulesetsStore,
-  useSubscribesStore,
-} from '@/stores'
-import { deepAssign, deepClone, APP_TITLE, createTextMatcher } from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useEnvStore } from '@/stores/env'
+import { usePluginsStore } from '@/stores/plugins'
+import { useRulesetsStore } from '@/stores/rulesets'
+import { useSubscribesStore } from '@/stores/subscribes'
+
+import { APP_TITLE } from './env'
+import { deepAssign, createTextMatcher, deepClone } from './others'
 
 const _generateRule = (
   rule: App.Rule | App.DnsRule,

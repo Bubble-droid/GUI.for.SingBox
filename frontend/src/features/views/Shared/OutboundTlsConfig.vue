@@ -10,7 +10,7 @@ import {
 import type { OutboundTlsConfig } from '@profiles/shared'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
+import { useBool } from '@/hooks/useBool'
 
 const model = defineModel<OutboundTlsConfig>({ required: true })
 const { t } = useI18n()

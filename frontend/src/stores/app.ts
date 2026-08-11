@@ -2,31 +2,16 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import {
-  Download,
-  HttpGet,
-  MoveFile,
-  UnzipZIPFile,
-  RemoveFile,
-  HttpCancel,
-  ReadDir,
-  Exec,
-  UnzipTarGZFile,
-} from '@/bridge'
+import { Exec } from '@/bridge/exec'
+import { ReadDir, RemoveFile, UnzipZIPFile, UnzipTarGZFile, MoveFile } from '@/bridge/io'
+import { HttpCancel, Download, HttpGet } from '@/bridge/net'
+
 import { LanguageOptions, LocalesFilePath } from '@/constant/app'
 import { OS } from '@/enums/app'
 import { loadLocale } from '@/lang'
-import {
-  APP_VERSION,
-  APP_VERSION_API,
-  getGitHubApiAuthorization,
-  confirm,
-  message,
-  sampleID,
-  sleep,
-  modal,
-  APP_IDENTIFIER,
-} from '@/utils'
+import { APP_VERSION, APP_IDENTIFIER, APP_VERSION_API } from '@/utils/env'
+import { confirm, message, modal } from '@/utils/interaction'
+import { sleep, sampleID, getGitHubApiAuthorization } from '@/utils/others'
 
 import AboutView from '@/components/_common/AboutView.vue'
 

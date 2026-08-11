@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useAppStore } from '@/stores'
+import { useAppStore } from '@/stores/app.ts'
 
 import CoreSettings from './components/CoreSettings.vue'
 import GeneralSettings from './components/GeneralSettings.vue'

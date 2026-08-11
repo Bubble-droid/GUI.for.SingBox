@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch, onActivated, useTemplateRef } from 'vue'
 
-import { formatBytes } from '@/utils'
+import { formatBytes } from '@/utils/format'
 
 interface Props {
   height?: number

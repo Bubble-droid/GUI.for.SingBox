@@ -2,10 +2,12 @@
 import { ref, inject, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ReadFile, WriteFile } from '@/bridge'
+import { WriteFile, ReadFile } from '@/bridge/io'
+
 import { PluginTriggerEvent } from '@/enums/app'
-import { usePluginsStore } from '@/stores'
-import { deepClone, ignoredError, message } from '@/utils'
+import { usePluginsStore } from '@/stores/plugins'
+import { message } from '@/utils/interaction'
+import { ignoredError, deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'

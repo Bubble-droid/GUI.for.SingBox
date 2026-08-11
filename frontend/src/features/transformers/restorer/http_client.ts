@@ -2,7 +2,7 @@ import { createHttpClient } from '@defaults/http_client'
 import type { SingBoxHttpClient } from '@features/types/sing-box'
 import type { HttpClientConfig } from '@profiles/http_client'
 
-import { sampleID } from '@/utils'
+import { sampleID } from '@/utils/others'
 
 import {
   restoreDialer,

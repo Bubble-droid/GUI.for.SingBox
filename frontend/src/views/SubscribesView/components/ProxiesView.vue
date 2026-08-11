@@ -2,10 +2,13 @@
 import { ref, computed, inject, h, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ClipboardSetText, ReadFile, WriteFile } from '@/bridge'
+import { WriteFile, ReadFile } from '@/bridge/io'
+import { ClipboardSetText } from '@wails/runtime/runtime'
+
 import { DraggableOptions } from '@/constant/app'
-import { useSubscribesStore } from '@/stores'
-import { buildSmartRegExp, deepClone, ignoredError, message, modal, sampleID } from '@/utils'
+import { useSubscribesStore } from '@/stores/subscribes'
+import { modal, message } from '@/utils/interaction'
+import { deepClone, buildSmartRegExp, sampleID, ignoredError } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 import CodeEditor from '@/components/CodeEditor/index.vue'

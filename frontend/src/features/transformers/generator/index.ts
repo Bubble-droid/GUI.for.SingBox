@@ -4,8 +4,9 @@ import type { TagItem } from '@profiles/shared'
 import { parse } from 'yaml'
 
 import { Branch } from '@/enums/app'
-import { useAppSettingsStore, usePluginsStore } from '@/stores'
-import { deepClone, deepAssign } from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { usePluginsStore } from '@/stores/plugins'
+import { deepClone, deepAssign } from '@/utils/others'
 
 import { _adaptToStableBranch } from './adapter'
 import { generateCertificate } from './certificate'

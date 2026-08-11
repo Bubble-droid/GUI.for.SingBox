@@ -2,8 +2,9 @@
 import { useI18n } from 'vue-i18n'
 
 import { Branch } from '@/enums/app'
-import { useAppSettingsStore, useKernelApiStore } from '@/stores'
-import { message } from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { message } from '@/utils/interaction'
 
 const { t } = useI18n()
 const appSettings = useAppSettingsStore()

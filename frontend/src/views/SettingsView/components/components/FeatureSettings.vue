@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { OS } from '@/enums/app'
-import { useAppSettingsStore } from '@/stores'
+import { useAppSettingsStore } from '@/stores/appSettings'
 const appSettings = useAppSettingsStore()
 </script>
 

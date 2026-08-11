@@ -2,8 +2,11 @@
 import { h, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useProfilesStore, useAppSettingsStore, useSubscribesStore } from '@/stores'
-import { message, sampleID } from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useProfilesStore } from '@/stores/profiles'
+import { useSubscribesStore } from '@/stores/subscribes'
+import { message } from '@/utils/interaction'
+import { sampleID } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 

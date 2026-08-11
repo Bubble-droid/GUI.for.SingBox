@@ -1,9 +1,11 @@
 import { stringify } from 'yaml'
 
 import { OS } from '@/enums/app'
-import { useAppSettingsStore } from '@/stores'
+import { useAppSettingsStore } from '@/stores/appSettings'
 import appDts from '@/types/app.d.ts?raw'
-import { APP_TITLE, APP_VERSION, isValidIPv4, isValidIPv6 } from '@/utils'
+
+import { APP_TITLE, APP_VERSION } from './env'
+import { isValidIPv4, isValidIPv6 } from './is'
 
 export const getAppDts = () => appDts
 

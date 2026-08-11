@@ -2,16 +2,18 @@
 import { ref, inject, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { IsNotificationAvailable, RequestNotificationAuthorization } from '@/bridge'
+import { IsNotificationAvailable, RequestNotificationAuthorization } from '@wails/runtime/runtime'
+
 import { ScheduledTaskOptions } from '@/constant/app'
 import { ScheduledTasksType } from '@/enums/app'
-import {
-  useScheduledTasksStore,
-  useSubscribesStore,
-  useRulesetsStore,
-  usePluginsStore,
-} from '@/stores'
-import { alert, deepClone, formatDate, isValidCron, message, sampleID } from '@/utils'
+import { usePluginsStore } from '@/stores/plugins'
+import { useRulesetsStore } from '@/stores/rulesets'
+import { useScheduledTasksStore } from '@/stores/scheduledtasks'
+import { useSubscribesStore } from '@/stores/subscribes'
+import { formatDate } from '@/utils/format'
+import { alert, message } from '@/utils/interaction'
+import { isValidCron } from '@/utils/is'
+import { sampleID, deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 

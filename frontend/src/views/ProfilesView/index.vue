@@ -3,17 +3,16 @@ import { generateConfig } from '@generator'
 import type { Profile } from '@profiles'
 import { useI18n, I18nT } from 'vue-i18n'
 
-import { ClipboardSetText } from '@/bridge'
+import { ClipboardSetText } from '@wails/runtime/runtime.js'
+
 import { DraggableOptions, ProfileMenuList, ViewOptions } from '@/constant/app'
 import { View } from '@/enums/app'
-import {
-  useProfilesStore,
-  useAppSettingsStore,
-  useKernelApiStore,
-  useSubscribesStore,
-  usePluginsStore,
-  useAppStore,
-} from '@/stores'
+import { useAppStore } from '@/stores/app.ts'
+import { useAppSettingsStore } from '@/stores/appSettings.ts'
+import { useKernelApiStore } from '@/stores/kernelApi.ts'
+import { usePluginsStore } from '@/stores/plugins.ts'
+import { useProfilesStore } from '@/stores/profiles.ts'
+import { useSubscribesStore } from '@/stores/subscribes.ts'
 import { alert, message, modal } from '@/utils/interaction.ts'
 import { deepClone, sampleID, debounce } from '@/utils/others.ts'
 

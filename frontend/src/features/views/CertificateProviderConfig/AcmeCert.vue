@@ -7,7 +7,7 @@ import PortInput from '@views/Shared/PortInput.vue'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
+import { useBool } from '@/hooks/useBool'
 
 import type { ComponentOption } from '@/types/views'
 

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
-import { RemoveFile } from '@/bridge'
+import { RemoveFile } from '@/bridge/io'
+
 import { CoreCacheFilePath } from '@/constant/kernel'
 import { useCoreBranch } from '@/hooks/useCoreBranch'
-import { useEnvStore, useKernelApiStore } from '@/stores'
-import { message } from '@/utils'
+import { useEnvStore } from '@/stores/env'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { message } from '@/utils/interaction'
 
 interface Props {
   isAlpha: boolean

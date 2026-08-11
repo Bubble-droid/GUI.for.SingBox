@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { h, withDirectives } from 'vue'
 
-import { ClipboardSetText } from '@/bridge'
+import { ClipboardSetText } from '@wails/runtime/runtime'
+
 import vTips from '@/directives/tips'
-import { useLogsStore } from '@/stores'
-import { message } from '@/utils'
+import { useLogsStore } from '@/stores/logs'
+import { message } from '@/utils/interaction'
 
 import Button from '@/components/Button/index.vue'
 

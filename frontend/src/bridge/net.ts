@@ -2,8 +2,8 @@ import * as Bridge from '@wails/go/bridge/App'
 import { EventsOn, EventsOff, EventsEmit } from '@wails/runtime/runtime'
 
 import { RequestMethod } from '@/enums/app'
-import { sampleID, transformRequestUrl, getUserAgent } from '@/utils'
 import { GetRequestProxy } from '@/utils/helper'
+import { getUserAgent, sampleID, transformRequestUrl } from '@/utils/others'
 
 interface NetOptions {
   Mode?: 'Binary' | 'Text'

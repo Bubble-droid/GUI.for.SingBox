@@ -4,8 +4,9 @@ import { RuleSetFormatOptions } from '@features/constant/options'
 import { ref, inject, watch, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useRulesetsStore } from '@/stores'
-import { deepClone, message, sampleID } from '@/utils'
+import { useRulesetsStore } from '@/stores/rulesets'
+import { message } from '@/utils/interaction'
+import { sampleID, deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 

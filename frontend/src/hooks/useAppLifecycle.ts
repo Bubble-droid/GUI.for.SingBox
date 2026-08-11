@@ -1,15 +1,20 @@
 import { onUnmounted } from 'vue'
 
-import { EventsOn, WindowHide } from '@/bridge'
-import * as Stores from '@/stores'
-import { exitApp, message, modal, sampleID } from '@/utils'
+import { EventsOn, WindowHide } from '@wails/runtime/runtime'
+
+import { useAppStore } from '@/stores/app'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useSubscribesStore } from '@/stores/subscribes'
+import { exitApp } from '@/utils/helper'
+import { modal, message } from '@/utils/interaction'
+import { sampleID } from '@/utils/others'
 
 import CommandView from '@/components/_common/CommandView.vue'
 
 export const useAppLifecycle = () => {
-  const appStore = Stores.useAppStore()
-  const appSettings = Stores.useAppSettingsStore()
-  const subscribesStore = Stores.useSubscribesStore()
+  const appStore = useAppStore()
+  const appSettings = useAppSettingsStore()
+  const subscribesStore = useSubscribesStore()
   let commandModal: ReturnType<typeof modal> | undefined
 
   const offLaunchApp = EventsOn('onLaunchApp', async ([arg]: string[]) => {

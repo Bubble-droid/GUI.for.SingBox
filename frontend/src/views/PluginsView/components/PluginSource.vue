@@ -3,7 +3,7 @@ import { h } from 'vue'
 
 import { DefaultPluginHubSources } from '@/constant/app'
 import useI18n from '@/lang'
-import { useAppSettingsStore } from '@/stores'
+import { useAppSettingsStore } from '@/stores/appSettings'
 
 import Button from '@/components/Button/index.vue'
 

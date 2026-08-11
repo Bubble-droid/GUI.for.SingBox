@@ -2,8 +2,9 @@
 import Prism from 'prismjs'
 import { computed } from 'vue'
 
-import { ClipboardSetText } from '@/bridge'
-import { message } from '@/utils'
+import { ClipboardSetText } from '@wails/runtime/runtime'
+
+import { message } from '@/utils/interaction'
 
 import 'prismjs/components/prism-markup'
 import 'prismjs/components/prism-css'

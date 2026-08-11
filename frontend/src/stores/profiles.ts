@@ -4,10 +4,14 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { parse } from 'yaml'
 
-import { ReadFile, WriteFile } from '@/bridge'
+import { ReadFile, WriteFile } from '@/bridge/io'
+
 import { ProfilesFilePath } from '@/constant/app'
-import { useAppSettingsStore } from '@/stores'
-import { ignoredError, eventBus, stringifyNoFolding, migrateProfiles } from '@/utils'
+import { eventBus } from '@/utils/eventBus'
+import { migrateProfiles } from '@/utils/migration'
+import { ignoredError, stringifyNoFolding } from '@/utils/others'
+
+import { useAppSettingsStore } from './appSettings'
 
 export const useProfilesStore = defineStore('profiles', () => {
   const appSettingsStore = useAppSettingsStore()

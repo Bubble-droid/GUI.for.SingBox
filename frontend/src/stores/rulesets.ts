@@ -3,18 +3,15 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { parse } from 'yaml'
 
-import { ReadFile, WriteFile, CopyFile, Download, HttpGet } from '@/bridge'
+import { ReadFile, WriteFile, CopyFile } from '@/bridge/io'
+import { HttpGet, Download } from '@/bridge/net'
+
 import { RulesetHubFilePath, RulesetsFilePath } from '@/constant/app'
 import { EmptyRuleSet } from '@/constant/kernel'
-import {
-  asyncPool,
-  stringifyNoFolding,
-  eventBus,
-  ignoredError,
-  isValidRulesJson,
-  migrateRulesets,
-  omitArray,
-} from '@/utils'
+import { eventBus } from '@/utils/eventBus'
+import { isValidRulesJson } from '@/utils/is'
+import { migrateRulesets } from '@/utils/migration'
+import { ignoredError, omitArray, stringifyNoFolding, asyncPool } from '@/utils/others'
 
 export const useRulesetsStore = defineStore('rulesets', () => {
   const rulesets = ref<App.RuleSet[]>([])

@@ -8,8 +8,9 @@ import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
 import { BuiltInOutbound } from '@/constant/kernel'
-import { useSubscribesStore } from '@/stores'
-import { deepClone, message } from '@/utils'
+import { useSubscribesStore } from '@/stores/subscribes'
+import { message } from '@/utils/interaction'
+import { deepClone } from '@/utils/others'
 
 const model = defineModel<OutboundConfig[]>({ required: true })
 

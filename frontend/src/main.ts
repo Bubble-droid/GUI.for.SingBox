@@ -9,7 +9,7 @@ import components from './components'
 import directives from './directives'
 import i18n from './lang'
 import router from './router'
-import { setAppContext } from './utils'
+import { setAppContext } from './utils/appContext.ts'
 
 const app = createApp(App)
 

@@ -1,37 +1,24 @@
 import { RuleSetFormat } from '@features/constant/kernel'
 
+import { GetSystemProxy, GetEnv, ExitApp } from '@/bridge/app'
+import { Exec } from '@/bridge/exec'
+import { AbsolutePath, FileExists, WriteFile, RemoveFile, ReadFile } from '@/bridge/io'
+import { WindowReloadApp } from '@wails/runtime/runtime'
+
 import { deleteConnection, getConnections, useProxy } from '@/api/kernel'
-import {
-  AbsolutePath,
-  Exec,
-  ExitApp,
-  FileExists,
-  GetEnv,
-  GetSystemProxy,
-  ReadFile,
-  RemoveFile,
-  WindowReloadApp,
-  WriteFile,
-} from '@/bridge'
 import { OS, RequestProxyMode } from '@/enums/app'
 import i18n from '@/lang'
-import {
-  useAppSettingsStore,
-  useAppStore,
-  useEnvStore,
-  useKernelApiStore,
-  usePluginsStore,
-  useRulesetsStore,
-} from '@/stores'
-import {
-  formatProxyHost,
-  ignoredError,
-  normalizeRequestProxy,
-  message,
-  confirm,
-  APP_TITLE,
-  getAutoStartConfiguration,
-} from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useEnvStore } from '@/stores/env'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { usePluginsStore } from '@/stores/plugins'
+import { useRulesetsStore } from '@/stores/rulesets'
+
+import { APP_TITLE } from './env'
+import { formatProxyHost } from './format'
+import { confirm, message } from './interaction'
+import { normalizeRequestProxy, getAutoStartConfiguration, ignoredError } from './others'
 
 // Permissions Helper
 export const SwitchPermissions = async (enable: boolean) => {

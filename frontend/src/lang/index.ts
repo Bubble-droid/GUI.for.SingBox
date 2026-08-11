@@ -1,6 +1,7 @@
 import { createI18n } from 'vue-i18n'
 
-import { ReadFile } from '@/bridge'
+import { ReadFile } from '@/bridge/io'
+
 import { LocalesFilePath } from '@/constant/app'
 import { Lang } from '@/enums/app'
 

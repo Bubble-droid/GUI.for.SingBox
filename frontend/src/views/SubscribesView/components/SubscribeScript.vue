@@ -2,8 +2,8 @@
 import { ref, inject, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useSubscribesStore } from '@/stores'
-import { message } from '@/utils'
+import { useSubscribesStore } from '@/stores/subscribes'
+import { message } from '@/utils/interaction'
 
 import Button from '@/components/Button/index.vue'
 

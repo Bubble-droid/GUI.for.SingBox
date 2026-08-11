@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 
-import logo from '@/assets/logo'
+import { RestartApp } from '@/bridge/app'
 import {
   WindowSetAlwaysOnTop,
   WindowHide,
-  WindowMinimise,
   WindowSetSize,
-  WindowToggleMaximise,
   WindowIsMaximised,
-  RestartApp,
-} from '@/bridge'
+  WindowToggleMaximise,
+  WindowMinimise,
+} from '@wails/runtime/runtime'
+
+import logo from '@/assets/logo'
 import { OS } from '@/enums/app'
-import { useAppSettingsStore, useKernelApiStore, useEnvStore, useAppStore } from '@/stores'
-import { APP_TITLE, APP_VERSION, debounce, exitApp, reloadApp } from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useEnvStore } from '@/stores/env'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { APP_TITLE, APP_VERSION } from '@/utils/env'
+import { exitApp, reloadApp } from '@/utils/helper'
+import { debounce } from '@/utils/others'
 
 const isPinned = ref(false)
 const isMaximised = ref(false)

@@ -2,9 +2,6 @@ import type { typebox } from '@zhexin/typebox'
 
 import type { UnpackArray } from '../../types/utils'
 
-export type { log as SingBoxLogConfig } from '@zhexin/typebox/log'
-export type { experimental as SingBoxExperimental } from '@zhexin/typebox/experimental'
-
 export type SingBoxConfig = typebox<
   string,
   string,
@@ -17,7 +14,11 @@ export type SingBoxConfig = typebox<
   string
 >
 
+export type SingBoxLogConfig = NonNullable<SingBoxConfig['log']>
+
 export type SingBoxNtp = NonNullable<SingBoxConfig['ntp']>
+
+export type SingBoxExperimental = NonNullable<SingBoxConfig['experimental']>
 
 export type SingBoxCert = NonNullable<SingBoxConfig['certificate']>
 

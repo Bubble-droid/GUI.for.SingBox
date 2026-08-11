@@ -2,8 +2,10 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useLogsStore, useScheduledTasksStore } from '@/stores'
-import { buildSmartRegExp, formatDate } from '@/utils'
+import { useLogsStore } from '@/stores/logs'
+import { useScheduledTasksStore } from '@/stores/scheduledtasks'
+import { formatDate } from '@/utils/format'
+import { buildSmartRegExp } from '@/utils/others'
 
 import type { Column } from '@/components/Table/index.vue'
 

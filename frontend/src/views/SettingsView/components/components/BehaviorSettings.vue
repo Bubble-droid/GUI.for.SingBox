@@ -1,20 +1,21 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 
-import { ExitApp } from '@/bridge'
+import { ExitApp } from '@/bridge/app'
+
 import { WebviewGpuPolicyOptions, WindowStateOptions } from '@/constant/app'
 import { OS } from '@/enums/app'
-import { useAppSettingsStore, useEnvStore } from '@/stores'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useEnvStore } from '@/stores/env'
 import {
-  confirm,
-  message,
-  CheckPermissions,
-  SwitchPermissions,
   RunWithPowerShell,
-  IsAutoStartEnabled,
+  SwitchPermissions,
   EnableAutoStart,
   DisableAutoStart,
-} from '@/utils'
+  IsAutoStartEnabled,
+  CheckPermissions,
+} from '@/utils/helper'
+import { confirm, message } from '@/utils/interaction'
 
 const appSettings = useAppSettingsStore()
 const envStore = useEnvStore()

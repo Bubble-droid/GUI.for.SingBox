@@ -5,8 +5,8 @@ import { restoreProfile } from '@restorer'
 import { ref, inject, h, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useProfilesStore } from '@/stores'
-import { message } from '@/utils'
+import { useProfilesStore } from '@/stores/profiles'
+import { message } from '@/utils/interaction'
 
 import Button from '@/components/Button/index.vue'
 

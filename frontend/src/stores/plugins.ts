@@ -1,24 +1,26 @@
 import type { Profile } from '@profiles'
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed, readonly, ref, watch } from 'vue'
 import { parse } from 'yaml'
 
-import { HttpGet, ReadFile, RemoveFile, Requests, WriteFile } from '@/bridge'
+import { ReadFile, WriteFile, RemoveFile } from '@/bridge/io'
+import { HttpGet, Requests } from '@/bridge/net'
+
 import { PluginHubFilePath, PluginsFilePath } from '@/constant/app'
 import { PluginTrigger, PluginTriggerEvent, RequestMethod } from '@/enums/app'
-import { useAppSettingsStore } from '@/stores'
+import { confirm } from '@/utils/interaction'
+import { isNumber } from '@/utils/is'
 import {
   ignoredError,
-  updateTrayAndMenus,
-  isNumber,
-  omitArray,
   deepClone,
-  confirm,
-  asyncPool,
-  stringifyNoFolding,
-  readonly,
   base64Encode,
-} from '@/utils'
+  omitArray,
+  stringifyNoFolding,
+  asyncPool,
+} from '@/utils/others'
+import { updateTrayAndMenus } from '@/utils/tray'
+
+import { useAppSettingsStore } from './appSettings'
 
 interface PluginRuntimeCache {
   plugin: App.Plugin

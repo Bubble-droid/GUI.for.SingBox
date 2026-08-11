@@ -5,9 +5,10 @@ export const IS_IN_MODAL = 'IS_IN_MODAL'
 <script setup lang="ts">
 import { computed, markRaw, provide, ref, watch } from 'vue'
 
-import { useBool } from '@/hooks'
-import { useAppStore } from '@/stores'
-import { message, sampleID } from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { useAppStore } from '@/stores/app'
+import { message } from '@/utils/interaction'
+import { sampleID } from '@/utils/others'
 
 export interface Props {
   title?: string | undefined

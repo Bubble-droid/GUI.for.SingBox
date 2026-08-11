@@ -7,9 +7,10 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
-import { useBool } from '@/hooks'
-import { useRulesetsStore } from '@/stores'
-import { deepClone, message } from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { useRulesetsStore } from '@/stores/rulesets'
+import { message } from '@/utils/interaction'
+import { deepClone } from '@/utils/others'
 
 interface Props {
   outboundOptions: { label: string; value: string }[]

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 
-import { useAppSettingsStore } from '@/stores'
+import { useAppSettingsStore } from '@/stores/appSettings.ts'
 
 import NavigationBar from './NavigationBar.vue'
 import TitleBar from './TitleBar.vue'

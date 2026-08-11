@@ -1,7 +1,7 @@
 import type { Profile } from '@profiles'
 import type { MixinConfig, ScriptConfig } from '@profiles/mixin-script'
 
-import { sampleID } from '@/utils'
+import { sampleID } from '@/utils/others'
 
 import { createCertificate } from './certificate'
 import { createDns } from './dns'

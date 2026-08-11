@@ -1,7 +1,7 @@
 import type { Directive } from 'vue'
 
-import { useAppStore } from '@/stores'
-import { debounce } from '@/utils'
+import { useAppStore } from '@/stores/app'
+import { debounce } from '@/utils/others'
 
 interface TipsElement extends HTMLElement {
   _tipsValue?: string

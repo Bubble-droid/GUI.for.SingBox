@@ -2,19 +2,18 @@
 import { computed } from 'vue'
 import { useI18n, I18nT } from 'vue-i18n'
 
-import { BrowserOpenURL, ClipboardSetText, RemoveFile } from '@/bridge'
+import { RemoveFile } from '@/bridge/io.ts'
+import { BrowserOpenURL, ClipboardSetText } from '@wails/runtime/runtime'
+
 import { DraggableOptions, ViewOptions } from '@/constant/app'
 import { RequestProxyMode, View } from '@/enums/app'
-import { useSubscribesStore, useAppSettingsStore, usePluginsStore, useAppStore } from '@/stores'
-import {
-  formatBytes,
-  formatRelativeTime,
-  debounce,
-  ignoredError,
-  formatDate,
-  message,
-  modal,
-} from '@/utils'
+import { useAppStore } from '@/stores/app.ts'
+import { useAppSettingsStore } from '@/stores/appSettings.ts'
+import { usePluginsStore } from '@/stores/plugins.ts'
+import { useSubscribesStore } from '@/stores/subscribes.ts'
+import { formatBytes, formatDate, formatRelativeTime } from '@/utils/format.ts'
+import { message, modal } from '@/utils/interaction.ts'
+import { ignoredError, debounce } from '@/utils/others.ts'
 
 import ProxiesEditor from './components/ProxiesEditor.vue'
 import ProxiesView from './components/ProxiesView.vue'

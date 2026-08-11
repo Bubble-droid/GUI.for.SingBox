@@ -2,7 +2,7 @@
 import { ref, useTemplateRef, watch } from 'vue'
 
 import { DraggableOptions } from '@/constant/app'
-import { sampleID } from '@/utils'
+import { sampleID } from '@/utils/others'
 
 import Input from '@/components/Input/index.vue'
 

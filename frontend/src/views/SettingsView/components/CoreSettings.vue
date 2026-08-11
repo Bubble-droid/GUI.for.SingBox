@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { modal } from '@/utils'
+import { modal } from '@/utils/interaction.ts'
 
 import BranchDetail from './components/BranchDetail.vue'
 import CoreConfiguration from './components/CoreConfig.vue'

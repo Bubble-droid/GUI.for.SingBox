@@ -4,21 +4,17 @@ import { RuleSetFormat, RouteRuleType, RuleSetType } from '@features/constant/ke
 import { computed } from 'vue'
 import { useI18n, I18nT } from 'vue-i18n'
 
-import { RemoveFile, WriteFile, OpenURI } from '@/bridge'
+import { OpenURI, RemoveFile, WriteFile } from '@/bridge/io.ts'
+
 import { DraggableOptions, ViewOptions } from '@/constant/app'
 import { BuiltInOutbound, EmptyRuleSet } from '@/constant/kernel'
 import { View } from '@/enums/app'
-import { useRulesetsStore, useAppSettingsStore, useProfilesStore } from '@/stores'
-import {
-  debounce,
-  formatRelativeTime,
-  ignoredError,
-  formatDate,
-  message,
-  picker,
-  deepClone,
-  modal,
-} from '@/utils'
+import { useAppSettingsStore } from '@/stores/appSettings.ts'
+import { useProfilesStore } from '@/stores/profiles.ts'
+import { useRulesetsStore } from '@/stores/rulesets.ts'
+import { formatDate, formatRelativeTime } from '@/utils/format.ts'
+import { modal, message, picker } from '@/utils/interaction.ts'
+import { ignoredError, deepClone, debounce } from '@/utils/others.ts'
 
 import RulesetForm from './components/RulesetForm.vue'
 import RulesetHub from './components/RulesetHub.vue'

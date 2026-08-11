@@ -2,8 +2,9 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { usePluginsStore } from '@/stores'
-import { createTextMatcher, deepClone, message, modal } from '@/utils'
+import { usePluginsStore } from '@/stores/plugins.ts'
+import { message, modal } from '@/utils/interaction.ts'
+import { createTextMatcher, deepClone } from '@/utils/others.ts'
 
 import PluginSource from './PluginSource.vue'
 

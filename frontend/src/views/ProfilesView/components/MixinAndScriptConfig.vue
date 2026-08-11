@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { parse, stringify } from 'yaml'
 
-import { message } from '@/utils'
+import { message } from '@/utils/interaction'
 
 const model = defineModel<{ mixin: MixinConfig; script: ScriptConfig }>({
   required: true,

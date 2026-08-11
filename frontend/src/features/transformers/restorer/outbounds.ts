@@ -2,8 +2,8 @@ import { createOutbound } from '@defaults/outbounds'
 import { Outbound } from '@features/constant/kernel'
 import type { OutboundConfig, ProxyConfig } from '@profiles/outbounds'
 
-import { useSubscribesStore } from '@/stores'
-import { createTextMatcher } from '@/utils'
+import { useSubscribesStore } from '@/stores/subscribes'
+import { createTextMatcher } from '@/utils/others'
 
 import type { GuiOutbound } from './types'
 

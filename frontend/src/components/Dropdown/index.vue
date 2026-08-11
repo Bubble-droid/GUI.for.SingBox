@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch, nextTick, useTemplateRef } from 'vue'
 
-import { debounce } from '@/utils'
+import { debounce } from '@/utils/others'
 
 type TriggerType = 'click' | 'hover'
 

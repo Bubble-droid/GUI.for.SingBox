@@ -5,16 +5,13 @@ import { useI18n } from 'vue-i18n'
 import { deleteConnection } from '@/api/kernel'
 import { DraggableOptions } from '@/constant/app'
 import { DefaultConnections } from '@/constant/kernel'
-import { useBool } from '@/hooks'
-import { useAppSettingsStore, useKernelApiStore } from '@/stores'
-import {
-  addToRuleSet,
-  formatBytes,
-  formatRelativeTime,
-  getDomainSuffixes,
-  message,
-  picker,
-} from '@/utils'
+import { useBool } from '@/hooks/useBool'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { useKernelApiStore } from '@/stores/kernelApi'
+import { formatBytes, formatRelativeTime } from '@/utils/format'
+import { addToRuleSet } from '@/utils/helper'
+import { message, picker } from '@/utils/interaction'
+import { getDomainSuffixes } from '@/utils/others'
 
 import type { PickerItem } from '@/components/Picker/index.vue'
 import type { Column } from '@/components/Table/index.vue'

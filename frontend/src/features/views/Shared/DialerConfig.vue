@@ -3,7 +3,7 @@ import { NetworkStrategyOptions, NetworkTypeOptions } from '@features/constant/o
 import type { Dialer } from '@profiles/shared'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
+import { useBool } from '@/hooks/useBool.ts'
 
 import type { ComponentOption } from '@/types/views'
 

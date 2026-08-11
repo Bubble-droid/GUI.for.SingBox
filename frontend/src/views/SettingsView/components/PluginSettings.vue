@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 
-import { useAppSettingsStore, usePluginsStore } from '@/stores'
+import { useAppSettingsStore } from '@/stores/appSettings'
+import { usePluginsStore } from '@/stores/plugins'
 import PluginConfigItem from '@/views/PluginsView/components/PluginConfigItem.vue'
 
 const appSettingsStore = useAppSettingsStore()
