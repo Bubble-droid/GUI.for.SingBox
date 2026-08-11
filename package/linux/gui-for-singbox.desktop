@@ -1,8 +1,7 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=GUI.for.SingBox
-Name[zh_CN]=GUI for SingBox
+Name=GUI for SingBox
 Comment=A GUI client application for sing-box
 Comment[zh_CN]=适用于 sing-box 的图形客户端
 Exec=gui-for-singbox %U
