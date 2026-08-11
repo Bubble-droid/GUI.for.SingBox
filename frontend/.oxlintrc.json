@@ -1,5 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": ["src/bridge/wailsjs/**"],
   "plugins": ["eslint", "typescript", "unicorn", "oxc", "vue"],
   "env": {
     "browser": true
@@ -15,5 +16,8 @@
         "allowTernary": true
       }
     ]
+  },
+  "options": {
+    "typeAware": true
   }
 }

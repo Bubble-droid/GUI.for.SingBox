@@ -231,7 +231,7 @@ export const restoreDns01Challenge = (
     ...template,
     ...raw,
     resolvers: ensureArray((raw as Dns01Challenge).resolvers)
-      .map(maps.dnsServers.get)
+      .map((v) => maps.dnsServers.get(v))
       .filter(Boolean) as string[],
   } as Dns01Challenge
 }

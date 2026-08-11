@@ -15,11 +15,13 @@ import {
 } from '@/stores'
 import { exitApp, handleChangeMode, message, reloadApp } from '@/utils'
 
+import type { Lang } from '@/enums/app'
+
 interface Command {
   label: string
   cmd: string
   desc?: string
-  handler?: (() => Promise<any> | any) | undefined
+  handler?: (() => MaybePromise<any>) | undefined
   children?: Command[]
 }
 
@@ -137,7 +139,7 @@ export const getCommands = () => {
             ...appStore.locales.map((v) => ({
               label: v.label,
               cmd: v.value,
-              handler: () => (appSettings.app.lang = v.value),
+              handler: () => (appSettings.app.lang = v.value as Lang),
             })),
           ],
         },

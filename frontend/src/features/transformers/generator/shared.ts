@@ -153,6 +153,6 @@ export const generateDns01Challenge = (
 ): SingBoxDns01Challenge => {
   return filterInvalidProps({
     ...dns01,
-    resolvers: dns01.resolvers.map(maps.dnsServers.get).filter(Boolean),
+    resolvers: dns01.resolvers.map((v) => maps.dnsServers.get(v)).filter(Boolean),
   })
 }

@@ -29,7 +29,9 @@ interface PluginRuntimeCache {
     modulePromise: Promise<
       {
         default?: MaybePromise<
-          (Plugin: App.Plugin) => Partial<Record<PluginTriggerEvent, (...args: any[]) => any>>
+          (
+            Plugin: App.Plugin,
+          ) => MaybePromise<Partial<Record<PluginTriggerEvent, (...args: any[]) => any>>>
         >
       } & Record<PluginTriggerEvent, MaybePromise<(...args: any[]) => any>>
     >
@@ -396,7 +398,7 @@ export const usePluginsStore = defineStore('plugins', () => {
 
         if (p === 'status') {
           plugin.status = newValue
-          updatePluginState(plugin.id, plugin)
+          void updatePluginState(plugin.id, plugin)
           return true
         }
 
@@ -792,7 +794,7 @@ export const usePluginsStore = defineStore('plugins', () => {
     const exitCode = await runPluginEvent(id, event, args)
     if (isNumber(exitCode) && exitCode !== plugin.status) {
       plugin.status = exitCode
-      editPlugin(id, plugin)
+      void editPlugin(id, plugin)
     }
     return exitCode
   }
@@ -819,20 +821,24 @@ export const usePluginsStore = defineStore('plugins', () => {
   const _watchDisabled = computed(() =>
     plugins.value
       .map((v) => v.disabled)
-      .sort()
+      .sort((a, b) => String(a).localeCompare(String(b)))
       .join(),
   )
 
   const _watchMenus = computed(() =>
     plugins.value
       .map((v) => Object.entries(v.menus).map((v) => v[0] + v[1]))
-      .sort()
+      .sort((a, b) => {
+        const strA = a.join(',')
+        const strB = b.join(',')
+        return strA.localeCompare(strB)
+      })
       .join(),
   )
 
   watch([_watchMenus, _watchDisabled], () => {
     if (appSettingsStore.app.addPluginToMenu) {
-      updateTrayAndMenus()
+      void updateTrayAndMenus()
     }
   })
 

@@ -20,7 +20,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
     scheduledtasks.value.forEach(async ({ disabled, cron, id }) => {
       if (!disabled) {
         cronJobsMap[id] = new Cron(cron, () => {
-          runScheduledTask(id)
+          void runScheduledTask(id)
         })
       }
     })
@@ -42,7 +42,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
       const failures = result.length - successes
       const details = result.flatMap((v) => v.result).join('\n')
       const content = `Successes: ${successes}; Failures: ${failures}. \n\n${details}`
-      Notify(task.name, content)
+      void Notify(task.name, content)
     }
 
     const log = {
@@ -125,7 +125,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
     scheduledtasks.value.push(s)
     try {
       cronJobsMap[s.id] = new Cron(s.cron, () => {
-        runScheduledTask(s.id)
+        void runScheduledTask(s.id)
       })
       await saveScheduledTasks()
     } catch (error) {
@@ -164,7 +164,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
         delete cronJobsMap[id]
       } else {
         cronJobsMap[id] = new Cron(s.cron, () => {
-          runScheduledTask(id)
+          void runScheduledTask(id)
         })
       }
     } catch (error) {

@@ -223,7 +223,7 @@ interface RequestWithAutoTransform extends Request {
 }
 
 export const Requests = async <T = any>(options: RequestWithAutoTransform) => {
-  const { method = 'GET', url, headers = {}, body = '', options: reqOpts = {} } = options
+  const { method, url, headers = {}, body = '', options: reqOpts = {} } = options
 
   const [reqHeaders, reqBody, finalReqOpts] = await transformRequest(headers, body, reqOpts)
   const streamEvent = (options.onStream && sampleID()) || ''

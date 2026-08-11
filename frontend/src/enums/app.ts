@@ -1,3 +1,5 @@
+import type { ValueOf } from '@/types/utils'
+
 export enum OS {
   Windows = 'windows',
   Linux = 'linux',
@@ -21,10 +23,12 @@ export enum Theme {
   Dark = 'dark',
 }
 
-export enum Lang {
-  EN = 'en',
-  ZH = 'zh',
-}
+export const Lang = {
+  EN: 'en',
+  ZH: 'zh',
+} as const
+
+export type Lang = ValueOf<typeof Lang>
 
 export enum View {
   Grid = 'grid',

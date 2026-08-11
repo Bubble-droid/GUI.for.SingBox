@@ -54,7 +54,7 @@ declare namespace App {
   }
 
   interface AppSettings {
-    lang: 'en' | 'zh' | string
+    lang: 'en' | 'zh'
     theme: Theme
     color: Color
     primaryColor: string

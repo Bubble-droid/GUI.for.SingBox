@@ -144,7 +144,7 @@ export const useCoreBranch = (isAlpha = false) => {
         await ignoredError(Exec, 'chmod', ['+x', await AbsolutePath(CoreFilePath)])
       }
 
-      refreshLocalVersion()
+      void refreshLocalVersion()
       downloadCompleted.value = true
       message.success('common.success')
     } catch (error: any) {
@@ -225,7 +225,7 @@ export const useCoreBranch = (isAlpha = false) => {
     } else {
       await doRollback()
     }
-    refreshLocalVersion()
+    void refreshLocalVersion()
     message.success('common.success')
   }
 
@@ -249,9 +249,9 @@ export const useCoreBranch = (isAlpha = false) => {
     }, 500),
   )
 
-  refreshLocalVersion()
+  void refreshLocalVersion()
   if (!envStore.env.isBundled) {
-    refreshRemoteVersion()
+    void refreshRemoteVersion()
   }
 
   return {

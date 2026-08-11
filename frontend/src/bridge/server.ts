@@ -75,7 +75,7 @@ export const StartServer = async (
           body,
         },
         {
-          end: (status, headers, body, options = { mode: 'Text' }) => {
+          end: (status, headers, body, options) => {
             EventsEmit(id, status, JSON.stringify(headers), body, JSON.stringify(options))
           },
         },

@@ -46,11 +46,11 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
       this.patchProps({ destroyOnClose: true })
       this.close()
     },
-    setProps(options: Partial<ModalProps> & Recordable) {
+    setProps(options: ModalProps) {
       props.value = options
       return this
     },
-    patchProps(options: Partial<ModalProps> & Recordable) {
+    patchProps(options: ModalProps) {
       Object.assign(props.value, options)
       return this
     },

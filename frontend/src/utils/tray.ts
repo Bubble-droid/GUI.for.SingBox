@@ -28,6 +28,8 @@ import {
   handleUseProxy,
 } from '@/utils'
 
+import type { Lang } from '@/enums/app'
+
 const getTrayIcons = () => {
   const envStore = useEnvStore()
   const appSettings = useAppSettingsStore()
@@ -142,7 +144,7 @@ const getTrayMenus = () => {
               checkable: true,
               checked: proxy.name === group.now,
               event: () => {
-                handleUseProxy(group, proxy)
+                void handleUseProxy(group, proxy)
               },
             }
           }),
@@ -165,7 +167,7 @@ const getTrayMenus = () => {
             text,
             event: () => {
               pluginsStore.manualTrigger(id, event as any).catch((err: any) => {
-                Notify('Error', err.message || err)
+                void Notify('Error', err.message || err)
               })
             },
           }
@@ -303,7 +305,7 @@ const getTrayMenus = () => {
             text: v.label,
             checkable: true,
             checked: appSettings.app.lang === v.value,
-            event: () => (appSettings.app.lang = v.value),
+            event: () => (appSettings.app.lang = v.value as Lang),
           })),
         },
       ],

@@ -283,7 +283,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
         const logs = await ReadFile(CoreLogFilePath, { Range: '-4096' }).catch((err) => String(err))
         logs.split('\n').forEach((line) => line && logsStore.recordKernelLog(line))
         end && logsStore.recordKernelLog(end)
-        onCoreStopped()
+        void onCoreStopped()
       },
       {
         PidFile: CorePidFilePath,
@@ -528,7 +528,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
   watch(needRestart, (v) => {
     if (v && appSettingsStore.app.autoRestartKernel) {
-      restartCore()
+      void restartCore()
     }
   })
 

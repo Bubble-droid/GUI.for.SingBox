@@ -10,7 +10,8 @@ import type {
   SingBoxCertificateProvider,
   SingBoxCertificateProviderOf,
 } from '@features/types/sing-box'
-import type { ValueOf } from '@features/types/utils'
+
+import type { ValueOf } from '@/types/utils'
 
 export const LogLevel = {
   Trace: 'trace',

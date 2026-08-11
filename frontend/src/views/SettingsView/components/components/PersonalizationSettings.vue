@@ -70,7 +70,7 @@ const handleOpenLocalesFolder = async () => {
           @click="appStore.loadLocales()"
         />
       </div>
-      <Radio v-model="appSettings.app.lang" :options="appStore.locales" />
+      <Radio v-model="appSettings.app.lang as string" :options="appStore.locales" />
     </div>
     <div class="px-8 py-12 flex items-center justify-between">
       <div class="text-16 font-bold">{{ $t('settings.fontFamily') }}</div>

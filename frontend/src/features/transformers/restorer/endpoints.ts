@@ -282,7 +282,7 @@ export const restoreOpenVpnServer = (
   const { listen, rest: reset1 } = restoreListen(rest, maps)
   const { udpNat, rest: final } = restoreUdpNat(reset1)
 
-  const { tls = {}, push = {} } = final
+  const { tls, push = {} } = final
 
   const pushDnsServer = createOpenVpnPushDnsServer()
 

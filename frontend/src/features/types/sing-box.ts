@@ -1,6 +1,6 @@
 import type { typebox } from '@zhexin/typebox'
 
-import type { UnpackArray } from './utils'
+import type { UnpackArray } from '../../types/utils'
 
 export type { log as SingBoxLogConfig } from '@zhexin/typebox/log'
 export type { experimental as SingBoxExperimental } from '@zhexin/typebox/experimental'
