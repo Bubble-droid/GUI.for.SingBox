@@ -68,8 +68,8 @@ dev: $(DEV_PRE_REQ)
 	$(DEV_ENV) VITE_APP_VERSION=dev wails dev -tags "$(DEV_TAGS) non_xdg" -ldflags "-X '$(GO_MODULE)/bridge.AppVersion=dev'"
 
 dev-xdg: $(DEV_PRE_REQ)
-	echo "==> Starting Wails dev mode with XDG (Version: $(APP_VERSION))..."
-	$(DEV_ENV) VITE_APP_VERSION=$(APP_VERSION) wails dev -tags "$(DEV_TAGS)" -ldflags "$(LDFLAGS_BASE)"
+	echo "==> Starting Wails dev mode with XDG (Version: dev)..."
+	$(DEV_ENV) VITE_APP_VERSION=dev wails dev -tags "$(DEV_TAGS)" -ldflags "-X '$(GO_MODULE)/bridge.AppVersion=dev'"
 
 build-frontend:
 	pnpm --dir frontend install --frozen-lockfile
