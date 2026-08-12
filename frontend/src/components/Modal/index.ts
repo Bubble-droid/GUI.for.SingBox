@@ -10,7 +10,8 @@ import {
 
 import type { Props as ModalProps, Slots as ModalSlots } from './index.vue'
 
-const Modal = defineAsyncComponent(() => import('./index.vue'))
+export const IS_IN_MODAL = 'IS_IN_MODAL'
+export const Modal = defineAsyncComponent(() => import('./index.vue'))
 
 export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}) => {
   const open = ref(false)

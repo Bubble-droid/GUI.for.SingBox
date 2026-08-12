@@ -22,7 +22,7 @@ import { getCompletions } from '@/utils/completion'
 import { message } from '@/utils/interaction'
 import { debounce } from '@/utils/others'
 
-import { IS_IN_MODAL } from '@/components/Modal/index.vue'
+import { IS_IN_MODAL } from '@/components/Modal'
 
 interface Props {
   modelValue?: string
