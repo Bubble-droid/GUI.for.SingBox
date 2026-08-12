@@ -1,15 +1,16 @@
 import {
   ref,
   defineComponent,
+  defineAsyncComponent,
   h,
   computed,
   type VNode,
   type ComponentPublicInstance,
-  type Component,
 } from 'vue'
 
-import Modal from './index.vue'
 import type { Props as ModalProps, Slots as ModalSlots } from './index.vue'
+
+const Modal = defineAsyncComponent(() => import('./index.vue'))
 
 export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}) => {
   const open = ref(false)
@@ -33,7 +34,7 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
         open: open.value,
         'onUpdate:open': (val: boolean) => (open.value = val),
       }))
-      return () => h(Modal as Component, mergedProps.value, { ...slots.value, ...ctx.slots })
+      return () => h(Modal, mergedProps.value, { ...slots.value, ...ctx.slots })
     },
   })
 
