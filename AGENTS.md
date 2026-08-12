@@ -2,6 +2,10 @@
 
 GUI.for.SingBox — a desktop GUI client for [sing-box](https://sing-box.sagernet.org/), built with [Wails v2](https://wails.io/): Go backend + Vue 3 frontend compiled into one binary. The Go module is `guiforcores` (not the repo name).
 
+## Skills
+
+`.agents/skills/` holds skill files meant to be used, not browsed. Before acting on any user task, self-select and load the skill(s) relevant to the work at hand and apply them — proactive, autonomous skill use is expected; do not wait for the user to invoke one.
+
 ## Layout
 
 - `main.go` — Wails entrypoint; embeds the built frontend via `//go:embed all:frontend/dist`.
