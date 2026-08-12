@@ -4,11 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "dev": "run-p -x type-check:watch dev:server",
+    "dev:server": "vite --host",
+    "build": "run-p -x type-check \"build-only {@}\" --",
     "build-only": "vite build",
-    "type-check": "vue-tsc --build",
-    "lint": "run-s \"lint:*\"",
+    "type-check": "golar tsc --build",
+    "type-check:watch": "golar tsc --build --watch",
+    "lint": "run-s -x \"lint:*\"",
     "lint:oxlint": "oxlint --fix --fix-suggestions .",
     "lint:eslint": "eslint --fix --cache .",
     "format": "oxfmt --no-error-on-unmatched-pattern src/",
@@ -38,9 +40,11 @@
     "yaml": "^2.9.0"
   },
   "devDependencies": {
+    "@golar/vue": "^0.1.10",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "26.1.2",
     "@types/prismjs": "^1.26.6",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/eslint-config-typescript": "^14.9.0",
     "@vue/tsconfig": "^0.9.1",
@@ -49,6 +53,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-oxlint": "^1.77.0",
     "eslint-plugin-vue": "^10.10.0",
+    "golar": "^0.1.10",
     "husky": "^9.1.7",
     "less": "^4.8.1",
     "lint-staged": "^17.3.0",
@@ -56,8 +61,7 @@
     "oxfmt": "^0.62.0",
     "oxlint": "^1.77.0",
     "oxlint-tsgolint": "^7.0.2001",
-    "typescript": "~6.0.3",
-    "vite": "8.2.0",
-    "vue-tsc": "^3.3.9"
+    "typescript": "npm:@typescript/typescript6@~6.0.2",
+    "vite": "8.2.0"
   }
 }
