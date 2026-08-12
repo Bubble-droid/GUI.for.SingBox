@@ -11,7 +11,8 @@ import { OS } from '@/enums/app'
 import { loadLocale } from '@/lang'
 import { APP_VERSION, APP_IDENTIFIER, APP_VERSION_API } from '@/utils/env'
 import { confirm, message, modal } from '@/utils/interaction'
-import { sleep, sampleID, getGitHubApiAuthorization } from '@/utils/others'
+import { sleep, getGitHubApiAuthorization } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import AboutView from '@/components/_common/AboutView.vue'
 

@@ -4,7 +4,7 @@ import { computed, markRaw, provide, ref, watch } from 'vue'
 import { useBool } from '@/hooks/useBool'
 import { useAppStore } from '@/stores/app'
 import { message } from '@/utils/interaction'
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import { IS_IN_MODAL } from './index'
 

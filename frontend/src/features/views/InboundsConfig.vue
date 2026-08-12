@@ -13,7 +13,7 @@ import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
 import { picker } from '@/utils/interaction'
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 const model = defineModel<InboundConfig[]>({ required: true })
 

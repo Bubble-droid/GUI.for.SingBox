@@ -22,7 +22,7 @@ import type {
   OpenConnectFormEntry,
 } from '@profiles/endpoints'
 
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import { restoreDialer, restoreUdpNat, restoreListen } from './shared'
 import type { IdMaps } from './types'

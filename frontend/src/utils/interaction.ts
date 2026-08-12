@@ -19,7 +19,8 @@ import type { ResourceSelectProps } from '@/components/ResourceSelect/index.vue'
 
 import { bindAppContext } from './appContext'
 import { APP_TITLE } from './env'
-import { sampleID, normalizeErrorMessage } from './others'
+import { normalizeErrorMessage } from './others'
+import { sampleID } from './secure'
 
 const ContainerCssText = `
     position: fixed;

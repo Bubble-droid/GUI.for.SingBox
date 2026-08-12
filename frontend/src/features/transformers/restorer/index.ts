@@ -5,7 +5,7 @@ import type { Profile } from '@profiles'
 import type { LogConfig } from '@profiles/log'
 
 import { useProfilesStore } from '@/stores/profiles'
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import { restoreCertificate } from './certificate'
 import { restoreCertificateProviders } from './certificate_provider'

@@ -7,7 +7,7 @@ import { useAppSettingsStore } from '@/stores/appSettings'
 import { useSubscribesStore } from '@/stores/subscribes'
 import { exitApp } from '@/utils/helper'
 import { modal, message } from '@/utils/interaction'
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import CommandView from '@/components/_common/CommandView.vue'
 

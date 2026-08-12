@@ -106,8 +106,6 @@ export const ignoredError = async <F extends (...args: any[]) => Promise<any>>(
   }
 }
 
-export const sampleID = () => 'ID_' + Math.random().toString(36).substring(2, 10)
-
 export const generateSecureKey = (bits = 256) => {
   const bytes = bits / 8
   const array = new Uint8Array(bytes)

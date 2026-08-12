@@ -6,7 +6,8 @@ import { useI18n } from 'vue-i18n'
 
 import { useRulesetsStore } from '@/stores/rulesets'
 import { message } from '@/utils/interaction'
-import { sampleID, deepClone } from '@/utils/others'
+import { deepClone } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import Button from '@/components/Button/index.vue'
 

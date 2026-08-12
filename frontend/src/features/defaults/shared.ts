@@ -26,7 +26,7 @@ import type {
   Dns01ChallengeBase,
 } from '@profiles/shared'
 
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 export const DefaultOutboundIds = {
   Select: 'outbound-select',

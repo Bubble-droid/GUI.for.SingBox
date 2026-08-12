@@ -13,7 +13,8 @@ import { useSubscribesStore } from '@/stores/subscribes'
 import { formatDate } from '@/utils/format'
 import { alert, message } from '@/utils/interaction'
 import { isValidCron } from '@/utils/is'
-import { sampleID, deepClone } from '@/utils/others'
+import { deepClone } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import Button from '@/components/Button/index.vue'
 

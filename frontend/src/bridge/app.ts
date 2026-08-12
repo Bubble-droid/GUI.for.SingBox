@@ -5,7 +5,7 @@ import {
   SendNotification,
 } from '@wails/runtime/runtime'
 
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 export const RestartApp = Bridge.RestartApp
 

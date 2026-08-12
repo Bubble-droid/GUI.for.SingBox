@@ -17,9 +17,9 @@ import {
   omitArray,
   stringifyNoFolding,
   buildSmartRegExp,
-  sampleID,
   asyncPool,
 } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import { usePluginsStore } from './plugins'
 

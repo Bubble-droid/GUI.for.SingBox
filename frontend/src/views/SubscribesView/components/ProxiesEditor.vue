@@ -6,7 +6,8 @@ import { WriteFile, ReadFile } from '@/bridge/io'
 
 import { useSubscribesStore } from '@/stores/subscribes'
 import { message } from '@/utils/interaction'
-import { deepClone, sampleID, omitArray, ignoredError } from '@/utils/others'
+import { deepClone, omitArray, ignoredError } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import Button from '@/components/Button/index.vue'
 

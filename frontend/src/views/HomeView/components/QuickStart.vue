@@ -6,7 +6,7 @@ import { useAppSettingsStore } from '@/stores/appSettings'
 import { useProfilesStore } from '@/stores/profiles'
 import { useSubscribesStore } from '@/stores/subscribes'
 import { message } from '@/utils/interaction'
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/secure'
 
 import Button from '@/components/Button/index.vue'
 

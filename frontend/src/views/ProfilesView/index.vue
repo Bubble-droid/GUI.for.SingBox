@@ -14,7 +14,8 @@ import { usePluginsStore } from '@/stores/plugins.ts'
 import { useProfilesStore } from '@/stores/profiles.ts'
 import { useSubscribesStore } from '@/stores/subscribes.ts'
 import { alert, message, modal } from '@/utils/interaction.ts'
-import { deepClone, sampleID, debounce } from '@/utils/others.ts'
+import { deepClone, debounce } from '@/utils/others.ts'
+import { sampleID } from '@/utils/secure.ts'
 
 import CodeViewer from '@/components/CodeViewer/index.vue'
 
