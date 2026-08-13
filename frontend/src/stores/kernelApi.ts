@@ -38,7 +38,7 @@ import { updateTrayAndMenus } from '@/utils/tray'
 
 import type { CoreApiConfig, CoreApiProxy } from '@/types/kernel'
 
-import { useStoreDeps } from './deps'
+import { StoreDep, useStoreDeps } from './deps'
 
 export type ProxyType = 'mixed' | 'http' | 'socks'
 export interface ProxyEndpoint {
@@ -51,13 +51,13 @@ export interface ProxyEndpoint {
 }
 
 export const useKernelApiStore = defineStore('kernelApi', () => {
-  const envStore = useStoreDeps('envStore')
-  const logsStore = useStoreDeps('logsStore')
-  const pluginsStore = useStoreDeps('pluginsStore')
-  const profilesStore = useStoreDeps('profilesStore')
-  const subscribesStore = useStoreDeps('subscribesStore')
-  const rulesetsStore = useStoreDeps('rulesetsStore')
-  const appSettingsStore = useStoreDeps('appSettingsStore')
+  const envStore = useStoreDeps(StoreDep.EnvStore)
+  const logsStore = useStoreDeps(StoreDep.LogsStore)
+  const pluginsStore = useStoreDeps(StoreDep.PluginsStore)
+  const profilesStore = useStoreDeps(StoreDep.ProfilesStore)
+  const subscribesStore = useStoreDeps(StoreDep.SubscribesStore)
+  const rulesetsStore = useStoreDeps(StoreDep.RulesetsStore)
+  const appSettingsStore = useStoreDeps(StoreDep.AppSettingsStore)
 
   /** RESTful API */
   const config = ref<CoreApiConfig>({

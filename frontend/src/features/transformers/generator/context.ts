@@ -1,13 +1,13 @@
 import type { GenerateContext } from '@generator/types'
 
-import { useStoreDeps } from '@/stores/deps'
+import { StoreDep, useStoreDeps } from '@/stores/deps'
 
 export const getGenerateContext = (): GenerateContext => {
-  const appSettingsStore = useStoreDeps('appSettingsStore')
-  const envStore = useStoreDeps('envStore')
-  const pluginsStore = useStoreDeps('pluginsStore')
-  const subscribesStore = useStoreDeps('subscribesStore')
-  const ruleSetStore = useStoreDeps('rulesetsStore')
+  const appSettingsStore = useStoreDeps(StoreDep.AppSettingsStore)
+  const envStore = useStoreDeps(StoreDep.EnvStore)
+  const pluginsStore = useStoreDeps(StoreDep.PluginsStore)
+  const subscribesStore = useStoreDeps(StoreDep.SubscribesStore)
+  const ruleSetStore = useStoreDeps(StoreDep.RulesetsStore)
 
   return {
     appSettings: appSettingsStore.app,

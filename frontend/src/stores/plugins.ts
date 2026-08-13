@@ -20,7 +20,7 @@ import {
 } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
-import { useStoreDeps } from './deps'
+import { StoreDep, useStoreDeps } from './deps'
 
 interface PluginRuntimeCache {
   plugin: App.Plugin
@@ -102,7 +102,7 @@ const PluginsTriggerMap: Partial<
 }
 
 export const usePluginsStore = defineStore('plugins', () => {
-  const appSettingsStore = useStoreDeps('appSettingsStore')
+  const appSettingsStore = useStoreDeps(StoreDep.AppSettingsStore)
 
   const plugins = ref<App.Plugin[]>([])
   const pluginHub = ref<App.Plugin[]>([])

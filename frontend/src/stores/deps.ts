@@ -1,3 +1,5 @@
+import type { ValueOf } from '@/types/utils'
+
 import type { useAppStore } from './app'
 import type { useAppSettingsStore } from './appSettings'
 import type { useEnvStore } from './env'
@@ -9,29 +11,50 @@ import type { useRulesetsStore } from './rulesets'
 import type { useScheduledTasksStore } from './scheduledtasks'
 import type { useSubscribesStore } from './subscribes'
 
+export const StoreDep = {
+  AppStore: 'appStore',
+  AppSettingsStore: 'appSettingsStore',
+  EnvStore: 'envStore',
+  KernelApiStore: 'kernelApiStore',
+  LogsStore: 'logsStore',
+  PluginsStore: 'pluginsStore',
+  ProfilesStore: 'profilesStore',
+  RulesetsStore: 'rulesetsStore',
+  ScheduledTasksStore: 'scheduledTasksStore',
+  SubscribesStore: 'subscribesStore',
+} as const
+
+type StoreDep = ValueOf<typeof StoreDep>
+
 export interface StoreDeps {
-  appStore: ReturnType<typeof useAppStore>
-  appSettingsStore: ReturnType<typeof useAppSettingsStore>
-  envStore: ReturnType<typeof useEnvStore>
-  kernelApiStore: ReturnType<typeof useKernelApiStore>
-  logsStore: ReturnType<typeof useLogsStore>
-  pluginsStore: ReturnType<typeof usePluginsStore>
-  profilesStore: ReturnType<typeof useProfilesStore>
-  rulesetsStore: ReturnType<typeof useRulesetsStore>
-  scheduledTasksStore: ReturnType<typeof useScheduledTasksStore>
-  subscribesStore: ReturnType<typeof useSubscribesStore>
+  [StoreDep.AppStore]: ReturnType<typeof useAppStore>
+  [StoreDep.AppSettingsStore]: ReturnType<typeof useAppSettingsStore>
+  [StoreDep.EnvStore]: ReturnType<typeof useEnvStore>
+  [StoreDep.KernelApiStore]: ReturnType<typeof useKernelApiStore>
+  [StoreDep.LogsStore]: ReturnType<typeof useLogsStore>
+  [StoreDep.PluginsStore]: ReturnType<typeof usePluginsStore>
+  [StoreDep.ProfilesStore]: ReturnType<typeof useProfilesStore>
+  [StoreDep.RulesetsStore]: ReturnType<typeof useRulesetsStore>
+  [StoreDep.ScheduledTasksStore]: ReturnType<typeof useScheduledTasksStore>
+  [StoreDep.SubscribesStore]: ReturnType<typeof useSubscribesStore>
 }
 
-type StoreDepsProvider = { [K in keyof StoreDeps]: () => StoreDeps[K] }
+type StoreDepsProvider = { [K in StoreDep]: () => StoreDeps[K] }
 
-const providers: Partial<StoreDepsProvider> = {}
+const createStoreDeps = () => {
+  const providers: Partial<StoreDepsProvider> = {}
 
-export const registerStoreDeps = (deps: StoreDepsProvider) => {
-  Object.assign(providers, deps)
+  const registerStoreDeps = (deps: StoreDepsProvider) => {
+    Object.assign(providers, deps)
+  }
+
+  const useStoreDeps = <K extends StoreDep>(key: K): StoreDeps[K] => {
+    const provider = providers[key]
+    if (!provider) throw `Store dependency '${key}' has not been injected yet`
+    return provider()
+  }
+
+  return { registerStoreDeps, useStoreDeps }
 }
 
-export const useStoreDeps = <K extends keyof StoreDeps>(key: K): StoreDeps[K] => {
-  const provider = providers[key]
-  if (!provider) throw `Store dependency '${key}' has not been injected yet`
-  return provider()
-}
+export const { registerStoreDeps, useStoreDeps } = createStoreDeps()

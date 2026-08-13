@@ -1,11 +1,11 @@
-import { useStoreDeps } from '@/stores/deps'
+import { StoreDep, useStoreDeps } from '@/stores/deps'
 
 import type { RestoreContext } from './types'
 
 export const getRestoreContext = (): RestoreContext => {
-  const envStore = useStoreDeps('envStore')
-  const subscribesStore = useStoreDeps('subscribesStore')
-  const ruleSetStore = useStoreDeps('rulesetsStore')
+  const envStore = useStoreDeps(StoreDep.EnvStore)
+  const subscribesStore = useStoreDeps(StoreDep.SubscribesStore)
+  const ruleSetStore = useStoreDeps(StoreDep.RulesetsStore)
 
   return {
     appEnv: envStore.env,

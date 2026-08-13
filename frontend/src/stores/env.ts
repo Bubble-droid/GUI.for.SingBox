@@ -8,11 +8,11 @@ import { formatProxyHost } from '@/utils/format'
 import { ignoredError } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
-import { useStoreDeps } from './deps'
+import { StoreDep, useStoreDeps } from './deps'
 
 export const useEnvStore = defineStore('env', () => {
-  const appSettings = useStoreDeps('appSettingsStore')
-  const kernelApiStore = useStoreDeps('kernelApiStore')
+  const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
+  const kernelApiStore = useStoreDeps(StoreDep.KernelApiStore)
 
   const env = ref<App.AppEnv>({
     appName: '',
