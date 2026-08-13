@@ -3,7 +3,7 @@ import type { OutboundConfig } from '@profiles/outbounds'
 
 import { DefaultTestURL } from '@/constant/app'
 import i18n from '@/lang'
-import { sampleID } from '@/utils/secure'
+import { sampleID } from '@/utils/others'
 
 import { DefaultOutboundIds } from './shared'
 

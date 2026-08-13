@@ -4,7 +4,7 @@ import type { SingBoxConfig, SingBoxEndpoint } from '@features/types/sing-box'
 import type { Profile } from '@profiles'
 import type { LogConfig } from '@profiles/log'
 
-import { sampleID } from '@/utils/secure'
+import { sampleID } from '@/utils/others'
 
 import { restoreCertificate } from './certificate'
 import { restoreCertificateProviders } from './certificate_provider'

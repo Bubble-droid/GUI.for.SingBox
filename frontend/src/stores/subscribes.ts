@@ -16,10 +16,10 @@ import {
   omitArray,
   stringifyNoFolding,
   buildSmartRegExp,
+  sampleID,
   asyncPool,
 } from '@/utils/others'
 import { GetRequestProxy } from '@/utils/request'
-import { sampleID } from '@/utils/secure'
 
 import { StoreDep, useStoreDeps } from './deps'
 

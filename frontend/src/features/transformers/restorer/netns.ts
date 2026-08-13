@@ -3,7 +3,7 @@ import { NetnsType } from '@features/constant/kernel'
 import type { SingBoxNetns, SingBoxNetnsOf } from '@features/types/sing-box'
 import type { NetnsConfig, NetnsDefault, NetnsUnshare } from '@profiles/netns'
 
-import { sampleID } from '@/utils/secure'
+import { sampleID } from '@/utils/others'
 
 import type { IdMaps } from './types'
 

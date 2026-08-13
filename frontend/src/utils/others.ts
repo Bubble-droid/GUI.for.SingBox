@@ -106,6 +106,17 @@ export const ignoredError = async <F extends (...args: any[]) => Promise<any>>(
   }
 }
 
+export const sampleID = () => 'ID_' + Math.random().toString(36).substring(2, 10)
+
+export const generateSecureKey = (bits = 256) => {
+  const bytes = bits / 8
+  const array = new Uint8Array(bytes)
+  crypto.getRandomValues(array)
+  return Array.from(array)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
 export const getValue = <T = unknown>(obj: unknown, expr: string): T | undefined => {
   return expr.split('.').reduce<unknown>((value, key) => {
     if (value && typeof value === 'object') {

@@ -11,8 +11,7 @@ import { OS } from '@/enums/app'
 import { loadLocale } from '@/lang'
 import { APP_VERSION, APP_IDENTIFIER, APP_VERSION_API } from '@/utils/env'
 import { confirm, message } from '@/utils/interaction'
-import { sleep, getGitHubApiAuthorization } from '@/utils/others'
-import { sampleID } from '@/utils/secure'
+import { sleep, sampleID, getGitHubApiAuthorization } from '@/utils/others'
 
 import type { GitHubApiRelease } from '@/types/github'
 

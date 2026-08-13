@@ -3,7 +3,7 @@ import { computed, markRaw, provide, ref, watch } from 'vue'
 
 import { useBool } from '@/hooks/useBool'
 import { message } from '@/utils/interaction'
-import { sampleID } from '@/utils/secure'
+import { sampleID } from '@/utils/others'
 
 import { IS_IN_MODAL, modalStack, modalZIndexCounter, modalMinimized } from './state'
 

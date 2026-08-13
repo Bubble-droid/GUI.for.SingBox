@@ -8,7 +8,7 @@ import {
 } from '@features/constant/kernel'
 import type { RouteRuleConfig, RuleSetConfig, RouteConfig } from '@profiles/route'
 
-import { sampleID } from '@/utils/secure'
+import { sampleID } from '@/utils/others'
 
 import {
   DefaultInboundIds,

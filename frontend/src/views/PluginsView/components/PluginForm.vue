@@ -7,8 +7,7 @@ import { PluginTrigger } from '@/enums/app'
 import { useBool } from '@/hooks/useBool'
 import { usePluginsStore } from '@/stores/plugins'
 import { message } from '@/utils/interaction'
-import { deepClone } from '@/utils/others'
-import { sampleID } from '@/utils/secure'
+import { sampleID, deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 
