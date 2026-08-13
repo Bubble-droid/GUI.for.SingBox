@@ -385,8 +385,11 @@ export const getKernelAssetFileName = (version: string) => {
 export const processMagicVariables = (str: string) => {
   const { env } = useStoreDeps(StoreDep.EnvStore)
   let result = str
+  const coreBasePath = `${env.appDataPath}/sing-box`
   Object.entries({
-    $CORE_BASE_PATH: `${env.appDataPath}/sing-box`,
+    '$APP_BASE_PATH/$CORE_BASE_PATH': coreBasePath,
+    $APP_BASE_PATH: env.basePath,
+    $CORE_BASE_PATH: coreBasePath,
   }).forEach(([source, target]) => {
     result = result.replaceAll(source, target)
   })
