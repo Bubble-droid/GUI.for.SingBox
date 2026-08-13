@@ -23,7 +23,7 @@ export const restoreRouteRuleset = (
       }
     } else if (raw['type'] === RuleSetType.Local) {
       if ('path' in raw) {
-        const r = ctx.getRuleSetByPath(raw['path'].replace(`${ctx.appEnv.appDataPath}/`, 'data/'))
+        const r = ctx.getRuleSetByPath(raw['path']?.replace(`${ctx.appEnv.appDataPath}/`, 'data/'))
         if (r) {
           ruleset.path = r.id
         } else {

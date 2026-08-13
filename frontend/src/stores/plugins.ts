@@ -1,6 +1,6 @@
 import type { Profile } from '@profiles'
 import { defineStore } from 'pinia'
-import { computed, readonly, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { parse } from 'yaml'
 
 import { ReadFile, WriteFile, RemoveFile } from '@/bridge/io'
@@ -17,6 +17,7 @@ import {
   omitArray,
   stringifyNoFolding,
   asyncPool,
+  readonly,
 } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
