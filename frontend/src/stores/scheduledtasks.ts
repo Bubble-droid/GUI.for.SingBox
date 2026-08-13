@@ -10,10 +10,7 @@ import { ScheduledTasksFilePath } from '@/constant/app'
 import { ScheduledTasksType, PluginTriggerEvent } from '@/enums/app'
 import { ignoredError, stringifyNoFolding } from '@/utils/others'
 
-import { useLogsStore } from './logs'
-import { usePluginsStore } from './plugins'
-import { useRulesetsStore } from './rulesets'
-import { useSubscribesStore } from './subscribes'
+import { useStoreDeps } from './deps'
 
 export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
   const scheduledtasks = ref<App.ScheduledTask[]>([])
@@ -36,7 +33,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
     const task = getScheduledTaskById(id)
     if (!task) return
 
-    const logsStore = useLogsStore()
+    const logsStore = useStoreDeps('logsStore')
 
     task.lastTime = Date.now()
 
@@ -87,31 +84,31 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
   const getTaskFn = (task: App.ScheduledTask) => {
     switch (task.type) {
       case ScheduledTasksType.UpdateSubscription: {
-        const subscribesStore = useSubscribesStore()
+        const subscribesStore = useStoreDeps('subscribesStore')
         return withOutput(task.subscriptions, subscribesStore.updateSubscribe)
       }
       case ScheduledTasksType.UpdateRuleset: {
-        const rulesetsStore = useRulesetsStore()
+        const rulesetsStore = useStoreDeps('rulesetsStore')
         return withOutput(task.rulesets, rulesetsStore.updateRuleset)
       }
       case ScheduledTasksType.UpdatePlugin: {
-        const pluginsStores = usePluginsStore()
+        const pluginsStores = useStoreDeps('pluginsStore')
         return withOutput(task.plugins, pluginsStores.updatePlugin)
       }
       case ScheduledTasksType.UpdateAllSubscription: {
-        const subscribesStore = useSubscribesStore()
+        const subscribesStore = useStoreDeps('subscribesStore')
         return withOutput(['0'], () => subscribesStore.updateSubscribes())
       }
       case ScheduledTasksType.UpdateAllRuleset: {
-        const rulesetsStore = useRulesetsStore()
+        const rulesetsStore = useStoreDeps('rulesetsStore')
         return withOutput(['1'], () => rulesetsStore.updateRulesets())
       }
       case ScheduledTasksType.UpdateAllPlugin: {
-        const pluginsStores = usePluginsStore()
+        const pluginsStores = useStoreDeps('pluginsStore')
         return withOutput(['2'], () => pluginsStores.updatePlugins())
       }
       case ScheduledTasksType.RunPlugin: {
-        const pluginsStores = usePluginsStore()
+        const pluginsStores = useStoreDeps('pluginsStore')
         return withOutput(task.plugins, async (id: string) =>
           pluginsStores.manualTrigger(id, PluginTriggerEvent.OnTask),
         )

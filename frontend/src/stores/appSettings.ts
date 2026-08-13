@@ -38,12 +38,11 @@ import { message } from '@/utils/interaction'
 import { debounce, ignoredError, deepClone } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
-import { useAppStore } from './app'
-import { useEnvStore } from './env'
+import { useStoreDeps } from './deps'
 
 export const useAppSettingsStore = defineStore('app-settings', () => {
-  const appStore = useAppStore()
-  const envStore = useEnvStore()
+  const appStore = useStoreDeps('appStore')
+  const envStore = useStoreDeps('envStore')
 
   let latestUserSettings: string
 

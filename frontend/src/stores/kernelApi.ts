@@ -39,13 +39,7 @@ import { updateTrayAndMenus } from '@/utils/tray'
 
 import type { CoreApiConfig, CoreApiProxy } from '@/types/kernel'
 
-import { useAppSettingsStore } from './appSettings'
-import { useEnvStore } from './env'
-import { useLogsStore } from './logs'
-import { usePluginsStore } from './plugins'
-import { useProfilesStore } from './profiles'
-import { useRulesetsStore } from './rulesets'
-import { useSubscribesStore } from './subscribes'
+import { useStoreDeps } from './deps'
 
 export type ProxyType = 'mixed' | 'http' | 'socks'
 export interface ProxyEndpoint {
@@ -58,13 +52,13 @@ export interface ProxyEndpoint {
 }
 
 export const useKernelApiStore = defineStore('kernelApi', () => {
-  const envStore = useEnvStore()
-  const logsStore = useLogsStore()
-  const pluginsStore = usePluginsStore()
-  const profilesStore = useProfilesStore()
-  const subscribesStore = useSubscribesStore()
-  const rulesetsStore = useRulesetsStore()
-  const appSettingsStore = useAppSettingsStore()
+  const envStore = useStoreDeps('envStore')
+  const logsStore = useStoreDeps('logsStore')
+  const pluginsStore = useStoreDeps('pluginsStore')
+  const profilesStore = useStoreDeps('profilesStore')
+  const subscribesStore = useStoreDeps('subscribesStore')
+  const rulesetsStore = useStoreDeps('rulesetsStore')
+  const appSettingsStore = useStoreDeps('appSettingsStore')
 
   let generateCtxProvider: (() => GenerateContext) | undefined
 

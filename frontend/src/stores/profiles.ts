@@ -11,10 +11,10 @@ import { eventBus } from '@/utils/eventBus'
 import { migrateProfiles } from '@/utils/migration'
 import { ignoredError, stringifyNoFolding } from '@/utils/others'
 
-import { useAppSettingsStore } from './appSettings'
+import { useStoreDeps } from './deps'
 
 export const useProfilesStore = defineStore('profiles', () => {
-  const appSettingsStore = useAppSettingsStore()
+  const appSettingsStore = useStoreDeps('appSettingsStore')
 
   const profiles = ref<Profile[]>([])
   const currentProfile = computed(() => getProfileById(appSettingsStore.app.kernel.profile))

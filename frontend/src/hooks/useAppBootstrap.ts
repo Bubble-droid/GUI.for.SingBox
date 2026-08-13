@@ -3,9 +3,12 @@ import { ref } from 'vue'
 
 import { IsStartup } from '@/bridge/app'
 
+import { useAppStore } from '@/stores/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
+import { registerStoreDeps } from '@/stores/deps'
 import { useEnvStore } from '@/stores/env'
 import { useKernelApiStore } from '@/stores/kernelApi'
+import { useLogsStore } from '@/stores/logs'
 import { usePluginsStore } from '@/stores/plugins'
 import { useProfilesStore } from '@/stores/profiles'
 import { useRulesetsStore } from '@/stores/rulesets'
@@ -20,6 +23,19 @@ export const useAppBootstrap = () => {
   const loading = ref(true)
   const percent = ref(0)
   const hasError = ref(false)
+
+  registerStoreDeps({
+    appStore: () => useAppStore(),
+    appSettingsStore: () => useAppSettingsStore(),
+    envStore: () => useEnvStore(),
+    kernelApiStore: () => useKernelApiStore(),
+    logsStore: () => useLogsStore(),
+    pluginsStore: () => usePluginsStore(),
+    profilesStore: () => useProfilesStore(),
+    rulesetsStore: () => useRulesetsStore(),
+    scheduledTasksStore: () => useScheduledTasksStore(),
+    subscribesStore: () => useSubscribesStore(),
+  })
 
   const envStore = useEnvStore()
   const appSettings = useAppSettingsStore()

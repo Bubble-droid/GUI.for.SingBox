@@ -18,7 +18,7 @@ import AboutView from '@/components/_common/AboutView.vue'
 
 import type { GitHubApiRelease } from '@/types/github'
 
-import { useEnvStore } from './env'
+import { useStoreDeps } from './deps'
 
 export const useAppStore = defineStore('app', () => {
   const isAppExiting = ref(false)
@@ -99,7 +99,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const { t } = useI18n()
-  const envStore = useEnvStore()
+  const envStore = useStoreDeps('envStore')
 
   /* About Page */
   const showAbout = ref(false)

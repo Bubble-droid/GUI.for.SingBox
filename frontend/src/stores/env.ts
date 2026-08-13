@@ -8,12 +8,11 @@ import { formatProxyHost } from '@/utils/format'
 import { ignoredError } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
-import { useAppSettingsStore } from './appSettings'
-import { useKernelApiStore } from './kernelApi'
+import { useStoreDeps } from './deps'
 
 export const useEnvStore = defineStore('env', () => {
-  const appSettings = useAppSettingsStore()
-  const kernelApiStore = useKernelApiStore()
+  const appSettings = useStoreDeps('appSettingsStore')
+  const kernelApiStore = useStoreDeps('kernelApiStore')
 
   const env = ref<App.AppEnv>({
     appName: '',
@@ -45,7 +44,6 @@ export const useEnvStore = defineStore('env', () => {
   }
 
   const updateSystemProxyStatus = async () => {
-    const kernelApiStore = useKernelApiStore()
     const proxyServer = (await ignoredError(GetSystemProxy)) || ''
 
     if (!proxyServer) {

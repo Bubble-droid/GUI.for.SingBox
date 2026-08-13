@@ -21,7 +21,7 @@ import {
 import { GetRequestProxy } from '@/utils/request'
 import { sampleID } from '@/utils/secure'
 
-import { usePluginsStore } from './plugins'
+import { useStoreDeps } from './deps'
 
 export const useSubscribesStore = defineStore('subscribes', () => {
   const subscribes = ref<App.Subscription[]>([])
@@ -136,7 +136,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       throw 'Not a valid subscription data'
     }
 
-    const pluginStore = usePluginsStore()
+    const pluginStore = useStoreDeps('pluginsStore')
 
     proxies = await pluginStore.onSubscribeTrigger(proxies, s)
 
