@@ -1,5 +1,6 @@
 import { createInboundMixed } from '@defaults/inbounds'
 import { Inbound, TunStack, RuleSetType } from '@features/constant/kernel'
+import type { GenerateContext } from '@generator/types'
 import type { Profile } from '@profiles'
 import { restoreProfile } from '@restorer'
 import { defineStore } from 'pinia'
@@ -32,7 +33,8 @@ import { eventBus } from '@/utils/eventBus'
 import { generateConfigFile } from '@/utils/generator'
 import { getKernelFileName, getKernelRuntimeArgs, getKernelRuntimeEnv } from '@/utils/helper'
 import { message } from '@/utils/interaction'
-import { deepClone, sleep, normalizeProxyHost } from '@/utils/others'
+import { normalizeProxyHost } from '@/utils/normalize'
+import { deepClone, sleep } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
 import type { CoreApiConfig, CoreApiProxy } from '@/types/kernel'
@@ -346,7 +348,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     coreStoppedResolver(null)
   }
 
-  const startCore = async (_profile?: Profile) => {
+  const startCore = async (ctx: GenerateContext, _profile?: Profile) => {
     if (running.value) throw 'The core is already running'
 
     logsStore.clearKernelLog()
@@ -361,8 +363,10 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
     starting.value = true
     try {
-      await generateConfigFile(profile, (config) =>
-        pluginsStore.onBeforeCoreStartTrigger(config, profile),
+      await generateConfigFile(
+        profile,
+        (config) => pluginsStore.onBeforeCoreStartTrigger(config, profile),
+        ctx,
       )
       const isAlpha = branch === Branch.Alpha
       const pid = await runCoreProcess(isAlpha)
@@ -385,12 +389,16 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     }
   }
 
-  const restartCore = async (cleanupTask?: () => Promise<any>, keepRuntimeProfile = false) => {
+  const restartCore = async (
+    ctx: GenerateContext,
+    cleanupTask?: () => Promise<any>,
+    keepRuntimeProfile = false,
+  ) => {
     restarting.value = true
     try {
       await stopCore()
       await cleanupTask?.()
-      await startCore(keepRuntimeProfile ? runtimeProfile : undefined)
+      await startCore(ctx, keepRuntimeProfile ? runtimeProfile : undefined)
     } finally {
       needRestart.value = false
       restarting.value = false

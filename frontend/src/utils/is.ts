@@ -1,7 +1,7 @@
 import { Cron } from 'croner'
 import { parse } from 'yaml'
 
-import { normalizeBase64 } from './others'
+import { normalizeBase64 } from './normalize'
 
 export const isValidBase64 = (str: string) => {
   if (typeof str !== 'string') return false

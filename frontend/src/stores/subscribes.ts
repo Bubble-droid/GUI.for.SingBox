@@ -9,7 +9,6 @@ import { DefaultSubscribeScript, SubscribesFilePath } from '@/constant/app'
 import { DefaultExcludeProtocols } from '@/constant/kernel'
 import { PluginTriggerEvent, RequestMethod, RequestProxyMode } from '@/enums/app'
 import { eventBus } from '@/utils/eventBus'
-import { GetRequestProxy } from '@/utils/helper'
 import { isValidSubJson, isValidSubYAML, isValidBase64 } from '@/utils/is'
 import { migrateSubscribes } from '@/utils/migration'
 import {
@@ -19,6 +18,7 @@ import {
   buildSmartRegExp,
   asyncPool,
 } from '@/utils/others'
+import { GetRequestProxy } from '@/utils/request'
 import { sampleID } from '@/utils/secure'
 
 import { usePluginsStore } from './plugins'

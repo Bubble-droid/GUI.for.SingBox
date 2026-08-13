@@ -47,10 +47,12 @@ export enum Color {
   Custom = 'custom',
 }
 
-export enum Branch {
-  Main = 'main',
-  Alpha = 'alpha',
-}
+export const Branch = {
+  Main: 'main',
+  Alpha: 'alpha',
+} as const
+
+export type Branch = ValueOf<typeof Branch>
 
 export enum RequestProxyMode {
   Global = 'global',

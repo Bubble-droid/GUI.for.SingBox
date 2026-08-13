@@ -1,11 +1,11 @@
 import { stringify } from 'yaml'
 
 import { OS } from '@/enums/app'
-import { useAppSettingsStore } from '@/stores/appSettings'
 import appDts from '@/types/app.d.ts?raw'
 
 import { APP_TITLE, APP_VERSION } from './env'
 import { isValidIPv4, isValidIPv6 } from './is'
+import { normalizeBase64 } from './normalize'
 
 export const getAppDts = () => appDts
 
@@ -104,15 +104,6 @@ export const ignoredError = async <F extends (...args: any[]) => Promise<any>>(
   } catch {
     return undefined
   }
-}
-
-export const generateSecureKey = (bits = 256) => {
-  const bytes = bits / 8
-  const array = new Uint8Array(bytes)
-  crypto.getRandomValues(array)
-  return Array.from(array)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
 }
 
 export const getValue = <T = unknown>(obj: unknown, expr: string): T | undefined => {
@@ -221,21 +212,18 @@ export const createAsyncPool = <T, K>(
   return { run, controller }
 }
 
-export const getUserAgent = () => {
-  const appSettings = useAppSettingsStore()
-  return appSettings.app.userAgent || APP_TITLE + '/' + APP_VERSION
+export const getUserAgent = (appSettings: App.AppSettings) => {
+  return appSettings.userAgent || APP_TITLE + '/' + APP_VERSION
 }
 
-export const getGitHubApiAuthorization = () => {
-  const appSettings = useAppSettingsStore()
-  return appSettings.app.githubApiToken ? `Bearer ${appSettings.app.githubApiToken}` : ''
+export const getGitHubApiAuthorization = (appSettings: App.AppSettings) => {
+  return appSettings.githubApiToken ? `Bearer ${appSettings.githubApiToken}` : ''
 }
 
-const transformGitHubUrl = (url: string) => {
-  const appSettings = useAppSettingsStore()
-  const mirror = appSettings.app.githubDownloadMirror
+const transformGitHubUrl = (url: string, appSettings: App.AppSettings) => {
+  const mirror = appSettings.githubDownloadMirror
 
-  if (!appSettings.app.githubDownloadAcceleration || !mirror) return url
+  if (!appSettings.githubDownloadAcceleration || !mirror) return url
 
   try {
     const parsedUrl = new URL(url)
@@ -266,9 +254,8 @@ const transformGitHubUrl = (url: string) => {
   }
 }
 
-export const transformRequestUrl = (url: string) => {
-  url = transformGitHubUrl(url)
-  return url
+export const transformRequestUrl = (url: string, appSettings: App.AppSettings) => {
+  return transformGitHubUrl(url, appSettings)
 }
 
 export const getAutoStartConfiguration = (os: App.OS, appPath: string, delay = 30) => {
@@ -415,19 +402,6 @@ export const readonly = <T>(obj: T): T => {
   })
 }
 
-export const normalizeErrorMessage = (error: unknown) => {
-  if (typeof error === 'string') return error
-  if (error instanceof Error) return error.message
-  return String(error)
-}
-
-export const normalizeBase64 = (str: string): string => {
-  const normalized = str.trim().replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/')
-
-  const padding = (4 - (normalized.length % 4)) % 4
-  return normalized + '='.repeat(padding)
-}
-
 export const base64UrlEncode = (str: string): string => {
   return base64Encode(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
@@ -454,20 +428,6 @@ export const base64Decode = (input: string): string => {
 export const stringifyNoFolding = (content: any) => {
   // Disable string folding
   return stringify(content, { lineWidth: 0, minContentWidth: 0 })
-}
-
-export const normalizeRequestProxy = (proxy: string) => {
-  const trimmed = proxy.trim()
-  if (!trimmed) return ''
-  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) return trimmed
-  return `http://${trimmed}`
-}
-
-export const normalizeProxyHost = (host: string) => {
-  if (!host || ['0.0.0.0', '::', '[::]'].includes(host)) {
-    return '127.0.0.1'
-  }
-  return host
 }
 
 export const getDomainSuffixes = (host: string) => {

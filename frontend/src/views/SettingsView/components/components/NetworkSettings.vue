@@ -7,9 +7,8 @@ import { DefaultTestTimeout, DefaultTestURL, RequestProxyModeOptions } from '@/c
 import { RequestProxyMode } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { APP_TITLE, APP_VERSION } from '@/utils/env'
-import { GetRequestProxy } from '@/utils/helper'
 import { message } from '@/utils/interaction'
-import { normalizeRequestProxy } from '@/utils/others'
+import { GetRequestProxy, normalizeRequestProxy } from '@/utils/request'
 
 const appSettings = useAppSettingsStore()
 

@@ -6,7 +6,8 @@ import { restoreProfile } from '@restorer'
 import { RequestProxyMode } from '@/enums/app'
 
 import { legacyGenerateConfig } from './generator'
-import { deepAssign, normalizeErrorMessage } from './others'
+import { normalizeErrorMessage } from './normalize'
+import { deepAssign } from './others'
 
 export const migrateProfiles = async (
   profiles: (Profile | App.Profile)[],
