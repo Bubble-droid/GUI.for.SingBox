@@ -1,8 +1,7 @@
 import { GetSystemProxy } from '@/bridge/app'
 
 import { RequestProxyMode } from '@/enums/app'
-import { useAppSettingsStore } from '@/stores/appSettings'
-import { useKernelApiStore } from '@/stores/kernelApi'
+import { StoreDep, useStoreDeps } from '@/stores/deps'
 
 import { formatProxyHost } from './format'
 import { normalizeRequestProxy } from './normalize'
@@ -13,7 +12,8 @@ const requestProxyCache: { proxyPromise: Promise<string> | null; lastAccessTime:
 }
 
 export const GetRequestProxy = async (mode?: App.RequestProxyMode, customProxy?: string) => {
-  const appSettings = useAppSettingsStore()
+  const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
+  const kernelApiProxy = useStoreDeps(StoreDep.KernelApiStore)
   const requestProxyMode = mode ?? appSettings.app.requestProxyMode
 
   if (requestProxyMode === RequestProxyMode.None) {
@@ -21,7 +21,7 @@ export const GetRequestProxy = async (mode?: App.RequestProxyMode, customProxy?:
   }
 
   if (requestProxyMode === RequestProxyMode.Kernel) {
-    const kernelProxy = useKernelApiStore().getProxyEndpoint()
+    const kernelProxy = kernelApiProxy.getProxyEndpoint()
     if (!kernelProxy) return ''
 
     const { schema, host, port, username, password } = kernelProxy

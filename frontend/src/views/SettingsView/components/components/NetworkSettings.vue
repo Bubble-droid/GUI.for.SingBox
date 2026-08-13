@@ -8,7 +8,8 @@ import { RequestProxyMode } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { APP_TITLE, APP_VERSION } from '@/utils/env'
 import { message } from '@/utils/interaction'
-import { GetRequestProxy, normalizeRequestProxy } from '@/utils/request'
+import { normalizeRequestProxy } from '@/utils/normalize'
+import { GetRequestProxy } from '@/utils/request'
 
 const appSettings = useAppSettingsStore()
 

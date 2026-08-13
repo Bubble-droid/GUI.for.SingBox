@@ -74,7 +74,7 @@ export const useCoreBranch = (isAlpha = false) => {
     cancelDownload.value = undefined
     try {
       const { body } = await HttpGet<GitHubApiRelease | GitHubApiRelease[]>(releaseUrl, {
-        Authorization: getGitHubApiAuthorization(),
+        Authorization: getGitHubApiAuthorization(appSettings.app),
       })
       if (!Array.isArray(body) && 'message' in body) throw body.message
 
@@ -168,7 +168,7 @@ export const useCoreBranch = (isAlpha = false) => {
     remoteVersionLoading.value = true
     try {
       const { body } = await HttpGet<GitHubApiRelease | GitHubApiRelease[]>(releaseUrl, {
-        Authorization: getGitHubApiAuthorization(),
+        Authorization: getGitHubApiAuthorization(appSettings.app),
       })
       const release =
         isAlpha && Array.isArray(body) ? body.find((v) => v.prerelease === true) : body

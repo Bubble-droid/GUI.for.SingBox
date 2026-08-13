@@ -3,8 +3,7 @@ import { PredefinedClashModeOptions } from '@features/constant/options'
 import type { ExperimentalConfig } from '@profiles/experimental'
 import { useI18n } from 'vue-i18n'
 
-import { generateSecureKey } from '@/utils/others'
-import { sampleID } from '@/utils/secure'
+import { generateSecureKey, sampleID } from '@/utils/secure'
 
 import type { ComponentOption } from '@/types/views'
 

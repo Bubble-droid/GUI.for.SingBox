@@ -2,6 +2,7 @@ import * as Bridge from '@wails/go/bridge/App'
 import { EventsOn, EventsOff, EventsEmit } from '@wails/runtime/runtime'
 
 import { RequestMethod } from '@/enums/app'
+import { StoreDep, useStoreDeps } from '@/stores/deps'
 import { getUserAgent, transformRequestUrl } from '@/utils/others'
 import { GetRequestProxy } from '@/utils/request'
 import { sampleID } from '@/utils/secure'
@@ -78,6 +79,8 @@ const mergeRequestOptions = async (options: Request['options']) => {
   return mergedReqOpts
 }
 
+const getRequestAppSettings = () => useStoreDeps(StoreDep.AppSettingsStore).app
+
 const transformResponseHeaders = (
   headers: Record<string, string | string[]>,
 ): Response['headers'] => {
@@ -102,7 +105,7 @@ const transformRequest = async (
   body: Request['body'],
   options: Request['options'],
 ) => {
-  const transformedHeaders = { 'User-Agent': getUserAgent(), ...headers }
+  const transformedHeaders = { 'User-Agent': getUserAgent(getRequestAppSettings()), ...headers }
 
   if (transformedHeaders['Content-Type']?.includes('application/json')) {
     body && (body = JSON.stringify(body))
@@ -151,14 +154,16 @@ const requestWithProgress = (fnName: 'Download' | 'Upload') => {
       EventsOn(progressEvent, progress!)
     }
 
+    const fn = fnName === 'Download' ? Bridge.Download : Bridge.Upload
+
     const {
       flag,
       status,
       headers: respHeaders,
       body: respBody,
-    } = await Bridge[fnName](
+    } = await fn(
       method,
-      transformRequestUrl(url),
+      transformRequestUrl(url, getRequestAppSettings()),
       path,
       _headers,
       progressEvent,
@@ -189,7 +194,13 @@ const requestWithBody = (method: Extract<App.RequestMethod, 'PUT' | 'POST' | 'PA
       status,
       headers: respHeaders,
       body: respBody,
-    } = await Bridge.Requests(method, transformRequestUrl(url), _headers, _body, _options)
+    } = await Bridge.Requests(
+      method,
+      transformRequestUrl(url, getRequestAppSettings()),
+      _headers,
+      _body,
+      _options,
+    )
 
     if (!flag) throw respBody
 
@@ -210,7 +221,13 @@ const requestWithoutBody = (methd: Extract<App.RequestMethod, 'GET' | 'HEAD' | '
       status,
       headers: respHeaders,
       body,
-    } = await Bridge.Requests(methd, transformRequestUrl(url), _headers, '', _options)
+    } = await Bridge.Requests(
+      methd,
+      transformRequestUrl(url, getRequestAppSettings()),
+      _headers,
+      '',
+      _options,
+    )
 
     if (!flag) throw body
 
@@ -248,7 +265,7 @@ export const Requests = async <T = any>(options: RequestWithAutoTransform) => {
     body: respBody,
   } = await Bridge.Requests(
     method.toUpperCase(),
-    transformRequestUrl(url),
+    transformRequestUrl(url, getRequestAppSettings()),
     reqHeaders,
     reqBody,
     finalReqOpts,

@@ -100,6 +100,7 @@ export const useAppStore = defineStore('app', () => {
 
   const { t } = useI18n()
   const envStore = useStoreDeps(StoreDep.EnvStore)
+  const appSettingsStore = useStoreDeps(StoreDep.AppSettingsStore)
 
   /* About Page */
   const showAbout = ref(false)
@@ -171,7 +172,7 @@ export const useAppStore = defineStore('app', () => {
     downloadDigest.value = ''
     try {
       const { body } = await HttpGet<GitHubApiRelease>(APP_VERSION_API, {
-        Authorization: getGitHubApiAuthorization(),
+        Authorization: getGitHubApiAuthorization(appSettingsStore.app),
       })
       if (body.message) throw body.message
 

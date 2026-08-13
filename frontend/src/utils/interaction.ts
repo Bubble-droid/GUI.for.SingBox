@@ -19,7 +19,7 @@ import type { ResourceSelectProps } from '@/components/ResourceSelect/index.vue'
 
 import { bindAppContext } from './appContext'
 import { APP_TITLE } from './env'
-import { normalizeErrorMessage } from './others'
+import { normalizeErrorMessage } from './normalize'
 import { sampleID } from './secure'
 
 const ContainerCssText = `
