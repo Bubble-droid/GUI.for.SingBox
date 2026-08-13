@@ -4,8 +4,6 @@ import type { TagItem } from '@profiles/shared'
 import { parse } from 'yaml'
 
 import { Branch } from '@/enums/app'
-import { useAppSettingsStore } from '@/stores/appSettings'
-import { usePluginsStore } from '@/stores/plugins'
 import { deepClone, deepAssign } from '@/utils/others'
 
 import { _adaptToStableBranch } from './adapter'
@@ -20,7 +18,7 @@ import { generateNetns } from './netns'
 import { generateNtp } from './ntp'
 import { generateOutbounds } from './outbounds'
 import { generateRoute } from './route'
-import type { GenerateConfigOptions, TagMaps } from './types'
+import type { GenerateConfigOptions, GenerateContext, TagMaps } from './types'
 
 const buildIdTagMapping = (items: TagItem[]): Map<string, string> => {
   return new Map(items.map((v) => [v.id, v.tag]))
@@ -28,13 +26,13 @@ const buildIdTagMapping = (items: TagItem[]): Map<string, string> => {
 
 export const generateConfig = async (
   originalProfile: Profile,
+  ctx: GenerateContext,
   options: GenerateConfigOptions = {},
 ) => {
   if (typeof options === 'boolean') {
     options = { enableStableConfigCompat: options }
   }
-  const appSettings = useAppSettingsStore()
-  const isMainBranch = appSettings.app.kernel.branch === Branch.Main
+  const isMainBranch = ctx.branch === Branch.Main
 
   const {
     enableStableConfigCompat = isMainBranch,
@@ -65,8 +63,8 @@ export const generateConfig = async (
     network_namespaces: generateNetns(profile.network_namespaces),
     endpoints: generateEndpoints(profile.endpoints, tagMaps),
     inbounds: generateInbounds(profile.inbounds),
-    outbounds: await generateOutbounds(profile.outbounds),
-    route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns),
+    outbounds: await generateOutbounds(profile.outbounds, ctx),
+    route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns, ctx),
     dns: generateDns(profile.dns, profile.route.rule_set, profile.inbounds, profile.outbounds),
   })
 
@@ -77,8 +75,7 @@ export const generateConfig = async (
 
   // step 2
   if (enablePluginProcessing) {
-    const pluginsStore = usePluginsStore()
-    config = await pluginsStore.onGenerateTrigger(config, originalProfile)
+    config = await ctx.onGenerate(config, originalProfile)
   }
 
   // step 3

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Endpoint } from '@features/constant/kernel.ts'
 import { generateConfig } from '@generator'
+import type { GenerateContext } from '@generator/types.ts'
 import type { Profile } from '@profiles'
 import CertificateConfig from '@views/CertificateConfig.vue'
 import CertificateProviderConfig from '@views/CertificateProviderConfig/CertificateProviderConfig.vue'
@@ -33,12 +34,14 @@ import MixinAndScriptConfig from './MixinAndScriptConfig.vue'
 interface Props {
   id?: string
   step?: number
+  generateCtx?: GenerateContext | undefined
 }
 
 const props = withDefaults(defineProps<Props>(), {
   id: '',
   isUpdate: false,
   step: ProfileStep.Name,
+  generateCtx: undefined,
 })
 
 const { t } = useI18n()
@@ -151,7 +154,7 @@ const handleAdd = () => {
 
 const handlePreview = async () => {
   try {
-    const config = await generateConfig(profile.value)
+    const config = await generateConfig(profile.value, props.generateCtx!)
     const m = modal({
       title: profile.value.name,
       cancelText: 'common.close',

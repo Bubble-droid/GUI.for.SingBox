@@ -3,16 +3,15 @@ import type { OutboundConfig } from '@profiles/outbounds'
 
 import { ReadFile } from '@/bridge/io'
 
-import { useSubscribesStore } from '@/stores/subscribes'
 import { createTextMatcher } from '@/utils/others'
 
-export const generateOutbounds = async (outbounds: OutboundConfig[]) => {
+import type { GenerateContext } from './types'
+
+export const generateOutbounds = async (outbounds: OutboundConfig[], ctx: GenerateContext) => {
   const result: Recordable[] = []
   const SubscriptionCache: Recordable<any[]> = {}
   const proxiesSet = new Set<any>()
   const builtInProxiesSet = new Set<string>()
-
-  const subscribesStore = useSubscribesStore()
 
   for (const outbound of outbounds) {
     const _outbound: Recordable = {
@@ -38,7 +37,7 @@ export const generateOutbounds = async (outbounds: OutboundConfig[]) => {
           const subId = proxy.type === 'Subscription' ? proxy.id : proxy.type
           const targetSub = SubscriptionCache[subId] ?? []
           if (!targetSub) {
-            const sub = subscribesStore.getSubscribeById(subId)
+            const sub = ctx.getSubscribe(subId)
             if (sub) {
               const subStr = await ReadFile(sub.path)
               const proxies = JSON.parse(subStr)
