@@ -14,9 +14,9 @@ import { RequestProxyMode } from '@/enums/app'
 import { useBool } from '@/hooks/useBool'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useSubscribesStore } from '@/stores/subscribes'
+import { GetRequestProxy } from '@/utils/helper'
 import { message } from '@/utils/interaction'
 import { deepClone } from '@/utils/others'
-import { GetRequestProxy } from '@/utils/request'
 
 import Button from '@/components/Button/index.vue'
 

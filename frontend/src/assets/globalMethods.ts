@@ -32,7 +32,6 @@ import * as utils_is from '@/utils/is'
 import * as utils_migration from '@/utils/migration'
 import * as utils_normalize from '@/utils/normalize'
 import * as utils_others from '@/utils/others'
-import * as utils_request from '@/utils/request'
 import * as utils_tray from '@/utils/tray'
 
 const Bridge = {
@@ -59,7 +58,6 @@ const Utils = {
   ...utils_interaction,
   ...utils_eventBus,
   ...utils_migration,
-  ...utils_request,
   ...utils_normalize,
 }
 

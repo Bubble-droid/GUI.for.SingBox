@@ -3,8 +3,8 @@ import { EventsOn, EventsOff, EventsEmit } from '@wails/runtime/runtime'
 
 import { RequestMethod } from '@/enums/app'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
+import { GetRequestProxy } from '@/utils/helper'
 import { getUserAgent, sampleID, transformRequestUrl } from '@/utils/others'
-import { GetRequestProxy } from '@/utils/request'
 
 interface NetOptions {
   Mode?: 'Binary' | 'Text'
