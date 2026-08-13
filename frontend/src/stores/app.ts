@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { Exec } from '@/bridge/exec'
@@ -10,11 +10,9 @@ import { LanguageOptions, LocalesFilePath } from '@/constant/app'
 import { OS } from '@/enums/app'
 import { loadLocale } from '@/lang'
 import { APP_VERSION, APP_IDENTIFIER, APP_VERSION_API } from '@/utils/env'
-import { confirm, message, modal } from '@/utils/interaction'
+import { confirm, message } from '@/utils/interaction'
 import { sleep, getGitHubApiAuthorization } from '@/utils/others'
 import { sampleID } from '@/utils/secure'
-
-import AboutView from '@/components/_common/AboutView.vue'
 
 import type { GitHubApiRelease } from '@/types/github'
 
@@ -39,19 +37,6 @@ export const useAppStore = defineStore('app', () => {
     x: 0,
     y: 0,
   })
-
-  /* Modal Stack */
-  const modalStack: (() => void)[] = []
-  const modalZIndexCounter = 999
-  const modalMinimized = ref<
-    {
-      id: string
-      title: () => string
-      openFn: () => void
-      closeFn: () => void
-      minimizeFn: () => void
-    }[]
-  >([])
 
   /* i18n */
   const localesLoading = ref(false)
@@ -205,26 +190,6 @@ export const useAppStore = defineStore('app', () => {
     checkForUpdatesLoading.value = false
   }
 
-  watch(showAbout, (v) => {
-    if (v) {
-      const m = modal({
-        title: 'router.about',
-        submit: false,
-        cancelText: 'common.close',
-        toolbar: {
-          minimize: false,
-          maximize: false,
-        },
-        maskClosable: true,
-        minWidth: '60',
-        afterDestroy() {
-          showAbout.value = false
-        },
-      })
-      m.setContent(AboutView).open()
-    }
-  })
-
   return {
     isAppExiting,
     isAppReloading,
@@ -234,9 +199,6 @@ export const useAppStore = defineStore('app', () => {
     tipsShow,
     tipsMessage,
     tipsPosition,
-    modalStack,
-    modalMinimized,
-    modalZIndexCounter,
     showAbout,
     lastCheckTime,
     checkForUpdatesLoading,

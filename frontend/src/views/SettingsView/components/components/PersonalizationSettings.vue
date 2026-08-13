@@ -4,18 +4,17 @@ import { BrowserOpenURL } from '@wails/runtime/runtime'
 
 import { ColorOptions, DefaultFontFamily, LocalesFilePath, ThemeOptions } from '@/constant/app'
 import { Color, OS } from '@/enums/app'
-import routes from '@/router/routes'
+import { appPages } from '@/router/pages'
 import { useAppStore } from '@/stores/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { APP_LOCALES_URL } from '@/utils/env'
 
-const pages = routes.flatMap((route) => {
-  if (route.meta?.hidden !== undefined) return []
-  return {
-    label: route.meta!.name,
-    value: route.name as string,
-  }
-})
+const pages = appPages
+  .filter((page) => !('hidden' in page))
+  .map((page) => ({
+    label: page.label,
+    value: page.name,
+  }))
 
 const appStore = useAppStore()
 const appSettings = useAppSettingsStore()

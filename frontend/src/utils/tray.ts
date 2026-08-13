@@ -6,12 +6,7 @@ import { EventsOff, EventsOn } from '@wails/runtime/runtime'
 import { ColorOptions, ThemeOptions } from '@/constant/app'
 import { OS } from '@/enums/app'
 import i18n from '@/lang'
-import { useAppStore } from '@/stores/app'
-import { useAppSettingsStore } from '@/stores/appSettings'
-import { useEnvStore } from '@/stores/env'
-import { useKernelApiStore } from '@/stores/kernelApi'
-import { usePluginsStore } from '@/stores/plugins'
-import { useProfilesStore } from '@/stores/profiles'
+import { StoreDep, useStoreDeps } from '@/stores/deps'
 
 import type { Lang } from '@/enums/app'
 
@@ -20,9 +15,9 @@ import { handleUseProxy, handleChangeMode, exitApp } from './helper'
 import { debounce } from './others'
 
 const getTrayIcons = () => {
-  const envStore = useEnvStore()
-  const appSettings = useAppSettingsStore()
-  const kernelApiStore = useKernelApiStore()
+  const envStore = useStoreDeps(StoreDep.EnvStore)
+  const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
+  const kernelApiStore = useStoreDeps(StoreDep.KernelApiStore)
 
   const themeMode = appSettings.themeMode
   const ext = envStore.env.os === OS.Linux ? '.png' : '.ico'
@@ -68,12 +63,12 @@ const generateUniqueEventsForMenu = (menus: App.MenuItem[]) => {
 }
 
 const getTrayMenus = () => {
-  const appStore = useAppStore()
-  const envStore = useEnvStore()
-  const appSettings = useAppSettingsStore()
-  const kernelApiStore = useKernelApiStore()
-  const pluginsStore = usePluginsStore()
-  const profilesStore = useProfilesStore()
+  const appStore = useStoreDeps(StoreDep.AppStore)
+  const envStore = useStoreDeps(StoreDep.EnvStore)
+  const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
+  const kernelApiStore = useStoreDeps(StoreDep.KernelApiStore)
+  const pluginsStore = useStoreDeps(StoreDep.PluginsStore)
+  const profilesStore = useStoreDeps(StoreDep.ProfilesStore)
 
   let pluginMenus: App.MenuItem[] = []
   let pluginMenusHidden = !appSettings.app.addPluginToMenu
@@ -328,9 +323,9 @@ const getTrayMenus = () => {
 export const updateTrayAndMenus = debounce(async () => {
   const trayMenus = getTrayMenus()
   const trayIcons = getTrayIcons()
-  const pluginsStore = usePluginsStore()
+  const pluginsStore = useStoreDeps(StoreDep.PluginsStore)
 
-  const isDarwin = useEnvStore().env.os === OS.Darwin
+  const isDarwin = useStoreDeps(StoreDep.EnvStore).env.os === OS.Darwin
   const title = isDarwin ? '' : APP_TITLE
 
   const tray = { icon: trayIcons, title, tooltip: APP_TITLE + ' ' + APP_VERSION }

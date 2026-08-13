@@ -1,155 +1,43 @@
 import type { Profile } from '@profiles'
-import { render, h, type VNode } from 'vue'
-
-import i18n from '@/lang'
-
-import ConfirmComp from '@/components/Confirm/index.vue'
-import MessageComp from '@/components/Message/index.vue'
-import { useModal } from '@/components/Modal'
-import PickerComp from '@/components/Picker/index.vue'
-import PromptComp from '@/components/Prompt/index.vue'
-import ResourceSelectComp from '@/components/ResourceSelect/index.vue'
 
 import type { ConfirmOptions } from '@/components/Confirm/index.vue'
 import type { Props as InputProps } from '@/components/Input/index.vue'
 import type { MessageIcon } from '@/components/Message/index.vue'
+import type { useModal } from '@/components/Modal'
 import type { Props as ModalProps, Slots as ModalSlots } from '@/components/Modal/index.vue'
 import type { PickerItem } from '@/components/Picker/index.vue'
 import type { ResourceSelectProps } from '@/components/ResourceSelect/index.vue'
 
-import { bindAppContext } from './appContext'
-import { APP_TITLE } from './env'
-import { normalizeErrorMessage } from './normalize'
-import { sampleID } from './secure'
-
-const ContainerCssText = `
-    position: fixed;
-    z-index: 99999;
-    top: 84px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    max-height: 70%;
-`
-
-interface MessageInstance {
-  dom: HTMLDivElement
-  vnode: VNode
-  timer: number
+export interface MessageInstance {
+  id: string
+  info: (content: unknown) => void
+  warn: (content: unknown) => void
+  error: (content: unknown) => void
+  success: (content: unknown) => void
+  update: (content: unknown, icon?: MessageIcon) => void
+  destroy: () => void
 }
 
-class Message {
-  public container: HTMLElement
-  public instances: Record<string, MessageInstance>
-
-  constructor() {
-    const ID = APP_TITLE + '-toast'
-    this.container = document.getElementById(ID) || document.createElement('div')
-    this.container.id = ID
-    this.container.style.cssText = `
-        position: fixed;
-        z-index: 999999;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-    `
-    document.body.appendChild(this.container)
-    this.instances = {}
-  }
-
-  private buildMessage = (icon: MessageIcon) => {
-    return (content: unknown, duration = 3_000, onClose?: () => void) => {
-      const id = sampleID()
-      const dom = document.createElement('div')
-
-      const onMouseEnter = () => clearTimeout(this.instances[id]!.timer)
-      const onMouseLeave = () => (this.instances[id]!.timer = setTimeout(onDestroy, duration))
-
-      const onDestroy = () => {
-        dom.removeEventListener('mouseenter', onMouseEnter)
-        dom.removeEventListener('mouseleave', onMouseLeave)
-        this.destroy(id)
-      }
-
-      const initInstance = () => {
-        dom.style.cssText = 'display: flex; align-items: center; justify-content: center;'
-
-        const vnode = h(MessageComp, {
-          icon,
-          content: normalizeErrorMessage(content),
-          onClose: () => {
-            onClose?.()
-            onDestroy()
-          },
-        })
-        bindAppContext(vnode)
-
-        this.instances[id] = {
-          dom,
-          vnode,
-          timer: setTimeout(onDestroy, duration),
-        }
-
-        dom.addEventListener('mouseenter', onMouseEnter)
-        dom.addEventListener('mouseleave', onMouseLeave)
-
-        this.container.appendChild(dom)
-        render(vnode, dom)
-      }
-
-      initInstance()
-
-      return {
-        id,
-        info: (content: unknown) => this.update(id, content, 'info'),
-        warn: (content: unknown) => this.update(id, content, 'warn'),
-        error: (content: unknown) => this.update(id, content, 'error'),
-        success: (content: unknown) => this.update(id, content, 'success'),
-        update: (content: unknown, icon?: MessageIcon) => this.update(id, content, icon),
-        destroy: onDestroy,
-      }
-    }
-  }
-
-  public info = this.buildMessage('info')
-  public warn = this.buildMessage('warn')
-  public error = this.buildMessage('error')
-  public success = this.buildMessage('success')
-
-  public update = (id: string, content: unknown, icon?: MessageIcon) => {
-    const instance = this.instances[id]
-    if (instance) {
-      icon && (instance.vnode.component!.props['icon'] = icon)
-      content && (instance.vnode.component!.props['content'] = normalizeErrorMessage(content))
-    }
-  }
-
-  public destroy = (id: string) => {
-    const instance = this.instances[id]
-    if (instance) {
-      render(null, instance.dom)
-      instance.dom.remove()
-      clearTimeout(instance.timer)
-      delete this.instances[id]
-    }
-  }
+export interface Message {
+  info: (content: unknown, duration?: number, onClose?: () => void) => MessageInstance
+  warn: (content: unknown, duration?: number, onClose?: () => void) => MessageInstance
+  error: (content: unknown, duration?: number, onClose?: () => void) => MessageInstance
+  success: (content: unknown, duration?: number, onClose?: () => void) => MessageInstance
 }
 
-const ResourceTypeMap = {
-  profile: 'profile',
-  subscription: 'subscription',
-  ruleset: 'ruleset',
-  plugin: 'plugin',
-  scheduledtask: 'scheduledtask',
-  1: 'profile',
-  2: 'subscription',
-  3: 'ruleset',
-  4: 'plugin',
-  5: 'scheduledtask',
-} as const
+export type ResourceSelectType =
+  | 'profile'
+  | 'subscription'
+  | 'ruleset'
+  | 'plugin'
+  | 'scheduledtask'
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
 
-interface ResourceResultMap {
+export interface ResourceResultMap {
   profile: Profile
   subscription: App.Subscription
   ruleset: App.RuleSet
@@ -162,172 +50,82 @@ interface ResourceResultMap {
   5: App.ScheduledTask
 }
 
-class Picker {
-  constructor() {}
-
-  public single = <T>(title: string, options: PickerItem<T>[], initialValue: T[] = []) => {
-    return this.buildPicker('single', title, options, initialValue)
-  }
-
-  public multi = <T>(title: string, options: PickerItem<T>[], initialValue: T[] = []) => {
-    return this.buildPicker('multi', title, options, initialValue)
-  }
-
-  public resource = <T extends keyof typeof ResourceTypeMap>(
+export interface Picker {
+  single: <T>(title: string, options: PickerItem<T>[], initialValue?: T[]) => Promise<T>
+  multi: <T>(title: string, options: PickerItem<T>[], initialValue?: T[]) => Promise<T[]>
+  resource: <T extends ResourceSelectType>(
     type: T,
     title: string,
     options?: Partial<ResourceSelectProps>,
     initialValue?: string[],
-  ): Promise<{ ids: string[]; items: ResourceResultMap[T][] }> => {
-    return new Promise((resolve) => {
-      const dom = document.createElement('div')
-      const vnode = h(ResourceSelectComp, {
-        type: ResourceTypeMap[type],
-        title,
-        renderSlot: false,
-        openImmediate: true,
-        modelValue: initialValue ?? [],
-        onSubmit(ids, items) {
-          resolve({ ids, items } as any)
-          render(null, dom)
-          dom.remove()
-        },
-        ...options,
-      })
-      bindAppContext(vnode)
-      document.body.appendChild(dom)
-      render(vnode, dom)
-    })
-  }
+  ) => Promise<{ ids: string[]; items: ResourceResultMap[T][] }>
+}
 
-  private buildPicker = <ValueType, PickerType extends 'single' | 'multi'>(
-    type: PickerType,
+export type ModalAPI = ReturnType<typeof useModal>[1]
+
+export interface InteractionAPI {
+  message: Message
+  picker: Picker
+  prompt: <T>(
     title: string,
-    options: PickerItem<ValueType>[],
-    initialValue: ValueType[],
-  ): Promise<PickerType extends 'single' ? ValueType : ValueType[]> => {
-    return new Promise((resolve, reject) => {
-      const { t } = i18n.global
-      const dom = document.createElement('div')
-      dom.style.cssText = ContainerCssText
-      const vnode = h(PickerComp as any, {
-        type,
-        title,
-        options,
-        initialValue,
-        onConfirm: resolve,
-        onCancel: () => reject(t('common.canceled')),
-        onFinish: () => {
-          render(null, dom)
-          dom.remove()
-        },
-      })
-      bindAppContext(vnode)
-      document.body.appendChild(dom)
-      render(vnode, dom)
-    })
+    initialValue?: string | number,
+    props?: Partial<InputProps>,
+  ) => Promise<T>
+  alert: (title: string, message: string, options?: ConfirmOptions) => Promise<unknown>
+  confirm: (title: string, message: string, options?: ConfirmOptions) => Promise<unknown>
+  modal: (options?: ModalProps, slots?: ModalSlots) => ModalAPI
+}
+
+const createInteraction = () => {
+  let impl: InteractionAPI | null = null
+
+  const registerInteractionAPI = (api: InteractionAPI) => {
+    impl = api
   }
-}
 
-const buildConfirm = (
-  title: string,
-  message: string,
-  options: ConfirmOptions = { type: 'text' },
-  cancel = true,
-) => {
-  return new Promise((resolve, reject) => {
-    const { t } = i18n.global
-    const dom = document.createElement('div')
-    dom.style.cssText = ContainerCssText
-    const vnode = h(ConfirmComp, {
-      title,
-      message,
-      options,
-      cancel,
-      onConfirm: resolve,
-      onCancel: () => reject(t('common.canceled')),
-      onFinish: () => {
-        render(null, dom)
-        dom.remove()
-      },
-    })
-    bindAppContext(vnode)
-    document.body.appendChild(dom)
-    render(vnode, dom)
+  const requireImpl = (): InteractionAPI => {
+    if (!impl) throw new Error('interaction API has not been registered yet')
+    return impl
+  }
+
+  const prompt = <T>(
+    title: string,
+    initialValue: string | number = '',
+    props: Partial<InputProps> = {},
+  ): Promise<T> => {
+    return requireImpl().prompt<T>(title, initialValue, props)
+  }
+
+  const alert = (
+    title: string,
+    message: string,
+    options: ConfirmOptions = { type: 'text' },
+  ): Promise<unknown> => {
+    return requireImpl().alert(title, message, options)
+  }
+
+  const confirm = (
+    title: string,
+    message: string,
+    options: ConfirmOptions = { type: 'text' },
+  ): Promise<unknown> => {
+    return requireImpl().confirm(title, message, options)
+  }
+
+  const modal = (options: ModalProps = {}, slots: ModalSlots = {}): ModalAPI => {
+    return requireImpl().modal(options, slots)
+  }
+
+  const message = new Proxy<Message>({} as Message, {
+    get: (_target, prop) => requireImpl().message[prop as keyof Message],
   })
-}
 
-export const prompt = <T>(
-  title: string,
-  initialValue: string | number = '',
-  props: Partial<InputProps> = {},
-) => {
-  const { t } = i18n.global
-
-  return new Promise<T>((resolve, reject) => {
-    const dom = document.createElement('div')
-    dom.style.cssText = ContainerCssText
-    const vnode = h(PromptComp, {
-      title,
-      initialValue,
-      props,
-      onSubmit: resolve,
-      onCancel: () => reject(t('common.canceled')),
-      onFinish: () => {
-        render(null, dom)
-        dom.remove()
-      },
-    })
-    bindAppContext(vnode)
-    document.body.appendChild(dom)
-    render(vnode, dom)
+  const picker = new Proxy<Picker>({} as Picker, {
+    get: (_target, prop) => requireImpl().picker[prop as keyof Picker],
   })
+
+  return { message, picker, prompt, alert, confirm, modal, registerInteractionAPI }
 }
 
-export const alert = (
-  title: string,
-  message: string,
-  options: ConfirmOptions = { type: 'text' },
-) => {
-  return buildConfirm(title, message, options, false)
-}
-
-export const confirm = (
-  title: string,
-  message: string,
-  options: ConfirmOptions = { type: 'text' },
-) => {
-  return buildConfirm(title, message, options)
-}
-
-export const modal = (options: ModalProps = {}, slots: ModalSlots = {}) => {
-  const id = 'Modal-' + sampleID()
-
-  const container = document.createElement('div')
-  container.id = id
-  container.dataset['title'] = options.title
-  document.body.appendChild(container)
-
-  const [Modal, api] = useModal(
-    {
-      ...options,
-      container: '#' + id,
-      afterDestroy() {
-        options.afterDestroy?.()
-        render(null, container)
-        container.remove()
-      },
-    },
-    slots,
-  )
-  const vnode = h(Modal)
-  bindAppContext(vnode)
-
-  render(vnode, container)
-
-  return api
-}
-
-export const picker = new Picker()
-
-export const message = new Message()
+export const { message, picker, prompt, alert, confirm, modal, registerInteractionAPI } =
+  createInteraction()

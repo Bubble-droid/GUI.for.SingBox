@@ -2,7 +2,6 @@ import { onUnmounted } from 'vue'
 
 import { EventsOn, WindowHide } from '@wails/runtime/runtime'
 
-import { useAppStore } from '@/stores/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useSubscribesStore } from '@/stores/subscribes'
 import { exitApp } from '@/utils/helper'
@@ -10,9 +9,9 @@ import { modal, message } from '@/utils/interaction'
 import { sampleID } from '@/utils/secure'
 
 import CommandView from '@/components/_common/CommandView.vue'
+import { modalStack } from '@/components/Modal/state'
 
 export const useAppLifecycle = () => {
-  const appStore = useAppStore()
   const appSettings = useAppSettingsStore()
   const subscribesStore = useSubscribesStore()
   let commandModal: ReturnType<typeof modal> | undefined
@@ -82,7 +81,7 @@ export const useAppLifecycle = () => {
     }
 
     if (event.key === 'Escape') {
-      const closeFn = appStore.modalStack.at(-1)
+      const closeFn = modalStack.at(-1)
       closeFn?.()
     }
   }

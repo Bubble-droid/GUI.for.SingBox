@@ -8,12 +8,7 @@ import { WindowReloadApp } from '@wails/runtime/runtime'
 import { deleteConnection, getConnections, useProxy } from '@/api/kernel'
 import { OS } from '@/enums/app'
 import i18n from '@/lang'
-import { useAppStore } from '@/stores/app'
-import { useAppSettingsStore } from '@/stores/appSettings'
-import { useEnvStore } from '@/stores/env'
-import { useKernelApiStore } from '@/stores/kernelApi'
-import { usePluginsStore } from '@/stores/plugins'
-import { useRulesetsStore } from '@/stores/rulesets'
+import { StoreDep, useStoreDeps } from '@/stores/deps'
 
 import { APP_TITLE } from './env'
 import { confirm, message } from './interaction'
@@ -21,7 +16,7 @@ import { getAutoStartConfiguration, ignoredError } from './others'
 
 // Permissions Helper
 export const SwitchPermissions = async (enable: boolean) => {
-  const { appPath } = useEnvStore().env
+  const { appPath } = useStoreDeps(StoreDep.EnvStore).env
   const args = enable
     ? [
         'add',
@@ -45,7 +40,7 @@ export const SwitchPermissions = async (enable: boolean) => {
 }
 
 export const CheckPermissions = async () => {
-  const { appPath } = useEnvStore().env
+  const { appPath } = useStoreDeps(StoreDep.EnvStore).env
   try {
     const out = await Exec('reg', [
       'query',
@@ -62,7 +57,7 @@ export const CheckPermissions = async () => {
 }
 
 export const GrantTUNPermission = async (path: string) => {
-  const { os } = useEnvStore().env
+  const { os } = useStoreDeps(StoreDep.EnvStore).env
   const absPath = await AbsolutePath(path)
   if (os === OS.Darwin) {
     const command = `chown root:admin "${absPath}"; chmod +sx "${absPath}"`
@@ -117,8 +112,6 @@ export const RunWithPowerShell = async (
   return await Exec('powershell', psArgs, others)
 }
 
-
-
 // Auto-start
 const getPlistPath = async () => {
   const home = await GetEnv('HOME')
@@ -131,7 +124,7 @@ const getDesktopPath = async () => {
 }
 
 export const IsAutoStartEnabled = async () => {
-  const { os } = useEnvStore().env
+  const { os } = useStoreDeps(StoreDep.EnvStore).env
   let isAutoStart = false
   if (os === OS.Windows) {
     isAutoStart = await Exec('Schtasks', ['/Query', '/TN', APP_TITLE, '/XML'])
@@ -148,7 +141,7 @@ export const IsAutoStartEnabled = async () => {
 }
 
 export const EnableAutoStart = async (delay = 10) => {
-  const { os, appPath, isPrivileged } = useEnvStore().env
+  const { os, appPath, isPrivileged } = useStoreDeps(StoreDep.EnvStore).env
   const configuration = getAutoStartConfiguration(os, appPath, delay)
   if (os === OS.Windows) {
     const xmlPath = await AbsolutePath('data/.cache/tasksch.xml')
@@ -169,7 +162,7 @@ export const EnableAutoStart = async (delay = 10) => {
 }
 
 export const DisableAutoStart = async () => {
-  const { os, isPrivileged } = useEnvStore().env
+  const { os, isPrivileged } = useStoreDeps(StoreDep.EnvStore).env
   if (os === OS.Windows) {
     const fn = isPrivileged ? Exec : RunWithPowerShell
     await fn('SchTasks', ['/Delete', '/F', '/TN', APP_TITLE], { admin: true, hidden: true })
@@ -187,8 +180,8 @@ export const DisableAutoStart = async () => {
 export const handleUseProxy = async (group: any, proxy: any) => {
   if (group.type !== 'Selector' || group.now === proxy.name) return
   const promises: Promise<null>[] = []
-  const appSettings = useAppSettingsStore()
-  const kernelApiStore = useKernelApiStore()
+  const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
+  const kernelApiStore = useStoreDeps(StoreDep.KernelApiStore)
   if (appSettings.app.kernel.autoClose) {
     const { connections } = await getConnections()
     promises.push(
@@ -203,7 +196,7 @@ export const handleUseProxy = async (group: any, proxy: any) => {
 }
 
 export const handleChangeMode = async (mode: 'direct' | 'global' | 'rule') => {
-  const kernelApiStore = useKernelApiStore()
+  const kernelApiStore = useStoreDeps(StoreDep.KernelApiStore)
 
   if (mode === kernelApiStore.config.mode) return
 
@@ -220,7 +213,7 @@ export const addToRuleSet = async (
 ) => {
   const path = `data/rulesets/${id}.json`
 
-  const rulesetsStoe = useRulesetsStore()
+  const rulesetsStoe = useStoreDeps(StoreDep.RulesetsStore)
   let ruleset = rulesetsStoe.getRulesetById(id)
   if (!ruleset) {
     ruleset = {
@@ -261,8 +254,8 @@ export const addToRuleSet = async (
 
 export const reloadApp = async () => {
   const { t } = i18n.global
-  const appStore = useAppStore()
-  const pluginsStore = usePluginsStore()
+  const appStore = useStoreDeps(StoreDep.AppStore)
+  const pluginsStore = useStoreDeps(StoreDep.PluginsStore)
 
   appStore.isAppReloading = true
 
@@ -293,11 +286,11 @@ export const reloadApp = async () => {
 
 export const exitApp = async () => {
   const { t } = i18n.global
-  const appStore = useAppStore()
-  const envStore = useEnvStore()
-  const pluginsStore = usePluginsStore()
-  const appSettings = useAppSettingsStore()
-  const kernelApiStore = useKernelApiStore()
+  const appStore = useStoreDeps(StoreDep.AppStore)
+  const envStore = useStoreDeps(StoreDep.EnvStore)
+  const pluginsStore = useStoreDeps(StoreDep.PluginsStore)
+  const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
+  const kernelApiStore = useStoreDeps(StoreDep.KernelApiStore)
 
   appStore.isAppExiting = true
 
@@ -333,7 +326,7 @@ export const exitApp = async () => {
 }
 
 export const getKernelFileName = (isAlpha = false) => {
-  const envStore = useEnvStore()
+  const envStore = useStoreDeps(StoreDep.EnvStore)
   const { os } = envStore.env
   const fileSuffix = { windows: '.exe', linux: '', darwin: '' }[os]
   const latest = isAlpha ? '-latest' : ''
@@ -341,14 +334,14 @@ export const getKernelFileName = (isAlpha = false) => {
 }
 
 export const getKernelAssetFileName = (version: string) => {
-  const envStore = useEnvStore()
+  const envStore = useStoreDeps(StoreDep.EnvStore)
   const { os, arch } = envStore.env
   const suffix = { windows: '.zip', linux: '.tar.gz', darwin: '.tar.gz' }[os]
   return `sing-box-${version}-${os}-${arch}${suffix}`
 }
 
 export const processMagicVariables = (str: string) => {
-  const { env } = useEnvStore()
+  const { env } = useStoreDeps(StoreDep.EnvStore)
   let result = str
   Object.entries({
     $CORE_BASE_PATH: `${env.appDataPath}/sing-box`,
@@ -359,7 +352,7 @@ export const processMagicVariables = (str: string) => {
 }
 
 export const getKernelRuntimeEnv = (isAlpha = false) => {
-  const appSettings = useAppSettingsStore()
+  const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
   const { env } = isAlpha ? appSettings.app.kernel.alpha : appSettings.app.kernel.main
   return Object.entries(env).reduce((p, [key, value]) => {
     p[key] = processMagicVariables(value)
@@ -368,7 +361,7 @@ export const getKernelRuntimeEnv = (isAlpha = false) => {
 }
 
 export const getKernelRuntimeArgs = (isAlpha = false) => {
-  const appSettings = useAppSettingsStore()
+  const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
   const { args } = isAlpha ? appSettings.app.kernel.alpha : appSettings.app.kernel.main
   return args.map((arg) => processMagicVariables(arg))
 }

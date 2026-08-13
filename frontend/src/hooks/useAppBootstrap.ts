@@ -13,7 +13,8 @@ import { useProfilesStore } from '@/stores/profiles'
 import { useRulesetsStore } from '@/stores/rulesets'
 import { useScheduledTasksStore } from '@/stores/scheduledtasks'
 import { useSubscribesStore } from '@/stores/subscribes'
-import { message } from '@/utils/interaction'
+import { message, registerInteractionAPI } from '@/utils/interaction'
+import { createInteractionAPI } from '@/utils/interactionImpl'
 import { sleep } from '@/utils/others'
 
 const MIN_SPLASH_DURATION = 1000
@@ -22,6 +23,8 @@ export const useAppBootstrap = () => {
   const loading = ref(true)
   const percent = ref(0)
   const hasError = ref(false)
+
+  registerInteractionAPI(createInteractionAPI())
 
   registerStoreDeps({
     appStore: () => useAppStore(),

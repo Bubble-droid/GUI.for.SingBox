@@ -2,11 +2,11 @@
 import { computed, markRaw, provide, ref, watch } from 'vue'
 
 import { useBool } from '@/hooks/useBool'
-import { useAppStore } from '@/stores/app'
 import { message } from '@/utils/interaction'
 import { sampleID } from '@/utils/secure'
 
 import { IS_IN_MODAL } from './index'
+import { modalStack, modalZIndexCounter, modalMinimized } from './state'
 
 export interface Props {
   title?: string | undefined
@@ -87,7 +87,6 @@ const cancelLoading = ref(false)
 const submitLoading = ref(false)
 
 const modalZindex = ref()
-const appStore = useAppStore()
 const [isMaximize, toggleMaximize] = useBool(false)
 const [isMinimize, toggleMinimize] = useBool(false)
 
@@ -173,7 +172,7 @@ const minimizeModal = markRaw({
   id: sampleID(),
   title: () => props.title,
   openFn: () => {
-    modalZindex.value = ++appStore.modalZIndexCounter
+    modalZindex.value = ++modalZIndexCounter.value
     open.value = true
     removeMinimizedModal()
   },
@@ -186,16 +185,16 @@ const minimizeModal = markRaw({
 })
 
 const removeMinimizedModal = () => {
-  const idx = appStore.modalMinimized.findIndex((m) => m === minimizeModal)
+  const idx = modalMinimized.value.findIndex((m) => m === minimizeModal)
   if (idx !== -1) {
-    appStore.modalMinimized.splice(idx, 1)
+    modalMinimized.value.splice(idx, 1)
   }
 }
 
 const handleMinimize = () => {
-  const m = appStore.modalMinimized.includes(minimizeModal)
+  const m = modalMinimized.value.includes(minimizeModal)
   if (!m) {
-    appStore.modalMinimized.push(minimizeModal)
+    modalMinimized.value.push(minimizeModal)
   }
   open.value = false
   toggleMinimize()
@@ -205,16 +204,16 @@ watch(open, (v) => {
   if (v) {
     hasOpened.value = true
     isMinimize.value = false
-    modalZindex.value = ++appStore.modalZIndexCounter
-    appStore.modalStack.push(closeFn)
+    modalZindex.value = ++modalZIndexCounter.value
+    modalStack.push(closeFn)
   } else {
     if (!props.destroyOnClose) {
       handleMinimize()
     }
     closeMessage?.()
-    const idx = appStore.modalStack.findIndex((fn) => fn === closeFn)
+    const idx = modalStack.findIndex((fn) => fn === closeFn)
     if (idx !== -1) {
-      appStore.modalStack.splice(idx, 1)
+      modalStack.splice(idx, 1)
     }
   }
 })

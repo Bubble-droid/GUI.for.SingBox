@@ -1,7 +1,13 @@
 <script setup lang="ts">
+import { computed, watch } from 'vue'
+
 import { useAppStore } from '@/stores/app'
 import { useKernelApiStore } from '@/stores/kernelApi'
-import { message } from '@/utils/interaction'
+import { message, modal as openModal } from '@/utils/interaction'
+
+import { modalMinimized } from '@/components/Modal/state'
+
+import AboutView from './AboutView.vue'
 
 interface Props {
   loading: boolean
@@ -21,11 +27,33 @@ const handleRestartCore = async () => {
 }
 
 const openAll = () => {
-  appStore.modalMinimized.forEach((m) => m.openFn())
+  modalMinimized.value.forEach((m) => m.openFn())
 }
 const minimizeAll = () => {
-  appStore.modalMinimized.forEach((m) => m.minimizeFn())
+  modalMinimized.value.forEach((m) => m.minimizeFn())
 }
+
+const showAbout = computed(() => appStore.showAbout)
+
+watch(showAbout, (v) => {
+  if (v) {
+    const m = openModal({
+      title: 'router.about',
+      submit: false,
+      cancelText: 'common.close',
+      toolbar: {
+        minimize: false,
+        maximize: false,
+      },
+      maskClosable: true,
+      minWidth: '60',
+      afterDestroy() {
+        appStore.showAbout = false
+      },
+    })
+    m.setContent(AboutView).open()
+  }
+})
 </script>
 
 <template>
@@ -42,10 +70,10 @@ const minimizeAll = () => {
   />
 
   <div
-    v-if="appStore.modalMinimized.length || kernelApiStore.needRestart || kernelApiStore.restarting"
+    v-if="modalMinimized.length || kernelApiStore.needRestart || kernelApiStore.restarting"
     class="fixed right-32 bottom-32 flex flex-col gap-8 z-9999"
   >
-    <Dropdown v-if="appStore.modalMinimized.length" placement="top">
+    <Dropdown v-if="modalMinimized.length" placement="top">
       <Button icon="adjust" class="shadow" />
       <template #overlay>
         <Card title="common.modalList">
@@ -59,7 +87,7 @@ const minimizeAll = () => {
           </template>
           <div class="flex flex-col gap-4 p-4 min-w-128">
             <div
-              v-for="modal in appStore.modalMinimized"
+              v-for="modal in modalMinimized"
               :key="modal.id"
               class="flex items-center justify-between"
             >
