@@ -27,7 +27,7 @@ import type {
   ResourceSelectType,
 } from './interaction'
 import { normalizeErrorMessage } from './normalize'
-import { sampleID } from './secure'
+import { sampleID } from './others'
 
 const ContainerCssText = `
     position: fixed;
