@@ -2,19 +2,17 @@ import { createOutbound } from '@defaults/outbounds'
 import { Outbound } from '@features/constant/kernel'
 import type { OutboundConfig, ProxyConfig } from '@profiles/outbounds'
 
-import { useSubscribesStore } from '@/stores/subscribes'
 import { createTextMatcher } from '@/utils/others'
 
-import type { GuiOutbound } from './types'
+import type { GuiOutbound, RestoreContext } from './types'
 
 export const restoreOutbounds = (
   outbounds: Recordable[],
   OutboundsIds: Recordable,
   originalOutbounds: GuiOutbound[],
   subscriptionIds: string[],
+  ctx: RestoreContext,
 ): OutboundConfig[] => {
-  const subscribesStore = useSubscribesStore()
-
   const subscriptionCache = new Map<string, App.Subscription>()
   const proxyToSubMap = new Map<string, { sub: string; id: string }>()
   const originalOutboundMap = new Map<string, GuiOutbound>()
@@ -26,7 +24,7 @@ export const restoreOutbounds = (
   )
 
   subscriptionIds.forEach((id) => {
-    const sub = subscribesStore.getSubscribeById(id)
+    const sub = ctx.getSubscribe(id)
     if (sub) {
       subscriptionCache.set(id, sub)
       sub.proxies.forEach((proxy) => {

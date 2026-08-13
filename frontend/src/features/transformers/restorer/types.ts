@@ -1,6 +1,8 @@
 import type { Profile } from '@profiles'
 import type { OutboundConfig } from '@profiles/outbounds'
 
+import type { useSubscribesStore } from '@/stores/subscribes'
+
 export type GuiOutbound = Pick<OutboundConfig, 'exclude' | 'include' | 'hidden' | 'icon' | 'tag'>
 
 export interface RestoreProfileOptions {
@@ -18,4 +20,10 @@ export interface IdMaps {
   inbounds: Map<string, string>
   outbounds: Map<string, string>
   dnsServers: Map<string, string>
+}
+
+export interface RestoreContext {
+  appEnv: App.AppEnv
+  getSubscribe: ReturnType<typeof useSubscribesStore>['getSubscribeById']
+  getRuleSetByPath: (path: string) => App.RuleSet | undefined
 }

@@ -2,18 +2,15 @@ import { createRouteRuleset, createRouteRule } from '@defaults/route'
 import { RuleSetType, RouteRuleAction, RouteRuleType } from '@features/constant/kernel'
 import type { RuleSetConfig, RouteRuleConfig } from '@profiles/route'
 
-import { useEnvStore } from '@/stores/env'
-import { useRulesetsStore } from '@/stores/rulesets'
-
 import { supportedRuleTypes } from './shared'
+import type { RestoreContext } from './types'
 
 export const restoreRouteRuleset = (
   rulesets: Recordable[],
   RouteRuleSetIds: Recordable,
   OutboundsIds: Recordable,
+  ctx: RestoreContext,
 ): RuleSetConfig[] => {
-  const { env } = useEnvStore()
-  const rulesetsStore = useRulesetsStore()
   return rulesets.flatMap((raw) => {
     const ruleset = createRouteRuleset()
     ruleset.id = RouteRuleSetIds[raw['tag']]
@@ -26,9 +23,7 @@ export const restoreRouteRuleset = (
       }
     } else if (raw['type'] === RuleSetType.Local) {
       if ('path' in raw) {
-        const r = rulesetsStore.rulesets.find(
-          (v) => v.path === raw['path'].replace(`${env.appDataPath}/`, 'data/'),
-        )
+        const r = ctx.getRuleSetByPath(raw['path'].replace(`${ctx.appEnv.appDataPath}/`, 'data/'))
         if (r) {
           ruleset.path = r.id
         } else {

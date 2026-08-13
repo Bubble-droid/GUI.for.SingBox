@@ -1,14 +1,14 @@
-import { ProfileSchemaVersion, createMixin, createScript } from '@defaults'
+import { ProfileSchemaVersion, createMixin, createProfile, createScript } from '@defaults'
 import { createLog } from '@defaults/log'
 import type { SingBoxConfig, SingBoxEndpoint } from '@features/types/sing-box'
 import type { Profile } from '@profiles'
 import type { LogConfig } from '@profiles/log'
 
-import { useProfilesStore } from '@/stores/profiles'
 import { sampleID } from '@/utils/secure'
 
 import { restoreCertificate } from './certificate'
 import { restoreCertificateProviders } from './certificate_provider'
+import { getRestoreContext } from './context'
 import { restoreDnsServers, restoreDnsRules } from './dns'
 import { restoreEndpoints } from './endpoints'
 import { restoreExperimental } from './experimental'
@@ -39,7 +39,8 @@ export const restoreProfile = (
   name = sampleID(),
   options: RestoreProfileOptions = {},
 ): Profile => {
-  const template = useProfilesStore().getProfileTemplate()
+  const ctx = getRestoreContext()
+  const template = createProfile()
 
   const { profile, subscriptionIds } = options
 
@@ -80,9 +81,15 @@ export const restoreProfile = (
       OutboundsIds,
       profile?.outbounds || [],
       subscriptionIds || [],
+      ctx,
     ),
     route: {
-      rule_set: restoreRouteRuleset(config.route?.rule_set || [], RouteRuleSetIds, OutboundsIds),
+      rule_set: restoreRouteRuleset(
+        config.route?.rule_set || [],
+        RouteRuleSetIds,
+        OutboundsIds,
+        ctx,
+      ),
       rules: restoreRouteRules(
         config.route?.rules || [],
         InboundsIds,
