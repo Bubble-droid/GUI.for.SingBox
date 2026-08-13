@@ -1,17 +1,9 @@
-import {
-  ref,
-  defineComponent,
-  defineAsyncComponent,
-  h,
-  computed,
-  type VNode,
-  type ComponentPublicInstance,
-} from 'vue'
+import { ref, defineComponent, h, computed, type VNode, type ComponentPublicInstance } from 'vue'
 
 import type { Props as ModalProps, Slots as ModalSlots } from './index.vue'
+import ModalComp from './index.vue'
 
-export const IS_IN_MODAL = 'IS_IN_MODAL'
-export const Modal = defineAsyncComponent(() => import('./index.vue'))
+export const Modal = ModalComp
 
 export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}) => {
   const open = ref(false)

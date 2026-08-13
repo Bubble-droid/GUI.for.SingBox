@@ -1,5 +1,7 @@
 import { ref } from 'vue'
 
+export const IS_IN_MODAL = 'IS_IN_MODAL'
+
 export interface MinimizedModal {
   id: string
   title: () => string

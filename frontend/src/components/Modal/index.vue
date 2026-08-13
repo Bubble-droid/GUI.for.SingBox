@@ -5,8 +5,7 @@ import { useBool } from '@/hooks/useBool'
 import { message } from '@/utils/interaction'
 import { sampleID } from '@/utils/secure'
 
-import { IS_IN_MODAL } from './index'
-import { modalStack, modalZIndexCounter, modalMinimized } from './state'
+import { IS_IN_MODAL, modalStack, modalZIndexCounter, modalMinimized } from './state'
 
 export interface Props {
   title?: string | undefined
