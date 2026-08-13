@@ -134,7 +134,7 @@ func (a *App) ExitApp() {
 
 func (a *App) RestartApp() FlagResult {
 	log.Printf("RestartApp")
-	exePath := resolvePath(Env.AppName)
+	exePath := filepath.Join(Env.BasePath, Env.AppName)
 
 	cmd := exec.Command(exePath)
 	platform_exec.SetCmdWindowHidden(cmd)

@@ -95,11 +95,7 @@ defineExpose({
           :loading="appStore.checkForUpdatesLoading"
           type="text"
           size="small"
-          @click="
-            envStore.env.isSystemPackage
-              ? message.info('about.updatesManagedByOS')
-              : appStore.checkForUpdates(true)
-          "
+          @click="appStore.checkForUpdates(true)"
         >
           Bridge: {{ envStore.env.appVersion }} - UI: {{ APP_VERSION }}
         </Button>
