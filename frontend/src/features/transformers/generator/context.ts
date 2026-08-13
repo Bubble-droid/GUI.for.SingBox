@@ -13,7 +13,7 @@ export const getGenerateContext = (): GenerateContext => {
     appSettings: appSettingsStore.app,
     appEnv: envStore.env,
     onGenerate: pluginsStore.onGenerateTrigger,
-    getSubscribe: (id: string) => subscribesStore.getSubscribeById(id),
-    getRuleSet: (id: string) => ruleSetStore.getRulesetById(id),
+    getSubscribe: subscribesStore.getSubscribeById,
+    getRuleSet: ruleSetStore.getRulesetById,
   }
 }

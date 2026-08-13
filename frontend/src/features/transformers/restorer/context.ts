@@ -9,7 +9,7 @@ export const getRestoreContext = (): RestoreContext => {
 
   return {
     appEnv: envStore.env,
-    getSubscribe: (id: string) => subscribesStore.getSubscribeById(id),
+    getSubscribe: subscribesStore.getSubscribeById,
     getRuleSetByPath: (path: string) => ruleSetStore.rulesets.find((v) => v.path === path),
   }
 }
