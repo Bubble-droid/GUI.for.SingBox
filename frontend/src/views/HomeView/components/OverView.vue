@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { PredefinedClashModeOptions } from '@features/constant/options.ts'
-import { getGenerateContext } from '@generator/context'
 import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -37,7 +36,7 @@ const kernelApiStore = useKernelApiStore()
 
 const handleRestartKernel = async () => {
   try {
-    await kernelApiStore.restartCore(getGenerateContext())
+    await kernelApiStore.restartCore()
   } catch (error: any) {
     console.error(error)
     message.error(error)

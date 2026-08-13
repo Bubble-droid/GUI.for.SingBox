@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { getGenerateContext } from '@generator/context'
-
 import { useAppStore } from '@/stores/app'
 import { useKernelApiStore } from '@/stores/kernelApi'
 import { message } from '@/utils/interaction'
@@ -16,7 +14,7 @@ const kernelApiStore = useKernelApiStore()
 
 const handleRestartCore = async () => {
   try {
-    await kernelApiStore.restartCore(getGenerateContext())
+    await kernelApiStore.restartCore()
   } catch (error: unknown) {
     message.error(error instanceof Error ? error.message : String(error))
   }

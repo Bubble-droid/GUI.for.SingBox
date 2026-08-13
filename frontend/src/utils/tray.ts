@@ -202,13 +202,13 @@ const getTrayMenus = () => {
           type: 'item',
           text: 'tray.startKernel',
           hidden: kernelApiStore.running,
-          event: () => kernelApiStore.startCore(kernelApiStore.getGenerateCtx()),
+          event: kernelApiStore.startCore,
         },
         {
           type: 'item',
           text: 'tray.restartKernel',
           hidden: !kernelApiStore.running,
-          event: () => kernelApiStore.restartCore(kernelApiStore.getGenerateCtx()),
+          event: kernelApiStore.restartCore,
         },
         {
           type: 'item',

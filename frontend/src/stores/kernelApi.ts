@@ -1,6 +1,5 @@
 import { createInboundMixed } from '@defaults/inbounds'
 import { Inbound, TunStack, RuleSetType } from '@features/constant/kernel'
-import type { GenerateContext } from '@generator/types'
 import type { Profile } from '@profiles'
 import { restoreProfile } from '@restorer'
 import { defineStore } from 'pinia'
@@ -59,13 +58,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   const subscribesStore = useStoreDeps('subscribesStore')
   const rulesetsStore = useStoreDeps('rulesetsStore')
   const appSettingsStore = useStoreDeps('appSettingsStore')
-
-  let generateCtxProvider: (() => GenerateContext) | undefined
-
-  const getGenerateCtx = (): GenerateContext => {
-    if (!generateCtxProvider) throw 'Generate context provider is not initialized'
-    return generateCtxProvider()
-  }
 
   /** RESTful API */
   const config = ref<CoreApiConfig>({
@@ -232,7 +224,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
     fieldHandlerMap[field]?.()
 
-    await restartCore(getGenerateCtx(), undefined, true)
+    await restartCore(undefined, true)
     await envStore.updateSystemProxyStatus()
   }
 
@@ -254,8 +246,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   let isCoreStartedByThisInstance = false
   let { promise: coreStoppedPromise, resolve: coreStoppedResolver } = Promise.withResolvers()
 
-  const initCoreState = async (ctxProvider: () => GenerateContext) => {
-    generateCtxProvider = ctxProvider
+  const initCoreState = async () => {
     corePid.value = Number(await ReadFile(CorePidFilePath).catch(() => -1))
     const processName = corePid.value === -1 ? '' : await ProcessInfo(corePid.value).catch(() => '')
     running.value = processName.startsWith('sing-box')
@@ -267,7 +258,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       await Promise.all([refreshConfig(), refreshProviderProxies()])
       await envStore.updateSystemProxyStatus()
     } else if (appSettingsStore.app.autoStartKernel) {
-      await startCore(getGenerateCtx())
+      await startCore()
     }
   }
 
@@ -350,7 +341,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     coreStoppedResolver(null)
   }
 
-  const startCore = async (ctx: GenerateContext, _profile?: Profile) => {
+  const startCore = async (_profile?: Profile) => {
     if (running.value) throw 'The core is already running'
 
     logsStore.clearKernelLog()
@@ -365,10 +356,8 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
     starting.value = true
     try {
-      await generateConfigFile(
-        profile,
-        (config) => pluginsStore.onBeforeCoreStartTrigger(config, profile),
-        ctx,
+      await generateConfigFile(profile, (config) =>
+        pluginsStore.onBeforeCoreStartTrigger(config, profile),
       )
       const isAlpha = branch === Branch.Alpha
       const pid = await runCoreProcess(isAlpha)
@@ -391,16 +380,12 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     }
   }
 
-  const restartCore = async (
-    ctx: GenerateContext,
-    cleanupTask?: () => Promise<any>,
-    keepRuntimeProfile = false,
-  ) => {
+  const restartCore = async (cleanupTask?: () => Promise<any>, keepRuntimeProfile = false) => {
     restarting.value = true
     try {
       await stopCore()
       await cleanupTask?.()
-      await startCore(ctx, keepRuntimeProfile ? runtimeProfile : undefined)
+      await startCore(keepRuntimeProfile ? runtimeProfile : undefined)
     } finally {
       needRestart.value = false
       restarting.value = false
@@ -533,7 +518,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
   watch(needRestart, (v) => {
     if (v && appSettingsStore.app.autoRestartKernel) {
-      void restartCore(getGenerateCtx())
+      void restartCore()
     }
   })
 
@@ -558,7 +543,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     stopCore,
     restartCore,
     initCoreState,
-    getGenerateCtx,
     pid: corePid,
     running,
     starting,

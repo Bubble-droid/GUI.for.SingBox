@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { getGenerateContext } from '@generator/context'
 import { useI18n } from 'vue-i18n'
 
 import { Branch } from '@/enums/app'
@@ -17,7 +16,7 @@ const handleUseBranch = async (branch: Branch) => {
   if (!kernelApiStore.running) return
 
   try {
-    await kernelApiStore.restartCore(getGenerateContext())
+    await kernelApiStore.restartCore()
   } catch (error: any) {
     message.error(error)
   }

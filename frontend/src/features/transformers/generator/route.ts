@@ -66,7 +66,7 @@ export const generateRoute = (
         extra['rules'] = JSON.parse(ruleset.rules)
       } else if (ruleset.type === RuleSetType.Local) {
         const _ruleset = ctx.getRuleSet(ruleset.path)
-        extra['path'] = _ruleset?.path.replace(/^data\//, `${ctx.appDataPath}/`)
+        extra['path'] = _ruleset?.path.replace(/^data\//, `${ctx.appEnv.appDataPath}/`)
         extra['format'] = ruleset.format
       } else if (ruleset.type === RuleSetType.Remote) {
         extra['url'] = ruleset.url

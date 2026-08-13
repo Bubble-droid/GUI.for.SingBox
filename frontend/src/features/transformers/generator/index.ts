@@ -9,6 +9,7 @@ import { deepClone, deepAssign } from '@/utils/others'
 import { _adaptToStableBranch } from './adapter'
 import { generateCertificate } from './certificate'
 import { generateCertificateProviders } from './certificate_provider'
+import { getGenerateContext } from './context'
 import { generateDns } from './dns'
 import { generateEndpoints } from './endpoints'
 import { generateExperimental } from './experimental'
@@ -18,7 +19,7 @@ import { generateNetns } from './netns'
 import { generateNtp } from './ntp'
 import { generateOutbounds } from './outbounds'
 import { generateRoute } from './route'
-import type { GenerateConfigOptions, GenerateContext, TagMaps } from './types'
+import type { GenerateConfigOptions, TagMaps } from './types'
 
 const buildIdTagMapping = (items: TagItem[]): Map<string, string> => {
   return new Map(items.map((v) => [v.id, v.tag]))
@@ -26,13 +27,14 @@ const buildIdTagMapping = (items: TagItem[]): Map<string, string> => {
 
 export const generateConfig = async (
   originalProfile: Profile,
-  ctx: GenerateContext,
   options: GenerateConfigOptions = {},
 ) => {
   if (typeof options === 'boolean') {
     options = { enableStableConfigCompat: options }
   }
-  const isMainBranch = ctx.branch === Branch.Main
+
+  const ctx = getGenerateContext()
+  const isMainBranch = ctx.appSettings.kernel.branch === Branch.Main
 
   const {
     enableStableConfigCompat = isMainBranch,

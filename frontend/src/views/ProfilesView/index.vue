@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { generateConfig } from '@generator'
-import { getGenerateContext } from '@generator/context.ts'
 import type { Profile } from '@profiles'
 import { useI18n, I18nT } from 'vue-i18n'
 
@@ -51,7 +50,7 @@ const secondaryMenusList: App.Menu[] = [
         if (e && e !== 'The core is not running') {
           throw e
         }
-        await kernelApiStore.startCore(getGenerateContext())
+        await kernelApiStore.startCore()
       } catch (error: any) {
         message.error(error)
         console.error(error)
@@ -73,8 +72,7 @@ const secondaryMenusList: App.Menu[] = [
     handler: async (id: string) => {
       const p = profilesStore.getProfileById(id)!
       try {
-        const ctx = getGenerateContext()
-        const config = await generateConfig(p, ctx)
+        const config = await generateConfig(p)
         const str = JSON.stringify(config, null, 2)
         const ok = await ClipboardSetText(str)
         if (!ok) throw 'ClipboardSetText Error'
@@ -89,8 +87,7 @@ const secondaryMenusList: App.Menu[] = [
     handler: async (id: string) => {
       const p = profilesStore.getProfileById(id)!
       try {
-        const ctx = getGenerateContext()
-        const config = await generateConfig(p, ctx)
+        const config = await generateConfig(p)
         const m = modal({
           title: p.name,
           cancelText: 'common.close',
@@ -113,9 +110,8 @@ const secondaryMenusList: App.Menu[] = [
     label: 'profiles.editSourceFile',
     handler: async (id: string) => {
       const profile = profilesStore.getProfileById(id)!
-      const ctx = getGenerateContext()
       const m = modal({ title: profile.name, width: '90', height: '90' })
-      m.setContent(ProfileEditor, { profile, generateCtx: ctx }).open()
+      m.setContent(ProfileEditor, { profile }).open()
     },
   },
 ]
@@ -174,9 +170,8 @@ const generateMenus = (profile: Profile) => {
 }
 
 const handleShowProfileForm = (id?: string, step = 0) => {
-  const ctx = getGenerateContext()
   const m = modal({ title: id ? 'common.edit' : 'common.add', minWidth: '70' })
-  m.setContent(ProfileForm, { id, step, generateCtx: ctx }).open()
+  m.setContent(ProfileForm, { id, step }).open()
 }
 
 const handleDeleteProfile = async (p: Profile) => {
@@ -200,7 +195,7 @@ const handleUseProfile = async (p: Profile) => {
   appSettingsStore.app.kernel.profile = p.id
 
   if (kernelApiStore.running) {
-    await kernelApiStore.restartCore(getGenerateContext())
+    await kernelApiStore.restartCore()
   }
 }
 

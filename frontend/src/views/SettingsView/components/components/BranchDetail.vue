@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { getGenerateContext } from '@generator/context'
 import { useI18n } from 'vue-i18n'
 
 import { RemoveFile } from '@/bridge/io'
@@ -48,7 +47,7 @@ const {
 const handleClearCoreCache = async () => {
   try {
     if (kernelApiStore.running) {
-      await kernelApiStore.restartCore(getGenerateContext(), () => RemoveFile(CoreCacheFilePath))
+      await kernelApiStore.restartCore(() => RemoveFile(CoreCacheFilePath))
     } else {
       await RemoveFile(CoreCacheFilePath)
     }

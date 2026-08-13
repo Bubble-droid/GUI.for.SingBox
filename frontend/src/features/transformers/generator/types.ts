@@ -1,6 +1,6 @@
-import type { Profile } from '@profiles'
-
-import type { Branch } from '@/enums/app'
+import type { usePluginsStore } from '@/stores/plugins'
+import type { useRulesetsStore } from '@/stores/rulesets'
+import type { useSubscribesStore } from '@/stores/subscribes'
 
 export interface GenerateConfigOptions {
   enableStableConfigCompat?: boolean
@@ -19,9 +19,9 @@ export interface TagMaps {
 }
 
 export interface GenerateContext {
-  branch: Branch
-  appDataPath: string
-  onGenerate: (config: Recordable<any>, profile: Profile) => Promise<Recordable<any>>
-  getSubscribe: (id: string) => App.Subscription | undefined
-  getRuleSet: (id: string) => App.RuleSet | undefined
+  appSettings: App.AppSettings
+  appEnv: App.AppEnv
+  onGenerate: ReturnType<typeof usePluginsStore>['onGenerateTrigger']
+  getSubscribe: ReturnType<typeof useSubscribesStore>['getSubscribeById']
+  getRuleSet: ReturnType<typeof useRulesetsStore>['getRulesetById']
 }

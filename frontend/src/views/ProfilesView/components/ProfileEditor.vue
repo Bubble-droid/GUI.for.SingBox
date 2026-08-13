@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { generateConfig } from '@generator'
-import type { GenerateContext } from '@generator/types'
 import type { Profile } from '@profiles'
 import { restoreProfile } from '@restorer'
 import { ref, inject, h, onMounted } from 'vue'
@@ -13,7 +12,6 @@ import Button from '@/components/Button/index.vue'
 
 interface Props {
   profile: Profile
-  generateCtx?: GenerateContext | undefined
 }
 
 const props = defineProps<Props>()
@@ -56,7 +54,7 @@ const handleSave = async () => {
 }
 
 onMounted(() => {
-  generateConfig(props.profile, props.generateCtx!, {
+  generateConfig(props.profile, {
     enableStableConfigCompat: false,
     enablePluginProcessing: false,
     enableMixinProcessing: false,
