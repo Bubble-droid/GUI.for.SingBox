@@ -1,4 +1,5 @@
 import { PredefinedClashModeOptions } from '@features/constant/options'
+import { getGenerateContext } from '@generator/context'
 
 import { RestartApp } from '@/bridge/app'
 
@@ -62,7 +63,7 @@ export const getCommands = () => {
         {
           label: 'tray.startKernel',
           cmd: 'Start Core',
-          handler: kernelStore.startCore,
+          handler: () => kernelStore.startCore(getGenerateContext()),
         },
         {
           label: 'tray.stopKernel',
@@ -72,7 +73,7 @@ export const getCommands = () => {
         {
           label: 'tray.restartKernel',
           cmd: 'Restart Core',
-          handler: kernelStore.restartCore,
+          handler: () => kernelStore.restartCore(getGenerateContext()),
         },
         {
           label: 'tray.enableTunMode',

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getGenerateContext } from '@generator/context'
 import { ref, watch, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -27,7 +28,7 @@ const kernelApiStore = useKernelApiStore()
 
 const handleStartKernel = async () => {
   try {
-    await kernelApiStore.startCore()
+    await kernelApiStore.startCore(getGenerateContext())
   } catch (error: any) {
     console.error(error)
     message.error(error.message || error)

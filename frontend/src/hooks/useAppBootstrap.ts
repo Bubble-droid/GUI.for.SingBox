@@ -1,3 +1,4 @@
+import { getGenerateContext } from '@generator/context'
 import { ref } from 'vue'
 
 import { IsStartup } from '@/bridge/app'
@@ -63,7 +64,7 @@ export const useAppBootstrap = () => {
     await sleep(Math.max(0, MIN_SPLASH_DURATION - duration))
 
     loading.value = false
-    void kernelApiStore.initCoreState()
+    void kernelApiStore.initCoreState(getGenerateContext)
   }
 
   initialize().catch(showError)

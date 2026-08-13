@@ -66,6 +66,13 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   const rulesetsStore = useRulesetsStore()
   const appSettingsStore = useAppSettingsStore()
 
+  let generateCtxProvider: (() => GenerateContext) | undefined
+
+  const getGenerateCtx = (): GenerateContext => {
+    if (!generateCtxProvider) throw 'Generate context provider is not initialized'
+    return generateCtxProvider()
+  }
+
   /** RESTful API */
   const config = ref<CoreApiConfig>({
     port: 0,
@@ -231,7 +238,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
     fieldHandlerMap[field]?.()
 
-    await restartCore(undefined, true)
+    await restartCore(getGenerateCtx(), undefined, true)
     await envStore.updateSystemProxyStatus()
   }
 
@@ -253,7 +260,8 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   let isCoreStartedByThisInstance = false
   let { promise: coreStoppedPromise, resolve: coreStoppedResolver } = Promise.withResolvers()
 
-  const initCoreState = async () => {
+  const initCoreState = async (ctxProvider: () => GenerateContext) => {
+    generateCtxProvider = ctxProvider
     corePid.value = Number(await ReadFile(CorePidFilePath).catch(() => -1))
     const processName = corePid.value === -1 ? '' : await ProcessInfo(corePid.value).catch(() => '')
     running.value = processName.startsWith('sing-box')
@@ -265,7 +273,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       await Promise.all([refreshConfig(), refreshProviderProxies()])
       await envStore.updateSystemProxyStatus()
     } else if (appSettingsStore.app.autoStartKernel) {
-      await startCore()
+      await startCore(getGenerateCtx())
     }
   }
 
@@ -531,7 +539,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
   watch(needRestart, (v) => {
     if (v && appSettingsStore.app.autoRestartKernel) {
-      void restartCore()
+      void restartCore(getGenerateCtx())
     }
   })
 
@@ -556,6 +564,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     stopCore,
     restartCore,
     initCoreState,
+    getGenerateCtx,
     pid: corePid,
     running,
     starting,

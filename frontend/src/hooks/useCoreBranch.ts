@@ -1,3 +1,4 @@
+import { getGenerateContext } from '@generator/context'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -187,7 +188,7 @@ export const useCoreBranch = (isAlpha = false) => {
   const restartCore = async () => {
     if (!kernelApiStore.running) return
     try {
-      await kernelApiStore.restartCore()
+      await kernelApiStore.restartCore(getGenerateContext())
       downloadCompleted.value = false
     } catch (error: any) {
       message.error(error)
@@ -215,7 +216,7 @@ export const useCoreBranch = (isAlpha = false) => {
     const { branch } = appSettings.app.kernel
     const isCurrentRunning = kernelApiStore.running && (branch === Branch.Alpha) === isAlpha
     if (isCurrentRunning) {
-      await kernelApiStore.restartCore(doRollback)
+      await kernelApiStore.restartCore(getGenerateContext(), doRollback)
     } else {
       await doRollback()
     }

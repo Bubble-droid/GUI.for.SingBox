@@ -51,7 +51,7 @@ const secondaryMenusList: App.Menu[] = [
         if (e && e !== 'The core is not running') {
           throw e
         }
-        await kernelApiStore.startCore()
+        await kernelApiStore.startCore(getGenerateContext())
       } catch (error: any) {
         message.error(error)
         console.error(error)
@@ -200,7 +200,7 @@ const handleUseProfile = async (p: Profile) => {
   appSettingsStore.app.kernel.profile = p.id
 
   if (kernelApiStore.running) {
-    await kernelApiStore.restartCore()
+    await kernelApiStore.restartCore(getGenerateContext())
   }
 }
 
