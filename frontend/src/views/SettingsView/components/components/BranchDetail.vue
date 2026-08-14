@@ -128,11 +128,7 @@ const handleClearCoreCache = async () => {
       <Tag
         :color="updatable ? 'purple' : 'default'"
         class="cursor-pointer"
-        @click="
-          envStore.env.isBundled
-            ? message.info('about.updatesManagedByOS')
-            : refreshRemoteVersion(true)
-        "
+        @click="refreshRemoteVersion(true)"
       >
         {{ t('settings.kernel.remote') }}
         :
@@ -141,6 +137,7 @@ const handleClearCoreCache = async () => {
       <Button
         v-show="!localVersionLoading && !remoteVersionLoading && updatable"
         :loading="downloading"
+        :disabled="envStore.env.isBundled"
         icon="sparkle"
         size="small"
         type="primary"

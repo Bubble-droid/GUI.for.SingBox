@@ -69,6 +69,10 @@ export const useCoreBranch = (isAlpha = false) => {
   const CoreBakFilePath = `${CoreFilePath}.bak`
 
   const downloadCore = async () => {
+    if (envStore.env.isBundled) {
+      message.info('about.updatesManagedByOS')
+      return
+    }
     downloading.value = true
     downloadProgress.value = ''
     cancelDownload.value = undefined
@@ -199,15 +203,27 @@ export const useCoreBranch = (isAlpha = false) => {
   }
 
   const refreshRemoteVersion = async (showTips = false) => {
+    if (envStore.env.isBundled) {
+      message.info('about.updatesManagedByOS')
+      return
+    }
     remoteVersion.value = await getRemoteVersion(showTips)
   }
 
   const grantCorePermission = async () => {
+    if (envStore.env.isBundled) {
+      message.info('about.updatesManagedByOS')
+      return
+    }
     await GrantTUNPermission(CoreFilePath)
     message.success('common.success')
   }
 
   const rollbackCore = async () => {
+    if (envStore.env.isBundled) {
+      message.info('about.updatesManagedByOS')
+      return
+    }
     await confirm('common.warning', 'settings.kernel.rollback')
 
     const doRollback = () => MoveFile(CoreBakFilePath, CoreFilePath)
