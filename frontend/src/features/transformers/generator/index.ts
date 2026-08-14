@@ -48,6 +48,7 @@ export const generateConfig = async (
   const tagMaps: TagMaps = {
     certProviders: buildIdTagMapping(profile.certificate_providers),
     httpClients: buildIdTagMapping(profile.http_clients),
+    netns: buildIdTagMapping(profile.network_namespaces),
     endpoints: buildIdTagMapping(profile.endpoints),
     inbounds: buildIdTagMapping([...profile.endpoints, ...profile.inbounds]),
     outbounds: buildIdTagMapping([...profile.endpoints, ...profile.outbounds]),

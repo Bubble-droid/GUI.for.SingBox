@@ -90,7 +90,8 @@ export const restoreDialer = <T extends object>(
     ...owned,
     network_type: ensureArray(owned.network_type),
     fallback_network_type: ensureArray(owned.fallback_network_type),
-    detour: maps.outbounds.get(owned.detour!) ?? '',
+    netns: maps.netns.get(owned.netns ?? '') ?? '',
+    detour: maps.outbounds.get(owned.detour ?? '') ?? '',
     domain_resolver: resolver,
   }
   return { dialer, rest: result.rest }
@@ -119,7 +120,8 @@ export const restoreListen = <T extends object>(
   const listen: Listen = {
     ...template,
     ...owned,
-    detour: maps.inbounds.get(owned.detour!) ?? '',
+    netns: maps.netns.get(owned.netns ?? '') ?? '',
+    detour: maps.inbounds.get(owned.detour ?? '') ?? '',
   }
   return { listen, rest: result.rest }
 }

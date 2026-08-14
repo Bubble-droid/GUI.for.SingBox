@@ -12,6 +12,7 @@ export interface GenerateConfigOptions {
 export interface TagMaps {
   certProviders: Map<string, string>
   httpClients: Map<string, string>
+  netns: Map<string, string>
   endpoints: Map<string, string>
   inbounds: Map<string, string>
   outbounds: Map<string, string>

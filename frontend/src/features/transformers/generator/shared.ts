@@ -43,7 +43,8 @@ export const generateDomainResolver = (
 export const generateDialer = (dialer: Dialer, maps: TagMaps): SingBoxDialer => {
   return {
     ...(dialer as SingBoxDialer),
-    detour: maps.outbounds.get(dialer.detour)!,
+    netns: maps.netns.get(dialer.netns) ?? '',
+    detour: maps.outbounds.get(dialer.detour) ?? '',
     domain_resolver: generateDomainResolver(dialer.domain_resolver, maps),
   }
 }
@@ -53,10 +54,11 @@ export const generateUdpNat = (udpNat: UdpNat): SingBoxUdpNat => {
 }
 
 export const generateListen = (listen: Listen, maps: TagMaps): SingBoxListen => {
-  return filterInvalidProps({
+  return {
     ...(listen as SingBoxListen),
-    detour: maps.inbounds?.get(listen.detour),
-  })
+    netns: maps.netns.get(listen.netns) ?? '',
+    detour: maps.inbounds.get(listen.detour) ?? '',
+  }
 }
 
 export const _generateRule = (
