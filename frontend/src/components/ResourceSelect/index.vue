@@ -147,7 +147,7 @@ const handleSelect = (item: ResourceItem) => {
   const nextValue: string[] = []
 
   if (model.value.includes(id)) {
-    nextValue.push(...model.value.filter((item) => item !== id))
+    nextValue.push(...model.value.filter((v) => v !== id))
   } else {
     nextValue.push(...model.value, id)
     if (nextValue.length > props.max) {

@@ -49,7 +49,7 @@ const handleTest = async (event: PluginTriggerEvent, arg1?: any, arg2?: any) => 
   if (!plugin.value || testing.value) return
   testing.value = true
   try {
-    const metadata = JSON.stringify({
+    const metadataJSON = JSON.stringify({
       ...pluginsStore.getPluginMetadata(props.id),
       Mode: 'Dev',
     })
@@ -60,11 +60,11 @@ const handleTest = async (event: PluginTriggerEvent, arg1?: any, arg2?: any) => 
       arg1 = '{}'
       arg2 = '{}'
     } else if (event === PluginTriggerEvent.OnConfigure) {
-      arg1 = metadata
-      arg2 = metadata
+      arg1 = metadataJSON
+      arg2 = metadataJSON
     }
     const fn = new window.AsyncFunction(
-      `const Plugin = ${metadata};\n${code.value}\nreturn await ${event}(${arg1}, ${arg2})`,
+      `const Plugin = ${metadataJSON};\n${code.value}\nreturn await ${event}(${arg1}, ${arg2})`,
     )
     await fn()
     message.success('common.success')

@@ -89,8 +89,8 @@ const renderServer = (server: DnsServerConfig) => {
     h(Tag, () => generateDnsServerURL(server)),
   ]
   if (detour) {
-    const tag = props.outboundOptions.find((v) => v.value === detour)?.label || detour
-    children.push(h(Tag, { color: 'default' }, () => tag))
+    const detourLabel = props.outboundOptions.find((v) => v.value === detour)?.label || detour
+    children.push(h(Tag, { color: 'default' }, () => detourLabel))
   }
   return h('div', { class: 'font-bold' }, children)
 }

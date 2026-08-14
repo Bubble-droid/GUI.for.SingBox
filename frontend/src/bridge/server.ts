@@ -64,26 +64,32 @@ export const StartServer = async (
   }
 
   EventsOn(id, async (...args) => {
-    const [id, method, url, headers, body] = args
+    const [requestId, method, url, headers, body] = args
     try {
       await handler(
         {
-          id,
+          id: requestId,
           method,
           url,
           headers: Object.entries(headers).reduce((p, c: any) => ({ ...p, [c[0]]: c[1][0] }), {}),
           body,
         },
         {
-          end: (status, headers, body, options) => {
-            EventsEmit(id, status, JSON.stringify(headers), body, JSON.stringify(options))
+          end: (status, resHeaders, resBody, resOptions) => {
+            EventsEmit(
+              requestId,
+              status,
+              JSON.stringify(resHeaders),
+              resBody,
+              JSON.stringify(resOptions),
+            )
           },
         },
       )
     } catch (err: any) {
-      console.log('Server handler err:', err, id)
+      console.log('Server handler err:', err, requestId)
       EventsEmit(
-        id,
+        requestId,
         500,
         JSON.stringify({ 'Content-Type': 'text/plain; charset=utf-8' }),
         err.message || err,

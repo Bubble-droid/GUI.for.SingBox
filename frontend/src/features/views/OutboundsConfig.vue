@@ -54,7 +54,7 @@ const handleDeleteGroup = (index: number) => {
   model.value.splice(index, 1)
   proxyGroup.value = proxyGroup.value.map((v) => ({
     ...v,
-    proxies: v.proxies.filter((v) => v.id !== id),
+    proxies: v.proxies.filter((p) => p.id !== id),
   }))
 }
 

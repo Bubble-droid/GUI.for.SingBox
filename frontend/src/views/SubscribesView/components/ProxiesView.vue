@@ -136,10 +136,10 @@ const handleSave = async () => {
   try {
     const { path, proxies, id } = sub.value
     await initAllFieldsProxies()
-    const filteredProxies = allFieldsProxies.value.filter((v: any) =>
+    const matched = allFieldsProxies.value.filter((v: any) =>
       proxies.some((vv) => vv.tag === v.tag),
     )
-    const sortedArray = proxies.map((v) => filteredProxies.find((vv) => vv.tag === v.tag))
+    const sortedArray = proxies.map((v) => matched.find((vv) => vv.tag === v.tag))
     await WriteFile(path, JSON.stringify(sortedArray, null, 2))
     await subscribeStore.editSubscribe(id, sub.value)
     handleSubmit()

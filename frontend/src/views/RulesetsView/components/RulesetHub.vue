@@ -31,7 +31,7 @@ watch(keywords, () => (currentPage.value = 1))
 const filteredList = computed(() => {
   const tokens = keywords.value.trim().split(/\s+/).filter(Boolean)
   if (tokens.length === 0) return rulesetsStore.rulesetHub.list
-  const lowered = tokens.map((t) => t.toLocaleLowerCase())
+  const lowered = tokens.map((token) => token.toLocaleLowerCase())
   return rulesetsStore.rulesetHub.list.filter((ruleset) => {
     const fields = [ruleset.name, ruleset.type, ruleset.description].map((f) =>
       f?.toLocaleLowerCase(),
