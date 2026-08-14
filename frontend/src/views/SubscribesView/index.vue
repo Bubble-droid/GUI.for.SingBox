@@ -6,7 +6,7 @@ import { RemoveFile } from '@/bridge/io.ts'
 import { BrowserOpenURL, ClipboardSetText } from '@wails/runtime/runtime'
 
 import { DraggableOptions, ViewOptions } from '@/constant/app'
-import { RequestProxyMode, View } from '@/enums/app'
+import { RequestProxyMode, View } from '@/constant/app.ts'
 import { useAppStore } from '@/stores/app.ts'
 import { useAppSettingsStore } from '@/stores/appSettings.ts'
 import { usePluginsStore } from '@/stores/plugins.ts'

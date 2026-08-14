@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 
 import { GetEnv, GetSystemProxy, SetSystemProxy, SetSystemDNS } from '@/bridge/app'
 
-import { OS } from '@/enums/app'
+import { OS } from '@/constant/app'
 import { formatProxyHost } from '@/utils/format'
 import { ignoredError } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'

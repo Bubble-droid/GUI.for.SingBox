@@ -7,7 +7,7 @@ import { Notify } from '@/bridge/app'
 import { ReadFile, WriteFile } from '@/bridge/io'
 
 import { ScheduledTasksFilePath } from '@/constant/app'
-import { ScheduledTasksType, PluginTriggerEvent } from '@/enums/app'
+import { ScheduledTasksType, PluginTriggerEvent } from '@/constant/app'
 import { ignoredError, stringifyNoFolding } from '@/utils/others'
 
 import { StoreDep, useStoreDeps } from './deps'

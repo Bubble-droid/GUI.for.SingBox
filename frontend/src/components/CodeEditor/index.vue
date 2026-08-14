@@ -16,7 +16,7 @@ import estreePlugin from 'prettier/plugins/estree'
 import * as prettier from 'prettier/standalone'
 import { watch, onUnmounted, onMounted, useTemplateRef, inject } from 'vue'
 
-import { Theme } from '@/enums/app'
+import { Theme } from '@/constant/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { getCompletions } from '@/utils/completion'
 import { message } from '@/utils/interaction'

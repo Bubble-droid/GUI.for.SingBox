@@ -4,11 +4,11 @@ import { Notify, ShowMainWindow, RestartApp, UpdateTrayAndMenus } from '@/bridge
 import { EventsOff, EventsOn } from '@wails/runtime/runtime'
 
 import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { OS } from '@/enums/app'
+import { OS } from '@/constant/app'
 import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 
-import type { Lang } from '@/enums/app'
+import type { Lang } from '@/constant/app'
 
 import { APP_TITLE, APP_VERSION } from './env'
 import { handleUseProxy, handleChangeMode, exitApp } from './helper'

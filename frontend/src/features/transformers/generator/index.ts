@@ -3,7 +3,7 @@ import type { Profile } from '@profiles'
 import type { TagItem } from '@profiles/shared'
 import { parse } from 'yaml'
 
-import { Branch } from '@/enums/app'
+import { Branch } from '@/constant/app'
 import { deepClone, deepAssign } from '@/utils/others'
 
 import { _adaptToStableBranch } from './adapter'

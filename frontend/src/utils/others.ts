@@ -1,6 +1,6 @@
 import { stringify } from 'yaml'
 
-import { OS } from '@/enums/app'
+import { OS } from '@/constant/app'
 import appDts from '@/types/app.d.ts?raw'
 
 import { APP_TITLE, APP_VERSION } from './env'

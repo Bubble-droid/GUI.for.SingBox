@@ -6,7 +6,7 @@ import { useI18n, I18nT } from 'vue-i18n'
 import { ClipboardSetText } from '@wails/runtime/runtime.js'
 
 import { DraggableOptions, ProfileMenuList, ViewOptions } from '@/constant/app'
-import { View } from '@/enums/app'
+import { View } from '@/constant/app.ts'
 import { useAppStore } from '@/stores/app.ts'
 import { useAppSettingsStore } from '@/stores/appSettings.ts'
 import { useKernelApiStore } from '@/stores/kernelApi.ts'

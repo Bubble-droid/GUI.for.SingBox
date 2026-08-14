@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import { ExitApp } from '@/bridge/app'
 
 import { WebviewGpuPolicyOptions, WindowStateOptions } from '@/constant/app'
-import { OS } from '@/enums/app'
+import { OS } from '@/constant/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useEnvStore } from '@/stores/env'
 import {

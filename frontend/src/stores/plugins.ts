@@ -7,7 +7,7 @@ import { ReadFile, WriteFile, RemoveFile } from '@/bridge/io'
 import { HttpGet, Requests } from '@/bridge/net'
 
 import { PluginHubFilePath, PluginsFilePath } from '@/constant/app'
-import { PluginTrigger, PluginTriggerEvent, RequestMethod } from '@/enums/app'
+import { PluginTrigger, PluginTriggerEvent, RequestMethod } from '@/constant/app'
 import { confirm } from '@/utils/interaction'
 import { isNumber } from '@/utils/is'
 import {
@@ -237,7 +237,7 @@ export const usePluginsStore = defineStore('plugins', () => {
       })
     }
 
-    const events = new Set<PluginTriggerEvent | string>([
+    const events = new Set<PluginTriggerEvent>([
       PluginTriggerEvent.OnEnabled,
       PluginTriggerEvent.OnDisabled,
       PluginTriggerEvent.OnDispose,
@@ -253,7 +253,7 @@ export const usePluginsStore = defineStore('plugins', () => {
     }
 
     Object.values(cache.plugin.menus).forEach((fn) => {
-      events.add(fn)
+      events.add(fn as any)
     })
     Object.values(cache.plugin.context).forEach((ctx) => {
       Object.values(ctx).forEach((fn) => {

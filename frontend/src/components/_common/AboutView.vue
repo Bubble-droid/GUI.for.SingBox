@@ -6,7 +6,7 @@ import { ExitApp, RestartApp } from '@/bridge/app'
 import { BrowserOpenURL } from '@wails/runtime/runtime'
 
 import logo from '@/assets/logo'
-import { OS } from '@/enums/app'
+import { OS } from '@/constant/app'
 import { useAppStore } from '@/stores/app'
 import { useEnvStore } from '@/stores/env'
 import { PROJECT_URL, TG_GROUP, TG_CHANNEL, APP_TITLE, APP_VERSION } from '@/utils/env'

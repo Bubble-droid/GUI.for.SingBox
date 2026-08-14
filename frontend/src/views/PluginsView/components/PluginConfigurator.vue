@@ -2,7 +2,7 @@
 import { ref, inject, h, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { PluginTriggerEvent } from '@/enums/app'
+import { PluginTriggerEvent } from '@/constant/app.ts'
 import { useAppSettingsStore } from '@/stores/appSettings.ts'
 import { usePluginsStore } from '@/stores/plugins.ts'
 import { message } from '@/utils/interaction.ts'

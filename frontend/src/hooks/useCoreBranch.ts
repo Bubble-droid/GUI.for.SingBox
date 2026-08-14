@@ -15,8 +15,8 @@ import {
 import { HttpGet, HttpCancel, Download } from '@/bridge/net'
 import { BrowserOpenURL } from '@wails/runtime/runtime'
 
+import { Branch, OS } from '@/constant/app'
 import { CoreWorkingDirectory } from '@/constant/kernel'
-import { Branch, OS } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useEnvStore } from '@/stores/env'
 import { useKernelApiStore } from '@/stores/kernelApi'

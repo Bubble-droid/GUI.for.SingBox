@@ -21,7 +21,6 @@ import {
   DefaultTestURL,
   UserFilePath,
 } from '@/constant/app'
-import { DefaultConnections, DefaultCoreConfig } from '@/constant/kernel'
 import {
   Theme,
   WindowStartState,
@@ -32,7 +31,8 @@ import {
   ControllerCloseMode,
   Branch,
   RequestProxyMode,
-} from '@/enums/app'
+} from '@/constant/app'
+import { DefaultConnections, DefaultCoreConfig } from '@/constant/kernel'
 import i18n, { loadLocale } from '@/lang'
 import { message } from '@/utils/interaction'
 import { debounce, ignoredError, deepClone } from '@/utils/others'

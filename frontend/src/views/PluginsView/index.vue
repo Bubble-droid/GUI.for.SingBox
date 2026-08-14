@@ -5,7 +5,7 @@ import { useI18n, I18nT } from 'vue-i18n'
 import { OpenURI } from '@/bridge/io.ts'
 
 import { DraggableOptions, ViewOptions } from '@/constant/app'
-import { PluginTriggerEvent, PluginTrigger, View } from '@/enums/app'
+import { PluginTriggerEvent, PluginTrigger, View } from '@/constant/app.ts'
 import { useAppSettingsStore } from '@/stores/appSettings.ts'
 import { usePluginsStore } from '@/stores/plugins.ts'
 import { message, modal } from '@/utils/interaction.ts'

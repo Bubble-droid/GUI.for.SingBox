@@ -2,7 +2,7 @@ import { snippetCompletion, completeFromList } from '@codemirror/autocomplete'
 import type { CompletionContext, Completion } from '@codemirror/autocomplete'
 import { scopeCompletionSource, localCompletionSource, snippets } from '@codemirror/lang-javascript'
 
-import { PluginTriggerEvent } from '@/enums/app'
+import { PluginTriggerEvent } from '@/constant/app'
 import i18n from '@/lang'
 
 export const getCompletions = (pluginScope?: any) => {

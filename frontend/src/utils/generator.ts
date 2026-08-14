@@ -17,8 +17,8 @@ import { parse } from 'yaml'
 
 import { ReadFile, WriteFile } from '@/bridge/io'
 
+import { Branch } from '@/constant/app'
 import { CoreConfigFilePath } from '@/constant/kernel'
-import { Branch } from '@/enums/app'
 
 import { APP_TITLE } from './env'
 import { deepAssign, createTextMatcher, deepClone } from './others'

@@ -7,7 +7,7 @@ import { ReadDir, RemoveFile, UnzipZIPFile, UnzipTarGZFile, MoveFile } from '@/b
 import { HttpCancel, Download, HttpGet } from '@/bridge/net'
 
 import { LanguageOptions, LocalesFilePath } from '@/constant/app'
-import { OS } from '@/enums/app'
+import { OS } from '@/constant/app'
 import { loadLocale } from '@/lang'
 import { APP_VERSION, APP_IDENTIFIER, APP_VERSION_API } from '@/utils/env'
 import { confirm, message } from '@/utils/interaction'

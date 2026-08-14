@@ -3,7 +3,7 @@ import { createI18n } from 'vue-i18n'
 import { ReadFile } from '@/bridge/io'
 
 import { LocalesFilePath } from '@/constant/app'
-import { Lang } from '@/enums/app'
+import { Lang } from '@/constant/app'
 
 import en from './locale/en'
 import zh from './locale/zh'

@@ -3,7 +3,7 @@ import { ref, inject, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { PluginsTriggerOptions, DraggableOptions } from '@/constant/app'
-import { PluginTrigger } from '@/enums/app'
+import { PluginTrigger } from '@/constant/app'
 import { useBool } from '@/hooks/useBool'
 import { usePluginsStore } from '@/stores/plugins'
 import { message } from '@/utils/interaction'

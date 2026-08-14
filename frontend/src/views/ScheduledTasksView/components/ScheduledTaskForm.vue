@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { IsNotificationAvailable, RequestNotificationAuthorization } from '@wails/runtime/runtime'
 
 import { ScheduledTaskOptions } from '@/constant/app'
-import { ScheduledTasksType } from '@/enums/app'
+import { ScheduledTasksType } from '@/constant/app'
 import { usePluginsStore } from '@/stores/plugins'
 import { useRulesetsStore } from '@/stores/rulesets'
 import { useScheduledTasksStore } from '@/stores/scheduledtasks'

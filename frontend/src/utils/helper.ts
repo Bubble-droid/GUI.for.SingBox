@@ -6,7 +6,7 @@ import { AbsolutePath, FileExists, WriteFile, RemoveFile, ReadFile } from '@/bri
 import { WindowReloadApp } from '@wails/runtime/runtime'
 
 import { deleteConnection, getConnections, useProxy } from '@/api/kernel'
-import { OS, RequestProxyMode } from '@/enums/app'
+import { OS, RequestProxyMode } from '@/constant/app'
 import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 

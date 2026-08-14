@@ -11,7 +11,7 @@ import {
   DefaultTestTimeout,
   DefaultTestURL,
 } from '@/constant/app'
-import { ControllerCloseMode } from '@/enums/app'
+import { ControllerCloseMode } from '@/constant/app'
 import { useBool } from '@/hooks/useBool'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useKernelApiStore } from '@/stores/kernelApi'

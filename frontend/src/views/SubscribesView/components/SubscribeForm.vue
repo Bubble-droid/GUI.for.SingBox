@@ -10,7 +10,7 @@ import {
   RequestMethodOptions,
   SubscriptionRequestProxyModeOptions,
 } from '@/constant/app'
-import { RequestProxyMode } from '@/enums/app'
+import { RequestProxyMode } from '@/constant/app'
 import { useBool } from '@/hooks/useBool'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useSubscribesStore } from '@/stores/subscribes'
