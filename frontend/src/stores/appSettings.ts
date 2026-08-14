@@ -262,6 +262,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     if (latestUserSettings !== lastModifiedSettings) {
       void saveAppSettings(lastModifiedSettings).then(() => {
         latestUserSettings = lastModifiedSettings
+        return
       })
     } else {
       saveAppSettings.cancel()

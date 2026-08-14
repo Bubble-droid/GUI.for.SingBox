@@ -3,10 +3,12 @@ import type { Directive, DirectiveBinding } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { sleep } from '@/utils/others'
 
+const menuHandlers = new WeakMap<HTMLElement, (e: MouseEvent) => void>()
+
 const updateMenus = (el: HTMLElement, binding: DirectiveBinding<App.Menu[]>) => {
   const appStore = useAppStore()
 
-  el.oncontextmenu = async (e) => {
+  const onContextMenu = async (e: MouseEvent) => {
     e.preventDefault()
     if (binding.value.length) {
       appStore.menuPosition = { x: e.clientX, y: e.clientY }
@@ -18,6 +20,11 @@ const updateMenus = (el: HTMLElement, binding: DirectiveBinding<App.Menu[]>) => 
       appStore.menuShow = true
     }
   }
+
+  const previous = menuHandlers.get(el)
+  if (previous) el.removeEventListener('contextmenu', previous)
+  el.addEventListener('contextmenu', onContextMenu)
+  menuHandlers.set(el, onContextMenu)
 }
 
 export default {
@@ -28,6 +35,8 @@ export default {
     updateMenus(el, binding)
   },
   unmounted(el) {
-    el.oncontextmenu = null
+    const handler = menuHandlers.get(el)
+    if (handler) el.removeEventListener('contextmenu', handler)
+    menuHandlers.delete(el)
   },
 } satisfies Directive<HTMLElement, App.Menu[]>

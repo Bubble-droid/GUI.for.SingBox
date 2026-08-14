@@ -1,3 +1,4 @@
+// oxlint-disable import/no-unassigned-import
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 

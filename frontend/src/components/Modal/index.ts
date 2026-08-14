@@ -40,12 +40,12 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
       this.patchProps({ destroyOnClose: true })
       this.close()
     },
-    setProps(options: ModalProps) {
-      props.value = options
+    setProps(newOpts: ModalProps) {
+      props.value = newOpts
       return this
     },
-    patchProps(options: ModalProps) {
-      Object.assign(props.value, options)
+    patchProps(newOpts: ModalProps) {
+      Object.assign(props.value, newOpts)
       return this
     },
     setSlots(_slots: ModalSlots) {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import { ExitApp } from '@/bridge/app'
 
@@ -69,15 +69,13 @@ const onStartupDelayChange = async (delay: number) => {
   }
 }
 
-IsAutoStartEnabled().then((res) => {
-  isAutoStart.value = res
-})
+onMounted(async () => {
+  isAutoStart.value = await IsAutoStartEnabled()
 
-if (envStore.env.os === OS.Windows) {
-  CheckPermissions().then((admin) => {
-    isAdmin.value = admin
-  })
-}
+  if (envStore.env.os === OS.Windows) {
+    isAdmin.value = await CheckPermissions()
+  }
+})
 </script>
 
 <template>

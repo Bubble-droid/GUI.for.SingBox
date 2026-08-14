@@ -30,24 +30,30 @@ export class WebSockets {
 
     let isManualClose = false
     let ws: WebSocket | null = null
+    let onMessage: ((e: MessageEvent) => void) | null = null
+    let onClose: ((e: CloseEvent) => void) | null = null
 
     const connect = () => {
       ws = new WebSocket(this.base + url)
-      ws.onmessage = (e) => options.cb(JSON.parse(e.data))
-      ws.onclose = () => {
+      onMessage = (e) => options.cb(JSON.parse(e.data))
+      onClose = () => {
         setTimeout(() => {
           if (!isManualClose) {
             setTimeout(connect, 3000)
           }
         }, 1000)
       }
+      ws.addEventListener('message', onMessage)
+      ws.addEventListener('close', onClose)
     }
 
     const disconnect = () => {
       isManualClose = true
       if (ws) {
-        ws.onmessage = null
-        ws.onclose = null
+        if (onMessage) ws.removeEventListener('message', onMessage)
+        if (onClose) ws.removeEventListener('close', onClose)
+        onMessage = null
+        onClose = null
         ws.close()
         ws = null
       }
