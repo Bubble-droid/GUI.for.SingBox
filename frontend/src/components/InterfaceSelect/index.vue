@@ -1,5 +1,5 @@
 <script lang="ts" setup generic="M extends boolean = false">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import { GetInterfaces } from '@/bridge/app'
 
@@ -25,8 +25,9 @@ const onChange = (val: ModelType) => {
   emits('change', val)
 }
 
-GetInterfaces().then((res) => {
-  options.value = res.map((v) => ({ label: v, value: v }))
+onMounted(async () => {
+  const interfaces = await GetInterfaces()
+  options.value = interfaces.map((v) => ({ label: v, value: v }))
 })
 </script>
 

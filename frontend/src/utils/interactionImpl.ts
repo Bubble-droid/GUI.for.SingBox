@@ -109,11 +109,12 @@ class MessageImpl implements Message {
 
       return {
         id,
-        info: (content: unknown) => this.update(id, content, 'info'),
-        warn: (content: unknown) => this.update(id, content, 'warn'),
-        error: (content: unknown) => this.update(id, content, 'error'),
-        success: (content: unknown) => this.update(id, content, 'success'),
-        update: (content: unknown, icon?: MessageIcon) => this.update(id, content, icon),
+        info: (newContent: unknown) => this.update(id, newContent, 'info'),
+        warn: (newContent: unknown) => this.update(id, newContent, 'warn'),
+        error: (newContent: unknown) => this.update(id, newContent, 'error'),
+        success: (newContent: unknown) => this.update(id, newContent, 'success'),
+        update: (nextContent: unknown, nextIcon?: MessageIcon) =>
+          this.update(id, nextContent, nextIcon),
         destroy: onDestroy,
       }
     }

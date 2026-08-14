@@ -7,6 +7,11 @@ interface TipsElement extends HTMLElement {
   _tipsValue?: string
 }
 
+const tipsHandlers = new WeakMap<
+  TipsElement,
+  { onMouseEnter: (e: MouseEvent) => void; onMouseLeave: () => void }
+>()
+
 export default {
   mounted(el: TipsElement, binding) {
     const appStore = useAppStore()
@@ -22,17 +27,21 @@ export default {
       }
     }, delay)
 
-    el.onmouseenter = (e) => {
+    const onMouseEnter = (e: MouseEvent) => {
       if (el._tipsValue) {
         el.dataset['showTips'] = 'true'
         void show(e.clientX, e.clientY)
       }
     }
 
-    el.onmouseleave = () => {
+    const onMouseLeave = () => {
       appStore.tipsShow = false
       el.dataset['showTips'] = 'false'
     }
+
+    el.addEventListener('mouseenter', onMouseEnter)
+    el.addEventListener('mouseleave', onMouseLeave)
+    tipsHandlers.set(el, { onMouseEnter, onMouseLeave })
   },
   updated(el: TipsElement, binding) {
     el._tipsValue = binding.value
@@ -41,7 +50,11 @@ export default {
     const appStore = useAppStore()
     appStore.tipsShow = false
     el.dataset['showTips'] = 'false'
-    el.onmouseenter = null
-    el.onmouseleave = null
+    const handlers = tipsHandlers.get(el)
+    if (handlers) {
+      el.removeEventListener('mouseenter', handlers.onMouseEnter)
+      el.removeEventListener('mouseleave', handlers.onMouseLeave)
+    }
+    tipsHandlers.delete(el)
   },
 } satisfies Directive<HTMLElement, string>

@@ -53,15 +53,14 @@ const handleSave = async () => {
   loading.value = false
 }
 
-onMounted(() => {
-  generateConfig(props.profile, {
+onMounted(async () => {
+  const config = await generateConfig(props.profile, {
     enableStableConfigCompat: false,
     enablePluginProcessing: false,
     enableMixinProcessing: false,
     enableScriptProcessing: false,
-  }).then((text) => {
-    profileText.value = JSON.stringify(text, null, 2)
   })
+  profileText.value = JSON.stringify(config, null, 2)
 })
 
 const modalSlots = {

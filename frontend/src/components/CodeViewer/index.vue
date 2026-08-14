@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// oxlint-disable import/no-unassigned-import
 import Prism from 'prismjs'
 import { computed } from 'vue'
 
