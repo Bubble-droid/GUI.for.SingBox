@@ -1,9 +1,4 @@
-import {
-  RouteRuleType,
-  RouteRuleAction,
-  DomainStrategy,
-  RuleSetType,
-} from '@features/constant/kernel'
+import { RouteRuleType, RouteRuleAction, RuleSetType } from '@features/constant/kernel'
 import type { DnsConfig } from '@profiles/dns'
 import type { InboundConfig } from '@profiles/inbounds'
 import type { OutboundConfig } from '@profiles/outbounds'
@@ -11,7 +6,7 @@ import type { RouteConfig } from '@profiles/route'
 
 import { deepAssign } from '@/utils/others'
 
-import { _generateRule } from './shared'
+import { generateRule } from './shared'
 import type { GenerateContext } from './types'
 
 export const generateRoute = (
@@ -25,9 +20,9 @@ export const generateRoute = (
   const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
   const isInboundEnabled = (id: string) => inbounds.find((v) => v.id === id)?.enable
 
-  const extra: Recordable = {}
+  const routeExtra: Recordable = {}
   if (!route.auto_detect_interface) {
-    extra['default_interface'] = route.default_interface
+    routeExtra['default_interface'] = route.default_interface
   }
   return {
     rules: route.rules.flatMap((rule) => {
@@ -37,7 +32,7 @@ export const generateRoute = (
       if (rule.type === RouteRuleType.Inbound && !isInboundEnabled(rule.payload)) {
         return []
       }
-      const extra: Recordable = _generateRule(rule, route.rule_set, inbounds)
+      const extra: Recordable = generateRule(rule, route.rule_set, inbounds)
 
       if (rule.action === RouteRuleAction.Route) {
         extra['outbound'] = getOutbound(rule.outbound)
@@ -50,7 +45,7 @@ export const generateRoute = (
           extra['sniffer'] = rule.sniffer
         }
       } else if (rule.action === RouteRuleAction.Resolve) {
-        if (rule.strategy !== DomainStrategy.Default) {
+        if (rule.strategy) {
           extra['strategy'] = rule.strategy
         }
         extra['server'] = getDnsServer(rule.server)
@@ -65,8 +60,8 @@ export const generateRoute = (
       if (ruleset.type === RouteRuleType.Inline) {
         extra['rules'] = JSON.parse(ruleset.rules)
       } else if (ruleset.type === RuleSetType.Local) {
-        const _ruleset = ctx.getRuleSet(ruleset.path)
-        extra['path'] = _ruleset?.path.replace(/^data\//, `${ctx.appEnv.appDataPath}/`)
+        const localRuleset = ctx.getRuleSet(ruleset.path)
+        extra['path'] = localRuleset?.path.replace(/^data\//, `${ctx.appEnv.appDataPath}/`)
         extra['format'] = ruleset.format
       } else if (ruleset.type === RuleSetType.Remote) {
         extra['url'] = ruleset.url
@@ -88,6 +83,6 @@ export const generateRoute = (
     default_domain_resolver: {
       server: getDnsServer(route.default_domain_resolver.server),
     },
-    ...extra,
+    ...routeExtra,
   }
 }

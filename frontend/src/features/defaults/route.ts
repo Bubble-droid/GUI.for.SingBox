@@ -1,7 +1,7 @@
+import type { DomainStrategy } from '@features/constant/kernel'
 import {
   RouteRuleType,
   RouteRuleAction,
-  DomainStrategy,
   RuleSetType,
   RuleSetFormat,
   ClashMode,
@@ -26,7 +26,7 @@ export const createRouteRule = (): RouteRuleConfig => ({
   action: RouteRuleAction.Route,
   outbound: '',
   sniffer: [],
-  strategy: DomainStrategy.Default,
+  strategy: '' as DomainStrategy,
   server: '',
 })
 
@@ -53,7 +53,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Sniff,
       outbound: '',
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -65,7 +65,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.HijackDns,
       outbound: '',
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -77,7 +77,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -89,7 +89,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Global,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -101,7 +101,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: '',
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -113,7 +113,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -125,7 +125,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Block,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -137,7 +137,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Block,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -149,7 +149,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -161,7 +161,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -173,7 +173,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -185,7 +185,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
     {
@@ -197,7 +197,7 @@ export const createRoute = (): RouteConfig => ({
       action: RouteRuleAction.Route,
       outbound: DefaultOutboundIds.Select,
       sniffer: [],
-      strategy: DomainStrategy.Default,
+      strategy: '' as DomainStrategy,
       server: '',
     },
   ],

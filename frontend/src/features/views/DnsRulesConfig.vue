@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { createDnsRule } from '@defaults/dns'
+import type { DomainStrategy } from '@features/constant/kernel'
 import {
   DnsRuleType,
   DnsRuleAction,
-  DomainStrategy,
   DnsRejectMethod,
   ClashMode,
   RuleSetFormat,
@@ -83,7 +83,7 @@ const handleAddInsertionPoint = () => {
     action: DnsRuleAction.Route,
     server: '',
     invert: false,
-    strategy: DomainStrategy.Default,
+    strategy: '' as DomainStrategy,
     disable_cache: false,
     client_subnet: '',
   })

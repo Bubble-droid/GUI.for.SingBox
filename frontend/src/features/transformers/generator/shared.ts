@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-unsafe-type-assertion
 import { RouteRuleType, DnsRuleType } from '@features/constant/kernel'
 import type {
   SingBoxDomainResolver,
@@ -61,7 +62,7 @@ export const generateListen = (listen: Listen, maps: TagMaps): SingBoxListen => 
   }
 }
 
-export const _generateRule = (
+export const generateRule = (
   rule: RouteRuleConfig | DnsRuleConfig,
   rule_set: RuleSetConfig[],
   inbounds: InboundConfig[],
@@ -70,28 +71,34 @@ export const _generateRule = (
   const getRuleset = (id: string) => rule_set.find((v) => v.id === id)?.tag
 
   const extra: Recordable = { action: rule.action, invert: rule.invert ? true : undefined }
-  if (rule.type === RouteRuleType.Inline) {
-    deepAssign(extra, JSON.parse(rule.payload))
-  } else if (rule.type === RouteRuleType.RuleSet) {
-    extra[rule.type] = rule.payload.split(',').map((id) => getRuleset(id))
-  } else if (rule.type === RouteRuleType.Inbound) {
-    extra[rule.type] = getInbound(rule.payload)
-  } else if ([RouteRuleType.IpIsPrivate, DnsRuleType.IpAcceptAny].includes(rule.type as any)) {
-    extra[rule.type] = rule.payload === 'true'
-  } else if (rule.type === RouteRuleType.ClashMode) {
-    extra[rule.type] = rule.payload
-  } else {
-    extra[rule.type] = String(rule.payload)
-      .split(',')
-      .map((val) => {
-        if ([RouteRuleType.Port, RouteRuleType.SourcePort].includes(rule.type as any)) {
+  switch (rule.type) {
+    case RouteRuleType.Inline:
+      deepAssign(extra, JSON.parse(rule.payload))
+      break
+    case RouteRuleType.RuleSet:
+      extra[rule.type] = rule.payload.split(',').map((id) => getRuleset(id))
+      break
+    case RouteRuleType.Inbound:
+      extra[rule.type] = getInbound(rule.payload)
+      break
+    case DnsRuleType.IpIsPrivate:
+    case DnsRuleType.IpAcceptAny:
+      extra[rule.type] = rule.payload === 'true'
+      break
+    case RouteRuleType.ClashMode:
+      extra[rule.type] = rule.payload
+      break
+    default:
+      extra[rule.type] = rule.payload.split(',').map((val) => {
+        if (rule.type === RouteRuleType.Port || rule.type === RouteRuleType.SourcePort) {
           return Number(val)
         }
         return val
       })
-    if (extra[rule.type].length === 1) {
-      extra[rule.type] = extra[rule.type][0]
-    }
+      if (extra[rule.type].length === 1) {
+        extra[rule.type] = extra[rule.type][0]
+      }
+      break
   }
   return extra
 }
@@ -133,11 +140,7 @@ export const generateOutboundTls = (tls: OutboundTlsConfig): SingBoxOutboundTls 
 }
 
 export const generateHttp2Options = (http2: Http2Options): SingBoxHttp2 => {
-  return filterInvalidProps({
-    ...http2,
-    idle_timeout: http2.idle_timeout as any,
-    keep_alive_period: http2.keep_alive_period as any,
-  })
+  return filterInvalidProps({ ...http2 } as SingBoxHttp2)
 }
 
 export const generateQuicOptions = (quic: QuicOptions): SingBoxQuic => {

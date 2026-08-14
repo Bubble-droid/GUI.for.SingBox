@@ -229,12 +229,11 @@ export const DnsRuleType = {
 export type DnsRuleType = ValueOf<typeof DnsRuleType>
 
 export const DomainStrategy = {
-  Default: 'default',
   PreferIpv4: 'prefer_ipv4',
   PreferIpv6: 'prefer_ipv6',
   Ipv4Only: 'ipv4_only',
   Ipv6Only: 'ipv6_only',
-} as const satisfies Recordable<SingBoxDomainResolver['strategy'] | 'default'>
+} as const satisfies Recordable<SingBoxDomainResolver['strategy']>
 
 export type DomainStrategy = ValueOf<typeof DomainStrategy>
 

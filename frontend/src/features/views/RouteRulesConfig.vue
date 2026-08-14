@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { createRouteRule } from '@defaults/route'
+import type { DomainStrategy } from '@features/constant/kernel'
 import {
   RouteRuleType,
   RouteRuleAction,
-  DomainStrategy,
   ClashMode,
   RuleSetType,
   RuleSetFormat,
@@ -59,7 +59,7 @@ const handleAddInsertionPoint = () => {
     action: RouteRuleAction.Sniff,
     outbound: '',
     sniffer: [],
-    strategy: DomainStrategy.Default,
+    strategy: '' as DomainStrategy,
     server: '',
   })
 }

@@ -1,6 +1,6 @@
 import type { typebox } from '@zhexin/typebox'
 
-import type { UnpackArray } from '../../types/utils'
+import type { UnpackArray } from '@/types/utils'
 
 export type SingBoxConfig = typebox<
   string,
