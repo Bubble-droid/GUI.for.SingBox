@@ -28,7 +28,7 @@ const fetchAndUpdatePluginCode = async () => {
       code.value = content
     }
     const { body } = await HttpGet(p.url)
-    code.value = body
+    code.value = body as string
   }
 }
 

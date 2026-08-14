@@ -121,7 +121,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
           userInfo[key] = parseInt(value) || 0
         })
       }
-      body = b
+      body = b as string
     }
 
     if (isValidSubJson(body)) {

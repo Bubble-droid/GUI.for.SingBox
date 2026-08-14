@@ -51,7 +51,7 @@ const handleChangeSortField = (field: string) => {
 
 const tableData = computed(() => {
   if (!sortField.value || !sortFunc.value) return props.dataSource
-  const sorted = props.dataSource.slice().sort(sortFunc.value)
+  const sorted = props.dataSource.slice().toSorted(sortFunc.value)
   if (sortReverse.value) sorted.reverse()
   return sorted
 })

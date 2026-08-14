@@ -30,7 +30,7 @@ const groups = computed(() => {
       name,
       plugins: map[name]!,
     }))
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       const indexA = groupOrders.indexOf(a.name)
       const indexB = groupOrders.indexOf(b.name)
       if (indexA === -1 && indexB === -1) {

@@ -88,7 +88,7 @@ const columns = computed(() =>
         key: 'chains',
         hidden: !appSettingsStore.app.connections.visibility['chains'],
         sort: (a, b) => b['chains'][0].localeCompare(a['chains'][0]),
-        customRender: ({ value }) => value.slice().reverse().join(' :: '),
+        customRender: ({ value }: { value: string[] }) => value.slice().toReversed().join(' :: '),
       },
       {
         title: 'home.connections.uploadSpeed',
@@ -133,7 +133,7 @@ const columns = computed(() =>
         customRender: ({ value }) => formatRelativeTime(value),
       },
     ] as Column[]
-  ).sort(
+  ).toSorted(
     (a, b) =>
       appSettingsStore.app.connections.order.indexOf(a.key) -
       appSettingsStore.app.connections.order.indexOf(b.key),

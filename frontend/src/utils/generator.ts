@@ -1,4 +1,4 @@
-// oxlint-disable typescript/no-unsafe-type-assertion no-underscore-dangle no-shadow
+// oxlint-disable no-shadow
 import {
   RouteRuleType,
   DnsRuleType,

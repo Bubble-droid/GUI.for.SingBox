@@ -51,10 +51,10 @@ interface Request {
   }
 }
 
-interface Response<T = any> {
+interface Response {
   status: number
   headers: Record<string, string | string[]>
-  body: T
+  body: unknown
 }
 
 const mergeNetOptions = (options: NetOptions = {}): Required<NetOptions> => ({
@@ -88,15 +88,15 @@ const transformResponseHeaders = (
   )
 }
 
-const transformResponseBody = <T>(body: Response['body'], headers: Response['headers']) => {
+const transformResponseBody = (body: Response['body'], headers: Response['headers']) => {
   if (headers['Content-Type']?.includes('application/json')) {
     try {
-      body = JSON.parse(body)
+      return JSON.parse(body as string) as unknown
     } catch {
       console.warn('Failed to parse response body as JSON:', body)
     }
   }
-  return body as T
+  return body
 }
 
 const transformRequest = async (
@@ -116,13 +116,13 @@ const transformRequest = async (
   return [transformedHeaders, body, transformedReqOpts] as const
 }
 
-const transformResponse = <T = any>(
+const transformResponse = (
   status: Response['status'],
   headers: Record<string, string[]>,
   body: Response['body'],
 ) => {
   const transformedHeaders = transformResponseHeaders(headers)
-  const transformedBody = transformResponseBody<T>(body, transformedHeaders)
+  const transformedBody = transformResponseBody(body, transformedHeaders)
 
   return { status, headers: transformedHeaders, body: transformedBody }
 }
@@ -180,12 +180,7 @@ const requestWithProgress = (fnName: 'Download' | 'Upload') => {
 }
 
 const requestWithBody = (method: Extract<App.RequestMethod, 'PUT' | 'POST' | 'PATCH'>) => {
-  return async <T = any>(
-    url: string,
-    headers: Request['headers'] = {},
-    body = {},
-    options = {},
-  ) => {
+  return async (url: string, headers: Request['headers'] = {}, body = {}, options = {}) => {
     const [_headers, _body, _options] = await transformRequest(headers, body, options)
 
     const {
@@ -203,12 +198,12 @@ const requestWithBody = (method: Extract<App.RequestMethod, 'PUT' | 'POST' | 'PA
 
     if (!flag) throw respBody
 
-    return transformResponse<T>(status, respHeaders, respBody)
+    return transformResponse(status, respHeaders, respBody)
   }
 }
 
 const requestWithoutBody = (methd: Extract<App.RequestMethod, 'GET' | 'HEAD' | 'DELETE'>) => {
-  return async <T = any>(
+  return async (
     url: string,
     headers: Request['headers'] = {},
     options: Request['options'] = {},
@@ -230,7 +225,7 @@ const requestWithoutBody = (methd: Extract<App.RequestMethod, 'GET' | 'HEAD' | '
 
     if (!flag) throw body
 
-    return transformResponse<T>(status, respHeaders, body)
+    return transformResponse(status, respHeaders, body)
   }
 }
 
@@ -239,7 +234,7 @@ interface RequestWithAutoTransform extends Request {
   onStream?: (e: StreamEvent) => void
 }
 
-export const Requests = async <T = any>(options: RequestWithAutoTransform) => {
+export const Requests = async (options: RequestWithAutoTransform) => {
   const { method, url, headers = {}, body = '', options: reqOpts = {} } = options
 
   const [reqHeaders, reqBody, finalReqOpts] = await transformRequest(headers, body, reqOpts)
@@ -278,7 +273,7 @@ export const Requests = async <T = any>(options: RequestWithAutoTransform) => {
   return {
     status,
     headers: transformedHeaders,
-    body: transformBody ? transformResponseBody<T>(respBody, transformedHeaders) : (respBody as T),
+    body: transformBody ? transformResponseBody(respBody, transformedHeaders) : respBody,
   }
 }
 

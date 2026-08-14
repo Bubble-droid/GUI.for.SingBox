@@ -169,7 +169,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       if (inbound) {
         inbound[type]!.listen.listen_port = port
       } else {
-        const _type = createInboundMixed()!
+        const _type = createInboundMixed()
         _type.listen.listen_port = port
         inbound = {
           id: type + '-in',
@@ -281,6 +281,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
         Env: getKernelRuntimeEnv(isAlpha),
       },
     )
+    // oxlint-disable-next-line no-unmodified-loop-condition
     while (!stopped) {
       const ok = await probeApiAvailability().catch(() => false)
       if (ok) break
@@ -356,8 +357,8 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
     starting.value = true
     try {
-      await generateConfigFile(profile, (config) =>
-        pluginsStore.onBeforeCoreStartTrigger(config, profile),
+      await generateConfigFile(profile, (generateConfig) =>
+        pluginsStore.onBeforeCoreStartTrigger(generateConfig, profile),
       )
       const isAlpha = branch === Branch.Alpha
       const pid = await runCoreProcess(isAlpha)
@@ -530,7 +531,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
     const proxySignature = Object.values(proxies.value)
       .map((group) => group.name + group.now)
-      .sort()
+      .toSorted()
       .join()
 
     return source.concat([proxySignature, unAvailable, sortByDelay]).join('')

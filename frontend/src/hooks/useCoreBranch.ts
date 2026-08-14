@@ -77,15 +77,15 @@ export const useCoreBranch = (isAlpha = false) => {
     downloadProgress.value = ''
     cancelDownload.value = undefined
     try {
-      const { body } = await HttpGet<GitHubApiRelease | GitHubApiRelease[]>(releaseUrl, {
+      const response = await HttpGet(releaseUrl, {
         Authorization: getGitHubApiAuthorization(appSettings.app),
       })
-      if (!Array.isArray(body) && 'message' in body) throw body.message
+      const body = response.body as GitHubApiRelease | GitHubApiRelease[]
+      if (!Array.isArray(body) && body.message) throw body.message
 
-      const release =
-        isAlpha && Array.isArray(body) ? body.find((v) => v.prerelease === true) : body
+      const release = Array.isArray(body) ? body.find((v) => v.prerelease) : body
       if (!release) throw 'Not Found'
-      const { assets, tag_name } = release as GitHubApiRelease
+      const { assets, tag_name } = release
       const assetName = getKernelAssetFileName(tag_name.replace('v', ''))
       const asset = assets.find((v: any) => v.name === assetName)
       if (!asset) throw 'Asset Not Found:' + assetName
@@ -171,14 +171,16 @@ export const useCoreBranch = (isAlpha = false) => {
   const getRemoteVersion = async (showTips = false) => {
     remoteVersionLoading.value = true
     try {
-      const { body } = await HttpGet<GitHubApiRelease | GitHubApiRelease[]>(releaseUrl, {
+      const response = await HttpGet(releaseUrl, {
         Authorization: getGitHubApiAuthorization(appSettings.app),
       })
-      const release =
-        isAlpha && Array.isArray(body) ? body.find((v) => v.prerelease === true) : body
+      const body = response.body as GitHubApiRelease | GitHubApiRelease[]
+      if (!Array.isArray(body) && body.message) throw body.message
+
+      const release = Array.isArray(body) ? body.find((v) => v.prerelease) : body
       if (!release) throw 'Not Found'
-      const { tag_name } = release as GitHubApiRelease
-      return tag_name.replace('v', '') as string
+      const { tag_name } = release
+      return tag_name.replace('v', '')
     } catch (error: any) {
       console.log(error)
       showTips && message.error(error)

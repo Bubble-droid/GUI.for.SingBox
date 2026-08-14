@@ -21,7 +21,7 @@ export const omit = <T extends object, K extends keyof T>(obj: T, props: K[]): O
       }
     }
   }
-  return result as Omit<T, K>
+  return result
 }
 
 export const omitArray = <T, K extends keyof T>(arr: T[], fields: K[]): Omit<T, K>[] => {
@@ -117,13 +117,13 @@ export const generateSecureKey = (bits = 256) => {
     .join('')
 }
 
-export const getValue = <T = unknown>(obj: unknown, expr: string): T | undefined => {
+export const getValue = (obj: unknown, expr: string): unknown => {
   return expr.split('.').reduce<unknown>((value, key) => {
     if (value && typeof value === 'object') {
       return (value as Record<string, unknown>)[key]
     }
     return undefined
-  }, obj) as T
+  }, obj)
 }
 
 type IteratorFn<T, K> = (item: T, array: T[]) => Promise<K>

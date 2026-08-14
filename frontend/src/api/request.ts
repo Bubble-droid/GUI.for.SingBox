@@ -2,11 +2,11 @@ import { parse } from 'yaml'
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
-enum ResponseType {
-  JSON = 'JSON',
-  TEXT = 'TEXT',
-  YAML = 'YAML',
-}
+const ResponseType = {
+  JSON: 'JSON',
+  TEXT: 'TEXT',
+  YAML: 'YAML',
+} as const
 
 interface RequestOptions {
   base?: string

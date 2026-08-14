@@ -107,7 +107,7 @@ const getTrayMenus = () => {
             const delay = history[history.length - 1]?.delay || 0
             return { ...proxies[proxy], delay }
           })
-          .sort((a, b) => {
+          .toSorted((a, b) => {
             if (!appSettings.app.kernel.sortByDelay || a.delay === b.delay) return 0
             if (!a.delay) return 1
             if (!b.delay) return -1

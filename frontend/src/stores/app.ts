@@ -163,9 +163,10 @@ export const useAppStore = defineStore('app', () => {
     remoteVersion.value = APP_VERSION
     downloadDigest.value = ''
     try {
-      const { body } = await HttpGet<GitHubApiRelease>(APP_VERSION_API, {
+      const response = await HttpGet(APP_VERSION_API, {
         Authorization: getGitHubApiAuthorization(appSettingsStore.app),
       })
+      const body = response.body as GitHubApiRelease
       if (body.message) throw body.message
 
       const { tag_name, assets } = body

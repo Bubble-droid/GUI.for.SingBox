@@ -82,7 +82,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
         body = await ReadFile(r.url)
       } else if (r.type === 'Http') {
         const { body: b } = await HttpGet(r.url)
-        body = b
+        body = b as string
         if (typeof body !== 'string') {
           body = JSON.stringify(body)
         }
@@ -103,7 +103,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
       r.count = ruleset.rules.reduce(
         (p: number, c: string[]) =>
           Object.values(c).reduce(
-            (p, c: string[] | string) => (Array.isArray(c) ? p + c.length : p + 1),
+            (pre, cur: string[] | string) => (Array.isArray(cur) ? pre + cur.length : pre + 1),
             0,
           ) + p,
         0,
@@ -181,9 +181,10 @@ export const useRulesetsStore = defineStore('rulesets', () => {
   const updateRulesetHub = async () => {
     rulesetHubLoading.value = true
     try {
-      const { body } = await HttpGet<string>(
+      const response = await HttpGet(
         'https://github.com/GUI-for-Cores/Ruleset-Hub/releases/download/latest/sing-full.json',
       )
+      const body = response.body as string
       rulesetHub.value = JSON.parse(body)
       await WriteFile(RulesetHubFilePath, body)
     } finally {

@@ -23,6 +23,10 @@ import { updateTrayAndMenus } from '@/utils/tray'
 
 import { StoreDep, useStoreDeps } from './deps'
 
+declare global {
+  var __GUI_FOR_CORES_PLUGIN_CONTEXT__: Recordable<App.Plugin> | undefined
+}
+
 interface PluginRuntimeCache {
   plugin: App.Plugin
   code?: string
@@ -204,7 +208,7 @@ export const usePluginsStore = defineStore('plugins', () => {
 
   const releasePluginRuntimeCache = (id: string) => {
     resetPluginModuleCache(id)
-    delete (globalThis as any).__GUI_FOR_CORES_PLUGIN_CONTEXT__?.[id]
+    delete globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__?.[id]
     delete PluginsCache[id]
   }
 
@@ -262,8 +266,8 @@ export const usePluginsStore = defineStore('plugins', () => {
     })
 
     const eventsStr = [...events].join('|')
-    ;(globalThis as any).__GUI_FOR_CORES_PLUGIN_CONTEXT__ ||= {}
-    ;(globalThis as any).__GUI_FOR_CORES_PLUGIN_CONTEXT__[id] = getPluginMetadata(id)
+    globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__ ||= {}
+    globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__[id] = getPluginMetadata(id)
 
     const code = cache.code
       .replace(new RegExp(`^const\\s+(${eventsStr})`, 'gm'), 'export const $1')
@@ -280,11 +284,11 @@ export const usePluginsStore = defineStore('plugins', () => {
     const url = URL.createObjectURL(blob)
     const modulePromise = import(/* @vite-ignore */ url)
       .then((module) => {
-        delete (globalThis as any).__GUI_FOR_CORES_PLUGIN_CONTEXT__?.[id]
+        delete globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__?.[id]
         return module
       })
       .catch((error) => {
-        delete (globalThis as any).__GUI_FOR_CORES_PLUGIN_CONTEXT__?.[id]
+        delete globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__?.[id]
         resetPluginModuleCache(id)
         throw error
       }) as Required<PluginRuntimeCache>['module']['modulePromise']
@@ -324,7 +328,7 @@ export const usePluginsStore = defineStore('plugins', () => {
       }
       const handler = defaultHandler || moduleHandler
       if (typeof handler !== 'function') {
-        if (options?.allowUndefined) return
+        if (options?.allowUndefined) return undefined
         throw new Error(`${event} is not defined`)
       }
       return await handler(...args)
@@ -601,7 +605,7 @@ export const usePluginsStore = defineStore('plugins', () => {
       if (status !== 200) {
         throw new Error(`Failed to fetch plugin code from ${nextPlugin.url}. Status: ${status}`)
       }
-      code = body
+      code = body as string
     }
 
     if (nextPlugin.type !== 'File') {
@@ -670,7 +674,7 @@ export const usePluginsStore = defineStore('plugins', () => {
     pluginHubLoading.value = true
     const promises = appSettingsStore.app.plugins.sources.flatMap((source) => {
       if (!source.enable) return []
-      return Requests<string>({
+      return Requests({
         url: source.url,
         method: RequestMethod.Get,
         autoTransformBody: false,
@@ -681,8 +685,8 @@ export const usePluginsStore = defineStore('plugins', () => {
     pluginHub.value = results.reduce((acc, result) => {
       if (result.status === 'fulfilled') {
         try {
-          const plugins = JSON.parse(result.value.body) as App.Plugin[]
-          acc.push(...plugins)
+          const newPlugins = JSON.parse(result.value.body as string) as App.Plugin[]
+          acc.push(...newPlugins)
         } catch (error) {
           console.error('Failed to parse plugin list from source. Reason: ', error)
         }
@@ -813,9 +817,12 @@ export const usePluginsStore = defineStore('plugins', () => {
 
       if (isPluginUnavailable(cache)) continue
 
-      const { tray, menus } = await runPluginEvent(observer, fnName, [finalTray, finalMenus])
-      finalTray = tray
-      finalMenus = menus
+      const { tray: nextTray, menus: nextMenus } = await runPluginEvent(observer, fnName, [
+        finalTray,
+        finalMenus,
+      ])
+      finalTray = nextTray
+      finalMenus = nextMenus
     }
 
     return [finalTray, finalMenus] as const
@@ -824,14 +831,14 @@ export const usePluginsStore = defineStore('plugins', () => {
   const _watchDisabled = computed(() =>
     plugins.value
       .map((v) => v.disabled)
-      .sort((a, b) => String(a).localeCompare(String(b)))
+      .toSorted((a, b) => String(a).localeCompare(String(b)))
       .join(),
   )
 
   const _watchMenus = computed(() =>
     plugins.value
-      .map((v) => Object.entries(v.menus).map((v) => v[0] + v[1]))
-      .sort((a, b) => {
+      .map((plugin) => Object.entries(plugin.menus).map((v) => v[0] + v[1]))
+      .toSorted((a, b) => {
         const strA = a.join(',')
         const strB = b.join(',')
         return strA.localeCompare(strB)

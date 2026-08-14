@@ -1,4 +1,3 @@
-// oxlint-disable typescript/no-unsafe-type-assertion
 import { RouteRuleType, DnsRuleType } from '@features/constant/kernel'
 import type {
   SingBoxDomainResolver,

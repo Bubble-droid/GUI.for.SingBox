@@ -6,9 +6,13 @@
     "browser": true
   },
   "categories": {
-    "correctness": "error"
+    "correctness": "error",
+    "suspicious": "error"
   },
   "rules": {
+    "typescript/no-unsafe-type-assertion": "off",
+    "unicorn/consistent-function-scoping": "off",
+    "no-underscore-dangle": "off",
     "no-unused-expressions": [
       "error",
       {
