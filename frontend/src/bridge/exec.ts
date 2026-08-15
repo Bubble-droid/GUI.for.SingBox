@@ -27,7 +27,7 @@ const mergeExecOptions = (options: ExecOptions) => {
 export const Exec = async (path: string, args: string[], options: ExecOptions = {}) => {
   const { flag, data } = await Bridge.Exec(path, args, mergeExecOptions(options))
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return data
 }
@@ -39,8 +39,8 @@ export const ExecBackground = async (
   onEnd?: (out: string) => void,
   options: ExecOptions = {},
 ) => {
-  const outEvent = (onOut && sampleID()) || ''
-  const endEvent = (onEnd && sampleID()) || (outEvent && sampleID()) || ''
+  const outEvent = (onOut && sampleID()) ?? ''
+  const endEvent = (onEnd && sampleID()) ?? (outEvent && sampleID()) ?? ''
 
   const { flag, data } = await Bridge.ExecBackground(
     path,
@@ -50,7 +50,7 @@ export const ExecBackground = async (
     mergeExecOptions(options),
   )
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
 
   if (outEvent) {
@@ -58,10 +58,10 @@ export const ExecBackground = async (
   }
 
   if (endEvent) {
-    EventsOn(endEvent, (eventData) => {
+    EventsOn(endEvent, (endData) => {
       outEvent && EventsOff(outEvent)
       EventsOff(endEvent)
-      onEnd?.(eventData)
+      onEnd?.(endData as string)
     })
   }
 
@@ -71,7 +71,7 @@ export const ExecBackground = async (
 export const ProcessInfo = async (pid: number) => {
   const { flag, data } = await Bridge.ProcessInfo(pid)
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return data
 }
@@ -79,7 +79,7 @@ export const ProcessInfo = async (pid: number) => {
 export const ProcessMemory = async (pid: number) => {
   const { flag, data } = await Bridge.ProcessMemory(pid)
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return Number(data)
 }
@@ -87,7 +87,7 @@ export const ProcessMemory = async (pid: number) => {
 export const KillProcess = async (pid: number, timeout = 10) => {
   const { flag, data } = await Bridge.KillProcess(pid, timeout)
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return data
 }

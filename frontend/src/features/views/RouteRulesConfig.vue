@@ -65,15 +65,15 @@ const handleAddInsertionPoint = () => {
 }
 
 const handleAddEnd = () => {
-  if (ruleId !== -1) {
-    model.value[ruleId] = fields.value
-  } else {
+  if (ruleId === -1) {
     const index = model.value.findIndex((v) => v.type === RouteRuleType.InsertionPoint)
-    if (index !== -1) {
-      model.value.splice(index + 1, 0, fields.value)
-    } else {
+    if (index === -1) {
       model.value.unshift(fields.value)
+    } else {
+      model.value.splice(index + 1, 0, fields.value)
     }
+  } else {
+    model.value[ruleId] = fields.value
   }
 }
 
@@ -84,7 +84,7 @@ const handleEdit = (index: number) => {
 }
 
 const handleUse = (ruleset: any) => {
-  const ids = fields.value.payload.split(',').filter((v) => v)
+  const ids = fields.value.payload.split(',').filter(Boolean)
   const idx = ids.findIndex((v) => v === ruleset.id)
   if (idx === -1) {
     ids.push(ruleset.id)
@@ -110,16 +110,16 @@ const isSupportPayload = computed(() => {
 })
 
 const isInsertionPointMissing = computed(
-  () => model.value.findIndex((rule) => rule.type === RouteRuleType.InsertionPoint) === -1,
+  () => !model.value.some((rule) => rule.type === RouteRuleType.InsertionPoint),
 )
 
 const hasLost = (rule: RouteRuleConfig) => {
   const rulesValidationFlags: boolean[] = []
-  const hasMissingInbound = !props.inboundOptions.find((v) => v.value === rule.payload)
-  const hasMissingOutbound = !props.outboundOptions.find((v) => v.value === rule.outbound)
+  const hasMissingInbound = !props.inboundOptions.some((v) => v.value === rule.payload)
+  const hasMissingOutbound = !props.outboundOptions.some((v) => v.value === rule.outbound)
   const hasMissingRuleset = rule.payload
     .split(',')
-    .some((id) => !props.ruleSet.find((v) => v.id === id))
+    .some((id) => !props.ruleSet.some((v) => v.id === id))
   if (rule.action === RouteRuleAction.Route) {
     rulesValidationFlags.push(hasMissingOutbound)
   } else if (rule.action === RouteRuleAction.RouteOptions) {
@@ -138,7 +138,7 @@ const hasLost = (rule: RouteRuleConfig) => {
   } else if (rule.type === RouteRuleType.RuleSet) {
     rulesValidationFlags.push(hasMissingRuleset)
   }
-  return rulesValidationFlags.some((v) => v) || !rule.payload
+  return rulesValidationFlags.some(Boolean) || !rule.payload
 }
 
 const renderRule = (rule: RouteRuleConfig) => {

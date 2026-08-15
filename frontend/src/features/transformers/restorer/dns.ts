@@ -1,63 +1,67 @@
+// oxlint-disable typescript/no-unsafe-assignment typescript/no-unsafe-call typescript/no-unsafe-member-access typescript/no-unsafe-return typescript/no-unsafe-argument
 import { createDnsServer, createDnsRule } from '@defaults/dns'
 import { DnsServer, DnsRuleAction, RouteRuleType } from '@features/constant/kernel'
+import type { SingBoxDnsServer } from '@features/types/sing-box'
 import type { DnsServerConfig, DnsRuleConfig } from '@profiles/dns'
 
 import { supportedRuleTypes } from './shared'
 
 export const restoreDnsServers = (
-  servers: Recordable[],
-  DnsServersIds: Recordable,
-  OutboundsIds: Recordable,
+  servers: SingBoxDnsServer[],
+  DnsServersIds: Recordable<string>,
+  OutboundsIds: Recordable<string>,
 ): DnsServerConfig[] => {
   return servers.flatMap((raw) => {
     if (!raw['type']) return []
     const server = createDnsServer()
-    server.id = DnsServersIds[raw['tag']]
+    server.id = DnsServersIds[raw['tag']]!
     server.tag = raw['tag']
-    server.type = raw['type']
+    server.type = raw['type'] as DnsServer
     if (
-      [
-        DnsServer.Local,
-        DnsServer.Tcp,
-        DnsServer.Udp,
-        DnsServer.Tls,
-        DnsServer.Quic,
-        DnsServer.Https,
-        DnsServer.H3,
-        DnsServer.Dhcp,
-      ].includes(raw['type'])
-    ) {
-      if ('detour' in raw) {
-        server.detour = OutboundsIds[raw['detour']]
-      }
-      if ('domain_resolver' in raw) {
-        server.domain_resolver = DnsServersIds[raw['domain_resolver']]
-      }
-      if (
+      (
         [
+          DnsServer.Local,
           DnsServer.Tcp,
           DnsServer.Udp,
           DnsServer.Tls,
           DnsServer.Quic,
           DnsServer.Https,
           DnsServer.H3,
-        ].includes(raw['type'])
+          DnsServer.Dhcp,
+        ] as string[]
+      ).includes(raw['type'])
+    ) {
+      if ('detour' in raw) {
+        server.detour = OutboundsIds[raw['detour']]!
+      }
+      if ('domain_resolver' in raw) {
+        server.domain_resolver = DnsServersIds[raw['domain_resolver'] as string] as string
+      }
+      if (
+        (
+          [
+            DnsServer.Tcp,
+            DnsServer.Udp,
+            DnsServer.Tls,
+            DnsServer.Quic,
+            DnsServer.Https,
+            DnsServer.H3,
+          ] as string[]
+        ).includes(raw['type'])
       ) {
         if ('server' in raw) {
           server.server = raw['server']
         }
         if ('server_port' in raw) {
-          server.server_port = raw['server_port']
+          server.server_port = String(raw['server_port'])
         }
-        if ([DnsServer.Https, DnsServer.H3].includes(raw['type'])) {
-          if ('path' in raw) {
-            server.path = raw['path']
-          }
+        if (([DnsServer.Https, DnsServer.H3] as string[]).includes(raw['type']) && 'path' in raw) {
+          server.path = raw['path'] as string
         }
       }
     } else if (DnsServer.Hosts === server.type) {
       if ('path' in raw) {
-        server.hosts_path = raw['path']
+        server.hosts_path = raw['path'] as string[]
       }
       if ('predefined' in raw) {
         server.predefined = Object.entries<string[] | string>(raw['predefined']).reduce(
@@ -70,7 +74,7 @@ export const restoreDnsServers = (
       }
     } else if (DnsServer.Dhcp === server.type) {
       if ('interface' in raw) {
-        server.interface = raw['interface']
+        server.interface = raw['interface'] as string
       }
     } else if (DnsServer.FakeIp === server.type) {
       if ('inet4_range' in raw) {
@@ -93,7 +97,7 @@ export const restoreDnsRules = (
   return rules.flatMap((raw: Recordable, i) => {
     const rule = createDnsRule()
     rule.id = 'rule-' + i
-    rule.action = raw['action'] || DnsRuleAction.Route
+    rule.action = raw['action'] ?? DnsRuleAction.Route
 
     const hits = supportedRuleTypes.filter((key) => key in raw)
     if (hits.length === 1) {

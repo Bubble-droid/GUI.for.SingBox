@@ -1,8 +1,9 @@
 import { ref, defineComponent, h, computed, type VNode, type ComponentPublicInstance } from 'vue'
 
-import type { Props as ModalProps, Slots as ModalSlots } from './index.vue'
 import ModalComp from './index.vue'
+import type { ModalProps, ModalSlots } from './types.ts'
 
+// oxlint-disable-next-line typescript/no-unsafe-assignment
 export const Modal = ModalComp
 
 export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}) => {
@@ -11,7 +12,7 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
   const slots = ref(contents)
   const modalRef = ref<InstanceType<typeof Modal>>()
 
-  if ('component' in options && options.component) {
+  if ('component' in options && Boolean(options.component)) {
     console.warn(
       '[Deprecated] The "component" option is deprecated. Please use the second parameter instead, e.g. \n{ \n\tdefault: () => any \n}',
     )
@@ -27,6 +28,7 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
         open: open.value,
         'onUpdate:open': (val: boolean) => (open.value = val),
       }))
+      // oxlint-disable-next-line typescript/no-unsafe-argument
       return () => h(Modal, mergedProps.value, { ...slots.value, ...ctx.slots })
     },
   })
@@ -34,6 +36,7 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
   const api = {
     open: () => (open.value = true),
     close: () => {
+      // oxlint-disable-next-line typescript/no-unsafe-call typescript/no-unsafe-member-access
       modalRef.value?.handleCancel()
     },
     destroy() {
@@ -68,7 +71,7 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
           {
             ..._props,
             ref: (el: ComponentPublicInstance<{ modalSlots: ModalSlots }> | null) => {
-              if (el?.modalSlots) this.patchSlots(el?.modalSlots || {})
+              if (el?.modalSlots) this.patchSlots(el?.modalSlots ?? {})
             },
           },
           _slots,

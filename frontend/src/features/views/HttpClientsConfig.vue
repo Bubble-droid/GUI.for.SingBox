@@ -48,10 +48,10 @@ const handleDelete = (index: number) => {
 }
 
 const handleAddEnd = () => {
-  if (editIndex !== -1) {
-    model.value[editIndex] = fields.value
-  } else {
+  if (editIndex === -1) {
     model.value.unshift(fields.value)
+  } else {
+    model.value[editIndex] = fields.value
   }
 }
 </script>

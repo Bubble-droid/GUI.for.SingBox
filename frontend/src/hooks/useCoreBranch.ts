@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/consistent-function-scoping
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -81,14 +82,16 @@ export const useCoreBranch = (isAlpha = false) => {
         Authorization: getGitHubApiAuthorization(appSettings.app),
       })
       const body = response.body as GitHubApiRelease | GitHubApiRelease[]
-      if (!Array.isArray(body) && body.message) throw body.message
+      if (!Array.isArray(body) && body.message) {
+        throw new Error(body.message)
+      }
 
       const release = Array.isArray(body) ? body.find((v) => v.prerelease) : body
-      if (!release) throw 'Not Found'
+      if (!release) throw new Error('Not Found')
       const { assets, tag_name } = release
       const assetName = getKernelAssetFileName(tag_name.replace('v', ''))
-      const asset = assets.find((v: any) => v.name === assetName)
-      if (!asset) throw 'Asset Not Found:' + assetName
+      const asset = assets.find((v) => v.name === assetName)
+      if (!asset) throw new Error(`Asset Not Found: ${assetName}`)
       if (asset.uploader.login !== 'github-actions[bot]') {
         await confirm('common.warning', 'settings.kernel.risk', {
           type: 'text',
@@ -145,9 +148,9 @@ export const useCoreBranch = (isAlpha = false) => {
       void refreshLocalVersion()
       downloadCompleted.value = true
       message.success('common.success')
-    } catch (error: any) {
+    } catch (error) {
       console.log(error)
-      message.error(error.message || error)
+      message.error(error)
       downloadCompleted.value = false
     }
     downloading.value = false
@@ -158,7 +161,7 @@ export const useCoreBranch = (isAlpha = false) => {
     try {
       const res = await Exec(CoreFilePath, ['version'])
       versionDetail.value = res.trim()
-      return res.match(/version (\S+)/)?.[1] || ''
+      return res.match(/version (\S+)/v)?.[1] ?? ''
     } catch (error: any) {
       console.log(error)
       showTips && message.error(error)
@@ -175,10 +178,12 @@ export const useCoreBranch = (isAlpha = false) => {
         Authorization: getGitHubApiAuthorization(appSettings.app),
       })
       const body = response.body as GitHubApiRelease | GitHubApiRelease[]
-      if (!Array.isArray(body) && body.message) throw body.message
+      if (!Array.isArray(body) && body.message) {
+        throw new Error(body.message)
+      }
 
       const release = Array.isArray(body) ? body.find((v) => v.prerelease) : body
-      if (!release) throw 'Not Found'
+      if (!release) throw new Error('Not Found')
       const { tag_name } = release
       return tag_name.replace('v', '')
     } catch (error: any) {

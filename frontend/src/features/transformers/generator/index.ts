@@ -4,6 +4,7 @@ import type { TagItem } from '@profiles/shared'
 import { parse } from 'yaml'
 
 import { Branch } from '@/constant/app'
+import { normalizeErrorMessage } from '@/utils/normalize'
 import { deepClone, deepAssign } from '@/utils/others'
 
 import { _adaptToStableBranch } from './adapter'
@@ -96,15 +97,15 @@ export const generateConfig = async (
     const fn = new window.AsyncFunction(
       'config',
       `${originalProfile.script.code}; return await onGenerate(config)`,
-    )
+    ) as (c: Recordable) => MaybePromise<Recordable>
     try {
       config = await fn(config)
-    } catch (error: any) {
-      throw error.message || error
+    } catch (error) {
+      throw new Error(normalizeErrorMessage(error), { cause: error })
     }
 
     if (typeof config !== 'object') {
-      throw 'Wrong result'
+      throw new TypeError('Wrong result')
     }
   }
 

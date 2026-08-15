@@ -22,7 +22,7 @@ export const UpdateTrayAndMenus = Bridge.UpdateTrayAndMenus
 export const GetEnv = <T extends string | undefined = undefined>(
   key?: T,
 ): Promise<T extends string ? string : App.AppEnv> => {
-  return Bridge.GetEnv(key || '')
+  return Bridge.GetEnv(key ?? '')
 }
 
 export const IsStartup = Bridge.IsStartup
@@ -30,7 +30,7 @@ export const IsStartup = Bridge.IsStartup
 export const GetSystemProxy = async () => {
   const { flag, data } = await Bridge.GetSystemProxy()
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return data
 }
@@ -44,7 +44,7 @@ export const SetSystemProxy = async (
 ) => {
   const { flag, data } = await Bridge.SetSystemProxy(enable, server, proxyType, bypass, services)
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return data
 }
@@ -52,7 +52,7 @@ export const SetSystemProxy = async (
 export const SetSystemDNS = async (servers: string, services: string[] = []) => {
   const { flag, data } = await Bridge.SetSystemDNS(servers, services)
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return data
 }
@@ -60,7 +60,7 @@ export const SetSystemDNS = async (servers: string, services: string[] = []) => 
 export const GetSystemProxyBypass = async () => {
   const { flag, data } = await Bridge.GetSystemProxyBypass()
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return data
 }
@@ -68,7 +68,7 @@ export const GetSystemProxyBypass = async () => {
 export const GetInterfaces = async () => {
   const { flag, data } = await Bridge.GetInterfaces()
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return data.split('|')
 }

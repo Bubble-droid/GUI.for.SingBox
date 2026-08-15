@@ -39,7 +39,7 @@ const { t } = useI18n()
 const innerClearable = computed(() => {
   if (!props.clearable) return false
   if (props.multiple) {
-    return Array.isArray(model.value) && model.value.length !== 0
+    return Array.isArray(model.value) && model.value.length > 0
   }
   return model.value !== undefined && model.value !== null && model.value !== ''
 })

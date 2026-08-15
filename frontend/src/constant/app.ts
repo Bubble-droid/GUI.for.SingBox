@@ -360,9 +360,8 @@ export const ProfileMenuList = ProfileSteps.map((step) => {
     return 'profile.step.http_clients'
   } else if (step === 'MixinScript') {
     return 'profile.step.mixin-script'
-  } else {
-    return `profile.step.${step.toLowerCase()}`
   }
+  return `profile.step.${step.toLowerCase()}`
 }) as `profile.step.${Lowercase<(typeof ProfileSteps)[number]>}`[]
 
 export const ProfileStepItems = ProfileMenuList.map((v) => ({ title: v }))

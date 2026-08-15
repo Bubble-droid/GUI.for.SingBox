@@ -1,6 +1,6 @@
 import { ProfileSchemaVersion, createMixin, createProfile, createScript } from '@defaults'
 import { createLog } from '@defaults/log'
-import type { SingBoxConfig, SingBoxEndpoint } from '@features/types/sing-box'
+import type { SingBoxConfig, SingBoxDnsServer, SingBoxEndpoint } from '@features/types/sing-box'
 import type { Profile } from '@profiles'
 import type { LogConfig } from '@profiles/log'
 
@@ -22,13 +22,14 @@ import type { RestoreProfileOptions, IdMaps } from './types'
 
 const legacyBuildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<string> => {
   if (!arr) return {}
+  // oxlint-disable-next-line typescript/no-unsafe-member-access
   return arr.reduce((p, c, i) => ((p[c['tag']] = prefix + i), p), {})
 }
 
 const buildTagIdMapping = (prefix: string, arr: { tag?: string }[] = []): Map<string, string> => {
   return new Map(
     arr.flatMap((v, i) => {
-      if (!v.tag) return []
+      if (v.tag === undefined || v.tag === '') return []
       return [[v.tag, `${prefix}${i}`]]
     }),
   )
@@ -64,7 +65,7 @@ export const restoreProfile = (
   }
 
   return {
-    id: profile?.id || sampleID(),
+    id: profile?.id ?? sampleID(),
     name,
     schema: ProfileSchemaVersion,
     log: { ...createLog(), ...(config.log as LogConfig) },
@@ -75,23 +76,23 @@ export const restoreProfile = (
     http_clients: restoreHttpClients(config.http_clients, idMaps),
     network_namespaces: restoreNetns(config.network_namespaces, idMaps),
     endpoints: restoreEndpoints(config.endpoints as SingBoxEndpoint[], idMaps),
-    inbounds: restoreInbounds(config.inbounds || [], InboundsIds),
+    inbounds: restoreInbounds(config.inbounds ?? [], InboundsIds),
     outbounds: restoreOutbounds(
-      config.outbounds || [],
+      config.outbounds ?? [],
       OutboundsIds,
-      profile?.outbounds || [],
-      subscriptionIds || [],
+      profile?.outbounds ?? [],
+      subscriptionIds ?? [],
       ctx,
     ),
     route: {
       rule_set: restoreRouteRuleset(
-        config.route?.rule_set || [],
+        config.route?.rule_set ?? [],
         RouteRuleSetIds,
         OutboundsIds,
         ctx,
       ),
       rules: restoreRouteRules(
-        config.route?.rules || [],
+        config.route?.rules ?? [],
         InboundsIds,
         OutboundsIds,
         RouteRuleSetIds,
@@ -104,9 +105,12 @@ export const restoreProfile = (
       final: OutboundsIds[config.route?.final ?? ''] ?? template.route.final,
       default_domain_resolver: {
         server:
+          // oxlint-disable-next-line typescript/no-unsafe-member-access
           DnsServersIds[(config.route?.default_domain_resolver as any)?.server] ??
           template.route.default_domain_resolver.server,
+        // oxlint-disable-next-line typescript/no-unsafe-assignment
         client_subnet:
+          // oxlint-disable-next-line typescript/no-unsafe-member-access
           (config.route?.default_domain_resolver as any)?.client_subnet ??
           template.route.default_domain_resolver.client_subnet,
       },
@@ -114,14 +118,19 @@ export const restoreProfile = (
     dns: {
       disable_cache: config.dns?.disable_cache ?? template.dns.disable_cache,
       disable_expire: config.dns?.disable_expire ?? template.dns.disable_expire,
+      // oxlint-disable-next-line typescript/no-deprecated
       independent_cache: config.dns?.independent_cache ?? template.dns.independent_cache,
       final: DnsServersIds[config.dns?.final ?? ''] ?? template.dns.final,
       strategy: config.dns?.strategy ?? template.dns.strategy,
       client_subnet: config.dns?.client_subnet ?? template.dns.client_subnet,
-      servers: restoreDnsServers(config.dns?.servers || [], DnsServersIds, OutboundsIds),
-      rules: restoreDnsRules(config.dns?.rules || [], InboundsIds, RouteRuleSetIds, DnsServersIds),
+      servers: restoreDnsServers(
+        (config.dns?.servers as SingBoxDnsServer[]) ?? [],
+        DnsServersIds,
+        OutboundsIds,
+      ),
+      rules: restoreDnsRules(config.dns?.rules ?? [], InboundsIds, RouteRuleSetIds, DnsServersIds),
     },
-    mixin: profile?.mixin || createMixin(),
-    script: profile?.script || createScript(),
+    mixin: profile?.mixin ?? createMixin(),
+    script: profile?.script ?? createScript(),
   }
 }

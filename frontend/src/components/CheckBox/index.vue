@@ -38,10 +38,10 @@ const isActive = (val: string) => model.value.includes(val)
 
 const handleSelect = (val: string) => {
   const idx = model.value.findIndex((v) => v === val)
-  if (idx !== -1) {
-    model.value.splice(idx, 1)
-  } else {
+  if (idx === -1) {
     model.value.push(val)
+  } else {
+    model.value.splice(idx, 1)
   }
   internalUpdate = true
   emit('update:modelValue', [...model.value])

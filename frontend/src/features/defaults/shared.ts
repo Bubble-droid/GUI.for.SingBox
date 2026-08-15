@@ -240,6 +240,12 @@ export const createDns01Challenge = (provider?: Dns01Provider): Dns01Challenge =
     resolvers: [],
     override_domain: '',
   }
+  if (!provider) {
+    return {
+      ...base,
+      provider: '' as Dns01Provider,
+    } as Dns01Challenge
+  }
   switch (provider) {
     case Dns01Provider.AliDns:
       return {
@@ -267,9 +273,6 @@ export const createDns01Challenge = (provider?: Dns01Provider): Dns01Challenge =
         server_url: '',
       }
     default:
-      return {
-        ...base,
-        provider: '' as Dns01Provider,
-      } as Dns01Challenge
+      throw new Error(`Unexpected DNS provider: ${provider as string}`)
   }
 }

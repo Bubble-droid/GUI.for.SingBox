@@ -16,9 +16,9 @@ export class WebSockets {
   public beforeConnect: () => void
 
   constructor(options: WebSocketsOptions) {
-    this.base = options.base || ''
-    this.bearer = options.bearer || ''
-    this.beforeConnect = options.beforeConnect || (() => 0)
+    this.base = options.base ?? ''
+    this.bearer = options.bearer ?? ''
+    this.beforeConnect = options.beforeConnect ?? (() => 0)
   }
 
   public createWS(options: Options) {
@@ -35,7 +35,9 @@ export class WebSockets {
 
     const connect = () => {
       ws = new WebSocket(this.base + url)
-      onMessage = (e) => options.cb(JSON.parse(e.data))
+      onMessage = (e) => {
+        options.cb(JSON.parse(e.data as string))
+      }
       onClose = () => {
         setTimeout(() => {
           if (!isManualClose) {

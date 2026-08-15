@@ -102,3 +102,28 @@ export type SingBoxEndpointOf<T extends SingBoxEndpoint['type']> = Extract<
   SingBoxEndpoint,
   { type: T }
 >
+
+export type SingBoxRoute = NonNullable<SingBoxConfig['route']>
+
+export type SingBoxRuleSet = UnpackArray<NonNullable<SingBoxRoute['rule_set']>>
+
+export type SingBoxRuleSetOf<T extends SingBoxRuleSet['type']> = Extract<
+  SingBoxRuleSet,
+  {
+    type: T
+  }
+>
+
+export type SingBoxDns = NonNullable<SingBoxConfig['dns']>
+
+export type SingBoxDnsServer = Extract<
+  UnpackArray<NonNullable<SingBoxDns['servers']>>,
+  { type: unknown }
+>
+
+export type SingBoxDnsServerOf<T extends SingBoxDnsServer['type']> = Extract<
+  SingBoxDnsServer,
+  {
+    type: T
+  }
+>

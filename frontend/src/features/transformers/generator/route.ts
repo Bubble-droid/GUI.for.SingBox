@@ -2,7 +2,7 @@ import { RouteRuleType, RouteRuleAction, RuleSetType } from '@features/constant/
 import type { DnsConfig } from '@profiles/dns'
 import type { InboundConfig } from '@profiles/inbounds'
 import type { OutboundConfig } from '@profiles/outbounds'
-import type { RouteConfig } from '@profiles/route'
+import type { RouteConfig, RuleSetConfig } from '@profiles/route'
 
 import { deepAssign } from '@/utils/others'
 
@@ -29,7 +29,7 @@ export const generateRoute = (
       if (rule.type === RouteRuleType.InsertionPoint || !rule.enable) {
         return []
       }
-      if (rule.type === RouteRuleType.Inbound && !isInboundEnabled(rule.payload)) {
+      if (rule.type === RouteRuleType.Inbound && isInboundEnabled(rule.payload) !== true) {
         return []
       }
       const extra: Recordable = generateRule(rule, route.rule_set, inbounds)
@@ -41,7 +41,7 @@ export const generateRoute = (
       } else if (rule.action === RouteRuleAction.Reject) {
         extra['method'] = rule.outbound
       } else if (rule.action === RouteRuleAction.Sniff) {
-        if (rule.sniffer.length) {
+        if (rule.sniffer.length > 0) {
           extra['sniffer'] = rule.sniffer
         }
       } else if (rule.action === RouteRuleAction.Resolve) {
@@ -56,17 +56,17 @@ export const generateRoute = (
       return extra
     }),
     rule_set: route.rule_set.map((ruleset) => {
-      const extra: Recordable = {}
+      const extra: Partial<RuleSetConfig> = {}
       if (ruleset.type === RouteRuleType.Inline) {
-        extra['rules'] = JSON.parse(ruleset.rules)
+        extra['rules'] = JSON.parse(ruleset.rules) as string
       } else if (ruleset.type === RuleSetType.Local) {
         const localRuleset = ctx.getRuleSet(ruleset.path)
-        extra['path'] = localRuleset?.path.replace(/^data\//, `${ctx.appEnv.appDataPath}/`)
+        extra['path'] = localRuleset?.path.replace(/^data\//v, `${ctx.appEnv.appDataPath}/`) ?? ''
         extra['format'] = ruleset.format
       } else if (ruleset.type === RuleSetType.Remote) {
         extra['url'] = ruleset.url
         extra['format'] = ruleset.format
-        extra['download_detour'] = getOutbound(ruleset.download_detour)
+        extra['download_detour'] = getOutbound(ruleset.download_detour)!
         if (ruleset.update_interval) {
           extra['update_interval'] = ruleset.update_interval
         }

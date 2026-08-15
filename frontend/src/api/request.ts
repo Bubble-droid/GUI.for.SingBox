@@ -24,11 +24,11 @@ export class Request {
   public beforeRequest: () => void
 
   constructor(options: RequestOptions = {}) {
-    this.base = options.base || ''
-    this.bearer = options.bearer || ''
-    this.timeout = options.timeout || 10000
-    this.responseType = options.responseType || ResponseType.JSON
-    this.beforeRequest = options.beforeRequest || (() => 0)
+    this.base = options.base ?? ''
+    this.bearer = options.bearer ?? ''
+    this.timeout = options.timeout ?? 10000
+    this.responseType = options.responseType ?? ResponseType.JSON
+    this.beforeRequest = options.beforeRequest ?? (() => 0)
   }
 
   private request = async <T>(
@@ -47,17 +47,17 @@ export class Request {
     }
 
     if (this.bearer) {
-      if (!init.headers) init.headers = {}
+      init.headers ??= {}
       Object.assign(init.headers, { Authorization: `Bearer ${this.bearer}` })
     }
 
     if (['GET'].includes(options.method)) {
-      const query = new URLSearchParams(options.body || {}).toString()
+      const query = new URLSearchParams(options.body ?? {}).toString()
       query && (url += '?' + query)
     }
 
     if (['POST', 'PUT', 'PATCH'].includes(options.method)) {
-      init.body = JSON.stringify(options.body || {})
+      init.body = JSON.stringify(options.body ?? {})
     }
 
     const res = await fetch(url, init)
@@ -67,8 +67,8 @@ export class Request {
     }
 
     if ([504, 401, 503].includes(res.status)) {
-      const { message } = await res.json()
-      throw message
+      const { message } = (await res.json()) as { message: string }
+      throw new Error(message)
     }
 
     if (this.responseType === ResponseType.TEXT) {
@@ -81,8 +81,8 @@ export class Request {
       return parse(text) as T
     }
 
-    const json = await res.json()
-    return json as T
+    const json = (await res.json()) as T
+    return json
   }
 
   public get = <T>(url: string, body = {}) => this.request<T>(url, { method: 'GET', body })

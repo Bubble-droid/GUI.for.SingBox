@@ -33,10 +33,10 @@ export const generateEndpoints = (
         case Endpoint.OpenVpnServer:
           return [generateOpenVpnServer(ep, maps)]
         default:
-          throw `Unexpected endpoint type: ${type as string}`
+          throw new Error(`Unexpected endpoint type: ${type as string}`)
       }
     })
-    .map(filterInvalidProps)
+    .map((ep) => filterInvalidProps(ep))
 }
 
 export const generateWireGuard = (
@@ -51,7 +51,7 @@ export const generateWireGuard = (
     ...generateUdpNat(udpNat),
     peers: rest.peers
       .map((v) => ({ ...v, reserved: v.reserved.map(Number) }))
-      .map(filterInvalidProps),
+      .map((v) => filterInvalidProps(v)),
     type,
     tag,
   }
@@ -68,7 +68,9 @@ export const generateTailscale = (
     ...generateDialer(dialer, maps),
     type,
     tag,
-    udp_timeout: rest.udp_timeout as any,
+    udp_timeout: rest.udp_timeout as NonNullable<
+      SingBoxEndpointOf<typeof Endpoint.Tailscale>['udp_timeout']
+    >,
     ssh_server: (rest.ssh_server.enabled
       ? { ...filterInvalidProps(rest.ssh_server), enabled: true }
       : undefined) as NonNullable<SingBoxEndpointOf<typeof Endpoint.Tailscale>['ssh_server']>,

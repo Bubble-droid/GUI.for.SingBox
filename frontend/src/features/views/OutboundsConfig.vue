@@ -58,7 +58,7 @@ const handleDeleteGroup = (index: number) => {
   }))
 }
 
-const handleClearGroup = async (outbound: OutboundConfig) => {
+const handleClearGroup = (outbound: OutboundConfig) => {
   const filtered = outbound.outbounds.filter(({ id, type }) => {
     if (type === 'Built-in') {
       return model.value.some((v) => v.id === id)
@@ -105,10 +105,10 @@ const handleAddProxy = (groupID: string, proxyID: string, proxyName: string) => 
   if (groupID === 'Built-in' && proxyID === fields.value.id) return
 
   const idx = fields.value.outbounds.findIndex((outbound) => outbound.id === proxyID)
-  if (idx !== -1) {
-    fields.value.outbounds.splice(idx, 1)
-  } else {
+  if (idx === -1) {
     fields.value.outbounds.push({ id: proxyID, tag: proxyName, type: groupID })
+  } else {
+    fields.value.outbounds.splice(idx, 1)
   }
 }
 
@@ -182,7 +182,7 @@ const showLost = () => message.warn('kernel.outbounds.notFound')
 
 const showNeedToAdd = () => message.error('kernel.outbounds.needToAdd')
 
-subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
+subscribesStore.subscribes.forEach(({ id, name, proxies }) => {
   proxyGroup.value[1]!.proxies.push({ id, tag: name, type: 'Subscribe' })
   proxyGroup.value.push({ id, name, proxies })
   SubscribesNameMap.value[id] = name

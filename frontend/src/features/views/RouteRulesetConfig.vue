@@ -36,10 +36,10 @@ const handleAdd = () => {
 defineExpose({ handleAdd })
 
 const handleAddEnd = () => {
-  if (rulesetId !== -1) {
-    model.value[rulesetId] = fields.value
-  } else {
+  if (rulesetId === -1) {
     model.value.unshift(fields.value)
+  } else {
+    model.value[rulesetId] = fields.value
   }
 }
 

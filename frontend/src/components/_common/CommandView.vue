@@ -67,7 +67,7 @@ const onKeydown = async (ev: KeyboardEvent) => {
     return
   }
   if (ev.code === 'Enter') {
-    if (hitCommand.value.length) {
+    if (hitCommand.value.length > 0) {
       await handleExecCommand(selected.value)
     } else {
       nextTick(inputRef.value!['focus'])

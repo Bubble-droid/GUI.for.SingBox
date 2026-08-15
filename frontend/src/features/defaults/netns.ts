@@ -12,7 +12,7 @@ export const createNetns = <T extends NetnsType>(type: T): Result<T> => {
     case NetnsType.Unshare:
       return createNetnsUnshare() as Result<T>
     default:
-      throw `Unexpected netns type: ${type}`
+      throw new Error(`Unexpected netns type: ${type}`)
   }
 }
 

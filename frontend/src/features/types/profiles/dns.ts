@@ -14,7 +14,7 @@ export interface DnsServerConfig extends TagItem {
   domain_resolver: string
   // hosts
   hosts_path: string[]
-  predefined: Recordable
+  predefined: Recordable<string>
   // [tcp,udp,tls,quic/https,h3]
   server: string
   server_port: string

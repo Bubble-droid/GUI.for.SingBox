@@ -22,7 +22,7 @@ export default {
     const show = debounce((x: number, y: number) => {
       if (el.dataset['showTips'] === 'true') {
         appStore.tipsPosition = { x, y }
-        appStore.tipsMessage = el._tipsValue || ''
+        appStore.tipsMessage = el._tipsValue ?? ''
         appStore.tipsShow = true
       }
     }, delay)

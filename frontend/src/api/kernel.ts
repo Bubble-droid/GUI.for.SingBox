@@ -41,10 +41,10 @@ const resolveController = (controller: string, defaultPort: number) => {
   }
 
   if (trimmed.startsWith('[')) {
-    const match = trimmed.match(/^\[([^\]]+)\](?::(\d+))?$/)
+    const match = trimmed.match(/^\[([^\]]+)\](?::(\d+))?$/v)
     return {
-      host: normalizeProxyHost(match?.[1] || ''),
-      port: Number(match?.[2] || defaultPort),
+      host: normalizeProxyHost(match?.[1] ?? ''),
+      port: Number(match?.[2] ?? defaultPort),
     }
   }
 
@@ -84,8 +84,17 @@ const setupCoreApi = (protocol: 'http' | 'ws') => {
   }
 }
 
-const request = new Request({ beforeRequest: () => setupCoreApi('http'), timeout: 60 * 1000 })
-const websocket = new WebSockets({ beforeConnect: () => setupCoreApi('ws') })
+const request = new Request({
+  beforeRequest: () => {
+    setupCoreApi('http')
+  },
+  timeout: 60 * 1000,
+})
+const websocket = new WebSockets({
+  beforeConnect: () => {
+    setupCoreApi('ws')
+  },
+})
 
 const wsChannels: {
   [K in WsKey]: WsChannel<K>
@@ -146,7 +155,12 @@ export const initWebsocket = () => {
     const { connect, disconnect } = websocket.createWS({
       url: channel.url,
       params: channel.params,
-      cb: (data) => channel.handlers.forEach((cb) => cb(data)),
+      cb: (data) => {
+        channel.handlers.forEach((cb) => {
+          // oxlint-disable-next-line typescript/no-unsafe-argument
+          cb(data)
+        })
+      },
     })
     channel.connect = connect
     channel.disconnect = disconnect

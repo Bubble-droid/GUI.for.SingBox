@@ -70,6 +70,7 @@ export const generateRule = (
   const getRuleset = (id: string) => rule_set.find((v) => v.id === id)?.tag
 
   const extra: Recordable = { action: rule.action, invert: rule.invert ? true : undefined }
+  // oxlint-disable-next-line typescript/switch-exhaustiveness-check
   switch (rule.type) {
     case RouteRuleType.Inline:
       deepAssign(extra, JSON.parse(rule.payload))
@@ -87,17 +88,19 @@ export const generateRule = (
     case RouteRuleType.ClashMode:
       extra[rule.type] = rule.payload
       break
-    default:
+    default: {
       extra[rule.type] = rule.payload.split(',').map((val) => {
         if (rule.type === RouteRuleType.Port || rule.type === RouteRuleType.SourcePort) {
           return Number(val)
         }
         return val
       })
-      if (extra[rule.type].length === 1) {
-        extra[rule.type] = extra[rule.type][0]
+      const value = extra[rule.type] as unknown[]
+      if (value.length === 1) {
+        extra[rule.type] = value[0]
       }
       break
+    }
   }
   return extra
 }

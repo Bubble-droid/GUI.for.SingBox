@@ -28,7 +28,7 @@ export const createCertificateProvider = <T extends CertificateProviderType>(
     case CertificateProviderType.CloudflareOriginCa:
       return createCloudflareOriginCaProvider() as Result<T>
     default:
-      throw `Unexpected certificate provider type: ${type}`
+      throw new Error(`Unexpected certificate provider type: ${type}`)
   }
 }
 

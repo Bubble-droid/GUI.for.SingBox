@@ -58,7 +58,7 @@ export const createEndpoint = <T extends Endpoint>(type: T): Result<T> => {
     case Endpoint.OpenVpnServer:
       return createOpenVpnServer() as Result<T>
     default:
-      throw `Unexpected endpoint type: ${type}`
+      throw new Error(`Unexpected endpoint type: ${type}`)
   }
 }
 

@@ -41,7 +41,7 @@ let ruleId = 0
 const fields = ref<DnsRuleConfig>(createDnsRule())
 
 const isInsertionPointMissing = computed(
-  () => model.value.findIndex((rule) => rule.type === DnsRuleType.InsertionPoint) === -1,
+  () => !model.value.some((rule) => rule.type === DnsRuleType.InsertionPoint),
 )
 
 const { t } = useI18n()
@@ -56,15 +56,15 @@ const handleAdd = () => {
 defineExpose({ handleAdd })
 
 const handleAddEnd = () => {
-  if (ruleId !== -1) {
-    model.value[ruleId] = fields.value
-  } else {
+  if (ruleId === -1) {
     const index = model.value.findIndex((v) => v.type === DnsRuleType.InsertionPoint)
-    if (index !== -1) {
-      model.value.splice(index + 1, 0, fields.value)
-    } else {
+    if (index === -1) {
       model.value.unshift(fields.value)
+    } else {
+      model.value.splice(index + 1, 0, fields.value)
     }
+  } else {
+    model.value[ruleId] = fields.value
   }
 }
 
@@ -94,7 +94,7 @@ const handleDeleteRule = (index: number) => {
 }
 
 const handleUse = (ruleset: any) => {
-  const ids = fields.value.payload.split(',').filter((v) => v)
+  const ids = fields.value.payload.split(',').filter(Boolean)
   const idx = ids.findIndex((v) => v === ruleset.id)
   if (idx === -1) {
     ids.push(ruleset.id)
@@ -114,7 +114,7 @@ const showLost = () => message.warn('kernel.route.rules.invalid')
 const hasLost = (rule: DnsRuleConfig) => {
   const checkServer = () => {
     if (rule.action === DnsRuleAction.Route) {
-      if (!props.serversOptions.find((v) => v.value === rule.server)) {
+      if (!props.serversOptions.some((v) => v.value === rule.server)) {
         return true
       }
       return false
@@ -130,12 +130,12 @@ const hasLost = (rule: DnsRuleConfig) => {
 
   const checkPayload = () => {
     if (rule.type === DnsRuleType.Inbound) {
-      return !props.inboundOptions.find((v) => v.value === rule.payload)
+      return !props.inboundOptions.some((v) => v.value === rule.payload)
     }
     if (rule.type === DnsRuleType.RuleSet) {
       const hasMissingRuleset = rule.payload
         .split(',')
-        .some((id) => !props.ruleSet.find((v) => v.id === id))
+        .some((id) => !props.ruleSet.some((v) => v.id === id))
       return hasMissingRuleset
     }
     if (rule.type === DnsRuleType.Inline) {

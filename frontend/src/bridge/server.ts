@@ -1,6 +1,8 @@
 import * as Bridge from '@wails/go/bridge/App'
 import { EventsOn, EventsEmit, EventsOff } from '@wails/runtime/runtime'
 
+import { normalizeErrorMessage } from '@/utils/normalize'
+
 interface Request {
   id: string
   method: string
@@ -60,42 +62,50 @@ export const StartServer = async (
   }
   const { flag, data } = await Bridge.StartServer(address, id, _options)
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
 
-  EventsOn(id, async (...args) => {
-    const [requestId, method, url, headers, body] = args
-    try {
-      await handler(
-        {
-          id: requestId,
-          method,
-          url,
-          headers: Object.entries(headers).reduce((p, c: any) => ({ ...p, [c[0]]: c[1][0] }), {}),
-          body,
-        },
-        {
-          end: (status, resHeaders, resBody, resOptions) => {
-            EventsEmit(
-              requestId,
-              status,
-              JSON.stringify(resHeaders),
-              resBody,
-              JSON.stringify(resOptions),
-            )
+  EventsOn(id, (...args) => {
+    void (async () => {
+      const [requestId, method, url, headers, body] = args as [
+        Request['id'],
+        Request['method'],
+        Request['url'],
+        Request['headers'],
+        Request['body'],
+      ]
+      try {
+        await handler(
+          {
+            id: requestId,
+            method,
+            url,
+            headers: Object.entries(headers).reduce((p, c) => ({ ...p, [c[0]]: c[1][0] }), {}),
+            body,
           },
-        },
-      )
-    } catch (err: any) {
-      console.log('Server handler err:', err, requestId)
-      EventsEmit(
-        requestId,
-        500,
-        JSON.stringify({ 'Content-Type': 'text/plain; charset=utf-8' }),
-        err.message || err,
-        JSON.stringify({ Mode: 'Text' }),
-      )
-    }
+          {
+            end: (status, resHeaders, resBody, resOptions) => {
+              EventsEmit(
+                requestId,
+                status,
+                JSON.stringify(resHeaders),
+                resBody,
+                JSON.stringify(resOptions),
+              )
+            },
+          },
+        )
+      } catch (err: any) {
+        console.log('Server handler err:', err, requestId)
+        EventsEmit(
+          requestId,
+          500,
+          JSON.stringify({ 'Content-Type': 'text/plain; charset=utf-8' }),
+          normalizeErrorMessage(err),
+          JSON.stringify({ Mode: 'Text' }),
+        )
+      }
+    })()
   })
   return { close: () => StopServer(id) }
 }
@@ -103,7 +113,7 @@ export const StartServer = async (
 export const StopServer = async (serverID: string) => {
   const { flag, data } = await Bridge.StopServer(serverID)
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   EventsOff(serverID)
   return data
@@ -112,7 +122,7 @@ export const StopServer = async (serverID: string) => {
 export const ListServer = async () => {
   const { flag, data } = await Bridge.ListServer()
   if (!flag) {
-    throw data
+    throw new Error(data)
   }
   return data.split('|').filter((id) => id.length)
 }

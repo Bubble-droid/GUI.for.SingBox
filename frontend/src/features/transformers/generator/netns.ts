@@ -5,16 +5,16 @@ import type { NetnsConfig } from '@profiles/netns'
 
 export const generateNetns = (netns: NetnsConfig[]) => {
   return netns
-    .flatMap((item): SingBoxNetns[] => {
-      const { enable, type, tag, config } = item
+    .flatMap((ns): SingBoxNetns[] => {
+      const { enable, type, tag, config } = ns
       if (!enable) return []
       switch (type) {
         case NetnsType.Default:
         case NetnsType.Unshare:
           return [{ type, tag, ...config } as SingBoxNetns]
         default:
-          throw `Unexpected netns type: ${type as string}`
+          throw new Error(`Unexpected netns type: ${type as string}`)
       }
     })
-    .map(filterInvalidProps)
+    .map((ns) => filterInvalidProps(ns))
 }

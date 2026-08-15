@@ -66,7 +66,7 @@ const validate = (val: string | number) => {
   if (props.type === 'number') {
     val = Number(val)
     if (Number.isNaN(val)) {
-      throw new Error('Please enter a valid number')
+      throw new TypeError('Please enter a valid number')
     }
     const { min, max } = props
     if (min !== undefined) {

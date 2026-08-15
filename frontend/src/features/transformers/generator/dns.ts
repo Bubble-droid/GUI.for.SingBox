@@ -10,34 +10,28 @@ import { generateRule } from './shared'
 
 export const generateDnsServerURL = (dnsServer: DnsServerConfig) => {
   const { type, server_port, path, server, interface: _interface } = dnsServer
-  let address = ''
+  // oxlint-disable-next-line typescript/switch-exhaustiveness-check
   switch (type) {
     case DnsServer.Https:
-      address = `https://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
-      break
+      return `https://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
     case DnsServer.H3:
-      address = `h3://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
-      break
+      return `h3://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
     case DnsServer.Dhcp:
-      address = `dhcp://${_interface}`
-      break
+      return `dhcp://${_interface}`
     case DnsServer.FakeIp:
-      address =
+      return (
         'fake-ip://' +
         (dnsServer.inet4_range ? dnsServer.inet4_range : '') +
         (dnsServer.inet6_range ? (dnsServer.inet4_range ? ',' : '') + dnsServer.inet6_range : '')
-      break
-    case DnsServer.Hosts:
-      address = 'hosts'
-      break
-    case DnsServer.Local:
-      address = 'local'
-      break
+      )
+    case DnsServer.Quic:
+    case DnsServer.Tcp:
+    case DnsServer.Udp:
+    case DnsServer.Tls:
+      return `${type}://${server}${server_port ? ':' + server_port : ''}`
     default:
-      address = `${type}://${server}${server_port ? ':' + server_port : ''}`
-      break
+      return type
   }
-  return address
 }
 
 export const generateDns = (
@@ -98,6 +92,7 @@ export const generateDns = (
           }
         }
       }
+      // oxlint-disable-next-line typescript/switch-exhaustiveness-check
       switch (server.type) {
         case DnsServer.Hosts:
           extra['path'] = server.hosts_path.reduce((p, c) => p.concat(c.split(',')), [] as string[])
@@ -126,7 +121,7 @@ export const generateDns = (
       }
       const extra: Recordable = generateRule(rule, rule_set, inbounds)
       if (rule.type === DnsRuleType.Inline && rule.payload.includes('__is_fake_ip')) {
-        if (!dns.servers.find((v) => v.type === DnsServer.FakeIp)) {
+        if (!dns.servers.some((v) => v.type === DnsServer.FakeIp)) {
           return []
         }
         delete extra['__is_fake_ip']

@@ -27,10 +27,10 @@ export const generateCertificateProviders = (
         case CertificateProviderType.CloudflareOriginCa:
           return [generateCloudflareOriginCaProvider(cp, maps)]
         default:
-          throw `Unexpected certificate provider type: ${type as string}`
+          throw new Error(`Unexpected certificate provider type: ${type as string}`)
       }
     })
-    .map(filterInvalidProps)
+    .map((cp) => filterInvalidProps(cp))
 }
 
 export const generateAcmeProvider = (

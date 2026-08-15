@@ -19,9 +19,8 @@ const pages = computed(() => {
     return [...range(1, 7), 'next', total] as const
   } else if (current >= total - 3) {
     return [1, 'prev', ...range(total - 6, total)] as const
-  } else {
-    return [1, 'prev', ...range(current - 2, current + 2), 'next', total] as const
   }
+  return [1, 'prev', ...range(current - 2, current + 2), 'next', total] as const
 })
 
 const range = (start: number, end: number) => {

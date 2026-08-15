@@ -16,35 +16,37 @@ export const useAppLifecycle = () => {
   const subscribesStore = useSubscribesStore()
   let commandModal: ReturnType<typeof modal> | undefined
 
-  const offLaunchApp = EventsOn('onLaunchApp', async ([arg]: string[]) => {
-    if (!arg) return
+  const offLaunchApp = EventsOn('onLaunchApp', ([arg]: string[]) => {
+    void (async () => {
+      if (!arg) return
 
-    let _url
-    let _name = sampleID()
+      let _url
+      let _name = sampleID()
 
-    const url = new URL(arg)
-    if (url.pathname === '//install-config/' || url.hostname === 'import-remote-profile') {
-      _url = url.searchParams.get('url')
-      _name = url.searchParams.get('name') || sampleID()
-    } else if (url.pathname.startsWith('//import-remote-profile')) {
-      _url = url.searchParams.get('url')
-      _name = decodeURIComponent(url.hash).slice(1) || sampleID()
-    }
+      const url = new URL(arg)
+      if (url.pathname === '//install-config/' || url.hostname === 'import-remote-profile') {
+        _url = url.searchParams.get('url')
+        _name = url.searchParams.get('name') ?? sampleID()
+      } else if (url.pathname.startsWith('//import-remote-profile')) {
+        _url = url.searchParams.get('url')
+        _name = decodeURIComponent(url.hash).slice(1) || sampleID()
+      }
 
-    if (!_url) {
-      message.error('URL missing')
-      return
-    }
+      if (!_url) {
+        message.error('URL missing')
+        return
+      }
 
-    try {
-      await subscribesStore.importSubscribe(_name, _url)
-      message.success('common.success')
-    } catch (error) {
-      message.error(error)
-    }
+      try {
+        await subscribesStore.importSubscribe(_name, _url)
+        message.success('common.success')
+      } catch (error) {
+        message.error(error)
+      }
+    })()
   })
 
-  const offBeforeExitApp = EventsOn('onBeforeExitApp', async () => {
+  const offBeforeExitApp = EventsOn('onBeforeExitApp', () => {
     if (appSettings.app.exitOnClose) {
       void exitApp()
       return
@@ -53,7 +55,9 @@ export const useAppLifecycle = () => {
     WindowHide()
   })
 
-  const offExitApp = EventsOn('onExitApp', () => exitApp())
+  const offExitApp = EventsOn('onExitApp', () => {
+    void exitApp()
+  })
 
   const handleKeydown = (event: KeyboardEvent) => {
     if (((event.ctrlKey && event.shiftKey) || event.metaKey) && event.code === 'KeyP') {
@@ -76,7 +80,11 @@ export const useAppLifecycle = () => {
         },
       })
       commandModal = m
-      m.setContent(CommandView, { close: () => m.close() }).open()
+      m.setContent(CommandView, {
+        close: () => {
+          m.close()
+        },
+      }).open()
       return
     }
 

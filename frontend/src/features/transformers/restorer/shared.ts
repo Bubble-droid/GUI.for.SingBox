@@ -64,11 +64,11 @@ export const restoreDomainResolver = (
   maps: IdMaps,
 ): DomainResolver => {
   const template = createDomainResolver()
-  const normalizedResolver = !raw
-    ? template
-    : typeof raw === 'string'
+  const normalizedResolver = raw
+    ? typeof raw === 'string'
       ? { ...template, server: raw }
       : extractProps(raw, template).owned
+    : template
   const resolver: DomainResolver = {
     ...template,
     ...normalizedResolver,
