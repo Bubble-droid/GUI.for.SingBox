@@ -7,12 +7,16 @@
   },
   "categories": {
     "correctness": "error",
-    "suspicious": "error"
+    "suspicious": "error",
+    "perf": "error"
   },
   "rules": {
     "typescript/no-unsafe-type-assertion": "off",
     "unicorn/consistent-function-scoping": "off",
     "no-underscore-dangle": "off",
+    "oxc/no-map-spread": "off",
+    "oxc/no-accumulating-spread": "off",
+    "no-await-in-loop": "off",
     "no-unused-expressions": [
       "error",
       {

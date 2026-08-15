@@ -79,15 +79,15 @@ const getTrayMenus = () => {
   if (!groupMenusHidden) {
     const { proxies } = kernelApiStore
     if (!proxies) return []
-    const hiddenList = (profilesStore.currentProfile?.outbounds || []).flatMap((v) =>
-      v.hidden ? v.tag : [],
+    const hiddenList = new Set(
+      (profilesStore.currentProfile?.outbounds || []).flatMap((v) => (v.hidden ? v.tag : [])),
     )
     groupMenus = Object.values(proxies)
       .filter(
         (v) =>
           ['Selector', 'URLTest'].includes(v.type) &&
           v.name !== 'GLOBAL' &&
-          !hiddenList.includes(v.name),
+          !hiddenList.has(v.name),
       )
       .concat(proxies['GLOBAL'] || [])
       .map((group) => {

@@ -38,15 +38,13 @@ const groups = computed(() => {
     p[c.tag] = c.icon
     return p
   }, {} as Recordable<string>)
-  const hiddenList = (profilesStore.currentProfile?.outbounds || []).flatMap((v) =>
-    v.hidden ? v.tag : [],
+  const hiddenList = new Set(
+    (profilesStore.currentProfile?.outbounds || []).flatMap((v) => (v.hidden ? v.tag : [])),
   )
   return Object.values(proxies)
     .filter(
       (v) =>
-        ['Selector', 'URLTest'].includes(v.type) &&
-        v.name !== 'GLOBAL' &&
-        !hiddenList.includes(v.name),
+        ['Selector', 'URLTest'].includes(v.type) && v.name !== 'GLOBAL' && !hiddenList.has(v.name),
     )
     .concat(proxies['GLOBAL'] || [])
     .map((group) => {

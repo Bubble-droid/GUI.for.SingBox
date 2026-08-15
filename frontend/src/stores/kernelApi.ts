@@ -476,10 +476,12 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
   eventBus.on('subscriptionsChange', () => {
     if (running.value && profilesStore.currentProfile) {
-      const enabledSubs = subscribesStore.subscribes.flatMap((v) => (v.disabled ? [] : v.id))
+      const enabledSubs = new Set(
+        subscribesStore.subscribes.flatMap((v) => (v.disabled ? [] : v.id)),
+      )
       const inUse = profilesStore.currentProfile.outbounds.some(({ outbounds }) =>
         outbounds.some(
-          (outbound) => outbound.type === 'Subscription' && enabledSubs.includes(outbound.id),
+          (outbound) => outbound.type === 'Subscription' && enabledSubs.has(outbound.id),
         ),
       )
       if (inUse) {
@@ -509,8 +511,10 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
   eventBus.on('rulesetsChange', () => {
     if (running.value && profilesStore.currentProfile) {
-      const enabledRulesets = rulesetsStore.rulesets.flatMap((v) => (v.disabled ? [] : v.id))
-      const inUse = collectRulesetIDs().some((v) => enabledRulesets.includes(v))
+      const enabledRulesets = new Set(
+        rulesetsStore.rulesets.flatMap((v) => (v.disabled ? [] : v.id)),
+      )
+      const inUse = collectRulesetIDs().some((v) => enabledRulesets.has(v))
       if (inUse) {
         needRestart.value = true
       }
