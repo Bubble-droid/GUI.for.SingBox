@@ -1,3 +1,4 @@
+// oxlint-disable no-redeclare
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 declare namespace App {
   type OS = 'windows' | 'linux' | 'darwin'
@@ -104,11 +105,11 @@ declare namespace App {
       controllerCloseMode: 'all' | 'button'
       controllerSensitivity: number
       main: {
-        env: Recordable
+        env: Recordable<string>
         args: string[]
       }
       alpha: {
-        env: Recordable
+        env: Recordable<string>
         args: string[]
       }
     }

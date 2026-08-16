@@ -10,11 +10,13 @@ import { message, picker } from '@/utils/interaction'
 import { isValidIPv4, isValidIPv6 } from '@/utils/is'
 import { buildSmartRegExp, getDomainSuffixes } from '@/utils/others'
 
-import type { PickerItem } from '@/components/Picker/index.vue'
+import type { PickerItem } from '@/components/Picker/types'
+import type { CoreApiLogsData } from '@/types/kernel'
+import type { RuleCandidate } from '@/types/views'
 
 const logType = ref<'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'panic'>('info')
 const keywords = ref('')
-const logs = ref<{ type: string; payload: string }[]>([])
+const logs = ref<CoreApiLogsData[]>([])
 
 const LogLevelMap = {
   trace: ['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'panic'],
@@ -43,45 +45,52 @@ const menus: App.Menu[] = (
 ).map(([label, ruleset]) => {
   return {
     label,
-    handler: async ({ type, payload }) => {
-      if (type !== 'info') {
-        message.error('Not Support')
-        return
-      }
-      const regex = /(\b((?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}|(?:\d{1,3}\.){3}\d{1,3})(:\d+)?\b)/g
-      const matches = payload.match(regex)
-      if (!matches) {
-        message.error('Not Matched')
-        return
-      }
+    handler: async ({ type: _, payload }: CoreApiLogsData) => {
+      const regex =
+        /\[([0-9a-fA-F:.]{2,})\](?::\d+)?|((?:\d{1,3}\.){3}\d{1,3})(?::\d+)?|((?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(?::\d+)?|((?=[0-9a-fA-F:]*:)[0-9a-fA-F:.]{2,})/gu
+      const matches = payload.matchAll(regex)
 
-      const options: PickerItem<Record<string, any>[]>[] = []
+      const options: PickerItem<RuleCandidate>[] = []
 
-      matches.forEach((match: string) => {
-        // FIXME: IPv6
-        const address = match.split(':')[0]
-        if (!address) return
-        if (isValidIPv4(address) || isValidIPv6(address)) {
+      for (const [, bracketed, ipv4, domain, ipv6] of matches) {
+        const token = bracketed ?? ipv4 ?? domain ?? ipv6
+        if (!token) continue
+
+        let ip = token
+        let prefix = 0
+        if (isValidIPv6(ip)) {
+          prefix = 128
+        } else if (isValidIPv4(ip)) {
+          prefix = 32
+        } else {
+          const host = ip.match(/^(.+):(\d{1,5})$/u)
+          if (host && isValidIPv6(host[1]!)) {
+            ip = host[1]!
+            prefix = 128
+          }
+        }
+
+        if (prefix > 0) {
           options.push({
             label: t('kernel.rules.type.ip_cidr'),
-            value: { ip_cidr: address + '/32' } as any,
-            description: address,
+            value: { ip_cidr: ip + '/' + prefix },
+            description: ip,
           })
-        } else {
+        } else if (token.includes('.')) {
           options.push({
             label: t('kernel.rules.type.domain'),
-            value: { domain: address } as any,
-            description: address,
+            value: { domain: token },
+            description: token,
           })
-          getDomainSuffixes(address).forEach((suffix) => {
+          getDomainSuffixes(token).forEach((suffix) => {
             options.push({
               label: t('kernel.rules.type.domain_suffix'),
-              value: { domain_suffix: suffix } as any,
+              value: { domain_suffix: suffix },
               description: suffix,
             })
           })
         }
-      })
+      }
 
       const payloads = await picker.multi('rulesets.selectRuleType', options)
 

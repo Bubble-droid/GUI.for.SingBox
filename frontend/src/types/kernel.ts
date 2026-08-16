@@ -1,3 +1,9 @@
+export interface CoreApiConfigTun {
+  enable: boolean
+  stack: string
+  device: string
+}
+
 export interface CoreApiConfig {
   port: number
   'socks-port': number
@@ -5,11 +11,11 @@ export interface CoreApiConfig {
   'interface-name': string
   'allow-lan': boolean
   mode: string
-  tun: {
-    enable: boolean
-    stack: string
-    device: string
-  }
+  tun: CoreApiConfigTun
+}
+
+export interface CoreApiProxyHistory {
+  delay: number
 }
 
 export interface CoreApiProxy {
@@ -19,20 +25,20 @@ export interface CoreApiProxy {
   now: string
   type: string
   udp: boolean
-  history: {
-    delay: number
-  }[]
+  history: CoreApiProxyHistory[]
 }
 
 export interface CoreApiProxies {
   proxies: Record<string, CoreApiProxy>
 }
 
+export interface CoreApiConnection {
+  id: string
+  chains: string[]
+}
+
 export interface CoreApiConnections {
-  connections: {
-    id: string
-    chains: string[]
-  }[]
+  connections: CoreApiConnection[]
 }
 
 export interface CoreApiTrafficData {
@@ -50,30 +56,34 @@ export interface CoreApiLogsData {
   payload: string
 }
 
+export interface CoreApiConnectionMetadata {
+  destinationIP: string
+  destinationPort: string
+  dnsMode: string
+  host: string
+  network: string
+  processPath: string
+  sourceIP: string
+  sourcePort: string
+  type: string
+}
+
+export interface CoreApiConnectionsDataConnection {
+  chains: string[]
+  download: number
+  id: string
+  metadata: CoreApiConnectionMetadata
+  rule: string
+  rulePayload: string
+  start: string
+  upload: number
+}
+
 export interface CoreApiConnectionsData {
   memory: number
   uploadTotal: number
   downloadTotal: number
-  connections: {
-    chains: string[]
-    download: number
-    id: string
-    metadata: {
-      destinationIP: string
-      destinationPort: string
-      dnsMode: string
-      host: string
-      network: string
-      processPath: string
-      sourceIP: string
-      sourcePort: string
-      type: string
-    }
-    rule: string
-    rulePayload: string
-    start: string
-    upload: number
-  }[]
+  connections: CoreApiConnectionsDataConnection[]
 }
 
 export interface CoreApiWsDataMap {

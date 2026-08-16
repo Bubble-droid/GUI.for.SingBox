@@ -10,6 +10,9 @@ import { OS, RequestProxyMode } from '@/constant/app'
 import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 
+import type { CoreApiProxy } from '@/types/kernel'
+import type { RuleCandidate } from '@/types/views'
+
 import { APP_TITLE } from './env'
 import { formatProxyHost } from './format'
 import { confirm, message } from './interaction'
@@ -69,27 +72,27 @@ export const GrantTUNPermission = async (path: string) => {
   }
 }
 
-export const RunWithOsaScript = async (
+export const RunWithOsaScript = (
   path: string,
   args: string[] = [],
   options: { admin?: boolean; wait?: boolean } = {},
 ) => {
   const { admin = false, wait = true, ...others } = options
-  const escapedArgs = args.map((arg) => `'${arg.replace(/'/g, "'\\''")}'`).join(' ')
+  const escapedArgs = args.map((arg) => `'${arg.replaceAll("'", "'\\''")}'`).join(' ')
   let shellCmd = `${path} ${escapedArgs}`.trim()
   if (!wait) {
     shellCmd += ' > /dev/null 2>&1 &'
   }
-  const escapedShellCmd = shellCmd.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+  const escapedShellCmd = shellCmd.replaceAll('\\', '\\\\').replaceAll('"', '\\"')
   let appleScript = `do shell script "${escapedShellCmd}"`
   if (admin) {
     appleScript += ' with administrator privileges'
   }
   const osaArgs = ['-e', appleScript]
-  return await Exec('osascript', osaArgs, others)
+  return Exec('osascript', osaArgs, others)
 }
 
-export const RunWithPowerShell = async (
+export const RunWithPowerShell = (
   path: string,
   args: string[] = [],
   options: { admin?: boolean; hidden?: boolean; wait?: boolean } = {},
@@ -98,7 +101,7 @@ export const RunWithPowerShell = async (
   const psArgs: string[] = []
   let command = `Start-Process -FilePath "${path}"`
   if (args.length > 0) {
-    const argList = args.map((a) => `"${a.replace(/"/g, '""')}"`).join(',')
+    const argList = args.map((a) => `"${a.replaceAll('"', '""')}"`).join(',')
     command += ` -ArgumentList ${argList}`
   }
   if (admin) {
@@ -111,7 +114,7 @@ export const RunWithPowerShell = async (
     command += ' -Wait'
   }
   psArgs.push('-NoProfile', '-Command', command)
-  return await Exec('powershell', psArgs, others)
+  return Exec('powershell', psArgs, others)
 }
 
 const requestProxyCache: { proxyPromise: Promise<string> | null; lastAccessTime: number } = {
@@ -119,7 +122,7 @@ const requestProxyCache: { proxyPromise: Promise<string> | null; lastAccessTime:
   lastAccessTime: 0,
 }
 
-export const GetRequestProxy = async (mode?: App.RequestProxyMode, customProxy?: string) => {
+export const GetRequestProxy = (mode?: App.RequestProxyMode, customProxy?: string) => {
   const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
   const kernelApiProxy = useStoreDeps(StoreDep.KernelApiStore)
   const requestProxyMode = mode ?? appSettings.app.requestProxyMode
@@ -219,7 +222,10 @@ export const DisableAutoStart = async () => {
 }
 
 // Others
-export const handleUseProxy = async (group: any, proxy: any) => {
+export const handleUseProxy = async (
+  group: Pick<CoreApiProxy, 'type' | 'name' | 'now'>,
+  proxy: Partial<CoreApiProxy>,
+) => {
   if (group.type !== 'Selector' || group.now === proxy.name) return
   const promises: Promise<null>[] = []
   const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
@@ -232,7 +238,7 @@ export const handleUseProxy = async (group: any, proxy: any) => {
         .map((v) => deleteConnection(v.id)),
     )
   }
-  await useProxy(encodeURIComponent(group.name), proxy.name)
+  await useProxy(encodeURIComponent(group.name), proxy.name!)
   await Promise.all(promises)
   await kernelApiStore.refreshProviderProxies()
 }
@@ -249,9 +255,11 @@ export const handleChangeMode = async (mode: 'direct' | 'global' | 'rule') => {
   await Promise.all(promises)
 }
 
+type RuleCandidateInRuleSet = Partial<Record<keyof RuleCandidate, string[]>>
+
 export const addToRuleSet = async (
   id: 'direct' | 'reject' | 'proxy',
-  payloads: Record<string, any>[],
+  payloads: RuleCandidate[],
 ) => {
   const path = `data/rulesets/${id}.json`
 
@@ -272,24 +280,21 @@ export const addToRuleSet = async (
     await rulesetsStoe.addRuleset(ruleset)
   }
 
-  const content = (await ignoredError(ReadFile, path)) || '{ "version": 1, "rules": [] }'
-  const { rules = [] } = JSON.parse(content)
-  rules[0] = rules[0] || {}
+  const content = (await ignoredError(ReadFile, path)) ?? '{ "version": 1, "rules": [] }'
+  const { rules = [] } = JSON.parse(content) as { rules?: RuleCandidateInRuleSet[] }
+  const first = rules[0] ?? {}
   payloads.forEach((payload) => {
-    if (payload['domain']) {
-      rules[0].domain = [...new Set((rules[0].domain || []).concat(payload['domain']))]
-    } else if (payload['ip_cidr']) {
-      rules[0].ip_cidr = [...new Set((rules[0].ip_cidr || []).concat(payload['ip_cidr']))]
-    } else if (payload['process_path']) {
-      rules[0].process_path = [
-        ...new Set((rules[0].process_path || []).concat(payload['process_path'])),
-      ]
-    } else if (payload['domain_suffix']) {
-      rules[0].domain_suffix = [
-        ...new Set((rules[0].domain_suffix || []).concat(payload['domain_suffix'])),
-      ]
+    if (payload.domain) {
+      first.domain = [...new Set((first.domain ?? []).concat(payload.domain))]
+    } else if (payload.ip_cidr) {
+      first.ip_cidr = [...new Set((first.ip_cidr ?? []).concat(payload.ip_cidr))]
+    } else if (payload.process_path) {
+      first.process_path = [...new Set((first.process_path ?? []).concat(payload.process_path))]
+    } else if (payload.domain_suffix) {
+      first.domain_suffix = [...new Set((first.domain_suffix ?? []).concat(payload.domain_suffix))]
     }
   })
+  rules[0] = first
   await WriteFile(path, JSON.stringify({ version: 1, rules }, null, 2))
   await rulesetsStoe.updateRuleset(id)
 }
@@ -304,7 +309,7 @@ export const reloadApp = async () => {
   let timedout = false
   const { destroy } = message.info('titlebar.reloadPending', 10 * 60 * 1000)
 
-  const timeoutId = setTimeout(async () => {
+  const timeoutId = setTimeout(() => {
     timedout = true
     appStore.isAppReloading = false
     destroy()
@@ -339,7 +344,7 @@ export const exitApp = async () => {
   let timedout = false
   const { destroy } = message.info('titlebar.exitPending', 10 * 60 * 1000)
 
-  const timeoutId = setTimeout(async () => {
+  const timeoutId = setTimeout(() => {
     timedout = true
     appStore.isAppExiting = false
     destroy()
@@ -399,10 +404,10 @@ export const processMagicVariables = (str: string) => {
 export const getKernelRuntimeEnv = (isAlpha = false) => {
   const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
   const { env } = isAlpha ? appSettings.app.kernel.alpha : appSettings.app.kernel.main
-  return Object.entries(env).reduce((p, [key, value]) => {
+  return Object.entries(env).reduce<Recordable<string>>((p, [key, value]) => {
     p[key] = processMagicVariables(value)
     return p
-  }, {} as Recordable)
+  }, {})
 }
 
 export const getKernelRuntimeArgs = (isAlpha = false) => {

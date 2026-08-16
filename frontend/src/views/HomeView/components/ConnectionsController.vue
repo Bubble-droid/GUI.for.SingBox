@@ -11,16 +11,19 @@ import { useKernelApiStore } from '@/stores/kernelApi'
 import { formatBytes, formatRelativeTime } from '@/utils/format'
 import { addToRuleSet } from '@/utils/helper'
 import { message, picker } from '@/utils/interaction'
+import { isValidIPv6 } from '@/utils/is'
 import { getDomainSuffixes } from '@/utils/others'
 
-import type { PickerItem } from '@/components/Picker/index.vue'
+import type { PickerItem } from '@/components/Picker/types'
 import type { Column } from '@/components/Table/index.vue'
-import type { CoreApiConnectionsData } from '@/types/kernel'
+import type { CoreApiConnectionsData, CoreApiConnectionsDataConnection } from '@/types/kernel'
+import type { RuleCandidate } from '@/types/views.ts'
 
 interface TrafficCacheType {
   up: number
   down: number
 }
+
 const TrafficCache: Record<string, TrafficCacheType> = {}
 
 const appSettingsStore = useAppSettingsStore()
@@ -177,43 +180,46 @@ const menu: App.Menu[] = [
   ).map(([label, ruleset]) => {
     return {
       label,
-      handler: async (record: Record<string, any>) => {
-        const options: PickerItem<Record<string, any>[]>[] = []
-        if (record['metadata'].host) {
+      handler: async (record: CoreApiConnectionsDataConnection) => {
+        const options: PickerItem<RuleCandidate>[] = []
+        if (record.metadata.host) {
           options.push({
             label: t('kernel.rules.type.domain'),
-            value: { domain: record['metadata'].host } as any,
-            description: record['metadata'].host,
+            value: { domain: record.metadata.host },
+            description: record.metadata.host,
           })
-          getDomainSuffixes(record['metadata'].host).forEach((suffix) => {
+          getDomainSuffixes(record.metadata.host).forEach((suffix) => {
             options.push({
               label: t('kernel.rules.type.domain_suffix'),
               value: {
                 domain_suffix: suffix,
-              } as any,
+              },
               description: suffix,
             })
           })
         }
-        if (record['metadata'].destinationIP) {
+        if (record.metadata.destinationIP) {
+          const destinationIP = record.metadata.destinationIP
           options.push({
             label: t('kernel.rules.type.ip_cidr'),
-            value: { ip_cidr: record['metadata'].destinationIP + '/32' } as any,
-            description: record['metadata'].destinationIP,
+            value: {
+              ip_cidr: destinationIP + (isValidIPv6(destinationIP) ? '/128' : '/32'),
+            },
+            description: destinationIP,
           })
         }
-        if (record['metadata'].processPath) {
+        if (record.metadata.processPath) {
           options.push({
             label: t('kernel.rules.type.process_path'),
-            value: { process_path: record['metadata'].processPath } as any,
-            description: record['metadata'].processPath,
+            value: { process_path: record.metadata.processPath },
+            description: record.metadata.processPath,
           })
         }
         const payloads = await picker.multi('rulesets.selectRuleType', options)
         try {
           await addToRuleSet(ruleset, payloads)
           message.success('common.success')
-        } catch (error: any) {
+        } catch (error) {
           message.error(error)
           console.log(error)
         }
@@ -249,7 +255,7 @@ const handleCloseAll = async () => {
     )
     disconnectedData.value.push(...filteredConnections.value)
     dataSource.value = dataSource.value.filter(
-      (connection) => !filteredConnections.value.find((c) => c.id === connection.id),
+      (connection) => !filteredConnections.value.some((c) => c.id === connection.id),
     )
   } catch (error: any) {
     message.error(error.message || error)
