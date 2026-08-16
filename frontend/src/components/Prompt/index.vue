@@ -3,15 +3,9 @@ import { ref, unref } from 'vue'
 
 import useI18n from '@/lang'
 
-import type { Props as InputProps } from '@/components/Input/index.vue'
+import type { PromptProps } from './types'
 
-interface Props {
-  title: string
-  initialValue?: string | number
-  props: Omit<InputProps, 'modelValue'>
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<PromptProps>(), {
   placeholder: '',
   initialValue: '',
 })

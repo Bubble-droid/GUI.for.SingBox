@@ -1,5 +1,4 @@
-<script lang="ts" setup>
-import type { Profile } from '@profiles'
+<script lang="ts" setup generic="T extends ResourceType">
 import { computed, nextTick, onMounted, type SetupContext, type Slot } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -10,27 +9,19 @@ import { useScheduledTasksStore } from '@/stores/scheduledtasks'
 import { useSubscribesStore } from '@/stores/subscribes'
 import { modal, message } from '@/utils/interaction'
 
-type ResourceType = 'profile' | 'subscription' | 'ruleset' | 'plugin' | 'scheduledtask'
-type ResourceItem = Profile | App.Subscription | App.RuleSet | App.Plugin | App.ScheduledTask
-interface ResourceConfig {
+import type { ResourceItemMap, ResourceSelectProps, ResourceType } from './types'
+
+interface ResourceConfig<K extends ResourceType> {
   title: string
-  list: ResourceItem[]
-  getById: (id: string) => ResourceItem | undefined
-  getName: (item: ResourceItem) => string
-  getDescription: (item: ResourceItem) => string
+  list: ResourceItemMap<K>[]
+  getById: (id: string) => ResourceItemMap<K> | undefined
+  getName: (item: ResourceItemMap<K>) => string
+  getDescription: (item: ResourceItemMap<K>) => string
 }
 
-export interface ResourceSelectProps {
-  type: ResourceType
-  title?: string | undefined
-  cols?: number
-  max?: number
-  min?: number
-  renderSlot?: boolean
-  openImmediate?: boolean
-}
+type ResourceConfigMap = { [K in ResourceType]: ResourceConfig<K> }
 
-const props = withDefaults(defineProps<ResourceSelectProps>(), {
+const props = withDefaults(defineProps<ResourceSelectProps<T>>(), {
   title: undefined,
   cols: 3,
   min: 0,
@@ -42,8 +33,8 @@ const props = withDefaults(defineProps<ResourceSelectProps>(), {
 const model = defineModel<string[]>({ default: () => [] })
 
 const emit = defineEmits<{
-  (e: 'change', val: string[], items: ResourceItem[]): void
-  (e: 'submit', val: string[], items: ResourceItem[]): void
+  (e: 'change', val: string[], items: ResourceItemMap<T>[]): void
+  (e: 'submit', val: string[], items: ResourceItemMap<T>[]): void
 }>()
 
 const { t } = useI18n()
@@ -53,48 +44,46 @@ const rulesetsStore = useRulesetsStore()
 const pluginsStore = usePluginsStore()
 const scheduledTasksStore = useScheduledTasksStore()
 
-const resourceConfig = computed(() => {
-  const configs: Record<ResourceType, ResourceConfig> = {
+const resourceConfig = computed<ResourceConfig<T>>(() => {
+  const configs: ResourceConfigMap = {
     profile: {
       title: 'profiles.select',
       list: profilesStore.profiles,
       getById: profilesStore.getProfileById,
-      getName: (item) => (item as Profile).name,
+      getName: (item) => item.name,
       getDescription: () => '',
     },
     subscription: {
       title: 'subscribes.select',
       list: subscribesStore.subscribes,
       getById: subscribesStore.getSubscribeById,
-      getName: (item) => (item as App.Subscription).name,
-      getDescription: (item) => (item as App.Subscription).type,
+      getName: (item) => item.name,
+      getDescription: (item) => item.type,
     },
     ruleset: {
       title: 'rulesets.select',
       list: rulesetsStore.rulesets,
       getById: rulesetsStore.getRulesetById,
-      getName: (item) => (item as App.RuleSet).name,
+      getName: (item) => item.name,
       getDescription: (item) => {
-        const ruleset = item as App.RuleSet
-        return `${ruleset.type} / ${ruleset.format}`
+        return `${item.type} / ${item.format}`
       },
     },
     plugin: {
       title: 'plugins.select',
       list: pluginsStore.plugins,
       getById: pluginsStore.getPluginById,
-      getName: (item) => (item as App.Plugin).name,
+      getName: (item) => item.name,
       getDescription: (item) => {
-        const plugin = item as App.Plugin
-        return plugin.description || plugin.type
+        return item.description || item.type
       },
     },
     scheduledtask: {
       title: 'scheduledtasks.select',
       list: scheduledTasksStore.scheduledtasks,
       getById: scheduledTasksStore.getScheduledTaskById,
-      getName: (item) => (item as App.ScheduledTask).name,
-      getDescription: (item) => t('scheduledtask.' + (item as App.ScheduledTask).type),
+      getName: (item) => item.name,
+      getDescription: (item) => t('scheduledtask.' + item.type),
     },
   }
 
@@ -141,7 +130,7 @@ const getItems = (val = model.value) => {
   })
 }
 
-const handleSelect = (item: ResourceItem) => {
+const handleSelect = (item: ResourceItemMap<T>) => {
   const id = item.id
 
   const nextValue: string[] = []

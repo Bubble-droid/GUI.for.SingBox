@@ -3,27 +3,9 @@ import { ref, toRaw, type Ref } from 'vue'
 
 import useI18n from '@/lang'
 
-export interface PickerItem<T> {
-  label: string
-  value: T
-  description?: string
-  background?: string
-  onSelect?: (args: {
-    value: PickerItem<T>['value']
-    option: PickerItem<T>
-    options: PickerItem<T>[]
-    selected: PickerItem<T>['value'][]
-  }) => void
-}
+import type { PickerItem, PickerProps } from './types'
 
-interface Props<T, K> {
-  type: K
-  title: string
-  options?: PickerItem<T>[]
-  initialValue?: T[]
-}
-
-const props = withDefaults(defineProps<Props<ValueType, PickerType>>(), {
+const props = withDefaults(defineProps<PickerProps<ValueType, PickerType>>(), {
   options: () => [],
   initialValue: () => [],
 })

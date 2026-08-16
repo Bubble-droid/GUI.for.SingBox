@@ -8,24 +8,23 @@ import { useModal } from '@/components/Modal'
 import PickerComp from '@/components/Picker/index.vue'
 import PromptComp from '@/components/Prompt/index.vue'
 import ResourceSelectComp from '@/components/ResourceSelect/index.vue'
+import { ResourceTypeMap } from '@/components/ResourceSelect/types'
 
 import type { ConfirmOptions } from '@/components/Confirm/index.vue'
-import type { Props as InputProps } from '@/components/Input/index.vue'
+import type { InputProps } from '@/components/Input/types'
 import type { MessageIcon } from '@/components/Message/index.vue'
-import type { Props as ModalProps, Slots as ModalSlots } from '@/components/Modal/index.vue'
-import type { PickerItem } from '@/components/Picker/index.vue'
-import type { ResourceSelectProps } from '@/components/ResourceSelect/index.vue'
+import type { ModalProps, ModalSlots } from '@/components/Modal/types'
+import type { PickerItem, PickerProps } from '@/components/Picker/types'
+import type {
+  ResourceResultMap,
+  ResourceSelectProps,
+  ResourceSelectType,
+  ResourceTypeOf,
+} from '@/components/ResourceSelect/types'
 
 import { bindAppContext } from './appContext'
 import { APP_TITLE } from './env'
-import type {
-  InteractionAPI,
-  Message,
-  MessageInstance,
-  Picker,
-  ResourceResultMap,
-  ResourceSelectType,
-} from './interaction'
+import type { InteractionAPI, Message, MessageInstance, Picker } from './interaction'
 import { normalizeErrorMessage } from './normalize'
 import { sampleID } from './others'
 
@@ -52,7 +51,7 @@ class MessageImpl implements Message {
 
   constructor() {
     const ID = APP_TITLE + '-toast'
-    this.container = document.getElementById(ID) || document.createElement('div')
+    this.container = document.querySelector(`#${ID}`) ?? document.createElement('div')
     this.container.id = ID
     this.container.style.cssText = `
         position: fixed;
@@ -61,7 +60,7 @@ class MessageImpl implements Message {
         left: 50%;
         transform: translateX(-50%);
     `
-    document.body.appendChild(this.container)
+    document.body.append(this.container)
     this.instances = {}
   }
 
@@ -70,8 +69,12 @@ class MessageImpl implements Message {
       const id = sampleID()
       const dom = document.createElement('div')
 
-      const onMouseEnter = () => clearTimeout(this.instances[id]!.timer)
-      const onMouseLeave = () => (this.instances[id]!.timer = setTimeout(onDestroy, duration))
+      const onMouseEnter = () => {
+        clearTimeout(this.instances[id]!.timer)
+      }
+      const onMouseLeave = () => {
+        this.instances[id]!.timer = setTimeout(onDestroy, duration)
+      }
 
       const onDestroy = () => {
         dom.removeEventListener('mouseenter', onMouseEnter)
@@ -101,7 +104,7 @@ class MessageImpl implements Message {
         dom.addEventListener('mouseenter', onMouseEnter)
         dom.addEventListener('mouseleave', onMouseLeave)
 
-        this.container.appendChild(dom)
+        this.container.append(dom)
         render(vnode, dom)
       }
 
@@ -109,12 +112,21 @@ class MessageImpl implements Message {
 
       return {
         id,
-        info: (newContent: unknown) => this.update(id, newContent, 'info'),
-        warn: (newContent: unknown) => this.update(id, newContent, 'warn'),
-        error: (newContent: unknown) => this.update(id, newContent, 'error'),
-        success: (newContent: unknown) => this.update(id, newContent, 'success'),
-        update: (nextContent: unknown, nextIcon?: MessageIcon) =>
-          this.update(id, nextContent, nextIcon),
+        info: (newContent: unknown) => {
+          this.update(id, newContent, 'info')
+        },
+        warn: (newContent: unknown) => {
+          this.update(id, newContent, 'warn')
+        },
+        error: (newContent: unknown) => {
+          this.update(id, newContent, 'error')
+        },
+        success: (newContent: unknown) => {
+          this.update(id, newContent, 'success')
+        },
+        update: (nextContent: unknown, nextIcon?: MessageIcon) => {
+          this.update(id, nextContent, nextIcon)
+        },
         destroy: onDestroy,
       }
     }
@@ -144,19 +156,6 @@ class MessageImpl implements Message {
   }
 }
 
-const ResourceTypeMap = {
-  profile: 'profile',
-  subscription: 'subscription',
-  ruleset: 'ruleset',
-  plugin: 'plugin',
-  scheduledtask: 'scheduledtask',
-  1: 'profile',
-  2: 'subscription',
-  3: 'ruleset',
-  4: 'plugin',
-  5: 'scheduledtask',
-} as const
-
 class PickerImpl implements Picker {
   public single = <T>(title: string, options: PickerItem<T>[], initialValue: T[] = []) => {
     return this.buildPicker('single', title, options, initialValue)
@@ -169,11 +168,12 @@ class PickerImpl implements Picker {
   public resource = <T extends ResourceSelectType>(
     type: T,
     title: string,
-    options?: Partial<ResourceSelectProps>,
+    options?: Partial<ResourceSelectProps<ResourceTypeOf<T>>>,
     initialValue?: string[],
   ): Promise<{ ids: string[]; items: ResourceResultMap[T][] }> => {
     return new Promise((resolve) => {
       const dom = document.createElement('div')
+      // oxlint-disable-next-line typescript/no-unsafe-argument
       const vnode = h(ResourceSelectComp, {
         type: ResourceTypeMap[type],
         title,
@@ -181,14 +181,15 @@ class PickerImpl implements Picker {
         openImmediate: true,
         modelValue: initialValue ?? [],
         onSubmit(ids, items) {
-          resolve({ ids, items } as any)
+          // oxlint-disable-next-line typescript/no-unsafe-assignment
+          resolve({ ids, items: items as ResourceResultMap[T][] })
           render(null, dom)
           dom.remove()
         },
         ...options,
       })
       bindAppContext(vnode)
-      document.body.appendChild(dom)
+      document.body.append(dom)
       render(vnode, dom)
     })
   }
@@ -209,25 +210,22 @@ class PickerImpl implements Picker {
         options,
         initialValue,
         onConfirm: resolve,
-        onCancel: () => reject(t('common.canceled')),
+        onCancel: () => {
+          reject(new Error(t('common.canceled')))
+        },
         onFinish: () => {
           render(null, dom)
           dom.remove()
         },
-      })
+      } satisfies PickerProps<ValueType, PickerType>)
       bindAppContext(vnode)
-      document.body.appendChild(dom)
+      document.body.append(dom)
       render(vnode, dom)
     })
   }
 }
 
-const buildConfirm = (
-  title: string,
-  message: string,
-  options: ConfirmOptions = { type: 'text' },
-  cancel = true,
-) => {
+const buildConfirm = (title: string, message: string, options?: ConfirmOptions, cancel = true) => {
   return new Promise((resolve, reject) => {
     const { t } = i18n.global
     const dom = document.createElement('div')
@@ -235,17 +233,19 @@ const buildConfirm = (
     const vnode = h(ConfirmComp, {
       title,
       message,
-      options,
+      options: { type: 'text', ...options },
       cancel,
       onConfirm: resolve,
-      onCancel: () => reject(t('common.canceled')),
+      onCancel: () => {
+        reject(new Error(t('common.canceled')))
+      },
       onFinish: () => {
         render(null, dom)
         dom.remove()
       },
     })
     bindAppContext(vnode)
-    document.body.appendChild(dom)
+    document.body.append(dom)
     render(vnode, dom)
   })
 }
@@ -260,29 +260,32 @@ const prompt = <T>(
   return new Promise<T>((resolve, reject) => {
     const dom = document.createElement('div')
     dom.style.cssText = ContainerCssText
+    // oxlint-disable-next-line typescript/no-unsafe-argument
     const vnode = h(PromptComp, {
       title,
       initialValue,
       props,
       onSubmit: resolve,
-      onCancel: () => reject(t('common.canceled')),
+      onCancel: () => {
+        reject(new Error(t('common.canceled')))
+      },
       onFinish: () => {
         render(null, dom)
         dom.remove()
       },
     })
     bindAppContext(vnode)
-    document.body.appendChild(dom)
+    document.body.append(dom)
     render(vnode, dom)
   })
 }
 
-const alert = (title: string, message: string, options: ConfirmOptions = { type: 'text' }) => {
-  return buildConfirm(title, message, options, false)
+const alert = (title: string, message: string, options?: ConfirmOptions) => {
+  return buildConfirm(title, message, { type: 'text', ...options }, false)
 }
 
-const confirm = (title: string, message: string, options: ConfirmOptions = { type: 'text' }) => {
-  return buildConfirm(title, message, options)
+const confirm = (title: string, message: string, options?: ConfirmOptions) => {
+  return buildConfirm(title, message, { type: 'text', ...options })
 }
 
 const modal = (options: ModalProps = {}, slots: ModalSlots = {}) => {
@@ -291,7 +294,7 @@ const modal = (options: ModalProps = {}, slots: ModalSlots = {}) => {
   const container = document.createElement('div')
   container.id = id
   container.dataset['title'] = options.title
-  document.body.appendChild(container)
+  document.body.append(container)
 
   const [Modal, api] = useModal(
     {

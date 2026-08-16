@@ -1,12 +1,15 @@
-import type { Profile } from '@profiles'
-
 import type { ConfirmOptions } from '@/components/Confirm/index.vue'
-import type { Props as InputProps } from '@/components/Input/index.vue'
+import type { InputProps } from '@/components/Input/types'
 import type { MessageIcon } from '@/components/Message/index.vue'
 import type { useModal } from '@/components/Modal'
-import type { Props as ModalProps, Slots as ModalSlots } from '@/components/Modal/index.vue'
-import type { PickerItem } from '@/components/Picker/index.vue'
-import type { ResourceSelectProps } from '@/components/ResourceSelect/index.vue'
+import type { ModalProps, ModalSlots } from '@/components/Modal/types'
+import type { PickerItem } from '@/components/Picker/types'
+import type {
+  ResourceResultMap,
+  ResourceSelectProps,
+  ResourceSelectType,
+  ResourceTypeOf,
+} from '@/components/ResourceSelect/types'
 
 export interface MessageInstance {
   id: string
@@ -25,38 +28,13 @@ export interface Message {
   success: (content: unknown, duration?: number, onClose?: () => void) => MessageInstance
 }
 
-export type ResourceSelectType =
-  | 'profile'
-  | 'subscription'
-  | 'ruleset'
-  | 'plugin'
-  | 'scheduledtask'
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-
-export interface ResourceResultMap {
-  profile: Profile
-  subscription: App.Subscription
-  ruleset: App.RuleSet
-  plugin: App.Plugin
-  scheduledtask: App.ScheduledTask
-  1: Profile
-  2: App.Subscription
-  3: App.RuleSet
-  4: App.Plugin
-  5: App.ScheduledTask
-}
-
 export interface Picker {
   single: <T>(title: string, options: PickerItem<T>[], initialValue?: T[]) => Promise<T>
   multi: <T>(title: string, options: PickerItem<T>[], initialValue?: T[]) => Promise<T[]>
   resource: <T extends ResourceSelectType>(
     type: T,
     title: string,
-    options?: Partial<ResourceSelectProps>,
+    options?: Partial<ResourceSelectProps<ResourceTypeOf<T>>>,
     initialValue?: string[],
   ) => Promise<{ ids: string[]; items: ResourceResultMap[T][] }>
 }
@@ -96,20 +74,12 @@ const createInteraction = () => {
     return requireImpl().prompt<T>(title, initialValue, props)
   }
 
-  const alert = (
-    title: string,
-    message: string,
-    options: ConfirmOptions = { type: 'text' },
-  ): Promise<unknown> => {
-    return requireImpl().alert(title, message, options)
+  const alert = (title: string, message: string, options?: ConfirmOptions): Promise<unknown> => {
+    return requireImpl().alert(title, message, { type: 'text', ...options })
   }
 
-  const confirm = (
-    title: string,
-    message: string,
-    options: ConfirmOptions = { type: 'text' },
-  ): Promise<unknown> => {
-    return requireImpl().confirm(title, message, options)
+  const confirm = (title: string, message: string, options?: ConfirmOptions): Promise<unknown> => {
+    return requireImpl().confirm(title, message, { type: 'text', ...options })
   }
 
   const modal = (options: ModalProps = {}, slots: ModalSlots = {}): ModalAPI => {
