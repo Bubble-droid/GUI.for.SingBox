@@ -90,6 +90,12 @@ func ProcessFixedWebView2Runtime(resolvePathFunc func(string) string) string {
 	return strings.TrimSuffix(cabFile, ".cab")
 }
 
-func OnStartup(ctx context.Context, appMenu *menu.Menu, appName string, resolvePathFunc func(string) string) string {
+func OnStartup(appName string, resolvePathFunc func(string) string) string {
 	return ProcessFixedWebView2Runtime(resolvePathFunc)
+}
+
+func CreateMacOSSymlink(appName string, basePath string) {
+}
+
+func CreateMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
 }

@@ -28,14 +28,15 @@ func IsBundled(isSystemPackage bool, appName string) bool {
 func LogPackageInfo(isSystemPackage bool, isBundled bool, singBoxVersion string, singBoxAlphaVersion string) {
 }
 
-func createMacOSSymlink(appName string, resolvePathFunc func(string) string) {
+func CreateMacOSSymlink(appName string, basePath string) {
+	linkPath := filepath.Join(basePath, "data")
+
 	currentUser, err := user.Current()
 	if err != nil {
 		log.Printf("Failed to resolve current user: %v", err)
 		return
 	}
 
-	linkPath := resolvePathFunc("data")
 	appPath := filepath.Join("/Users", currentUser.Username, "Library", "Application Support", appName)
 
 	if err := os.MkdirAll(appPath, os.ModePerm); err != nil {
@@ -48,7 +49,7 @@ func createMacOSSymlink(appName string, resolvePathFunc func(string) string) {
 	}
 }
 
-func createMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
+func CreateMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
 	appMenuSub := appMenu.AddSubmenu("App")
 	appMenuSub.AddText("Show", keys.CmdOrCtrl("s"), func(_ *menu.CallbackData) {
 		runtime.WindowShow(ctx)
@@ -61,12 +62,9 @@ func createMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
 		runtime.EventsEmit(ctx, "onExitApp")
 	})
 
-	// on macos platform, we should append EditMenu to enable Cmd+C,Cmd+V,Cmd+Z... shortcut
 	appMenu.Append(menu.EditMenu())
 }
 
-func OnStartup(ctx context.Context, appMenu *menu.Menu, appName string, resolvePathFunc func(string) string) string {
-	createMacOSSymlink(appName, resolvePathFunc)
-	createMacOSMenus(appMenu, ctx)
+func OnStartup(appName string, resolvePathFunc func(string) string) string {
 	return ""
 }

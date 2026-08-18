@@ -176,6 +176,12 @@ func LogPackageInfo(isSystemPackage bool, isBundled bool, singBoxVersion string,
 	LogLinuxPackageInfo(isSystemPackage, isBundled, singBoxVersion, singBoxAlphaVersion)
 }
 
-func OnStartup(ctx context.Context, appMenu *menu.Menu, appName string, resolvePathFunc func(string) string) string {
+func OnStartup(appName string, resolvePathFunc func(string) string) string {
 	return ""
+}
+
+func CreateMacOSSymlink(appName string, basePath string) {
+}
+
+func CreateMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
 }

@@ -1,7 +1,6 @@
 package bridge
 
 import (
-	"context"
 	"embed"
 
 	"log"
@@ -53,14 +52,13 @@ var Env = &EnvResult{
 }
 
 // NewApp creates a new App application struct
-func NewApp(fs embed.FS) *App {
+func NewApp() *App {
 	return &App{
 		AppMenu: menu.NewMenu(),
-		fs:      fs,
 	}
 }
 
-func CreateApp(fs embed.FS) *App {
+func CreateApp() *App {
 	exePath, err := os.Executable()
 	if err != nil {
 		panic(err)
@@ -77,7 +75,7 @@ func CreateApp(fs embed.FS) *App {
 		Env.IsPrivileged = priv
 	}
 
-	app := NewApp(fs)
+	app := NewApp()
 
 	if AppVersion != "" {
 		Env.AppVersion = AppVersion
@@ -92,14 +90,16 @@ func CreateApp(fs embed.FS) *App {
 	Env.AppConfigPath = paths.AppConfigPath
 	Env.AppCachePath = paths.AppCachePath
 
+	if Env.OS == "darwin" {
+		platform_lifecycle.CreateMacOSMenus(app.AppMenu, app.Ctx)
+	}
+
 	loadConfig()
 
 	return app
 }
 
-func (a *App) Startup(ctx context.Context) {
-	a.Ctx = ctx
-
+func Startup(fs embed.FS) {
 	log.Printf("Build Version: %s", Env.AppVersion)
 
 	platform_lifecycle.LogPackageInfo(Env.IsSystemPackage, Env.IsBundled, SingBoxVersion, SingBoxAlphaVersion)
@@ -111,11 +111,15 @@ func (a *App) Startup(ctx context.Context) {
 	log.Printf("App Config Path: %s", Env.AppConfigPath)
 	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
-	if webviewPath := platform_lifecycle.OnStartup(a.Ctx, a.AppMenu, AppName, resolvePath); webviewPath != "" {
+	if Env.OS == "darwin" {
+		platform_lifecycle.CreateMacOSSymlink(AppName, Env.BasePath)
+	}
+
+	if webviewPath := platform_lifecycle.OnStartup(AppName, resolvePath); webviewPath != "" {
 		Env.WebviewPath = webviewPath
 	}
 
-	extractEmbeddedFiles(a.fs)
+	extractEmbeddedFiles(fs)
 }
 
 func (a *App) IsStartup() bool {
