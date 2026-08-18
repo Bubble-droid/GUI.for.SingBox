@@ -11,3 +11,4 @@ package/tmp
 tools
 dist
 .agents/skills
+.agents/containers
