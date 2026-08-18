@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strings"
 
+	"guiforcores/bridge/config"
 	platform_exec "guiforcores/bridge/platform/exec"
 	platform_lifecycle "guiforcores/bridge/platform/lifecycle"
 	platform_path "guiforcores/bridge/platform/path"
@@ -20,14 +21,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gopkg.in/yaml.v3"
-)
-
-var (
-	AppName             = "gui-for-singbox"
-	AppVersion          = "dev"
-	IsDev               = AppVersion == "dev"
-	SingBoxVersion      = "unknown"
-	SingBoxAlphaVersion = "unknown"
 )
 
 var Config = &AppConfig{}
@@ -59,13 +52,10 @@ func NewApp() *App {
 }
 
 func CreateApp() *App {
-	exePath, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
+	execPath := GetExecPath()
 
-	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
-	Env.AppName = filepath.Base(exePath)
+	Env.BasePath = filepath.ToSlash(filepath.Dir(execPath))
+	Env.AppName = filepath.Base(execPath)
 
 	if slices.Contains(os.Args, "tasksch") {
 		Env.FromTaskSch = true
@@ -77,22 +67,25 @@ func CreateApp() *App {
 
 	app := NewApp()
 
-	if AppVersion != "" {
-		Env.AppVersion = AppVersion
+	if config.Info.AppVersion != "" {
+		Env.AppVersion = config.Info.AppVersion
 	}
 
-	Env.IsSystemPackage = platform_lifecycle.IsSystemPackage(exePath)
-	Env.IsBundled = platform_lifecycle.IsBundled(Env.IsSystemPackage, AppName)
+	result := platform_lifecycle.InitAppEnv(platform_lifecycle.InitAppEnvOptions{
+		AppMenu:  app.AppMenu,
+		Ctx:      app.Ctx,
+		BasePath: Env.BasePath,
+	})
 
-	paths := platform_path.InitResolver(AppName, Env.BasePath)
+	if result.WebviewPath != "" {
+		Env.WebviewPath = result.WebviewPath
+	}
+
+	paths := platform_path.InitResolver(config.Info.AppID, Env.BasePath)
 
 	Env.AppDataPath = paths.AppDataPath
 	Env.AppConfigPath = paths.AppConfigPath
 	Env.AppCachePath = paths.AppCachePath
-
-	if Env.OS == "darwin" {
-		platform_lifecycle.CreateMacOSMenus(app.AppMenu, app.Ctx)
-	}
 
 	loadConfig()
 
@@ -102,22 +95,19 @@ func CreateApp() *App {
 func Startup(fs embed.FS) {
 	log.Printf("Build Version: %s", Env.AppVersion)
 
-	platform_lifecycle.LogPackageInfo(Env.IsSystemPackage, Env.IsBundled, SingBoxVersion, SingBoxAlphaVersion)
-	platform_lifecycle.SetupPlatformIntegration(Env.IsSystemPackage, Env.IsBundled, AppName)
-
 	platform_path.LogStorageMode()
 
 	log.Printf("App Data Path: %s", Env.AppDataPath)
 	log.Printf("App Config Path: %s", Env.AppConfigPath)
 	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
-	if Env.OS == "darwin" {
-		platform_lifecycle.CreateMacOSSymlink(AppName, Env.BasePath)
-	}
+	result := platform_lifecycle.OnStartup(platform_lifecycle.OnStartupOptions{
+		ExecPath: GetExecPath(),
+		BasePath: Env.BasePath,
+	})
 
-	if webviewPath := platform_lifecycle.OnStartup(AppName, resolvePath); webviewPath != "" {
-		Env.WebviewPath = webviewPath
-	}
+	Env.IsSystemPackage = result.IsSystemPackage
+	Env.IsBundled = result.IsBundled
 
 	extractEmbeddedFiles(fs)
 }

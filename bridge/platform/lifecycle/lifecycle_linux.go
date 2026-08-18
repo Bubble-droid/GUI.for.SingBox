@@ -3,42 +3,66 @@
 package lifecycle
 
 import (
-	"context"
+	_ "embed"
 	"fmt"
+	"guiforcores/bridge/config"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/adrg/xdg"
-	"github.com/wailsapp/wails/v2/pkg/menu"
 )
 
-func SetupPlatformIntegration(isSystemPackage bool, isBundled bool, appName string) {
-	go func() {
+type IntegrationOptions struct {
+	OnStartupOptions
+	OnStartupResult
+}
 
-		if !isSystemPackage {
-			createDesktopEntry(appName)
-			installAppIcon(appName)
+//go:embed assets/appicon.png
+var AppIcon []byte
+
+func InitAppEnv(opts InitAppEnvOptions) InitAppEnvResult {
+	return InitAppEnvResult{}
+}
+
+func OnStartup(opts OnStartupOptions) OnStartupResult {
+	sysPkg := isSystemPackage(opts.ExecPath)
+	bundled := isBundled(sysPkg)
+
+	result := OnStartupResult{
+		IsSystemPackage: sysPkg,
+		IsBundled:       bundled,
+	}
+
+	logPackageInfo(sysPkg, bundled)
+	setupPlatformIntegration(IntegrationOptions{
+		OnStartupOptions: opts,
+		OnStartupResult:  result,
+	})
+
+	return result
+}
+
+func setupPlatformIntegration(opts IntegrationOptions) {
+	go func() {
+		if !opts.IsSystemPackage {
+			createDesktopEntry(opts.ExecPath)
+			installAppIcon()
 			return
 		}
 
-		if isBundled {
-			createCoreSymlinks(appName)
+		if opts.IsBundled {
+			createCoreSymlinks()
 			return
 		}
 	}()
 }
 
-func createDesktopEntry(appName string) {
-	log.Println("Creating desktop entry")
-	execPath, err := os.Executable()
-	if err != nil {
-		return
-	}
-
-	userPath := filepath.Join(xdg.DataHome, "applications", appName+".desktop")
-	systemPath := filepath.Join("/usr/share/applications", appName+".desktop")
+func createDesktopEntry(execPath string) {
+	appID := config.Info.AppID
+	userPath := filepath.Join(xdg.DataHome, "applications", fmt.Sprintf(`%s.desktop`, appID))
+	systemPath := filepath.Join("/usr/share/applications", fmt.Sprintf(`%s.desktop`, appID))
 
 	if _, err := os.Stat(systemPath); err == nil {
 		return
@@ -47,11 +71,12 @@ func createDesktopEntry(appName string) {
 		return
 	}
 
+	log.Println("Creating desktop entry")
+
 	content := strings.TrimSpace(fmt.Sprintf(`[Desktop Entry]
 Type=Application
 Version=1.0
-Name=GUI.for.SingBox
-Name[zh_CN]=GUI for SingBox
+Name=GUI for SingBox
 Comment=A GUI client application for sing-box
 Comment[zh_CN]=适用于 sing-box 的图形客户端
 Exec=%s %%U
@@ -60,7 +85,7 @@ Terminal=false
 StartupNotify=true
 StartupWMClass=%s
 Categories=Network;Utility;
-MimeType=application/x-sing-box-profile;x-scheme-handler/sing-box;
+MimeType=x-scheme-handler/sing-box;
 Keywords=gfs;gui;sb;singbox;
 SingleMainWindow=true
 Actions=quit;
@@ -70,20 +95,18 @@ Exec=%s --quit
 Name=Quit
 Name[zh_CN]=退出应用
 Icon=application-exit
-`, execPath, appName, appName, execPath))
+`, execPath, appID, appID, execPath))
 
 	_ = os.MkdirAll(filepath.Dir(userPath), 0755)
 	_ = os.WriteFile(userPath, []byte(content), 0644)
 }
 
-func installAppIcon(appName string) {
-	log.Println("Creating application icon")
-	iconBytes := GetAppIcon()
-	if len(iconBytes) == 0 {
+func installAppIcon() {
+	if len(AppIcon) == 0 {
 		return
 	}
 
-	iconRelPath := fmt.Sprintf("icons/hicolor/512x512/apps/%s.png", appName)
+	iconRelPath := fmt.Sprintf("icons/hicolor/512x512/apps/%s.png", config.Info.AppID)
 	systemPath := filepath.Join("/usr/share", iconRelPath)
 	userPath := filepath.Join(xdg.DataHome, iconRelPath)
 
@@ -94,14 +117,16 @@ func installAppIcon(appName string) {
 		return
 	}
 
+	log.Println("Creating application icon")
+
 	_ = os.MkdirAll(filepath.Dir(userPath), 0755)
-	_ = os.WriteFile(userPath, iconBytes, 0644)
+	_ = os.WriteFile(userPath, AppIcon, 0644)
 }
 
-func createCoreSymlinks(appName string) {
-	log.Println("Creating core symlinks")
-	bundledCoresPath := fmt.Sprintf("/usr/lib/%s/cores", appName)
-	appDataCorePath := filepath.Join(xdg.DataHome, appName, "sing-box")
+func createCoreSymlinks() {
+	appID := config.Info.AppID
+	bundledCoresPath := fmt.Sprintf("/usr/lib/%s/cores", appID)
+	appDataCorePath := filepath.Join(xdg.DataHome, appID, "sing-box")
 
 	_ = os.MkdirAll(appDataCorePath, 0755)
 
@@ -118,13 +143,13 @@ func createCoreSymlinks(appName string) {
 			continue
 		}
 		if _, err := os.Stat(linkPath); os.IsNotExist(err) {
+			log.Println("Creating core symlinks")
 			_ = os.Symlink(target, linkPath)
 		}
-
 	}
 }
 
-func IsSystemPackage(execPath string) bool {
+func isSystemPackage(exePath string) bool {
 	if os.Getenv("SNAP") != "" || os.Getenv("container") == "flatpak" {
 		return true
 	}
@@ -143,19 +168,19 @@ func IsSystemPackage(execPath string) bool {
 	}
 
 	for _, prefix := range systemPrefixes {
-		if strings.HasPrefix(execPath, prefix) {
+		if strings.HasPrefix(exePath, prefix) {
 			return true
 		}
 	}
 
-	return !isWritable(filepath.Dir(execPath))
+	return !isWritable(filepath.Dir(exePath))
 }
 
-func IsBundled(isSystemPackage bool, appName string) bool {
+func isBundled(isSystemPackage bool) bool {
 	if !isSystemPackage {
 		return false
 	}
-	bundledCorePath := fmt.Sprintf("/usr/lib/%s/cores/sing-box", appName)
+	bundledCorePath := fmt.Sprintf("/usr/lib/%s/cores/sing-box", config.Info.AppID)
 	_, err := os.Stat(bundledCorePath)
 	return err == nil
 }
@@ -172,16 +197,11 @@ func isWritable(dir string) bool {
 	return true
 }
 
-func LogPackageInfo(isSystemPackage bool, isBundled bool, singBoxVersion string, singBoxAlphaVersion string) {
-	LogLinuxPackageInfo(isSystemPackage, isBundled, singBoxVersion, singBoxAlphaVersion)
-}
-
-func OnStartup(appName string, resolvePathFunc func(string) string) string {
-	return ""
-}
-
-func CreateMacOSSymlink(appName string, basePath string) {
-}
-
-func CreateMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
+func logPackageInfo(isSystemPackage bool, isBundled bool) {
+	log.Printf("Install as System Package: %t", isSystemPackage)
+	log.Printf("Cores Bundled Package: %t", isBundled)
+	if isBundled {
+		log.Printf("Bundled Sing-Box Core (Stable): v%s", config.Info.SingBoxVersion)
+		log.Printf("Bundled Sing-Box Core (Alpha) : v%s", config.Info.SingBoxAlphaVersion)
+	}
 }

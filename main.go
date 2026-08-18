@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"guiforcores/bridge"
+	"guiforcores/bridge/config"
 	"os"
 	"time"
 
@@ -34,7 +35,7 @@ func main() {
 		MinHeight:        400,
 		DisableResize:    false,
 		Menu:             app.AppMenu,
-		Title:            bridge.Env.AppName,
+		Title:            config.Info.AppTitle,
 		Frameless:        bridge.Env.OS != "darwin" && !bridge.Config.SystemTitleBar,
 		Width:            bridge.Config.Width,
 		Height:           bridge.Config.Height,
@@ -55,7 +56,7 @@ func main() {
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
-				Title:   bridge.Env.AppName,
+				Title:   config.Info.AppTitle,
 				Message: "© 2026 GUI.for.Cores",
 				Icon:    icon,
 			},
@@ -63,7 +64,7 @@ func main() {
 		Linux: &linux.Options{
 			Icon:                icon,
 			WindowIsTranslucent: false,
-			ProgramName:         bridge.Env.AppName,
+			ProgramName:         config.Info.AppID,
 			WebviewGpuPolicy:    linux.WebviewGpuPolicy(bridge.Config.WebviewGpuPolicy),
 		},
 		AssetServer: &assetserver.Options{
@@ -74,7 +75,7 @@ func main() {
 				if bridge.Config.MultipleInstance {
 					return time.Now().String()
 				}
-				return bridge.Env.AppName
+				return config.Info.AppID
 			}(),
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
 				if bridge.IsQuitArg(data.Args) {

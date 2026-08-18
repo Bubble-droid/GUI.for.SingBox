@@ -1,9 +1,8 @@
-//go:build windows
+//go:build windows && !dev
 
 package lifecycle
 
 import (
-	"context"
 	"log"
 	"os"
 	"os/exec"
@@ -11,26 +10,20 @@ import (
 	"strings"
 
 	platform_exec "guiforcores/bridge/platform/exec"
-
-	"github.com/wailsapp/wails/v2/pkg/menu"
 )
 
-func SetupPlatformIntegration(isSystemPackage bool, isBundled bool, appName string) {
+func InitAppEnv(opts InitAppEnvOptions) InitAppEnvResult {
+	return InitAppEnvResult{
+		WebviewPath: processFixedWebView2Runtime(opts.BasePath),
+	}
 }
 
-func IsSystemPackage(exePath string) bool {
-	return false
+func OnStartup(opts OnStartupOptions) OnStartupResult {
+	return OnStartupResult{}
 }
 
-func IsBundled(isSystemPackage bool, appName string) bool {
-	return false
-}
-
-func LogPackageInfo(isSystemPackage bool, isBundled bool, singBoxVersion string, singBoxAlphaVersion string) {
-}
-
-func ProcessFixedWebView2Runtime(resolvePathFunc func(string) string) string {
-	webviewDir := resolvePathFunc("data/WebView2")
+func processFixedWebView2Runtime(basePath string) string {
+	webviewDir := filepath.Join(basePath, "data/WebView2")
 	webviewPath := ""
 
 	err := filepath.Walk(webviewDir, func(path string, info os.FileInfo, err error) error {
@@ -88,14 +81,4 @@ func ProcessFixedWebView2Runtime(resolvePathFunc func(string) string) string {
 
 	log.Printf("WebView2 Runtime extracted successfully into: %s\n", webviewDir)
 	return strings.TrimSuffix(cabFile, ".cab")
-}
-
-func OnStartup(appName string, resolvePathFunc func(string) string) string {
-	return ProcessFixedWebView2Runtime(resolvePathFunc)
-}
-
-func CreateMacOSSymlink(appName string, basePath string) {
-}
-
-func CreateMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
 }

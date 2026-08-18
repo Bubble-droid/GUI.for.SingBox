@@ -7,12 +7,14 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"guiforcores/bridge/config"
 	platform_path "guiforcores/bridge/platform/path"
 )
 
@@ -34,7 +36,7 @@ func resolvePath(rawPath string) string {
 	}
 
 	resolvedPath := platform_path.Resolve(cleanPath)
-	if IsDev {
+	if config.Info.IsDev {
 		log.Printf("Real Path: %s", resolvedPath)
 	}
 
@@ -185,4 +187,12 @@ func IsQuitArg(args []string) bool {
 		}
 	}
 	return false
+}
+
+func GetExecPath() string {
+	execPath, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	return execPath
 }

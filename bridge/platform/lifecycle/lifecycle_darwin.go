@@ -1,9 +1,10 @@
-//go:build darwin
+//go:build darwin && !dev
 
 package lifecycle
 
 import (
 	"context"
+	"guiforcores/bridge/config"
 	"log"
 	"os"
 	"os/user"
@@ -14,30 +15,25 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func SetupPlatformIntegration(isSystemPackage bool, isBundled bool, appName string) {
+func InitAppEnv(opts InitAppEnvOptions) InitAppEnvResult {
+	createMacOSMenus(opts.AppMenu, opts.Ctx)
+	return InitAppEnvResult{}
 }
 
-func IsSystemPackage(exePath string) bool {
-	return false
+func OnStartup(opts OnStartupOptions) OnStartupResult {
+	createMacOSSymlink(opts.BasePath)
+	return OnStartupResult{}
 }
 
-func IsBundled(isSystemPackage bool, appName string) bool {
-	return false
-}
-
-func LogPackageInfo(isSystemPackage bool, isBundled bool, singBoxVersion string, singBoxAlphaVersion string) {
-}
-
-func CreateMacOSSymlink(appName string, basePath string) {
-	linkPath := filepath.Join(basePath, "data")
-
+func createMacOSSymlink(basePath string) {
 	currentUser, err := user.Current()
 	if err != nil {
 		log.Printf("Failed to resolve current user: %v", err)
 		return
 	}
 
-	appPath := filepath.Join("/Users", currentUser.Username, "Library", "Application Support", appName)
+	linkPath := filepath.Join(basePath, "data")
+	appPath := filepath.Join("/Users", currentUser.Username, "Library", "Application Support", config.Info.AppID)
 
 	if err := os.MkdirAll(appPath, os.ModePerm); err != nil {
 		log.Printf("Failed to create macOS app data directory: %v", err)
@@ -49,7 +45,7 @@ func CreateMacOSSymlink(appName string, basePath string) {
 	}
 }
 
-func CreateMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
+func createMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
 	appMenuSub := appMenu.AddSubmenu("App")
 	appMenuSub.AddText("Show", keys.CmdOrCtrl("s"), func(_ *menu.CallbackData) {
 		runtime.WindowShow(ctx)
@@ -63,8 +59,4 @@ func CreateMacOSMenus(appMenu *menu.Menu, ctx context.Context) {
 	})
 
 	appMenu.Append(menu.EditMenu())
-}
-
-func OnStartup(appName string, resolvePathFunc func(string) string) string {
-	return ""
 }

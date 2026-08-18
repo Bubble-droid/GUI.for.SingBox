@@ -2,7 +2,7 @@ SHELL := bash
 .SHELLFLAGS := -eu -o pipefail -c
 .ONESHELL:
 
-APP_NAME := gui-for-singbox
+APP_ID := gui-for-singbox
 GO_MODULE := guiforcores
 GOOS := $(shell go env GOOS)
 
@@ -50,10 +50,11 @@ PKG_VERSION = $(subst -,~,$(ARCHIVE_VERSION))
 DEB_ARCH = $(ARCH)
 RPM_ARCH = $(if $(filter amd64,$(ARCH)),x86_64,$(if $(filter arm64,$(ARCH)),aarch64,$(ARCH)))
 
-LDFLAGS_BASE = -X '$(GO_MODULE)/bridge.AppVersion=$(APP_VERSION)'
+LDFLAGS_BASE = -X '$(GO_MODULE)/bridge/config.appVersion=$(APP_VERSION)'
+
 LDFLAGS_LINUX = $(LDFLAGS_BASE) \
-	-X '$(GO_MODULE)/bridge.SingBoxVersion=$(STABLE_VER)' \
-	-X '$(GO_MODULE)/bridge.SingBoxAlphaVersion=$(ALPHA_VER)'
+	-X '$(GO_MODULE)/bridge/config.singBoxVersion=$(STABLE_VER)' \
+	-X '$(GO_MODULE)/bridge/config.singBoxAlphaVersion=$(ALPHA_VER)'
 
 WAILS_FLAGS = -m -s -trimpath -skipbindings -devtools
 
@@ -64,12 +65,12 @@ WAILS_FLAGS = -m -s -trimpath -skipbindings -devtools
 all: build-frontend $(NATIVE_BUILD_TARGET)
 
 dev: $(DEV_PRE_REQ)
-	echo "==> Starting Wails dev mode (Version: dev)..."
-	$(DEV_ENV) VITE_APP_VERSION=dev wails dev -tags "$(DEV_TAGS) non_xdg" -ldflags "-X '$(GO_MODULE)/bridge.AppVersion=dev'"
+	echo "==> Starting Wails dev mode..."
+	$(DEV_ENV) VITE_APP_VERSION=$(APP_VERSION) wails dev -tags "$(DEV_TAGS) non_xdg" -ldflags "$(LDFLAGS_BASE)"
 
 dev-xdg: $(DEV_PRE_REQ)
-	echo "==> Starting Wails dev mode with XDG (Version: dev)..."
-	$(DEV_ENV) VITE_APP_VERSION=dev wails dev -tags "$(DEV_TAGS)" -ldflags "-X '$(GO_MODULE)/bridge.AppVersion=dev'"
+	echo "==> Starting Wails dev mode with XDG..."
+	$(DEV_ENV) VITE_APP_VERSION=$(APP_VERSION) wails dev -tags "$(DEV_TAGS)" -ldflags "$(LDFLAGS_BASE)"
 
 build-frontend:
 	pnpm --dir frontend install --frozen-lockfile
@@ -77,8 +78,8 @@ build-frontend:
 
 build-windows:
 	echo "==> Building Windows binary ($(ARCH))..."
-	GOOS=windows GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -ldflags "$(LDFLAGS_BASE)" -o $(APP_NAME).exe
-	cd $(BIN_DIR) && powershell -Command "Compress-Archive -Path '$(APP_NAME).exe' -DestinationPath '$(APP_NAME)-$(ARCHIVE_VERSION)-windows-$(ARCH).zip' -Force"
+	GOOS=windows GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -ldflags "$(LDFLAGS_BASE)" -o $(APP_ID).exe
+	cd $(BIN_DIR) && powershell -Command "Compress-Archive -Path '$(APP_ID).exe' -DestinationPath '$(APP_ID)-$(ARCHIVE_VERSION)-windows-$(ARCH).zip' -Force"
 
 patch-macos:
 	echo "==> Patching Wails AppDelegate for macOS Accessory Policy..."
@@ -88,14 +89,14 @@ patch-macos:
 
 build-macos: patch-macos
 	echo "==> Building macOS binary ($(ARCH))..."
-	GOFLAGS="-mod=vendor" GOOS=darwin GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -ldflags "$(LDFLAGS_BASE)" -o $(APP_NAME)
-	cd $(BIN_DIR) && mv GUI.for.SingBox.app $(APP_NAME).app && \
-		tar -czvf $(APP_NAME)-$(ARCHIVE_VERSION)-darwin-$(ARCH).tar.gz $(APP_NAME).app
+	GOFLAGS="-mod=vendor" GOOS=darwin GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -ldflags "$(LDFLAGS_BASE)" -o $(APP_ID)
+	cd $(BIN_DIR) && mv GUI.for.SingBox.app $(APP_ID).app && \
+		tar -czvf $(APP_ID)-$(ARCHIVE_VERSION)-darwin-$(ARCH).tar.gz $(APP_ID).app
 
 build-linux:
 	echo "==> Building Linux binary ($(ARCH))..."
-	GOOS=linux GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -ldflags "$(LDFLAGS_LINUX)" -tags webkit2_41 -o $(APP_NAME)
-	cd $(BIN_DIR) && tar -czvf $(APP_NAME)-$(ARCHIVE_VERSION)-linux-$(ARCH).tar.gz $(APP_NAME)
+	GOOS=linux GOARCH=$(ARCH) wails build $(WAILS_FLAGS) -ldflags "$(LDFLAGS_LINUX)" -tags webkit2_41 -o $(APP_ID)
+	cd $(BIN_DIR) && tar -czvf $(APP_ID)-$(ARCHIVE_VERSION)-linux-$(ARCH).tar.gz $(APP_ID)
 
 .PHONY: check-binary fetch-cores \
 	package-deb package-rpm package-pacman \
@@ -122,8 +123,8 @@ fetch-cores:
 	fi
 
 check-binary:
-	if [ ! -f "$(BIN_DIR)/$(APP_NAME)" ]; then
-		echo "==> Error: Linux binary '$(BIN_DIR)/$(APP_NAME)' not found. Please run 'make build-linux' first." >&2
+	if [ ! -f "$(BIN_DIR)/$(APP_ID)" ]; then
+		echo "==> Error: Linux binary '$(BIN_DIR)/$(APP_ID)' not found. Please run 'make build-linux' first." >&2
 		exit 1
 	fi
 
@@ -162,37 +163,37 @@ package-deb: check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging Debian (.deb) for $(DEB_ARCH)..."
 	PACKAGER="$(PACKAGER)" DESCRIPTION="$(DESC_VANILLA_DEB)" ARCH="$(DEB_ARCH)" VERSION="$(PKG_VERSION)" \
-		nfpm package -f nfpm.yaml -p deb -t "$(PKGS_DIR)/$(APP_NAME)_$(ARCHIVE_VERSION)_linux_$(DEB_ARCH).deb"
+		nfpm package -f nfpm.yaml -p deb -t "$(PKGS_DIR)/$(APP_ID)_$(ARCHIVE_VERSION)_linux_$(DEB_ARCH).deb"
 
 package-rpm: check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging RPM (.rpm) for $(RPM_ARCH)..."
 	PACKAGER="$(PACKAGER)" DESCRIPTION="$(DESC_VANILLA_RPM)" ARCH="$(RPM_ARCH)" VERSION="$(PKG_VERSION)" \
-		nfpm package -f nfpm.yaml -p rpm -t "$(PKGS_DIR)/$(APP_NAME)_$(ARCHIVE_VERSION)_linux_$(RPM_ARCH).rpm"
+		nfpm package -f nfpm.yaml -p rpm -t "$(PKGS_DIR)/$(APP_ID)_$(ARCHIVE_VERSION)_linux_$(RPM_ARCH).rpm"
 
 package-pacman: check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging Pacman (.pkg.tar.zst) for $(RPM_ARCH)..."
 	PACKAGER="$(PACKAGER)" DESCRIPTION="$(DESC_VANILLA_ARCH)" ARCH="$(RPM_ARCH)" VERSION="$(PKG_VERSION)" \
-		nfpm package -f nfpm.yaml -p archlinux -t "$(PKGS_DIR)/$(APP_NAME)_$(ARCHIVE_VERSION)_linux_$(RPM_ARCH).pkg.tar.zst"
+		nfpm package -f nfpm.yaml -p archlinux -t "$(PKGS_DIR)/$(APP_ID)_$(ARCHIVE_VERSION)_linux_$(RPM_ARCH).pkg.tar.zst"
 
 package-deb-full: fetch-cores check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging Debian Full (.deb) for $(DEB_ARCH)..."
 	PACKAGER="$(PACKAGER)" DESCRIPTION="$(DESC_FULL_DEB)" ARCH="$(DEB_ARCH)" VERSION="$(PKG_VERSION)" \
-		nfpm package -f nfpm-full.yaml -p deb -t "$(PKGS_DIR)/$(APP_NAME)_$(ARCHIVE_VERSION)_linux_$(DEB_ARCH)$(BUNDLE_SUFFIX).deb"
+		nfpm package -f nfpm-full.yaml -p deb -t "$(PKGS_DIR)/$(APP_ID)_$(ARCHIVE_VERSION)_linux_$(DEB_ARCH)$(BUNDLE_SUFFIX).deb"
 
 package-rpm-full: fetch-cores check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging RPM Full (.rpm) for $(RPM_ARCH)..."
 	PACKAGER="$(PACKAGER)" DESCRIPTION="$(DESC_FULL_RPM)" ARCH="$(RPM_ARCH)" VERSION="$(PKG_VERSION)" \
-		nfpm package -f nfpm-full.yaml -p rpm -t "$(PKGS_DIR)/$(APP_NAME)_$(ARCHIVE_VERSION)_linux_$(RPM_ARCH)$(BUNDLE_SUFFIX).rpm"
+		nfpm package -f nfpm-full.yaml -p rpm -t "$(PKGS_DIR)/$(APP_ID)_$(ARCHIVE_VERSION)_linux_$(RPM_ARCH)$(BUNDLE_SUFFIX).rpm"
 
 package-pacman-full: fetch-cores check-binary
 	mkdir -p $(PKGS_DIR)
 	echo "==> Packaging Pacman Full (.pkg.tar.zst) for $(RPM_ARCH)..."
 	PACKAGER="$(PACKAGER)" DESCRIPTION="$(DESC_FULL_ARCH)" ARCH="$(RPM_ARCH)" VERSION="$(PKG_VERSION)" \
-		nfpm package -f nfpm-full.yaml -p archlinux -t "$(PKGS_DIR)/$(APP_NAME)_$(ARCHIVE_VERSION)_linux_$(RPM_ARCH)$(BUNDLE_SUFFIX).pkg.tar.zst"
+		nfpm package -f nfpm-full.yaml -p archlinux -t "$(PKGS_DIR)/$(APP_ID)_$(ARCHIVE_VERSION)_linux_$(RPM_ARCH)$(BUNDLE_SUFFIX).pkg.tar.zst"
 
 package-deb-all: package-deb package-deb-full
 package-rpm-all: package-rpm package-rpm-full
@@ -204,7 +205,7 @@ package-full: package-deb-full package-rpm-full package-pacman-full
 package-linux: package-standard package-full
 
 clean:
-	rm -rf $(BIN_DIR)/$(APP_NAME)* $(CORES_DIR) $(TMP_DIR) $(PKGS_DIR)
+	rm -rf $(BIN_DIR)/$(APP_ID)* $(CORES_DIR) $(TMP_DIR) $(PKGS_DIR)
 
 clean-cores:
 	rm -rf $(CORES_DIR)/*
