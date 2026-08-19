@@ -131,7 +131,8 @@ const createCoreWSHandlerRegister = <K extends WsKey>(key: K) => {
 // restful api
 export const probeApiAvailability = () => request.get('/version')
 export const getConfigs = () => request.get<CoreApiConfig>(Api.Configs)
-export const setConfigs = (body = {}) => request.patch<null>(Api.Configs, body)
+export const setConfigs = (body: Partial<CoreApiConfig> = {}) =>
+  request.patch<null>(Api.Configs, body)
 export const getProxies = () => request.get<CoreApiProxies>(Api.Proxies)
 export const getConnections = () => request.get<CoreApiConnections>(Api.Connections)
 export const deleteConnection = (id: string) => request.delete<null>(Api.Connections + '/' + id)

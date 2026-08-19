@@ -1,10 +1,10 @@
 import { createInboundMixed } from '@defaults/inbounds'
 import { Inbound, TunStack, RuleSetType } from '@features/constant/kernel'
+import type { SingBoxConfig } from '@features/types/sing-box'
 import type { Profile } from '@profiles'
 import { restoreProfile } from '@restorer'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import { ProcessInfo, ExecBackground, KillProcess } from '@/bridge/exec'
 import { ReadFile, RemoveFile } from '@/bridge/io'
@@ -36,12 +36,12 @@ import { normalizeProxyHost } from '@/utils/normalize'
 import { deepClone, sleep } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
-import type { CoreApiConfig, CoreApiProxy } from '@/types/kernel'
+import type { CoreApiConfig, CoreApiConfigTun, CoreApiProxy } from '@/types/kernel'
 
 import { StoreDep, useStoreDeps } from './deps'
 
-export type ProxyType = 'mixed' | 'http' | 'socks'
-export interface ProxyEndpoint {
+type ProxyType = typeof Inbound.Mixed | typeof Inbound.Http | typeof Inbound.Socks
+interface ProxyEndpoint {
   schema: 'http' | 'socks5'
   host: string
   port: number
@@ -49,6 +49,24 @@ export interface ProxyEndpoint {
   password: string
   proxyType: ProxyType
 }
+
+type PortPatchMap = Record<ProxyType, number>
+interface TunPatchOptions extends Partial<CoreApiConfigTun> {
+  interface_name?: string
+}
+
+type TunType = typeof Inbound.Tun
+type TunPatchField = TunType | `${TunType}-${'stack' | 'device'}` | 'interface-name'
+type TunPatchMep = Record<TunPatchField, TunPatchOptions>
+
+interface ConfigUpdateMap
+  extends Pick<CoreApiConfig, 'mode' | 'allow-lan'>, PortPatchMap, TunPatchMep {
+  inbound: null
+}
+
+type ConfigUpdateEntry = {
+  [K in keyof ConfigUpdateMap]: [field: K, value: ConfigUpdateMap[K]]
+}[keyof ConfigUpdateMap]
 
 export const useKernelApiStore = defineStore('kernelApi', () => {
   const envStore = useStoreDeps(StoreDep.EnvStore)
@@ -88,7 +106,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
     if (!runtimeProfile) {
       const txt = await ReadFile(CoreConfigFilePath)
-      runtimeProfile = restoreProfile(JSON.parse(txt))
+      runtimeProfile = restoreProfile(JSON.parse(txt) as SingBoxConfig)
       const profile = profilesStore.currentProfile
       if (profile) {
         const _profile = deepClone(profile)
@@ -115,9 +133,9 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     const http = runtimeProfile.inbounds.find((v) => v.enable && v.http)
     const socks = runtimeProfile.inbounds.find((v) => v.enable && v.socks)
     const tun = runtimeProfile.inbounds.find((v) => v.tun)
-    config.value['mixed-port'] = mixed?.mixed?.listen.listen_port || 0
-    config.value['port'] = http?.http?.listen.listen_port || 0
-    config.value['socks-port'] = socks?.socks?.listen.listen_port || 0
+    config.value['mixed-port'] = mixed?.mixed?.listen.listen_port ?? 0
+    config.value['port'] = http?.http?.listen.listen_port ?? 0
+    config.value['socks-port'] = socks?.socks?.listen.listen_port ?? 0
     config.value['allow-lan'] = [
       mixed?.mixed?.listen.listen,
       http?.http?.listen.listen,
@@ -125,8 +143,8 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     ].some((address) => address === '0.0.0.0' || address === '::')
 
     config.value.tun.enable = !!tun?.enable
-    config.value.tun.device = tun?.tun?.interface_name || ''
-    config.value.tun.stack = tun?.tun?.stack || ''
+    config.value.tun.device = tun?.tun?.interface_name ?? ''
+    config.value.tun.stack = tun?.tun?.stack ?? ''
     config.value['interface-name'] = runtimeProfile.route.default_interface
   }
 
@@ -142,7 +160,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     config.value.tun.device = ''
   }
 
-  const updateConfig = async (field: string, value: any) => {
+  const updateConfig = async (...[field, value]: ConfigUpdateEntry) => {
     if (field === 'mode') {
       await setConfigs({ mode: value })
       await refreshConfig()
@@ -153,17 +171,17 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       if (!runtimeProfile) return
       const inbound = runtimeProfile.inbounds.find(
         (v) =>
-          (v.type === Inbound.Mixed && v.mixed?.listen.listen_port) ||
-          (v.type === Inbound.Http && v.http?.listen.listen_port) ||
+          (v.type === Inbound.Mixed && v.mixed?.listen.listen_port) ??
+          (v.type === Inbound.Http && v.http?.listen.listen_port) ??
           (v.type === Inbound.Socks && v.socks?.listen.listen_port),
       )
       if (!inbound) {
-        throw 'home.overview.needPort'
+        throw new Error('home.overview.needPort')
       }
       inbound.enable = true
     }
 
-    const patchInboundPort = (type: 'mixed' | 'socks' | 'http', port: number) => {
+    const patchInboundPort = (type: ProxyType, port: number) => {
       if (!runtimeProfile) return
       let inbound = runtimeProfile.inbounds.find((v) => v.type === type)
       if (inbound) {
@@ -191,38 +209,42 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       })
     }
 
-    const patchInboundTun = (options: {
-      enable: boolean
-      stack: string
-      device: string
-      interface_name: string
-    }) => {
+    const patchInboundTun = (options: TunPatchOptions) => {
       if (!runtimeProfile) return
       const inbound = runtimeProfile.inbounds.find((v) => v.type === Inbound.Tun)
-      if (!inbound) throw 'home.overview.needTun'
-      options = { ...config.value.tun, ...options }
-      inbound.enable = options.enable
-      inbound.tun!.stack = (options.stack || TunStack.Mixed) as TunStack
-      inbound.tun!.interface_name = options.device || ''
-      if (options.interface_name) {
-        runtimeProfile.route.default_interface = options.interface_name
+      if (!inbound) throw new Error('home.overview.needTun')
+      const completeOpts = { ...config.value.tun, ...options }
+      inbound.enable = completeOpts.enable
+      inbound.tun!.stack = (completeOpts.stack || TunStack.Mixed) as TunStack
+      inbound.tun!.interface_name = completeOpts.device || ''
+      if (completeOpts.interface_name) {
+        runtimeProfile.route.default_interface = completeOpts.interface_name
       }
-      runtimeProfile.route.auto_detect_interface = !options.interface_name
+      runtimeProfile.route.auto_detect_interface = !completeOpts.interface_name
     }
 
-    const fieldHandlerMap: Recordable<() => void> = {
-      inbound: () => patchInbound(),
-      http: () => patchInboundPort(Inbound.Http, value),
-      socks: () => patchInboundPort(Inbound.Socks, value),
-      mixed: () => patchInboundPort(Inbound.Mixed, value),
-      'allow-lan': () => patchInboundAddress(value),
-      tun: () => patchInboundTun(value),
-      'tun-stack': () => patchInboundTun(value),
-      'tun-device': () => patchInboundTun(value),
-      'interface-name': () => patchInboundTun(value),
-    }
+    switch (field) {
+      case 'inbound':
+        patchInbound()
+        break
 
-    fieldHandlerMap[field]?.()
+      case 'http':
+      case 'socks':
+      case 'mixed':
+        patchInboundPort(field, value)
+        break
+
+      case 'allow-lan':
+        patchInboundAddress(value)
+        break
+
+      case 'tun':
+      case 'tun-stack':
+      case 'tun-device':
+      case 'interface-name':
+        patchInboundTun(value)
+        break
+    }
 
     await restartCore(undefined, true)
     await envStore.updateSystemProxyStatus()
@@ -232,8 +254,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     const { proxies: b } = await getProxies()
     proxies.value = b
   }
-
-  const { t } = useI18n()
 
   /* Bridge API */
   const corePid = ref(-1)
@@ -268,12 +288,16 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       CoreWorkingDirectory + '/' + getKernelFileName(isAlpha),
       getKernelRuntimeArgs(isAlpha),
       undefined,
-      async (end) => {
-        stopped = true
-        const logs = await ReadFile(CoreLogFilePath, { Range: '-4096' }).catch((err) => String(err))
-        logs.split('\n').forEach((line) => line && logsStore.recordKernelLog(line))
-        end && logsStore.recordKernelLog(end)
-        void onCoreStopped()
+      (end) => {
+        void (async () => {
+          stopped = true
+          const logs = await ReadFile(CoreLogFilePath, { Range: '-4096' }).catch(String)
+          logs.split('\n').forEach((line) => {
+            if (line) logsStore.recordKernelLog(line)
+          })
+          if (end) logsStore.recordKernelLog(end)
+          void onCoreStopped()
+        })()
       },
       {
         PidFile: CorePidFilePath,
@@ -281,6 +305,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
         Env: getKernelRuntimeEnv(isAlpha),
       },
     )
+
     // oxlint-disable-next-line no-unmodified-loop-condition
     while (!stopped) {
       const ok = await probeApiAvailability().catch(() => false)
@@ -289,7 +314,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     }
 
     if (stopped) {
-      throw t('kernel.startupFailed')
+      throw new Error('kernel.startupFailed')
     }
 
     return pid
@@ -300,7 +325,9 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     running.value = true
     needRestart.value = false
     isCoreStartedByThisInstance = true
-    coreStoppedPromise = new Promise((r) => (coreStoppedResolver = r))
+    coreStoppedPromise = new Promise((r) => {
+      coreStoppedResolver = r
+    })
 
     initWebsocket()
     await Promise.all([refreshConfig(), refreshProviderProxies()])
@@ -343,13 +370,13 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   }
 
   const startCore = async (_profile?: Profile) => {
-    if (running.value) throw 'The core is already running'
+    if (running.value) throw new Error('The core is already running')
 
     logsStore.clearKernelLog()
 
     const { profile: profileID, branch } = appSettingsStore.app.kernel
-    const profile = _profile || profilesStore.getProfileById(profileID)
-    if (!profile) throw 'Choose a profile first'
+    const profile = _profile ?? profilesStore.getProfileById(profileID)
+    if (!profile) throw new Error('Choose a profile first')
 
     if (!_profile) {
       runtimeProfile = undefined
@@ -369,7 +396,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   }
 
   const stopCore = async () => {
-    if (!running.value) throw 'The core is not running'
+    if (!running.value) throw new Error('The core is not running')
 
     stopping.value = true
     try {
@@ -411,7 +438,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
           ? inbound?.http
           : inbound?.socks
 
-    const listen = inboundOptions?.listen.listen || ''
+    const listen = inboundOptions?.listen.listen ?? ''
     const auth = inboundOptions?.users[0]?.trim()
     const host = normalizeProxyHost((listen || '').trim())
 
@@ -421,7 +448,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
     return {
       host,
-      username: username || '',
+      username: username ?? '',
       password: passwordParts.join(':'),
     }
   }
