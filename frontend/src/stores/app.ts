@@ -6,10 +6,10 @@ import { Exec } from '@/bridge/exec'
 import { ReadDir, RemoveFile, UnzipZIPFile, UnzipTarGZFile, MoveFile } from '@/bridge/io'
 import { HttpCancel, Download, HttpGet } from '@/bridge/net'
 
-import { LanguageOptions, LocalesFilePath } from '@/constant/app'
+import { LanguageOptions, LocalesFilePath, RollingReleaseDirectory } from '@/constant/app'
 import { OS } from '@/constant/app'
 import { loadLocale } from '@/lang'
-import { APP_VERSION, APP_IDENTIFIER, APP_VERSION_API } from '@/utils/env'
+import { APP_VERSION, APP_VERSION_API, APP_ID } from '@/utils/env'
 import { confirm, message } from '@/utils/interaction'
 import { sleep, sampleID, getGitHubApiAuthorization } from '@/utils/others'
 
@@ -67,7 +67,9 @@ export const useAppStore = defineStore('app', () => {
   ) => {
     if (!customActions.value[target]) throw new Error('Target does not exist: ' + target)
     const _actions = Array.isArray(actions) ? actions : [actions]
-    _actions.forEach((action) => !action.id && (action.id = sampleID()))
+    _actions.forEach((action) => {
+      action.id ??= sampleID()
+    })
     customActions.value[target].push(..._actions)
     const remove = () => {
       customActions.value[target] = customActions.value[target].filter(
@@ -103,7 +105,7 @@ export const useAppStore = defineStore('app', () => {
       return
     }
     downloading.value = true
-    const { appName, os, appPath } = envStore.env
+    const { os, appPath } = envStore.env
     try {
       const downloadCacheFile = `data/.cache/gui${os === OS.Windows ? '.zip' : '.tar.gz'}`
 
@@ -135,20 +137,22 @@ export const useAppStore = defineStore('app', () => {
         const cur_pkg_bak = appPath + '.bak'
         await RemoveFile(downloadCacheFile)
         await MoveFile(appPath, cur_pkg_bak)
-        await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_IDENTIFIER}.app`, appPath)
+        await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_ID}.app`, appPath)
         await Exec('xattr', ['-rd', 'com.apple.quarantine', appPath])
+        await RemoveFile(`${cur_pkg_bak}/Contents/MacOS/${RollingReleaseDirectory}`)
         await RemoveFile(cur_pkg_bak)
       } else {
         const suffix = { [OS.Windows]: '.exe', [OS.Linux]: '' }[os]
-        await MoveFile(appPath, `data/.cache/${appName}.bak`)
-        await MoveFile(`data/.cache/${APP_IDENTIFIER}${suffix}`, appPath)
+        await MoveFile(appPath, `data/.cache/${APP_ID}.bak`)
+        await MoveFile(`data/.cache/${APP_ID}${suffix}`, appPath)
         await RemoveFile(downloadCacheFile)
+        await RemoveFile(RollingReleaseDirectory)
       }
       message.success('about.updateSuccessfulRestart')
       restartable.value = true
-    } catch (error: any) {
+    } catch (error) {
       console.log(error)
-      message.error(error.message || error, 5_000)
+      message.error(error, 5_000)
     }
     downloading.value = false
   }
@@ -167,15 +171,15 @@ export const useAppStore = defineStore('app', () => {
         Authorization: getGitHubApiAuthorization(appSettingsStore.app),
       })
       const body = response.body as GitHubApiRelease
-      if (body.message) throw body.message
+      if (body.message) throw new Error(body.message)
 
       const { tag_name, assets } = body
 
       const { os, arch } = envStore.env
-      const assetName = `${APP_IDENTIFIER}-${tag_name.replace(/^v/, '')}-${os}-${arch}${os === OS.Windows ? '.zip' : '.tar.gz'}`
+      const assetName = `${APP_ID}-${tag_name.replace(/^v/u, '')}-${os}-${arch}${os === OS.Windows ? '.zip' : '.tar.gz'}`
 
-      const asset = assets.find((v: any) => v.name === assetName)
-      if (!asset) throw 'Asset Not Found:' + assetName
+      const asset = assets.find((v) => v.name === assetName)
+      if (!asset) throw new Error(`Asset Not Found: ${assetName}`)
       if (asset.uploader.login !== 'github-actions[bot]') {
         await confirm('common.warning', 'settings.kernel.risk', {
           type: 'text',
@@ -190,9 +194,9 @@ export const useAppStore = defineStore('app', () => {
       if (showTips) {
         message.info(updatable.value ? 'about.newVersion' : 'about.latestVersion')
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error(error)
-      message.error(error.message || error)
+      message.error(error)
     }
     lastCheckTime.value = Date.now()
     checkForUpdatesLoading.value = false

@@ -16,7 +16,7 @@ declare namespace App {
   type RequestMethod = 'GET' | 'POST' | 'DELETE' | 'PUT' | 'HEAD' | 'PATCH'
 
   interface AppEnv {
-    appName: string
+    execName: string
     appVersion: string
     basePath: string
     appPath: string

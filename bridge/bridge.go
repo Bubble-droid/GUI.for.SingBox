@@ -30,7 +30,7 @@ var Env = &EnvResult{
 	PreventExit:  true,
 	FromTaskSch:  false,
 	WebviewPath:  "",
-	AppName:      "",
+	ExecName:     "",
 	AppVersion:   "v1.26.1",
 	BasePath:     "",
 	OS:           sysruntime.GOOS,
@@ -55,7 +55,7 @@ func CreateApp() *App {
 	execPath := GetExecPath()
 
 	Env.BasePath = filepath.ToSlash(filepath.Dir(execPath))
-	Env.AppName = filepath.Base(execPath)
+	Env.ExecName = filepath.Base(execPath)
 
 	if slices.Contains(os.Args, "tasksch") {
 		Env.FromTaskSch = true
@@ -126,7 +126,7 @@ func (a *App) ExitApp() {
 
 func (a *App) RestartApp() FlagResult {
 	log.Printf("RestartApp")
-	exePath := filepath.Join(Env.BasePath, Env.AppName)
+	exePath := filepath.Join(Env.BasePath, Env.ExecName)
 
 	cmd := exec.Command(exePath)
 	platform_exec.SetCmdWindowHidden(cmd)
@@ -146,7 +146,7 @@ func (a *App) GetEnv(key string) any {
 		return os.Getenv(key)
 	}
 	return EnvResult{
-		AppName:      Env.AppName,
+		ExecName:     Env.ExecName,
 		AppVersion:   Env.AppVersion,
 		BasePath:     Env.BasePath,
 		OS:           Env.OS,

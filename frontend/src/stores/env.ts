@@ -15,7 +15,7 @@ export const useEnvStore = defineStore('env', () => {
   const kernelApiStore = useStoreDeps(StoreDep.KernelApiStore)
 
   const env = ref<App.AppEnv>({
-    appName: '',
+    execName: '',
     appVersion: '',
     basePath: '',
     appPath: '',
@@ -34,21 +34,19 @@ export const useEnvStore = defineStore('env', () => {
 
   const setupEnv = async () => {
     const _env = await GetEnv()
-    let appPath = `${_env.basePath}/${_env.appName}`
+    let appPath = `${_env.basePath}/${_env.execName}`
     if (_env.os === OS.Windows) {
       appPath = appPath.replaceAll('/', '\\')
     } else if (_env.os === OS.Darwin) {
-      appPath = appPath.replace(`/Contents/MacOS/${_env.appName}`, '')
+      appPath = appPath.replace(`/Contents/MacOS/${_env.execName}`, '')
     }
     env.value = { ..._env, appPath }
   }
 
   const updateSystemProxyStatus = async () => {
-    const proxyServer = (await ignoredError(GetSystemProxy)) || ''
+    const proxyServer = (await ignoredError(GetSystemProxy)) ?? ''
 
-    if (!proxyServer) {
-      systemProxy.value = false
-    } else {
+    if (proxyServer) {
       const kernelProxy = kernelApiStore.getProxyEndpoint()
       if (!kernelProxy) {
         systemProxy.value = false
@@ -72,6 +70,8 @@ export const useEnvStore = defineStore('env', () => {
         )
       }
       systemProxy.value = proxyServerList.includes(proxyServer)
+    } else {
+      systemProxy.value = false
     }
 
     return systemProxy.value
@@ -82,10 +82,10 @@ export const useEnvStore = defineStore('env', () => {
     const services = appSettings.app.systemProxyServices
     let proxyEndpoint = kernelApiStore.getProxyEndpoint()
     if (!proxyEndpoint) {
-      await kernelApiStore.updateConfig('inbound', undefined)
+      await kernelApiStore.updateConfig('inbound', null)
     }
     proxyEndpoint = kernelApiStore.getProxyEndpoint()
-    if (!proxyEndpoint) throw 'home.overview.needPort'
+    if (!proxyEndpoint) throw new Error('home.overview.needPort')
     const server = `${formatProxyHost(proxyEndpoint.host)}:${proxyEndpoint.port}`
     await SetSystemProxy(true, server, proxyEndpoint.proxyType, proxyBypassList, services)
     systemProxy.value = true
