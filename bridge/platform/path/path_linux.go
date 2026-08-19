@@ -3,6 +3,7 @@
 package path
 
 import (
+	"guiforcores/bridge/config"
 	"log"
 	"path/filepath"
 	"strings"
@@ -16,14 +17,17 @@ var (
 	cacheDir  string // ~/.cache/gui-for-singbox
 )
 
-func InitResolver(appName string, basePath string) AppPaths {
-	appDataPath := filepath.Join(xdg.DataHome, appName)
-	appConfigPath := filepath.Join(xdg.ConfigHome, appName)
-	appCachePath := filepath.Join(xdg.CacheHome, appName)
+func InitAppPaths(base string) AppPaths {
+	appID := config.Info.AppID
+	appDataPath := filepath.Join(xdg.DataHome, appID)
+	appConfigPath := filepath.Join(xdg.ConfigHome, appID)
+	appCachePath := filepath.Join(xdg.CacheHome, appID)
 
 	dataDir = appDataPath
 	configDir = appConfigPath
 	cacheDir = appCachePath
+
+	log.Println("Storage Mode: XDG Base Directory")
 
 	return AppPaths{
 		AppDataPath:   appDataPath,
@@ -63,8 +67,4 @@ func Resolve(cleanPath string) string {
 	}
 
 	return filepath.Join(dataDir, filepath.FromSlash(relPath))
-}
-
-func LogStorageMode() {
-	log.Println("Storage Mode: XDG Base Directory")
 }

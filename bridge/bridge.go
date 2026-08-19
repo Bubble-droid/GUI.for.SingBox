@@ -81,7 +81,7 @@ func CreateApp() *App {
 		Env.WebviewPath = result.WebviewPath
 	}
 
-	paths := platform_path.InitResolver(config.Info.AppID, Env.BasePath)
+	paths := platform_path.InitAppPaths(Env.BasePath)
 
 	Env.AppDataPath = paths.AppDataPath
 	Env.AppConfigPath = paths.AppConfigPath
@@ -94,8 +94,6 @@ func CreateApp() *App {
 
 func Startup(fs embed.FS) {
 	log.Printf("Build Version: %s", Env.AppVersion)
-
-	platform_path.LogStorageMode()
 
 	log.Printf("App Data Path: %s", Env.AppDataPath)
 	log.Printf("App Config Path: %s", Env.AppConfigPath)
