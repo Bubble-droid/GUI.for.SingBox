@@ -101,7 +101,6 @@ func (a *App) ExecBackground(path string, args []string, outEvent string, endEve
 		if err != nil {
 			return FlagResult{false, err.Error()}
 		}
-		defer logFile.Close()
 
 		cmd.Stdout = logFile
 		cmd.Stderr = logFile
@@ -115,6 +114,9 @@ func (a *App) ExecBackground(path string, args []string, outEvent string, endEve
 	}
 
 	if err := cmd.Start(); err != nil {
+		if logFile != nil {
+			_ = logFile.Close()
+		}
 		return FlagResult{false, err.Error()}
 	}
 
@@ -125,6 +127,9 @@ func (a *App) ExecBackground(path string, args []string, outEvent string, endEve
 			_ = platform_exec.SendExitSignal(cmd.Process)
 			_ = waitForProcessExitWithTimeout(cmd.Process, 10)
 			_ = cmd.Wait()
+			if logFile != nil {
+				_ = logFile.Close()
+			}
 			return FlagResult{false, err.Error()}
 		}
 	}
@@ -141,6 +146,10 @@ func (a *App) ExecBackground(path string, args []string, outEvent string, endEve
 
 	go func() {
 		err := cmd.Wait()
+		if logFile != nil {
+			_ = logFile.Close()
+		}
+
 		close(done)
 		<-outputDone
 

@@ -34,13 +34,15 @@ func runSystemProxyCommands(commands ...[]string) error {
 	var mu sync.Mutex
 	messages := []string{}
 	for _, command := range commands {
-		wg.Go(func() {
-			if _, err := runSystemProxyCommand(command[0], command[1:]...); err != nil {
+		wg.Add(1)
+		go func(cmd []string) {
+			defer wg.Done()
+			if _, err := runSystemProxyCommand(cmd[0], cmd[1:]...); err != nil {
 				mu.Lock()
 				messages = append(messages, err.Error())
 				mu.Unlock()
 			}
-		})
+		}(command)
 	}
 	wg.Wait()
 	if len(messages) > 0 {
