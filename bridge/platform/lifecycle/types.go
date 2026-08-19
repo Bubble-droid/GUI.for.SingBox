@@ -6,6 +6,11 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/menu"
 )
 
+type PackageInfo struct {
+	IsSystemPackage bool
+	IsBundled       bool
+}
+
 type InitAppEnvOptions struct {
 	AppMenu  *menu.Menu
 	Ctx      context.Context
@@ -17,11 +22,7 @@ type InitAppEnvResult struct {
 }
 
 type OnStartupOptions struct {
-	ExecPath  string
+	ExecPath string
 	BasePath string
-}
-
-type OnStartupResult struct {
-	IsSystemPackage bool
-	IsBundled       bool
+	PackageInfo
 }

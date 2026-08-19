@@ -15,14 +15,17 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+func DetectPackage(execPath string) PackageInfo {
+	return PackageInfo{}
+}
+
 func InitAppEnv(opts InitAppEnvOptions) InitAppEnvResult {
 	createMacOSMenus(opts.AppMenu, opts.Ctx)
 	return InitAppEnvResult{}
 }
 
-func OnStartup(opts OnStartupOptions) OnStartupResult {
+func OnStartup(opts OnStartupOptions) {
 	createMacOSSymlink(opts.BasePath)
-	return OnStartupResult{}
 }
 
 func createMacOSSymlink(basePath string) {

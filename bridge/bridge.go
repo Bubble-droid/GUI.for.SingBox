@@ -2,13 +2,11 @@ package bridge
 
 import (
 	"embed"
-
 	"log"
 	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"guiforcores/bridge/config"
@@ -44,6 +42,20 @@ var Env = &EnvResult{
 	AppCachePath:    "",
 }
 
+func init() {
+	execPath := GetExecPath()
+	Env.BasePath = filepath.ToSlash(filepath.Dir(execPath))
+	Env.ExecName = filepath.Base(execPath)
+
+	if config.Info.AppVersion != "" {
+		Env.AppVersion = config.Info.AppVersion
+	}
+
+	pkgInfo := platform_lifecycle.DetectPackage(execPath)
+	Env.IsSystemPackage = pkgInfo.IsSystemPackage
+	Env.IsBundled = pkgInfo.IsBundled
+}
+
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{
@@ -52,24 +64,11 @@ func NewApp() *App {
 }
 
 func CreateApp() *App {
-	execPath := GetExecPath()
-
-	Env.BasePath = filepath.ToSlash(filepath.Dir(execPath))
-	Env.ExecName = filepath.Base(execPath)
-
-	if slices.Contains(os.Args, "tasksch") {
-		Env.FromTaskSch = true
-	}
-
 	if priv, err := platform_exec.IsPrivileged(); err == nil {
 		Env.IsPrivileged = priv
 	}
 
 	app := NewApp()
-
-	if config.Info.AppVersion != "" {
-		Env.AppVersion = config.Info.AppVersion
-	}
 
 	result := platform_lifecycle.InitAppEnv(platform_lifecycle.InitAppEnvOptions{
 		AppMenu:  app.AppMenu,
@@ -99,13 +98,14 @@ func Startup(fs embed.FS) {
 	log.Printf("App Config Path: %s", Env.AppConfigPath)
 	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
-	result := platform_lifecycle.OnStartup(platform_lifecycle.OnStartupOptions{
+	platform_lifecycle.OnStartup(platform_lifecycle.OnStartupOptions{
 		ExecPath: GetExecPath(),
 		BasePath: Env.BasePath,
+		PackageInfo: platform_lifecycle.PackageInfo{
+			IsSystemPackage: Env.IsSystemPackage,
+			IsBundled:       Env.IsBundled,
+		},
 	})
-
-	Env.IsSystemPackage = result.IsSystemPackage
-	Env.IsBundled = result.IsBundled
 
 	extractEmbeddedFiles(fs)
 }

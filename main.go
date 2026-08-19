@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"embed"
+	"fmt"
 	"guiforcores/bridge"
 	"guiforcores/bridge/config"
 	"os"
-	"time"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -25,9 +25,19 @@ var assets embed.FS
 var icon []byte
 
 func main() {
+	cliOp := bridge.HandleCLI()
+	if cliOp == bridge.CLIOpExitNow {
+		return
+	}
+
 	app := bridge.CreateApp()
 
 	trayStart, trayEnd := bridge.CreateTray(app, icon)
+
+	uniqueID := config.Info.AppID
+	if bridge.Config.MultipleInstance {
+		uniqueID = fmt.Sprintf("%s-%d", config.Info.AppID, os.Getpid())
+	}
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -71,12 +81,7 @@ func main() {
 			Assets: assets,
 		},
 		SingleInstanceLock: &options.SingleInstanceLock{
-			UniqueId: func() string {
-				if bridge.Config.MultipleInstance {
-					return time.Now().String()
-				}
-				return config.Info.AppID
-			}(),
+			UniqueId: uniqueID,
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
 				if bridge.IsQuitArg(data.Args) {
 					runtime.EventsEmit(app.Ctx, "onExitApp")
@@ -88,12 +93,15 @@ func main() {
 		},
 		OnStartup: func(ctx context.Context) {
 			app.Ctx = ctx
+
+			if cliOp == bridge.CLIOpForwardIPC && bridge.IsQuitArg(os.Args[1:]) {
+				runtime.Quit(ctx)
+				return
+			}
+
 			bridge.Startup(assets)
 			runtime.InitializeNotifications(ctx)
 			trayStart()
-			if bridge.IsQuitArg(os.Args) {
-				runtime.EventsEmit(ctx, "onExitApp")
-			}
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
 			if !bridge.Env.PreventExit {

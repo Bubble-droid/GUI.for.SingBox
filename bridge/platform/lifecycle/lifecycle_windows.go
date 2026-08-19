@@ -12,15 +12,17 @@ import (
 	platform_exec "guiforcores/bridge/platform/exec"
 )
 
+func DetectPackage(execPath string) PackageInfo {
+	return PackageInfo{}
+}
+
 func InitAppEnv(opts InitAppEnvOptions) InitAppEnvResult {
 	return InitAppEnvResult{
 		WebviewPath: processFixedWebView2Runtime(opts.BasePath),
 	}
 }
 
-func OnStartup(opts OnStartupOptions) OnStartupResult {
-	return OnStartupResult{}
-}
+func OnStartup(opts OnStartupOptions) {}
 
 func processFixedWebView2Runtime(basePath string) string {
 	webviewDir := filepath.Join(basePath, "data/WebView2")

@@ -14,37 +14,28 @@ import (
 	"github.com/adrg/xdg"
 )
 
-type IntegrationOptions struct {
-	OnStartupOptions
-	OnStartupResult
-}
-
 //go:embed assets/appicon.png
 var AppIcon []byte
+
+func DetectPackage(execPath string) PackageInfo {
+	sysPkg := isSystemPackage(execPath)
+	bundled := isBundled(sysPkg)
+	return PackageInfo{
+		IsSystemPackage: sysPkg,
+		IsBundled:       bundled,
+	}
+}
 
 func InitAppEnv(opts InitAppEnvOptions) InitAppEnvResult {
 	return InitAppEnvResult{}
 }
 
-func OnStartup(opts OnStartupOptions) OnStartupResult {
-	sysPkg := isSystemPackage(opts.ExecPath)
-	bundled := isBundled(sysPkg)
-
-	result := OnStartupResult{
-		IsSystemPackage: sysPkg,
-		IsBundled:       bundled,
-	}
-
-	logPackageInfo(sysPkg, bundled)
-	setupPlatformIntegration(IntegrationOptions{
-		OnStartupOptions: opts,
-		OnStartupResult:  result,
-	})
-
-	return result
+func OnStartup(opts OnStartupOptions) {
+	logPackageInfo(opts.IsSystemPackage, opts.IsBundled)
+	setupPlatformIntegration(opts)
 }
 
-func setupPlatformIntegration(opts IntegrationOptions) {
+func setupPlatformIntegration(opts OnStartupOptions) {
 	go func() {
 		if !opts.IsSystemPackage {
 			createDesktopEntry(opts.ExecPath)
