@@ -45,14 +45,16 @@ func main() {
 	go func() {
 		<-sigChan
 		bridge.Env.PreventExit = false
-		if app.Ctx != nil {
-			runtime.Quit(app.Ctx)
-		}
 
-		time.Sleep(300 * time.Millisecond)
 		if trayStarted {
 			trayEnd()
 		}
+		if app.Ctx != nil {
+			runtime.CleanupNotifications(app.Ctx)
+			runtime.Quit(app.Ctx)
+		}
+
+		time.Sleep(100 * time.Millisecond)
 		os.Exit(0)
 	}()
 
@@ -114,7 +116,7 @@ func main() {
 			if cliOp == bridge.CLIOpForwardIPC && bridge.IsQuitArg(os.Args[1:]) {
 				bridge.Env.PreventExit = false
 				go func() {
-					time.Sleep(30 * time.Millisecond)
+					time.Sleep(50 * time.Millisecond)
 					runtime.Quit(ctx)
 				}()
 				return
