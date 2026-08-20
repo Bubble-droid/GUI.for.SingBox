@@ -1,8 +1,11 @@
 package config
 
+const (
+	baseAppTitle = "GUI.for.SingBox"
+	baseAppID    = "gui-for-singbox"
+)
+
 var (
-	appTitle            = "GUI.for.SingBox"
-	appID               = "gui-for-singbox"
 	appVersion          = "unknown"
 	singBoxVersion      = "unknown"
 	singBoxAlphaVersion = "unknown"
