@@ -7,6 +7,8 @@ import (
 	"guiforcores/bridge"
 	"guiforcores/bridge/config"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/wailsapp/wails/v2"
@@ -37,6 +39,22 @@ func main() {
 	if bridge.Config.MultipleInstance {
 		uniqueID = fmt.Sprintf("%s-%d", config.Info.AppID, os.Getpid())
 	}
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigChan
+		bridge.Env.PreventExit = false
+		if app.Ctx != nil {
+			runtime.Quit(app.Ctx)
+		}
+
+		time.Sleep(300 * time.Millisecond)
+		if trayStarted {
+			trayEnd()
+		}
+		os.Exit(0)
+	}()
 
 	// Create application with options
 	err := wails.Run(&options.App{
