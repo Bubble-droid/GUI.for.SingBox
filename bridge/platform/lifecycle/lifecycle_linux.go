@@ -15,7 +15,7 @@ import (
 )
 
 //go:embed assets/appicon.png
-var AppIcon []byte
+var appIcon []byte
 
 func DetectPackage(execPath string) PackageInfo {
 	sysPkg := isSystemPackage(execPath)
@@ -93,7 +93,7 @@ Icon=application-exit
 }
 
 func installAppIcon() {
-	if len(AppIcon) == 0 {
+	if len(appIcon) == 0 {
 		return
 	}
 
@@ -111,7 +111,7 @@ func installAppIcon() {
 	log.Println("Creating application icon")
 
 	_ = os.MkdirAll(filepath.Dir(userPath), 0755)
-	_ = os.WriteFile(userPath, AppIcon, 0644)
+	_ = os.WriteFile(userPath, appIcon, 0644)
 }
 
 func createCoreSymlinks() {

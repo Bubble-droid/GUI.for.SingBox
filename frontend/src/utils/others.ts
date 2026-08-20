@@ -3,7 +3,7 @@ import { stringify } from 'yaml'
 import { OS } from '@/constant/app'
 import appDts from '@/types/app.d.ts?raw'
 
-import { APP_TITLE, APP_VERSION } from './env'
+import { APP_ID, APP_TITLE, APP_VERSION } from './env'
 import { isValidIPv4, isValidIPv6 } from './is'
 import { normalizeBase64 } from './normalize'
 
@@ -311,7 +311,7 @@ export const getAutoStartConfiguration = (os: App.OS, appPath: string, delay = 3
   <Actions Context="Author">
     <Exec>
       <Command>${appPath}</Command>
-      <Arguments>tasksch</Arguments>
+      <Arguments>--tasksch</Arguments>
     </Exec>
   </Actions>
 </Task>`
@@ -320,8 +320,13 @@ export const getAutoStartConfiguration = (os: App.OS, appPath: string, delay = 3
   if (os === OS.Linux) {
     const desktop = `[Desktop Entry]
 Type=Application
-Exec=${appPath} tasksch
-Name=${APP_TITLE}`
+Version=1.0
+Name=GUI for SingBox
+Exec=${appPath} --tasksch
+Icon=${APP_ID}
+Terminal=false
+StartupWMClass=${APP_ID}
+SingleMainWindow=true`
     return desktop
   }
   if (os === OS.Darwin) {
@@ -337,7 +342,7 @@ Name=${APP_TITLE}`
         <string>/usr/bin/open</string>
         <string>${appPath}</string>
         <string>--args</string>
-        <string>tasksch</string>
+        <string>--tasksch</string>
     </array>
     <key>RunAtLoad</key>
     <true/>

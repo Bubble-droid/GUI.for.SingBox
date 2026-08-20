@@ -7,6 +7,7 @@ import (
 	"guiforcores/bridge"
 	"guiforcores/bridge/config"
 	"os"
+	"time"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -21,9 +22,6 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
-//go:embed frontend/dist/favicon.ico
-var icon []byte
-
 func main() {
 	cliOp := bridge.HandleCLI()
 	if cliOp == bridge.CLIOpExitNow {
@@ -32,7 +30,8 @@ func main() {
 
 	app := bridge.CreateApp()
 
-	trayStart, trayEnd := bridge.CreateTray(app, icon)
+	trayStart, trayEnd := bridge.CreateTray(app, appIcon)
+	var trayStarted bool
 
 	uniqueID := config.Info.AppID
 	if bridge.Config.MultipleInstance {
@@ -68,11 +67,11 @@ func main() {
 			About: &mac.AboutInfo{
 				Title:   config.Info.AppTitle,
 				Message: "© 2026 GUI.for.Cores",
-				Icon:    icon,
+				Icon:    appIcon,
 			},
 		},
 		Linux: &linux.Options{
-			Icon:                icon,
+			Icon:                appIcon,
 			WindowIsTranslucent: false,
 			ProgramName:         config.Info.AppID,
 			WebviewGpuPolicy:    linux.WebviewGpuPolicy(bridge.Config.WebviewGpuPolicy),
@@ -95,17 +94,24 @@ func main() {
 			app.Ctx = ctx
 
 			if cliOp == bridge.CLIOpForwardIPC && bridge.IsQuitArg(os.Args[1:]) {
-				runtime.Quit(ctx)
+				bridge.Env.PreventExit = false
+				go func() {
+					time.Sleep(30 * time.Millisecond)
+					runtime.Quit(ctx)
+				}()
 				return
 			}
 
 			bridge.Startup(assets)
 			runtime.InitializeNotifications(ctx)
 			trayStart()
+			trayStarted = true
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
 			if !bridge.Env.PreventExit {
-				trayEnd()
+				if trayStarted {
+					trayEnd()
+				}
 				runtime.CleanupNotifications(ctx)
 				return false
 			}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"guiforcores/bridge/config"
 	platform_console "guiforcores/bridge/platform/console"
+	"io"
 	"os"
 	"strings"
 )
@@ -16,8 +17,6 @@ const (
 	CLIOpExitNow
 	CLIOpForwardIPC
 )
-
-const taskschInfo = "Run in background task scheduler mode"
 
 func HandleCLI() CLIOperation {
 	args := os.Args[1:]
@@ -42,13 +41,15 @@ func HandleCLI() CLIOperation {
 	}
 
 	fs := flag.NewFlagSet("app", flag.ContinueOnError)
-	fs.SetOutput(os.Stderr)
+	fs.Usage = func() {}
+	fs.SetOutput(io.Discard)
 
-	taskSch := fs.Bool("t", false, taskschInfo)
-	fs.BoolVar(taskSch, "tasksch", false, taskschInfo)
+	taskSch := fs.Bool("t", false, "")
+	fs.BoolVar(taskSch, "tasksch", false, "")
 
 	if err := fs.Parse(args); err != nil {
 		platform_console.AttachParent()
+		fmt.Fprintf(os.Stderr, "%s\n\n", formatFlagError(err))
 		printHelp()
 		return CLIOpExitNow
 	}
@@ -58,6 +59,14 @@ func HandleCLI() CLIOperation {
 	}
 
 	return CLIOpLaunchGUI
+}
+
+func formatFlagError(err error) string {
+	msg := err.Error()
+	if after, ok := strings.CutPrefix(msg, "flag provided but not defined: "); ok {
+		return fmt.Sprintf("Unknown flag: %s", after)
+	}
+	return fmt.Sprintf("Unknown flag: %s", msg)
 }
 
 func IsQuitArg(args []string) bool {

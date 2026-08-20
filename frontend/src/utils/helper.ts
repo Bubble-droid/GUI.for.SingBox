@@ -13,7 +13,7 @@ import { StoreDep, useStoreDeps } from '@/stores/deps'
 import type { CoreApiProxy } from '@/types/kernel'
 import type { RuleCandidate } from '@/types/views'
 
-import { APP_TITLE } from './env'
+import { APP_ID } from './env'
 import { formatProxyHost } from './format'
 import { confirm, message } from './interaction'
 import { normalizeRequestProxy } from './normalize'
@@ -160,19 +160,19 @@ export const GetRequestProxy = (mode?: App.RequestProxyMode, customProxy?: strin
 // Auto-start
 const getPlistPath = async () => {
   const home = await GetEnv('HOME')
-  return `${home}/Library/LaunchAgents/${APP_TITLE}.plist`
+  return `${home}/Library/LaunchAgents/${APP_ID}.plist`
 }
 
 const getDesktopPath = async () => {
   const home = await GetEnv('HOME')
-  return `${home}/.config/autostart/${APP_TITLE}.desktop`
+  return `${home}/.config/autostart/${APP_ID}.desktop`
 }
 
 export const IsAutoStartEnabled = async () => {
   const { os } = useStoreDeps(StoreDep.EnvStore).env
   let isAutoStart = false
   if (os === OS.Windows) {
-    isAutoStart = await Exec('Schtasks', ['/Query', '/TN', APP_TITLE, '/XML'])
+    isAutoStart = await Exec('Schtasks', ['/Query', '/TN', APP_ID, '/XML'])
       .then(() => true)
       .catch(() => false)
   } else if (os === OS.Darwin) {
@@ -192,7 +192,7 @@ export const EnableAutoStart = async (delay = 10) => {
     const xmlPath = await AbsolutePath('data/.cache/tasksch.xml')
     await WriteFile(xmlPath, configuration)
     const fn = isPrivileged ? Exec : RunWithPowerShell
-    await fn('SchTasks', ['/Create', '/F', '/TN', APP_TITLE, '/XML', xmlPath], {
+    await fn('SchTasks', ['/Create', '/F', '/TN', APP_ID, '/XML', xmlPath], {
       admin: true,
       hidden: true,
     })
@@ -210,7 +210,7 @@ export const DisableAutoStart = async () => {
   const { os, isPrivileged } = useStoreDeps(StoreDep.EnvStore).env
   if (os === OS.Windows) {
     const fn = isPrivileged ? Exec : RunWithPowerShell
-    await fn('SchTasks', ['/Delete', '/F', '/TN', APP_TITLE], { admin: true, hidden: true })
+    await fn('SchTasks', ['/Delete', '/F', '/TN', APP_ID], { admin: true, hidden: true })
   } else if (os === OS.Darwin) {
     const plistPath = await getPlistPath()
     await Exec('launchctl', ['unload', plistPath])
