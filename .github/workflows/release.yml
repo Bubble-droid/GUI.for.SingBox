@@ -27,9 +27,6 @@ on:
     tags:
       - 'v*.*.*'
 
-permissions:
-  contents: write
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ inputs.build_platform }}-${{ inputs.build_arch }}
   cancel-in-progress: true
@@ -42,6 +39,8 @@ jobs:
   calculate_version:
     name: Calculate Version & Matrix
     runs-on: ubuntu-latest
+    permissions: &read_perms
+      contents: read
     outputs:
       version: ${{ steps.get_version.outputs.version }}
       is_prerelease: ${{ steps.get_version.outputs.is_prerelease }}
@@ -53,7 +52,7 @@ jobs:
       linux_run: ${{ steps.set_matrix.outputs.linux_run }}
     steps:
       - name: Checkout
-        uses: &checkout actions/checkout@v7
+        uses: &action_checkout actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Set Version
@@ -145,11 +144,13 @@ jobs:
     name: Build Frontend
     needs: calculate_version
     runs-on: ubuntu-latest
+    permissions: *read_perms
     env:
       APP_VERSION: ${{ needs.calculate_version.outputs.version }}
     steps:
-      - name: Checkout
-        uses: *checkout
+      - &step_checkout
+        name: Checkout
+        uses: *action_checkout
       - name: Setup PNPM
         uses: pnpm/action-setup@v6
         with:
@@ -163,7 +164,7 @@ jobs:
       - name: Build Frontend Dist
         run: make build-frontend
       - name: Upload Frontend Dist
-        uses: &upload actions/upload-artifact@v7
+        uses: &action_upload actions/upload-artifact@v7
         with:
           name: frontend-dist
           path: frontend/dist
@@ -173,15 +174,14 @@ jobs:
     needs: &build_needs [calculate_version, Build-Frontend]
     if: needs.calculate_version.outputs.win_run == 'true'
     runs-on: ${{ matrix.runner }}
-    env:
+    permissions: *read_perms
+    env: &build_env
       ARCH: ${{ matrix.arch }}
       APP_VERSION: ${{ needs.calculate_version.outputs.version }}
     strategy:
-      fail-fast: false
       matrix: ${{ fromJSON(needs.calculate_version.outputs.win_matrix) }}
     steps:
-      - name: Checkout
-        uses: *checkout
+      - *step_checkout
       - &setup_go
         name: Setup Go
         uses: actions/setup-go@v6
@@ -195,7 +195,7 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
       - &download_frontend_dist
         name: Download Frontend Dist
-        uses: &download actions/download-artifact@v8
+        uses: &action_download actions/download-artifact@v8
         with:
           name: frontend-dist
           path: frontend/dist
@@ -203,8 +203,8 @@ jobs:
       - name: Build Windows Binary
         run: make build-windows
 
-      - uses: *upload
-        name: Upload Windows Binary
+      - name: Upload Windows Binary
+        uses: *action_upload
         with:
           name: binary-windows-${{ matrix.arch }}
           path: build/bin/*.zip
@@ -214,15 +214,12 @@ jobs:
     needs: *build_needs
     if: needs.calculate_version.outputs.macos_run == 'true'
     runs-on: ${{ matrix.runner }}
-    env:
-      ARCH: ${{ matrix.arch }}
-      APP_VERSION: ${{ needs.calculate_version.outputs.version }}
+    permissions: *read_perms
+    env: *build_env
     strategy:
-      fail-fast: false
       matrix: ${{ fromJSON(needs.calculate_version.outputs.macos_matrix) }}
     steps:
-      - name: Checkout
-        uses: *checkout
+      - *step_checkout
       - *setup_go
       - *install_wails
       - *download_frontend_dist
@@ -230,8 +227,8 @@ jobs:
       - name: Build MacOS Binary
         run: make build-macos
 
-      - uses: *upload
-        name: Upload MacOS Binary
+      - name: Upload MacOS Binary
+        uses: *action_upload
         with:
           name: binary-macos-${{ matrix.arch }}
           path: build/bin/*.tar.gz
@@ -241,17 +238,16 @@ jobs:
     needs: *build_needs
     if: needs.calculate_version.outputs.linux_run == 'true'
     runs-on: ${{ matrix.runner }}
+    permissions: *read_perms
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PACKAGER: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
       ARCH: ${{ matrix.arch }}
       APP_VERSION: ${{ needs.calculate_version.outputs.version }}
     strategy:
-      fail-fast: false
       matrix: ${{ fromJSON(needs.calculate_version.outputs.linux_matrix) }}
     steps:
-      - name: Checkout
-        uses: *checkout
+      - *step_checkout
       - *setup_go
       - *install_wails
       - *download_frontend_dist
@@ -285,8 +281,8 @@ jobs:
           cp -f build/bin/*.tar.gz dist/
           cp -f package/dist/* dist/
 
-      - uses: *upload
-        name: Upload Linux Binary & Packages
+      - name: Upload Linux Binary & Packages
+        uses: *action_upload
         with:
           name: binary-linux-${{ matrix.arch }}
           path: dist/*
@@ -296,13 +292,14 @@ jobs:
     needs: [calculate_version, Build-Windows, Build-MacOS, Build-Linux]
     if: github.ref_type == 'tag'
     permissions:
+      contents: write
       id-token: write
       attestations: write
       artifact-metadata: write
     runs-on: ubuntu-latest
     steps:
       - name: Download builds
-        uses: *download
+        uses: *action_download
         with:
           pattern: binary-*
           path: release-assets
@@ -313,11 +310,12 @@ jobs:
         with:
           subject-path: 'release-assets/**'
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v3
+      - name: Create Release Draft and Upload Assets
+        uses: &action_release softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.calculate_version.outputs.version }}
           name: ${{ needs.calculate_version.outputs.version }}
+          fail_on_unmatched_files: true
           files: |
             release-assets/*.zip
             release-assets/*.tar.gz
@@ -327,3 +325,9 @@ jobs:
           draft: true
           prerelease: ${{ needs.calculate_version.outputs.is_prerelease == 'true' }}
           generate_release_notes: true
+
+      - name: Publish Release
+        uses: *action_release
+        with:
+          tag_name: ${{ needs.calculate_version.outputs.version }}
+          prerelease: ${{ needs.calculate_version.outputs.is_prerelease == 'true' }}
