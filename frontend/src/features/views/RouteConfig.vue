@@ -29,7 +29,9 @@ const { t } = useI18n()
 
 const handleAdd = () => {
   const handlerMap: Record<string, (() => void) | undefined> = {
-    common: () => {},
+    common: () => {
+      /* empty */
+    },
     rules: rulesConfigRef.value?.handleAdd,
     rule_set: rulesetConfigRef.value?.handleAdd,
   }

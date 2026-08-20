@@ -3,7 +3,6 @@ import { ref, defineComponent, h, computed, type VNode, type ComponentPublicInst
 import ModalComp from './index.vue'
 import type { ModalProps, ModalSlots } from './types.ts'
 
-// oxlint-disable-next-line typescript/no-unsafe-assignment
 export const Modal = ModalComp
 
 export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}) => {
@@ -28,7 +27,6 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
         open: open.value,
         'onUpdate:open': (val: boolean) => (open.value = val),
       }))
-      // oxlint-disable-next-line typescript/no-unsafe-argument
       return () => h(Modal, mergedProps.value, { ...slots.value, ...ctx.slots })
     },
   })
@@ -36,7 +34,6 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
   const api = {
     open: () => (open.value = true),
     close: () => {
-      // oxlint-disable-next-line typescript/no-unsafe-call typescript/no-unsafe-member-access
       modalRef.value?.handleCancel()
     },
     destroy() {

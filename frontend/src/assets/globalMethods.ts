@@ -9,4 +9,6 @@ window.Plugins = Plugins
 
 window.Vue = Vue
 
-window.AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
+window.AsyncFunction = Object.getPrototypeOf(async function () {
+  /* empty */
+}).constructor

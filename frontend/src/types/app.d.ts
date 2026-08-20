@@ -1,4 +1,3 @@
-// oxlint-disable no-redeclare
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 declare namespace App {
   type OS = 'windows' | 'linux' | 'darwin'

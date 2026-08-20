@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/consistent-function-scoping
 import { createProfile } from '@defaults'
 import type { Profile } from '@profiles'
 import { defineStore } from 'pinia'

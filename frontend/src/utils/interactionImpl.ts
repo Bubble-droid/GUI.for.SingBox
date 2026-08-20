@@ -173,7 +173,6 @@ class PickerImpl implements Picker {
   ): Promise<{ ids: string[]; items: ResourceResultMap[T][] }> => {
     return new Promise((resolve) => {
       const dom = document.createElement('div')
-      // oxlint-disable-next-line typescript/no-unsafe-argument
       const vnode = h(ResourceSelectComp, {
         type: ResourceTypeMap[type],
         title,
@@ -181,7 +180,6 @@ class PickerImpl implements Picker {
         openImmediate: true,
         modelValue: initialValue ?? [],
         onSubmit(ids, items) {
-          // oxlint-disable-next-line typescript/no-unsafe-assignment
           resolve({ ids, items: items as ResourceResultMap[T][] })
           render(null, dom)
           dom.remove()
@@ -260,7 +258,6 @@ const prompt = <T>(
   return new Promise<T>((resolve, reject) => {
     const dom = document.createElement('div')
     dom.style.cssText = ContainerCssText
-    // oxlint-disable-next-line typescript/no-unsafe-argument
     const vnode = h(PromptComp, {
       title,
       initialValue,

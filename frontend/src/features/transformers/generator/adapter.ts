@@ -1,1 +1,3 @@
-export const _adaptToStableBranch = (_: Recordable) => {}
+export const _adaptToStableBranch = (_: Recordable) => {
+  /* empty */
+}

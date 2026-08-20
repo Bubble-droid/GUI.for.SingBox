@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/consistent-function-scoping
 import { Cron } from 'croner'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'

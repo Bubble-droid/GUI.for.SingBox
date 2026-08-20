@@ -158,7 +158,6 @@ export const initWebsocket = () => {
       params: channel.params,
       cb: (data) => {
         channel.handlers.forEach((cb) => {
-          // oxlint-disable-next-line typescript/no-unsafe-argument
           cb(data)
         })
       },

@@ -1,4 +1,3 @@
-// oxlint-disable typescript/no-unsafe-assignment typescript/no-unsafe-member-access typescript/no-unsafe-argument typescript/no-unsafe-call typescript/no-unsafe-return
 import { createRouteRuleset, createRouteRule } from '@defaults/route'
 import { RuleSetType, RouteRuleAction, RouteRuleType } from '@features/constant/kernel'
 import type { RuleSetConfig, RouteRuleConfig } from '@profiles/route'

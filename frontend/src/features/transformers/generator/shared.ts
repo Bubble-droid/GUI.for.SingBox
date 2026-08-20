@@ -70,7 +70,6 @@ export const generateRule = (
   const getRuleset = (id: string) => rule_set.find((v) => v.id === id)?.tag
 
   const extra: Recordable = { action: rule.action, invert: rule.invert ? true : undefined }
-  // oxlint-disable-next-line typescript/switch-exhaustiveness-check
   switch (rule.type) {
     case RouteRuleType.Inline:
       deepAssign(extra, JSON.parse(rule.payload))

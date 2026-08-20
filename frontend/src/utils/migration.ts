@@ -9,6 +9,18 @@ import { legacyGenerateConfig } from './generator'
 import { normalizeErrorMessage } from './normalize'
 import { deepAssign } from './others'
 
+const getSubIds = (profile: Profile | App.Profile) => {
+  return profile.outbounds.reduce((p, c) => {
+    c.outbounds.forEach((outbound) => {
+      if (outbound.type !== 'Built-in') {
+        const id = outbound.type === 'Subscription' ? outbound.id : outbound.type
+        p.add(id)
+      }
+    })
+    return p
+  }, new Set<string>())
+}
+
 export const migrateProfiles = async (
   profiles: (Profile | App.Profile)[],
   save: () => Promise<string>,
@@ -29,18 +41,6 @@ export const migrateProfiles = async (
       }
     })
   })
-
-  const getSubIds = (profile: Profile | App.Profile) => {
-    return profile.outbounds.reduce((p, c) => {
-      c.outbounds.forEach((outbound) => {
-        if (outbound.type !== 'Built-in') {
-          const id = outbound.type === 'Subscription' ? outbound.id : outbound.type
-          p.add(id)
-        }
-      })
-      return p
-    }, new Set<string>())
-  }
 
   const template = createProfile()
 

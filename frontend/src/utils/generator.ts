@@ -1,4 +1,4 @@
-// oxlint-disable no-shadow typescript/no-unsafe-argument typescript/no-unsafe-member-access typescript/no-unsafe-assignment max-depth typescript/no-unsafe-call typescript/strict-void-return typescript/no-unsafe-return
+// oxlint-disable no-shadow
 import {
   RouteRuleType,
   DnsRuleType,
@@ -354,7 +354,9 @@ const generateDns = (
   }
 }
 
-const _adaptToStableBranch = (_: Recordable) => {}
+const _adaptToStableBranch = (_: Recordable) => {
+  /* empty */
+}
 
 interface GenerateConfigOptions {
   enableStableConfigCompat?: boolean

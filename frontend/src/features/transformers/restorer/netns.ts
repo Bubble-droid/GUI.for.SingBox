@@ -9,7 +9,6 @@ import type { IdMaps } from './types'
 
 export const restoreNetns = (raw: SingBoxNetns[] = [], maps: IdMaps): NetnsConfig[] => {
   return raw.map((netns): NetnsConfig => {
-    // oxlint-disable-next-line typescript/switch-exhaustiveness-check
     switch (netns.type) {
       case NetnsType.Unshare:
         return restoreNetnsUnshare(netns, maps)

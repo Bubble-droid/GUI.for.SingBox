@@ -1,4 +1,3 @@
-// oxlint-disable typescript/no-unsafe-assignment typescript/no-unsafe-call typescript/no-unsafe-member-access typescript/no-unsafe-return typescript/no-unsafe-argument
 import { createDnsServer, createDnsRule } from '@defaults/dns'
 import { DnsServer, DnsRuleAction, RouteRuleType } from '@features/constant/kernel'
 import type { SingBoxDnsServer } from '@features/types/sing-box'

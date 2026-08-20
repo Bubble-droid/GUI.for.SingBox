@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/consistent-function-scoping
 import type { Profile } from '@profiles'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
@@ -456,7 +457,9 @@ export const usePluginsStore = defineStore('plugins', () => {
     plugins.value.push(plugin)
     upsertPluginCache(plugin)
     syncPluginObservers(plugin, !plugin.disabled)
-    await _doUpdatePlugin(plugin).catch(() => {})
+    await _doUpdatePlugin(plugin).catch(() => {
+      /* empty */
+    })
     await runPluginEvent(plugin.id, PluginTriggerEvent.OnInstall, [], {
       allowDisabled: true,
       allowUndefined: true,
@@ -490,7 +493,9 @@ export const usePluginsStore = defineStore('plugins', () => {
     releasePluginRuntimeCache(id)
 
     if (plugin.path.startsWith('data')) {
-      await RemoveFile(plugin.path).catch((_) => {})
+      await RemoveFile(plugin.path).catch((_) => {
+        /* empty */
+      })
     }
     if (appSettingsStore.app.pluginSettings[plugin.id]) {
       if (await confirm('Tips', 'plugins.removeConfiguration').catch(() => 0)) {

@@ -22,7 +22,6 @@ import type { RestoreProfileOptions, IdMaps } from './types'
 
 const legacyBuildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<string> => {
   if (!arr) return {}
-  // oxlint-disable-next-line typescript/no-unsafe-member-access
   return arr.reduce((p, c, i) => ((p[c['tag']] = prefix + i), p), {})
 }
 
@@ -105,12 +104,9 @@ export const restoreProfile = (
       final: OutboundsIds[config.route?.final ?? ''] ?? template.route.final,
       default_domain_resolver: {
         server:
-          // oxlint-disable-next-line typescript/no-unsafe-member-access
           DnsServersIds[(config.route?.default_domain_resolver as any)?.server] ??
           template.route.default_domain_resolver.server,
-        // oxlint-disable-next-line typescript/no-unsafe-assignment
         client_subnet:
-          // oxlint-disable-next-line typescript/no-unsafe-member-access
           (config.route?.default_domain_resolver as any)?.client_subnet ??
           template.route.default_domain_resolver.client_subnet,
       },
@@ -118,7 +114,6 @@ export const restoreProfile = (
     dns: {
       disable_cache: config.dns?.disable_cache ?? template.dns.disable_cache,
       disable_expire: config.dns?.disable_expire ?? template.dns.disable_expire,
-      // oxlint-disable-next-line typescript/no-deprecated
       independent_cache: config.dns?.independent_cache ?? template.dns.independent_cache,
       final: DnsServersIds[config.dns?.final ?? ''] ?? template.dns.final,
       strategy: config.dns?.strategy ?? template.dns.strategy,

@@ -10,7 +10,6 @@ import { generateRule } from './shared'
 
 export const generateDnsServerURL = (dnsServer: DnsServerConfig) => {
   const { type, server_port, path, server, interface: _interface } = dnsServer
-  // oxlint-disable-next-line typescript/switch-exhaustiveness-check
   switch (type) {
     case DnsServer.Https:
       return `https://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
@@ -92,7 +91,6 @@ export const generateDns = (
           }
         }
       }
-      // oxlint-disable-next-line typescript/switch-exhaustiveness-check
       switch (server.type) {
         case DnsServer.Hosts:
           extra['path'] = server.hosts_path.reduce((p, c) => p.concat(c.split(',')), [] as string[])

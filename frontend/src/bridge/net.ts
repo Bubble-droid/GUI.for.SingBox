@@ -1,4 +1,3 @@
-// oxlint-disable typescript/strict-boolean-expressions
 import * as Bridge from '@wails/go/bridge/App'
 import { EventsOn, EventsOff, EventsEmit } from '@wails/runtime/runtime'
 
