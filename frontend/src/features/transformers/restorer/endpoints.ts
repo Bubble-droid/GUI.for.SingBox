@@ -9,7 +9,7 @@ import {
 } from '@defaults/endpoints'
 import { Endpoint } from '@features/constant/kernel'
 import type { SingBoxEndpointOf, SingBoxEndpoint } from '@features/types/sing-box'
-import { ensureArray } from '@features/utils/helper'
+import { normalizeArray } from '@features/utils/helper'
 import type {
   WireGuardPeer,
   EndpointWireGuard,
@@ -59,8 +59,8 @@ const restorePeers = (
     return {
       ...peer,
       ...rest,
-      allowed_ips: ensureArray(allowed_ips),
-      reserved: ensureArray(reserved).map(String),
+      allowed_ips: normalizeArray(allowed_ips),
+      reserved: normalizeArray(reserved).map(String),
     }
   })
 }
@@ -86,7 +86,7 @@ export const restoreWireGuard = (
     config: {
       ...template.config,
       ...final,
-      address: ensureArray(final.address),
+      address: normalizeArray(final.address),
       peers: restorePeers(final.peers),
       dialer,
       udpNat,
@@ -114,10 +114,10 @@ export const restoreTailscale = (
     config: {
       ...template.config,
       ...reset1,
-      advertise_routes: ensureArray(reset1.advertise_routes),
+      advertise_routes: normalizeArray(reset1.advertise_routes),
       advertise_tags:
-        'advertise_tags' in reset1 ? ensureArray(reset1.advertise_tags as string) : [],
-      relay_server_static_endpoints: ensureArray(reset1.relay_server_static_endpoints),
+        'advertise_tags' in reset1 ? normalizeArray(reset1.advertise_tags as string) : [],
+      relay_server_static_endpoints: normalizeArray(reset1.relay_server_static_endpoints),
       ssh_server: restoreSshServer(reset1.ssh_server, template.config),
       dialer,
     },
@@ -138,10 +138,10 @@ const restoreTnccCerts = (
   certificates: openconnect_tncc_certificate[] = [],
 ): OpenConnectTnccCertificate[] => {
   const template = createOpenConnectTnccCert()
-  return ensureArray(certificates).map((c) => ({
+  return normalizeArray(certificates).map((c) => ({
     ...template,
     ...c,
-    certificate: 'certificate' in c ? ensureArray(c.certificate) : [],
+    certificate: 'certificate' in c ? normalizeArray(c.certificate) : [],
   }))
 }
 
@@ -149,7 +149,7 @@ const restoreFormEntries = (
   formEntries: SingBoxEndpointOf<typeof Endpoint.OpenConnect>['form_entries'] = [],
 ): OpenConnectFormEntry[] => {
   const template = createOpenConnectFormEntry()
-  return ensureArray(formEntries).map((v) => ({
+  return normalizeArray(formEntries).map((v) => ({
     ...template,
     ...v,
   }))
@@ -191,13 +191,14 @@ export const restoreOpenConnect = (
       tls: {
         ...template.config.tls,
         ...tls,
-        peer_fingerprint: ensureArray(tls?.peer_fingerprint),
+        peer_fingerprint: normalizeArray(tls?.peer_fingerprint),
         certificate_authority:
-          'certificate_authority' in tls ? ensureArray(tls.certificate_authority) : [],
-        client_certificate: 'client_certificate' in tls ? ensureArray(tls.client_certificate) : [],
-        client_key: 'client_key' in tls ? ensureArray(tls.client_key) : [],
-        mca_certificate: 'mca_certificate' in tls ? ensureArray(tls.mca_certificate) : [],
-        mca_key: 'mca_key' in tls ? ensureArray(tls.mca_key) : [],
+          'certificate_authority' in tls ? normalizeArray(tls.certificate_authority) : [],
+        client_certificate:
+          'client_certificate' in tls ? normalizeArray(tls.client_certificate) : [],
+        client_key: 'client_key' in tls ? normalizeArray(tls.client_key) : [],
+        mca_certificate: 'mca_certificate' in tls ? normalizeArray(tls.mca_certificate) : [],
+        mca_key: 'mca_key' in tls ? normalizeArray(tls.mca_key) : [],
       },
       form_entries: restoreFormEntries(final.form_entries),
       dialer,
@@ -239,11 +240,11 @@ export const restoreOpenVpnClient = (
               ...v,
             }))
           : [],
-      address: ensureArray(final.address),
-      static_key: ensureArray(final.static_key),
-      data_ciphers: ensureArray(final.data_ciphers),
-      routes: ensureArray(final.routes),
-      redirect_gateway_flags: ensureArray(final.redirect_gateway_flags),
+      address: normalizeArray(final.address),
+      static_key: normalizeArray(final.static_key),
+      data_ciphers: normalizeArray(final.data_ciphers),
+      routes: normalizeArray(final.routes),
+      redirect_gateway_flags: normalizeArray(final.redirect_gateway_flags),
       pull_filters:
         final.pull_filters?.map((v) => ({
           ...pullFilter,
@@ -252,16 +253,19 @@ export const restoreOpenVpnClient = (
       tls: {
         ...template.config.tls,
         ...tls,
-        certificate: 'certificate' in tls ? ensureArray(tls.certificate) : [],
-        client_certificate: 'client_certificate' in tls ? ensureArray(tls.client_certificate) : [],
-        client_key: 'client_key' in tls ? ensureArray(tls.client_key) : [],
-        peer_fingerprint: ensureArray(final.tls.peer_fingerprint),
-        remote_certificate_ku: ensureArray(final.tls.remote_certificate_ku),
+        certificate: 'certificate' in tls ? normalizeArray(tls.certificate) : [],
+        client_certificate:
+          'client_certificate' in tls ? normalizeArray(tls.client_certificate) : [],
+        client_key: 'client_key' in tls ? normalizeArray(tls.client_key) : [],
+        peer_fingerprint: normalizeArray(final.tls.peer_fingerprint),
+        remote_certificate_ku: normalizeArray(final.tls.remote_certificate_ku),
         control_wrap: {
           ...template.config.tls.control_wrap,
           ...tls.control_wrap,
           key:
-            tls.control_wrap && 'key' in tls.control_wrap ? ensureArray(tls.control_wrap.key) : [],
+            tls.control_wrap && 'key' in tls.control_wrap
+              ? normalizeArray(tls.control_wrap.key)
+              : [],
         },
       },
       dialer,
@@ -295,40 +299,43 @@ export const restoreOpenVpnServer = (
     config: {
       ...template.config,
       ...final,
-      address: ensureArray(final.address),
-      users: ensureArray(final.users),
-      static_key: ensureArray(final.static_key),
-      data_ciphers: ensureArray(final.data_ciphers),
+      address: normalizeArray(final.address),
+      users: normalizeArray(final.users),
+      static_key: normalizeArray(final.static_key),
+      data_ciphers: normalizeArray(final.data_ciphers),
       tls: {
         ...template.config.tls,
         ...tls,
-        certificate: 'certificate' in tls ? ensureArray(tls.certificate) : [],
-        key: 'key' in tls ? ensureArray(tls.key) : [],
-        client_certificate: 'client_certificate' in tls ? ensureArray(tls.client_certificate) : [],
-        peer_fingerprint: ensureArray(tls.peer_fingerprint),
-        remote_certificate_ku: ensureArray(tls.remote_certificate_ku),
+        certificate: 'certificate' in tls ? normalizeArray(tls.certificate) : [],
+        key: 'key' in tls ? normalizeArray(tls.key) : [],
+        client_certificate:
+          'client_certificate' in tls ? normalizeArray(tls.client_certificate) : [],
+        peer_fingerprint: normalizeArray(tls.peer_fingerprint),
+        remote_certificate_ku: normalizeArray(tls.remote_certificate_ku),
         control_wrap: {
           ...template.config.tls.control_wrap,
           ...tls?.control_wrap,
           key:
-            tls.control_wrap && 'key' in tls.control_wrap ? ensureArray(tls.control_wrap.key) : [],
+            tls.control_wrap && 'key' in tls.control_wrap
+              ? normalizeArray(tls.control_wrap.key)
+              : [],
         },
       },
       push: {
         ...template.config.push,
         ...push,
-        routes: ensureArray(push.routes),
-        dns: ensureArray(push.dns),
+        routes: normalizeArray(push.routes),
+        dns: normalizeArray(push.dns),
         dns_servers:
           push.dns_servers?.map((d) => ({
             ...pushDnsServer,
             ...d,
-            addresses: ensureArray(d.addresses),
-            resolve_domains: ensureArray(d.resolve_domains),
+            addresses: normalizeArray(d.addresses),
+            resolve_domains: normalizeArray(d.resolve_domains),
           })) ?? [],
-        search_domains: ensureArray(push.search_domains),
-        dhcp_options: ensureArray(push.dhcp_options),
-        redirect_gateway_flags: ensureArray(push.redirect_gateway_flags),
+        search_domains: normalizeArray(push.search_domains),
+        dhcp_options: normalizeArray(push.dhcp_options),
+        redirect_gateway_flags: normalizeArray(push.redirect_gateway_flags),
       },
       listen,
       udpNat,

@@ -5,7 +5,7 @@ import type {
   SingBoxCertificateProvider,
   SingBoxCertificateProviderOf,
 } from '@features/types/sing-box'
-import { ensureArray } from '@features/utils/helper'
+import { normalizeArray } from '@features/utils/helper'
 import type {
   CertificateProviderConfig,
   CertificateProviderAcme,
@@ -52,7 +52,7 @@ export const restoreAcmeProvider = (
     config: {
       ...template.config,
       ...rest,
-      domain: ensureArray(raw.domain),
+      domain: normalizeArray(raw.domain),
       provider: raw.provider as AcmeProvider,
       external_account: {
         ...template.config.external_account,
@@ -101,7 +101,7 @@ export const restoreCloudflareOriginCaProvider = (
     config: {
       ...template.config,
       ...rest,
-      domain: ensureArray(raw.domain),
+      domain: normalizeArray(raw.domain),
       http_client: maps.httpClients.get(raw.http_client as string) ?? '',
     },
   }

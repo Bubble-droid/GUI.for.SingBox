@@ -1,31 +1,3 @@
-type Many<T> = T | readonly T[]
-
-export const ensureArray = <T>(value: Many<T> | null | undefined): T[] => {
-  if (value == null) return []
-  return Array.isArray(value) ? value : [value as T]
-}
-
-interface ExtractResult<T, M> {
-  owned: Pick<T, Extract<keyof T, keyof M>>
-  rest: Omit<T, keyof M>
-}
-
-export const extractProps = <T extends object, M extends object>(
-  obj: T,
-  template: M,
-): ExtractResult<T, M> => {
-  const owned: Recordable = {}
-  const rest: Recordable = {}
-  for (const [key, value] of Object.entries(obj)) {
-    if (Object.hasOwn(template, key)) {
-      owned[key] = value
-    } else {
-      rest[key] = value
-    }
-  }
-  return { owned, rest } as ExtractResult<T, M>
-}
-
 const isPlainObject = (val: unknown): val is Record<PropertyKey, unknown> => {
   if (typeof val !== 'object' || val === null) return false
   const proto = Object.getPrototypeOf(val)
@@ -82,4 +54,34 @@ export const cleanObject = <T extends object>(target: T, deep = false): Partial<
   }
 
   return result as Partial<T>
+}
+
+type Many<T> = T | readonly T[]
+
+export const normalizeArray = <T>(value: Many<T> | null | undefined): T[] => {
+  if (value == null) return []
+  return Array.isArray(value) ? value : [value as T]
+}
+
+interface SplitResult<T, M> {
+  target: Pick<T, Extract<keyof T, keyof M>>
+  rest: Omit<T, keyof M>
+}
+
+export const splitProps = <T extends object, M extends object>(
+  obj: T,
+  template: M,
+): SplitResult<T, M> => {
+  const target: Recordable = {}
+  const rest: Recordable = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (Object.hasOwn(template, key)) {
+      target[key] = value
+    } else {
+      rest[key] = value
+    }
+  }
+
+  return { target, rest } as SplitResult<T, M>
 }
