@@ -1,4 +1,5 @@
-import { filterInvalidProps } from '@features/utils/helper'
+import type { SingBoxConfig } from '@features/types/sing-box'
+import { cleanObject } from '@features/utils/helper'
 import type { Profile } from '@profiles'
 import type { TagItem } from '@profiles/shared'
 import { parse } from 'yaml'
@@ -8,7 +9,6 @@ import { normalizeErrorMessage } from '@/utils/normalize'
 import { deepClone, deepAssign } from '@/utils/others'
 
 import { _adaptToStableBranch } from './adapter'
-import { generateCertificate } from './certificate'
 import { generateCertificateProviders } from './certificate_provider'
 import { getGenerateContext } from './context'
 import { generateDns } from './dns'
@@ -57,20 +57,23 @@ export const generateConfig = async (
   }
 
   // step 1
-  let config: Recordable = filterInvalidProps({
-    log: filterInvalidProps(profile.log),
-    ntp: generateNtp(profile.ntp, tagMaps),
-    experimental: generateExperimental(profile.experimental, tagMaps),
-    certificate: generateCertificate(profile.certificate),
-    certificate_providers: generateCertificateProviders(profile.certificate_providers, tagMaps),
-    http_clients: generateHttpClients(profile.http_clients, tagMaps),
-    network_namespaces: generateNetns(profile.network_namespaces),
-    endpoints: generateEndpoints(profile.endpoints, tagMaps),
-    inbounds: generateInbounds(profile.inbounds),
-    outbounds: await generateOutbounds(profile.outbounds, ctx),
-    route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns, ctx),
-    dns: generateDns(profile.dns, profile.route.rule_set, profile.inbounds, profile.outbounds),
-  })
+  let config = cleanObject(
+    {
+      log: { ...profile.log },
+      ntp: generateNtp(profile.ntp, tagMaps),
+      experimental: generateExperimental(profile.experimental, tagMaps),
+      certificate: { ...profile.certificate },
+      certificate_providers: generateCertificateProviders(profile.certificate_providers, tagMaps),
+      http_clients: generateHttpClients(profile.http_clients, tagMaps),
+      network_namespaces: generateNetns(profile.network_namespaces),
+      endpoints: generateEndpoints(profile.endpoints, tagMaps),
+      inbounds: generateInbounds(profile.inbounds),
+      outbounds: await generateOutbounds(profile.outbounds, ctx),
+      route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns, ctx),
+      dns: generateDns(profile.dns, profile.route.rule_set, profile.inbounds, profile.outbounds),
+    } as SingBoxConfig,
+    true,
+  )
 
   // adapt to stable branch
   if (enableStableConfigCompat) {

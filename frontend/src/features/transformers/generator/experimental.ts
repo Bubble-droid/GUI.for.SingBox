@@ -1,5 +1,4 @@
 import type { SingBoxExperimental } from '@features/types/sing-box'
-import { filterInvalidProps } from '@features/utils/helper'
 import type { ExperimentalConfig } from '@profiles/experimental'
 
 import type { TagMaps } from './types'
@@ -9,13 +8,11 @@ export const generateExperimental = (
   maps: TagMaps,
 ): SingBoxExperimental => {
   const { clash_api, cache_file } = experimental
-  return filterInvalidProps({
-    clash_api: filterInvalidProps({
+  return {
+    clash_api: {
       ...clash_api,
       external_ui_download_detour: maps.outbounds.get(clash_api.external_ui_download_detour),
-    }),
-    cache_file: cache_file.enabled
-      ? { ...filterInvalidProps(cache_file), enabled: true }
-      : undefined,
-  })
+    },
+    cache_file: cache_file.enabled ? { ...cache_file } : undefined,
+  } as SingBoxExperimental
 }

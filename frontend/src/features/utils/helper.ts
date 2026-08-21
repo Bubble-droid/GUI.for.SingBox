@@ -1,24 +1,8 @@
-import { isPlainObject } from '@/utils/others'
+type Many<T> = T | readonly T[]
 
-type FilterResult<T> = {
-  [K in keyof T]-?: NonNullable<T[K]>
-}
-
-export const filterInvalidProps = <T extends object>(obj: T): FilterResult<T> => {
-  const result: Recordable = {}
-
-  for (const [key, value] of Object.entries(obj)) {
-    if (!value) continue
-    if (Array.isArray(value) && value.length === 0) continue
-    if (isPlainObject(value) && Object.keys(value).length === 0) continue
-    result[key] = value
-  }
-
-  return result as FilterResult<T>
-}
-
-export const ensureArray = <T>(value: T | T[] | null | undefined): T[] => {
-  return value == null ? [] : Array.isArray(value) ? value : [value]
+export const ensureArray = <T>(value: Many<T> | null | undefined): T[] => {
+  if (value == null) return []
+  return Array.isArray(value) ? value : [value as T]
 }
 
 interface ExtractResult<T, M> {
@@ -33,7 +17,7 @@ export const extractProps = <T extends object, M extends object>(
   const owned: Recordable = {}
   const rest: Recordable = {}
   for (const [key, value] of Object.entries(obj)) {
-    if (Object.prototype.hasOwnProperty.call(template, key)) {
+    if (Object.hasOwn(template, key)) {
       owned[key] = value
     } else {
       rest[key] = value
@@ -42,8 +26,60 @@ export const extractProps = <T extends object, M extends object>(
   return { owned, rest } as ExtractResult<T, M>
 }
 
-export const assertNever = (value: never, message?: string): never => {
-  throw new Error(
-    message ?? `Unexpected value: ${typeof value === 'string' ? value : JSON.stringify(value)}`,
-  )
+const isPlainObject = (val: unknown): val is Record<PropertyKey, unknown> => {
+  if (typeof val !== 'object' || val === null) return false
+  const proto = Object.getPrototypeOf(val)
+  return proto === null || proto === Object.prototype
+}
+
+const isInvalid = (val: unknown): boolean => {
+  if (!val) return true
+  if (Array.isArray(val)) return val.length === 0
+  if (isPlainObject(val)) return Object.keys(val).length === 0
+  return false
+}
+
+const cleanValue = (val: unknown, deep: boolean): unknown => {
+  if (!deep) return val
+
+  if (Array.isArray(val)) {
+    return val.map((item) => cleanValue(item, true)).filter((item) => !isInvalid(item))
+  }
+
+  if (isPlainObject(val)) {
+    const cleanedObj: Record<string, unknown> = {}
+    for (const [key, item] of Object.entries(val)) {
+      const cleanedItem = cleanValue(item, true)
+      if (!isInvalid(cleanedItem)) {
+        cleanedObj[key] = cleanedItem
+      }
+    }
+    return cleanedObj
+  }
+
+  return val
+}
+
+export const cleanObject = <T extends object>(target: T, deep = false): Partial<T> => {
+  if (!target || typeof target !== 'object') {
+    return target
+  }
+
+  if (Array.isArray(target)) {
+    const result = target
+      .map((item) => (deep ? cleanValue(item, true) : item))
+      .filter((item) => !isInvalid(item))
+    return result as unknown as Partial<T>
+  }
+
+  const result: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(target)) {
+    const processedVal = deep ? cleanValue(value, true) : value
+    if (!isInvalid(processedVal)) {
+      result[key] = processedVal
+    }
+  }
+
+  return result as Partial<T>
 }

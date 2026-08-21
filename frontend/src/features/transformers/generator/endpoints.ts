@@ -1,6 +1,5 @@
 import { Endpoint } from '@features/constant/kernel'
 import type { SingBoxEndpointOf, SingBoxEndpoint } from '@features/types/sing-box'
-import { filterInvalidProps } from '@features/utils/helper'
 import type {
   EndpointWireGuard,
   EndpointConfig,
@@ -18,25 +17,24 @@ export const generateEndpoints = (
   maps: TagMaps,
 ): SingBoxEndpoint[] => {
   return endpoints
-    .flatMap((ep): SingBoxEndpoint[] => {
-      const { enable, type } = ep
-      if (!enable) return []
+    .filter((ep) => ep.enable)
+    .map((ep): SingBoxEndpoint => {
+      const { type } = ep
       switch (type) {
         case Endpoint.WireGuard:
-          return [generateWireGuard(ep, maps)]
+          return generateWireGuard(ep, maps)
         case Endpoint.Tailscale:
-          return [generateTailscale(ep, maps)]
+          return generateTailscale(ep, maps)
         case Endpoint.OpenConnect:
-          return [generateOpenConnect(ep, maps)]
+          return generateOpenConnect(ep, maps)
         case Endpoint.OpenVpnClient:
-          return [generateOpenVpnClient(ep, maps)]
+          return generateOpenVpnClient(ep, maps)
         case Endpoint.OpenVpnServer:
-          return [generateOpenVpnServer(ep, maps)]
+          return generateOpenVpnServer(ep, maps)
         default:
           throw new Error(`Unexpected endpoint type: ${type as string}`)
       }
     })
-    .map((ep) => filterInvalidProps(ep))
 }
 
 export const generateWireGuard = (
@@ -49,11 +47,9 @@ export const generateWireGuard = (
     ...rest,
     ...generateDialer(dialer, maps),
     ...generateUdpNat(udpNat),
-    peers: rest.peers
-      .map((v) => ({ ...v, reserved: v.reserved.map(Number) }))
-      .map((v) => filterInvalidProps(v)),
     type,
     tag,
+    peers: rest.peers.map((v) => ({ ...v, reserved: v.reserved.map(Number) })),
   }
 }
 
@@ -68,13 +64,8 @@ export const generateTailscale = (
     ...generateDialer(dialer, maps),
     type,
     tag,
-    udp_timeout: rest.udp_timeout as NonNullable<
-      SingBoxEndpointOf<typeof Endpoint.Tailscale>['udp_timeout']
-    >,
-    ssh_server: (rest.ssh_server.enabled
-      ? { ...filterInvalidProps(rest.ssh_server), enabled: true }
-      : undefined) as NonNullable<SingBoxEndpointOf<typeof Endpoint.Tailscale>['ssh_server']>,
-  }
+    ssh_server: rest.ssh_server.enabled ? { ...rest.ssh_server } : undefined,
+  } as SingBoxEndpointOf<typeof Endpoint.Tailscale>
 }
 
 export const generateOpenConnect = (
@@ -88,21 +79,6 @@ export const generateOpenConnect = (
     ...rest,
     ...generateDialer(dialer, maps),
     ...generateUdpNat(udpNat),
-    token: filterInvalidProps(rest.token),
-    mobile: filterInvalidProps(rest.mobile),
-    csd: filterInvalidProps(rest.csd),
-    hip: filterInvalidProps(rest.hip),
-    tncc: filterInvalidProps({
-      ...rest.tncc,
-      certificates: rest.tncc.certificates
-        .map(filterInvalidProps)
-        .filter((c) => Object.keys(c).length > 0),
-    }),
-    fortinet_host_check: filterInvalidProps(rest.fortinet_host_check),
-    tls: filterInvalidProps(rest.tls),
-    form_entries: rest.form_entries
-      .map(filterInvalidProps)
-      .filter((f) => Object.keys(f).length > 0),
     type,
     tag,
   } as SingBoxEndpointOf<typeof Endpoint.OpenConnect>
@@ -119,14 +95,6 @@ export const generateOpenVpnClient = (
     ...rest,
     ...generateDialer(dialer, maps),
     ...generateUdpNat(udpNat),
-    servers: rest.servers.map(filterInvalidProps).filter((s) => Object.keys(s).length > 0),
-    pull_filters: rest.pull_filters
-      .map(filterInvalidProps)
-      .filter((f) => Object.keys(f).length > 0),
-    tls: filterInvalidProps({
-      ...rest.tls,
-      control_wrap: filterInvalidProps(rest.tls.control_wrap),
-    }),
     type,
     tag,
   } as SingBoxEndpointOf<typeof Endpoint.OpenVpnClient>
@@ -143,17 +111,6 @@ export const generateOpenVpnServer = (
     ...rest,
     ...generateListen(listen, maps),
     ...generateUdpNat(udpNat),
-    users: rest.users.map(filterInvalidProps).filter((u) => Object.keys(u).length > 0),
-    tls: filterInvalidProps({
-      ...rest.tls,
-      control_wrap: filterInvalidProps(rest.tls.control_wrap),
-    }),
-    push: filterInvalidProps({
-      ...rest.push,
-      dns_servers: rest.push.dns_servers
-        .map(filterInvalidProps)
-        .filter((d) => Object.keys(d).length > 0),
-    }),
     type,
     tag,
   } as unknown as SingBoxEndpointOf<typeof Endpoint.OpenVpnServer>

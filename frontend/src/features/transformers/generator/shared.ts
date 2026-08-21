@@ -10,7 +10,6 @@ import type {
   SingBoxQuic,
   SingBoxDns01Challenge,
 } from '@features/types/sing-box'
-import { filterInvalidProps } from '@features/utils/helper'
 import type { DnsRuleConfig } from '@profiles/dns'
 import type { InboundConfig } from '@profiles/inbounds'
 import type { RouteRuleConfig, RuleSetConfig } from '@profiles/route'
@@ -34,10 +33,10 @@ export const generateDomainResolver = (
   resolver: DomainResolver,
   maps: TagMaps,
 ): SingBoxDomainResolver => {
-  return filterInvalidProps({
+  return {
     ...(resolver as SingBoxDomainResolver),
-    server: maps.dnsServers.get(resolver.server)!,
-  })
+    server: maps.dnsServers.get(resolver.server) ?? '',
+  }
 }
 
 export const generateDialer = (dialer: Dialer, maps: TagMaps): SingBoxDialer => {
@@ -110,55 +109,55 @@ export const generateInboundTls = (
 ): SingBoxInboundTls | undefined => {
   if (!tls.enabled) return undefined
   const { enabled: _, ech, reality, ...rest } = tls
-  return filterInvalidProps({
-    enabled: true,
+  return {
     ...rest,
-    ech: ech.enabled ? filterInvalidProps(ech) : undefined,
+    enabled: true,
+    ech: ech.enabled ? { ...ech } : undefined,
     reality: reality.enabled
-      ? filterInvalidProps({
+      ? {
           ...reality,
-          handshake: filterInvalidProps({
+          handshake: {
             server: reality.handshake.server,
-            server_port: reality.handshake.server_port || undefined,
+            server_port: reality.handshake.server_port,
             ...generateDialer(reality.handshake.dialer, maps),
-          }),
-        })
+          },
+        }
       : undefined,
     certificate_provider: maps.certProviders.get(rest.certificate_provider),
-  } as SingBoxInboundTls)
+  } as SingBoxInboundTls
 }
 
 export const generateOutboundTls = (tls: OutboundTlsConfig): SingBoxOutboundTls | undefined => {
   if (!tls.enabled) return undefined
   const { enabled: _, ech, utls, reality, ...rest } = tls
-  return filterInvalidProps({
-    enabled: true,
+  return {
     ...rest,
-    ech: ech.enabled ? filterInvalidProps(ech) : undefined,
-    utls: utls.enabled ? filterInvalidProps(utls) : undefined,
-    reality: reality.enabled ? filterInvalidProps(reality) : undefined,
-  } as SingBoxOutboundTls)
+    enabled: true,
+    ech: ech.enabled ? { ...ech } : undefined,
+    utls: utls.enabled ? { ...utls } : undefined,
+    reality: reality.enabled ? { ...reality } : undefined,
+  } as SingBoxOutboundTls
 }
 
 export const generateHttp2Options = (http2: Http2Options): SingBoxHttp2 => {
-  return filterInvalidProps({ ...http2 } as SingBoxHttp2)
+  return { ...http2 } as SingBoxHttp2
 }
 
 export const generateQuicOptions = (quic: QuicOptions): SingBoxQuic => {
   const { initial_packet_size, disable_path_mtu_discovery, ...rest } = quic
-  return filterInvalidProps({
+  return {
     ...generateHttp2Options(rest),
     initial_packet_size,
     disable_path_mtu_discovery,
-  })
+  }
 }
 
 export const generateDns01Challenge = (
   dns01: Dns01Challenge,
   maps: TagMaps,
 ): SingBoxDns01Challenge => {
-  return filterInvalidProps({
+  return {
     ...dns01,
-    resolvers: dns01.resolvers.map((v) => maps.dnsServers.get(v)).filter(Boolean),
-  })
+    resolvers: dns01.resolvers.map((v) => maps.dnsServers.get(v)),
+  } as unknown as SingBoxDns01Challenge
 }

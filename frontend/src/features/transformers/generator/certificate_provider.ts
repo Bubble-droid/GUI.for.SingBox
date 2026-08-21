@@ -1,6 +1,5 @@
 import { CertificateProviderType } from '@features/constant/kernel'
 import type { SingBoxCertificateProvider } from '@features/types/sing-box'
-import { filterInvalidProps } from '@features/utils/helper'
 import type {
   CertificateProviderConfig,
   CertificateProviderAcme,
@@ -16,21 +15,20 @@ export const generateCertificateProviders = (
   maps: TagMaps,
 ): SingBoxCertificateProvider[] => {
   return providers
-    .flatMap((cp): SingBoxCertificateProvider[] => {
-      const { enable, type } = cp
-      if (!enable) return []
+    .filter((cp) => cp.enable)
+    .map((cp): SingBoxCertificateProvider => {
+      const { type } = cp
       switch (type) {
         case CertificateProviderType.Acme:
-          return [generateAcmeProvider(cp, maps)]
+          return generateAcmeProvider(cp, maps)
         case CertificateProviderType.Tailscale:
-          return [generateTailscaleProvider(cp, maps)]
+          return generateTailscaleProvider(cp, maps)
         case CertificateProviderType.CloudflareOriginCa:
-          return [generateCloudflareOriginCaProvider(cp, maps)]
+          return generateCloudflareOriginCaProvider(cp, maps)
         default:
           throw new Error(`Unexpected certificate provider type: ${type as string}`)
       }
     })
-    .map((cp) => filterInvalidProps(cp))
 }
 
 export const generateAcmeProvider = (
@@ -39,14 +37,13 @@ export const generateAcmeProvider = (
 ): SingBoxCertificateProvider => {
   const { type, tag, config } = acme
 
-  return filterInvalidProps({
+  return {
+    ...config,
     type,
     tag,
-    ...config,
-    external_account: filterInvalidProps(config.external_account),
     dns01_challenge: generateDns01Challenge(config.dns01_challenge, maps),
     http_client: maps.httpClients.get(config.http_client),
-  })
+  }
 }
 
 export const generateTailscaleProvider = (
@@ -55,11 +52,11 @@ export const generateTailscaleProvider = (
 ): SingBoxCertificateProvider => {
   const { type, tag, config } = tailscale
 
-  return filterInvalidProps({
+  return {
     type,
     tag,
-    endpoint: maps.endpoints.get(config.endpoint),
-  })
+    endpoint: maps.endpoints.get(config.endpoint) ?? '',
+  }
 }
 
 export const generateCloudflareOriginCaProvider = (
@@ -68,10 +65,10 @@ export const generateCloudflareOriginCaProvider = (
 ): SingBoxCertificateProvider => {
   const { type, tag, config } = cf
 
-  return filterInvalidProps({
+  return {
+    ...config,
     type,
     tag,
-    ...config,
     http_client: maps.httpClients.get(config.http_client),
-  })
+  }
 }
