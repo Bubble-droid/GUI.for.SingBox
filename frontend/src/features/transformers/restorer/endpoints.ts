@@ -21,6 +21,7 @@ import type {
   OpenConnectTnccCertificate,
   OpenConnectFormEntry,
 } from '@profiles/endpoints'
+import type { openconnect_tncc_certificate } from '@zhexin/typebox/endpoint'
 
 import { sampleID } from '@/utils/others'
 
@@ -133,12 +134,14 @@ export const restoreSshServer = (
   return { ...config.ssh_server, ...sshServer }
 }
 
-const restoreTnccCerts = (certificates: any[] = []): OpenConnectTnccCertificate[] => {
+const restoreTnccCerts = (
+  certificates: openconnect_tncc_certificate[] = [],
+): OpenConnectTnccCertificate[] => {
   const template = createOpenConnectTnccCert()
   return ensureArray(certificates).map((c) => ({
     ...template,
     ...c,
-    certificate: ensureArray(c.certificate),
+    certificate: 'certificate' in c ? ensureArray(c.certificate) : [],
   }))
 }
 
