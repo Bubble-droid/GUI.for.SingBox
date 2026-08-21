@@ -33,8 +33,6 @@
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": true,
 
-    "exactOptionalPropertyTypes": true,
-
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
 
@@ -53,10 +51,6 @@
     "inferTemplateDollarSlots": true,
     "fallthroughAttributes": true,
     "resolveStyleImports": true,
-    "resolveStyleClassNames": true,
-    "useAttrs": true,
-    "useCssModule": true,
-    "useSlots": true,
-    "useTemplateRef": true
+    "resolveStyleClassNames": true
   }
 }

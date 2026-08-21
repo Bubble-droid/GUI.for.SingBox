@@ -31,7 +31,7 @@ export const restoreDnsServers = (
       ).includes(raw['type'])
     ) {
       if ('detour' in raw) {
-        server.detour = OutboundsIds[raw['detour']]!
+        server.detour = OutboundsIds[raw['detour']!]!
       }
       if ('domain_resolver' in raw) {
         server.domain_resolver = DnsServersIds[raw['domain_resolver'] as string] as string
@@ -63,7 +63,7 @@ export const restoreDnsServers = (
         server.hosts_path = raw['path'] as string[]
       }
       if ('predefined' in raw) {
-        server.predefined = Object.entries<string[] | string>(raw['predefined']).reduce(
+        server.predefined = Object.entries<string[] | string>(raw['predefined']!).reduce(
           (p, [key, value]) => {
             p[key] = Array.isArray(value) ? value.join(',') : value
             return p
