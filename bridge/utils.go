@@ -35,9 +35,9 @@ func resolvePath(rawPath string) string {
 		return cleanPath
 	}
 
-	resolvedPath := platform.Resolve(cleanPath)
+	resolvedPath := appPaths.Resolve(cleanPath)
 	if config.Info.IsDev {
-		log.Printf("Real Path: %s", resolvedPath)
+		log.Printf("Real Path: %s", platform.MaskUserHome(resolvedPath))
 	}
 
 	return resolvedPath
@@ -179,7 +179,7 @@ func parseByteRange(s string, size int64) (start int64, end int64, err error) {
 	return 0, 0, errors.New("invalid range format")
 }
 
-func GetExecPath() string {
+func getExecPath() string {
 	execPath, err := os.Executable()
 	if err != nil {
 		panic(err)

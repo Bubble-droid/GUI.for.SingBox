@@ -10,7 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	sysruntime "runtime"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -19,7 +19,7 @@ import (
 	"guiforcores/platform"
 
 	"github.com/shirou/gopsutil/v3/process"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 func (a *App) Exec(path string, args []string, options ExecOptions) FlagResult {
@@ -158,10 +158,10 @@ func (a *App) ExecBackground(path string, args []string, outEvent string, endEve
 		}
 		if endEvent != "" {
 			if err != nil {
-				runtime.EventsEmit(a.Ctx, endEvent, err.Error())
+				wailsruntime.EventsEmit(a.Ctx, endEvent, err.Error())
 				return
 			}
-			runtime.EventsEmit(a.Ctx, endEvent)
+			wailsruntime.EventsEmit(a.Ctx, endEvent)
 		}
 	}()
 
@@ -222,7 +222,7 @@ func (a *App) ProcessMemory(pid int32) FlagResult {
 		return FlagResult{true, strconv.FormatUint(memInfo.RSS, 10)}
 	}
 
-	if sysruntime.GOOS == "darwin" {
+	if runtime.GOOS == "darwin" {
 		rss, fallbackErr := getDarwinProcessRSS(pid)
 		if fallbackErr == nil {
 			return FlagResult{true, strconv.FormatUint(rss, 10)}
@@ -316,7 +316,7 @@ func scanAndEmitOutput(a *App, reader io.Reader, outEvent string, options ExecOp
 		text := platform.DecodeCommandOutput(scanner.Bytes())
 
 		if !stopOutput {
-			runtime.EventsEmit(a.Ctx, outEvent, text)
+			wailsruntime.EventsEmit(a.Ctx, outEvent, text)
 
 			if options.StopOutputKeyword != "" && strings.Contains(text, options.StopOutputKeyword) {
 				stopOutput = true
@@ -343,7 +343,7 @@ func tailAndEmitLogFile(a *App, path string, outEvent string, options ExecOption
 			return false
 		}
 
-		runtime.EventsEmit(a.Ctx, outEvent, text)
+		wailsruntime.EventsEmit(a.Ctx, outEvent, text)
 		return options.StopOutputKeyword != "" && strings.Contains(text, options.StopOutputKeyword)
 	}
 

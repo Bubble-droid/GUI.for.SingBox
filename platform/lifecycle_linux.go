@@ -3,21 +3,24 @@
 package platform
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
-	"guiforcores/config"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"guiforcores/config"
+
 	"github.com/adrg/xdg"
+	"github.com/wailsapp/wails/v2/pkg/menu"
 )
 
 //go:embed assets/appicon.png
 var appIcon []byte
 
-func DetectPackage(execPath string) PackageInfo {
+func InitAppEnv(execPath string) PackageInfo {
 	sysPkg := isSystemPackage(execPath)
 	bundled := isBundled(sysPkg)
 	return PackageInfo{
@@ -26,8 +29,8 @@ func DetectPackage(execPath string) PackageInfo {
 	}
 }
 
-func InitAppEnv(opts InitAppEnvOptions) InitAppEnvResult {
-	return InitAppEnvResult{}
+func SetupApp(ctx context.Context, appMenu *menu.Menu, basePath string) string {
+	return ""
 }
 
 func OnStartup(opts OnStartupOptions) {

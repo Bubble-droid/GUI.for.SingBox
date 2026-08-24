@@ -12,32 +12,25 @@ import (
 	"github.com/adrg/xdg"
 )
 
-var (
-	dataDir   string // ~/.local/share/gui-for-singbox
-	configDir string // ~/.config/gui-for-singbox
-	cacheDir  string // ~/.cache/gui-for-singbox
-)
-
-func InitAppPaths(base string) AppPaths {
+func NewAppPaths(base string) *AppPaths {
 	appID := config.Info.AppID
 	appDataPath := filepath.Join(xdg.DataHome, appID)
 	appConfigPath := filepath.Join(xdg.ConfigHome, appID)
 	appCachePath := filepath.Join(xdg.CacheHome, appID)
 
-	dataDir = appDataPath
-	configDir = appConfigPath
-	cacheDir = appCachePath
-
-	log.Println("Storage Mode: XDG Base Directory")
-
-	return AppPaths{
+	return &AppPaths{
 		AppDataPath:   appDataPath,
 		AppConfigPath: appConfigPath,
 		AppCachePath:  appCachePath,
+		BasePath:      base,
 	}
 }
 
-func Resolve(cleanPath string) string {
+func (p *AppPaths) LogStorageMode() {
+	log.Println("Storage Mode: XDG Base Directory")
+}
+
+func (p *AppPaths) Resolve(cleanPath string) string {
 	normalized := filepath.ToSlash(cleanPath)
 
 	relPath := normalized
@@ -48,24 +41,24 @@ func Resolve(cleanPath string) string {
 	}
 
 	if strings.HasPrefix(relPath, "../") || relPath == ".." {
-		return dataDir
+		return p.AppDataPath
 	}
 
 	if relPath == "" || relPath == "." {
-		return dataDir
+		return p.AppDataPath
 	}
 
 	if strings.HasSuffix(relPath, ".yaml") && !strings.Contains(relPath, "/") {
-		return filepath.Join(configDir, relPath)
+		return filepath.Join(p.AppConfigPath, relPath)
 	}
 
 	if relPath == ".cache" {
-		return cacheDir
+		return p.AppCachePath
 	}
 
 	if after, ok := strings.CutPrefix(relPath, ".cache/"); ok {
-		return filepath.Join(cacheDir, after)
+		return filepath.Join(p.AppCachePath, after)
 	}
 
-	return filepath.Join(dataDir, filepath.FromSlash(relPath))
+	return filepath.Join(p.AppDataPath, filepath.FromSlash(relPath))
 }

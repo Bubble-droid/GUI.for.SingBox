@@ -16,13 +16,13 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func DetectPackage(execPath string) PackageInfo {
+func InitAppEnv(execPath string) PackageInfo {
 	return PackageInfo{}
 }
 
-func InitAppEnv(opts InitAppEnvOptions) InitAppEnvResult {
-	createMacOSMenus(opts.AppMenu, opts.Ctx)
-	return InitAppEnvResult{}
+func SetupApp(ctx context.Context, appMenu *menu.Menu, basePath string) string {
+	createMacOSMenus(appMenu, ctx)
+	return ""
 }
 
 func OnStartup(opts OnStartupOptions) {

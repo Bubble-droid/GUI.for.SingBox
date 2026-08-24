@@ -7,21 +7,21 @@ import (
 	"path/filepath"
 )
 
-var basePath string
+func NewAppPaths(base string) *AppPaths {
+	baseDataDir := filepath.Join(base, "data")
 
-func InitAppPaths(base string) AppPaths {
-	basePath = base
-	baseDataDir := filepath.Join(basePath, "data")
-
-	log.Println("Storage Mode: Portable (Relative to Application Path)")
-
-	return AppPaths{
+	return &AppPaths{
 		AppDataPath:   baseDataDir,
 		AppConfigPath: baseDataDir,
 		AppCachePath:  filepath.Join(baseDataDir, ".cache"),
+		BasePath:      base,
 	}
 }
 
-func Resolve(cleanPath string) string {
-	return filepath.Join(basePath, cleanPath)
+func (p *AppPaths) LogStorageMode() {
+	log.Println("Storage Mode: Portable (Relative to Application Path)")
+}
+
+func (p *AppPaths) Resolve(cleanPath string) string {
+	return filepath.Join(p.BasePath, cleanPath)
 }

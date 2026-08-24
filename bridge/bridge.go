@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	sysruntime "runtime"
+	"runtime"
 	"strings"
 
 	"guiforcores/config"
@@ -15,7 +15,7 @@ import (
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/options"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"gopkg.in/yaml.v3"
 )
 
@@ -27,29 +27,30 @@ var Env = &EnvResult{
 	FromTaskSch:  false,
 	WebviewPath:  "",
 	ExecName:     "",
-	AppVersion:   "v1.26.1",
+	AppVersion:   config.Info.AppVersion,
 	BasePath:     "",
-	OS:           sysruntime.GOOS,
-	ARCH:         sysruntime.GOARCH,
+	OS:           runtime.GOOS,
+	ARCH:         runtime.GOARCH,
 	IsPrivileged: false,
 
 	IsSystemPackage: false,
 	IsBundled:       false,
-	AppDataPath:     "",
-	AppConfigPath:   "",
-	AppCachePath:    "",
 }
 
+var appPaths *platform.AppPaths
+
 func init() {
-	execPath := GetExecPath()
+	execPath := getExecPath()
 	Env.BasePath = filepath.ToSlash(filepath.Dir(execPath))
 	Env.ExecName = filepath.Base(execPath)
 
-	if config.Info.AppVersion != "" {
-		Env.AppVersion = config.Info.AppVersion
+	if priv, err := platform.IsPrivileged(); err == nil {
+		Env.IsPrivileged = priv
 	}
 
-	pkgInfo := platform.DetectPackage(execPath)
+	appPaths = platform.NewAppPaths(Env.BasePath)
+
+	pkgInfo := platform.InitAppEnv(execPath)
 	Env.IsSystemPackage = pkgInfo.IsSystemPackage
 	Env.IsBundled = pkgInfo.IsBundled
 }
@@ -62,27 +63,9 @@ func NewApp() *App {
 }
 
 func CreateApp() *App {
-	if priv, err := platform.IsPrivileged(); err == nil {
-		Env.IsPrivileged = priv
-	}
-
 	app := NewApp()
 
-	result := platform.InitAppEnv(platform.InitAppEnvOptions{
-		AppMenu:  app.AppMenu,
-		Ctx:      app.Ctx,
-		BasePath: Env.BasePath,
-	})
-
-	if result.WebviewPath != "" {
-		Env.WebviewPath = result.WebviewPath
-	}
-
-	paths := platform.InitAppPaths(Env.BasePath)
-
-	Env.AppDataPath = paths.AppDataPath
-	Env.AppConfigPath = paths.AppConfigPath
-	Env.AppCachePath = paths.AppCachePath
+	Env.WebviewPath = platform.SetupApp(app.Ctx, app.AppMenu, Env.BasePath)
 
 	loadConfig()
 
@@ -92,12 +75,10 @@ func CreateApp() *App {
 func Startup(fs embed.FS) {
 	log.Printf("Build Version: %s", Env.AppVersion)
 
-	log.Printf("App Data Path: %s", Env.AppDataPath)
-	log.Printf("App Config Path: %s", Env.AppConfigPath)
-	log.Printf("App Cache Path: %s", Env.AppCachePath)
+	appPaths.LogPathSummary()
 
 	platform.OnStartup(platform.OnStartupOptions{
-		ExecPath: GetExecPath(),
+		ExecPath: getExecPath(),
 		BasePath: Env.BasePath,
 		PackageInfo: platform.PackageInfo{
 			IsSystemPackage: Env.IsSystemPackage,
@@ -119,7 +100,7 @@ func (a *App) IsStartup() bool {
 func (a *App) ExitApp() {
 	log.Printf("ExitApp")
 	Env.PreventExit = false
-	runtime.Quit(a.Ctx)
+	wailsruntime.Quit(a.Ctx)
 }
 
 func (a *App) RestartApp() FlagResult {
@@ -153,9 +134,9 @@ func (a *App) GetEnv(key string) any {
 
 		IsSystemPackage: Env.IsSystemPackage,
 		IsBundled:       Env.IsBundled,
-		AppDataPath:     Env.AppDataPath,
-		AppConfigPath:   Env.AppConfigPath,
-		AppCachePath:    Env.AppCachePath,
+		AppDataPath:     appPaths.AppDataPath,
+		AppConfigPath:   appPaths.AppConfigPath,
+		AppCachePath:    appPaths.AppCachePath,
 	}
 }
 
@@ -178,7 +159,7 @@ func (a *App) GetInterfaces() FlagResult {
 
 func (a *App) ShowMainWindow() {
 	log.Printf("ShowMainWindow")
-	runtime.WindowShow(a.Ctx)
+	wailsruntime.WindowShow(a.Ctx)
 }
 
 func extractEmbeddedFiles(fs embed.FS) {

@@ -3,21 +3,22 @@
 package platform
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/wailsapp/wails/v2/pkg/menu"
 )
 
-func DetectPackage(execPath string) PackageInfo {
+func InitAppEnv(execPath string) PackageInfo {
 	return PackageInfo{}
 }
 
-func InitAppEnv(opts InitAppEnvOptions) InitAppEnvResult {
-	return InitAppEnvResult{
-		WebviewPath: processFixedWebView2Runtime(opts.BasePath),
-	}
+func SetupApp(ctx context.Context, appMenu *menu.Menu, basePath string) string {
+	return processFixedWebView2Runtime(basePath)
 }
 
 func OnStartup(opts OnStartupOptions) {}
