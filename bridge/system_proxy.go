@@ -3,13 +3,13 @@ package bridge
 import (
 	"log"
 
-	platform_proxy "guiforcores/bridge/platform/proxy"
+	"guiforcores/platform"
 )
 
 func (a *App) GetSystemProxy() FlagResult {
 	log.Printf("GetSystemProxy")
 
-	proxyVal, err := platform_proxy.GetSystemProxy()
+	proxyVal, err := platform.GetSystemProxy()
 	if err != nil {
 		return FlagResult{false, err.Error()}
 	}
@@ -24,7 +24,7 @@ func (a *App) SetSystemProxy(enable bool, server string, proxyType string, bypas
 		proxyType = "mixed"
 	}
 
-	err := platform_proxy.SetSystemProxy(enable, server, proxyType, bypass, services)
+	err := platform.SetSystemProxy(enable, server, proxyType, bypass, services)
 	if err != nil {
 		return FlagResult{false, err.Error()}
 	}
@@ -35,7 +35,7 @@ func (a *App) SetSystemProxy(enable bool, server string, proxyType string, bypas
 func (a *App) SetSystemDNS(servers string, services []string) FlagResult {
 	log.Printf("SetSystemDNS: %s %v", servers, services)
 
-	err := platform_proxy.SetSystemDNS(servers, services)
+	err := platform.SetSystemDNS(servers, services)
 	if err != nil {
 		return FlagResult{false, err.Error()}
 	}
@@ -46,7 +46,7 @@ func (a *App) SetSystemDNS(servers string, services []string) FlagResult {
 func (a *App) GetSystemProxyBypass() FlagResult {
 	log.Printf("GetSystemProxyBypass")
 
-	bypass, err := platform_proxy.GetSystemProxyBypass()
+	bypass, err := platform.GetSystemProxyBypass()
 	if err != nil {
 		return FlagResult{false, err.Error()}
 	}

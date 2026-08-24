@@ -1,6 +1,6 @@
 //go:build linux
 
-package proxy
+package platform
 
 import (
 	"encoding/json"

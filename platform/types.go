@@ -1,4 +1,4 @@
-package lifecycle
+package platform
 
 import (
 	"context"
@@ -25,4 +25,10 @@ type OnStartupOptions struct {
 	ExecPath string
 	BasePath string
 	PackageInfo
+}
+
+type AppPaths struct {
+	AppDataPath   string
+	AppConfigPath string
+	AppCachePath  string
 }

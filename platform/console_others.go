@@ -1,5 +1,5 @@
 //go:build !windows
 
-package console
+package platform
 
 func AttachParent() bool { return true }

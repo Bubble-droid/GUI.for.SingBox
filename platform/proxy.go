@@ -1,4 +1,4 @@
-package proxy
+package platform
 
 import (
 	"errors"
@@ -8,13 +8,11 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
-
-	platform_exec "guiforcores/bridge/platform/exec"
 )
 
 func runSystemProxyCommand(path string, args ...string) (string, error) {
 	cmd := exec.Command(path, args...)
-	platform_exec.SetCmdWindowHidden(cmd)
+	SetCmdWindowHidden(cmd)
 	cmd.Env = os.Environ()
 
 	out, err := cmd.CombinedOutput()

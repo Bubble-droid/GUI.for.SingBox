@@ -9,7 +9,9 @@ GUI.for.SingBox — a desktop GUI client for [sing-box](https://sing-box.sagerne
 ## Layout
 
 - `main.go` — Wails entrypoint; embeds the built frontend via `//go:embed all:frontend/dist`.
-- `bridge/` — Go backend package exposed to the frontend as Wails bindings. `bridge/platform/` holds per-OS code (`exec`, `lifecycle`, `path`, `proxy`).
+- `bridge/` — Go backend package exposed to the frontend as Wails bindings.
+- `config/` — build-time app config (`config.Info`); versions are injected via `-ldflags` (targets like `guiforcores/config.appVersion`).
+- `platform/` — per-OS code (console, exec, lifecycle, path, proxy) selected by GOOS/build tags.
 - `frontend/` — Vue 3 + Vite 8 + TypeScript + Pinia + vue-router + vue-i18n + CodeMirror.
   - `frontend/src/bridge/` — handwritten TS wrappers plus `wailsjs/` **generated** bindings.
   - `frontend/src/views/` — top-level pages (`HomeView`, `ProfilesView`, `SettingsView`, …).

@@ -4,12 +4,14 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"guiforcores/bridge"
-	"guiforcores/bridge/config"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"guiforcores/bridge"
+	"guiforcores/cmd"
+	"guiforcores/config"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -25,8 +27,8 @@ import (
 var assets embed.FS
 
 func main() {
-	cliOp := bridge.HandleCLI()
-	if cliOp == bridge.CLIOpExitNow {
+	cliOp := cmd.HandleCLI()
+	if cliOp == cmd.CLIOpExitNow {
 		return
 	}
 
@@ -102,7 +104,7 @@ func main() {
 		SingleInstanceLock: &options.SingleInstanceLock{
 			UniqueId: uniqueID,
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
-				if bridge.IsQuitArg(data.Args) {
+				if cmd.IsQuitArg(data.Args) {
 					runtime.EventsEmit(app.Ctx, "onExitApp")
 					return
 				}
@@ -113,7 +115,7 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			app.Ctx = ctx
 
-			if cliOp == bridge.CLIOpForwardIPC && bridge.IsQuitArg(os.Args[1:]) {
+			if cliOp == cmd.CLIOpForwardIPC && cmd.IsQuitArg(os.Args[1:]) {
 				bridge.Env.PreventExit = false
 				go func() {
 					time.Sleep(50 * time.Millisecond)

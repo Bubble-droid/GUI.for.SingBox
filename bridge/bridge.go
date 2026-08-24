@@ -7,13 +7,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	sysruntime "runtime"
 	"strings"
 
-	"guiforcores/bridge/config"
-	platform_exec "guiforcores/bridge/platform/exec"
-	platform_lifecycle "guiforcores/bridge/platform/lifecycle"
-	platform_path "guiforcores/bridge/platform/path"
-	sysruntime "runtime"
+	"guiforcores/config"
+	"guiforcores/platform"
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -51,7 +49,7 @@ func init() {
 		Env.AppVersion = config.Info.AppVersion
 	}
 
-	pkgInfo := platform_lifecycle.DetectPackage(execPath)
+	pkgInfo := platform.DetectPackage(execPath)
 	Env.IsSystemPackage = pkgInfo.IsSystemPackage
 	Env.IsBundled = pkgInfo.IsBundled
 }
@@ -64,13 +62,13 @@ func NewApp() *App {
 }
 
 func CreateApp() *App {
-	if priv, err := platform_exec.IsPrivileged(); err == nil {
+	if priv, err := platform.IsPrivileged(); err == nil {
 		Env.IsPrivileged = priv
 	}
 
 	app := NewApp()
 
-	result := platform_lifecycle.InitAppEnv(platform_lifecycle.InitAppEnvOptions{
+	result := platform.InitAppEnv(platform.InitAppEnvOptions{
 		AppMenu:  app.AppMenu,
 		Ctx:      app.Ctx,
 		BasePath: Env.BasePath,
@@ -80,7 +78,7 @@ func CreateApp() *App {
 		Env.WebviewPath = result.WebviewPath
 	}
 
-	paths := platform_path.InitAppPaths(Env.BasePath)
+	paths := platform.InitAppPaths(Env.BasePath)
 
 	Env.AppDataPath = paths.AppDataPath
 	Env.AppConfigPath = paths.AppConfigPath
@@ -98,10 +96,10 @@ func Startup(fs embed.FS) {
 	log.Printf("App Config Path: %s", Env.AppConfigPath)
 	log.Printf("App Cache Path: %s", Env.AppCachePath)
 
-	platform_lifecycle.OnStartup(platform_lifecycle.OnStartupOptions{
+	platform.OnStartup(platform.OnStartupOptions{
 		ExecPath: GetExecPath(),
 		BasePath: Env.BasePath,
-		PackageInfo: platform_lifecycle.PackageInfo{
+		PackageInfo: platform.PackageInfo{
 			IsSystemPackage: Env.IsSystemPackage,
 			IsBundled:       Env.IsBundled,
 		},
@@ -129,7 +127,7 @@ func (a *App) RestartApp() FlagResult {
 	exePath := filepath.Join(Env.BasePath, Env.ExecName)
 
 	cmd := exec.Command(exePath)
-	platform_exec.SetCmdWindowHidden(cmd)
+	platform.SetCmdWindowHidden(cmd)
 
 	if err := cmd.Start(); err != nil {
 		return FlagResult{false, err.Error()}

@@ -1,12 +1,13 @@
 //go:build linux && !non_xdg
 
-package path
+package platform
 
 import (
-	"guiforcores/bridge/config"
 	"log"
 	"path/filepath"
 	"strings"
+
+	"guiforcores/config"
 
 	"github.com/adrg/xdg"
 )

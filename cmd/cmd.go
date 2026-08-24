@@ -1,13 +1,15 @@
-package bridge
+package cmd
 
 import (
 	"flag"
 	"fmt"
-	"guiforcores/bridge/config"
-	platform_console "guiforcores/bridge/platform/console"
 	"io"
 	"os"
 	"strings"
+
+	"guiforcores/bridge"
+	"guiforcores/config"
+	"guiforcores/platform"
 )
 
 type CLIOperation int
@@ -31,11 +33,11 @@ func HandleCLI() CLIOperation {
 	firstArg := strings.TrimLeft(args[0], "-")
 	switch firstArg {
 	case "h", "help":
-		platform_console.AttachParent()
+		platform.AttachParent()
 		printHelp()
 		return CLIOpExitNow
 	case "v", "version":
-		platform_console.AttachParent()
+		platform.AttachParent()
 		printVersion()
 		return CLIOpExitNow
 	}
@@ -48,14 +50,14 @@ func HandleCLI() CLIOperation {
 	fs.BoolVar(taskSch, "tasksch", false, "")
 
 	if err := fs.Parse(args); err != nil {
-		platform_console.AttachParent()
+		platform.AttachParent()
 		fmt.Fprintf(os.Stderr, "%s\n\n", formatFlagError(err))
 		printHelp()
 		return CLIOpExitNow
 	}
 
 	if *taskSch {
-		Env.FromTaskSch = true
+		bridge.Env.FromTaskSch = true
 	}
 
 	return CLIOpLaunchGUI
@@ -82,7 +84,7 @@ func IsQuitArg(args []string) bool {
 func printHelp() {
 	fmt.Printf("%s - A GUI client for sing-box\n\n", config.Info.AppTitle)
 	fmt.Println("Usage:")
-	fmt.Printf("  %s [flags]\n\n", Env.ExecName)
+	fmt.Printf("  %s [flags]\n\n", bridge.Env.ExecName)
 	fmt.Println("Flags:")
 	fmt.Println("  -h, --help       Show help information")
 	fmt.Println("  -v, --version    Show version information")
@@ -91,11 +93,11 @@ func printHelp() {
 }
 
 func printVersion() {
-	fmt.Printf("%s version %s %s/%s\n", config.Info.AppTitle, config.Info.AppVersion, Env.OS, Env.ARCH)
+	fmt.Printf("%s version %s %s/%s\n", config.Info.AppTitle, config.Info.AppVersion, bridge.Env.OS, bridge.Env.ARCH)
 
-	if Env.OS == "linux" {
-		if Env.IsSystemPackage {
-			if Env.IsBundled {
+	if bridge.Env.OS == "linux" {
+		if bridge.Env.IsSystemPackage {
+			if bridge.Env.IsBundled {
 				fmt.Println("Package Type : System Package (Bundled Cores)")
 				if config.Info.SingBoxVersion != "" && config.Info.SingBoxVersion != "unknown" {
 					fmt.Printf("  sing-box (stable): v%s\n", config.Info.SingBoxVersion)

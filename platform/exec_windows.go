@@ -1,6 +1,6 @@
 //go:build windows
 
-package exec
+package platform
 
 import (
 	"fmt"
@@ -15,7 +15,9 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-const ATTACH_PARENT_PROCESS uintptr = ^uintptr(0)
+// attachParentProcess is (DWORD)-1, the pseudo process handle meaning "the
+// parent process" for AttachConsole.
+const attachParentProcess uintptr = ^uintptr(0)
 
 var (
 	modAdvapi32 = windows.NewLazySystemDLL("advapi32.dll")
@@ -72,7 +74,7 @@ func SendExitSignal(p *os.Process) error {
 	}
 
 	defer func() {
-		procAttachConsole.Call(ATTACH_PARENT_PROCESS)
+		procAttachConsole.Call(attachParentProcess)
 	}()
 
 	if ret, _, err := procAttachConsole.Call(uintptr(p.Pid)); ret == 0 && err != windows.ERROR_ACCESS_DENIED {

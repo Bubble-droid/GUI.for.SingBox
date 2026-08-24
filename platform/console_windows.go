@@ -1,6 +1,6 @@
 //go:build windows
 
-package console
+package platform
 
 import (
 	"os"
@@ -10,12 +10,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-const AttachParentProcess uintptr = ^uintptr(0) // (DWORD)-1
-
 var (
-	modKernel32       = windows.NewLazySystemDLL("kernel32.dll")
-	procAttachConsole = modKernel32.NewProc("AttachConsole")
-
 	mu sync.Mutex
 )
 
@@ -23,7 +18,7 @@ func AttachParent() bool {
 	mu.Lock()
 	defer mu.Unlock()
 
-	ret, _, _ := procAttachConsole.Call(AttachParentProcess)
+	ret, _, _ := procAttachConsole.Call(attachParentProcess)
 	if ret != 0 {
 		rebindStdStreams()
 		enableVirtualTerminal()

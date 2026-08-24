@@ -1,14 +1,15 @@
 //go:build darwin && !dev
 
-package lifecycle
+package platform
 
 import (
 	"context"
-	"guiforcores/bridge/config"
 	"log"
 	"os"
 	"os/user"
 	"path/filepath"
+
+	"guiforcores/config"
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"

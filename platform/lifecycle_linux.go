@@ -1,11 +1,11 @@
 //go:build linux && !dev
 
-package lifecycle
+package platform
 
 import (
 	_ "embed"
 	"fmt"
-	"guiforcores/bridge/config"
+	"guiforcores/config"
 	"log"
 	"os"
 	"path/filepath"

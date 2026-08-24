@@ -1,6 +1,6 @@
 //go:build windows && !dev
 
-package lifecycle
+package platform
 
 import (
 	"log"
@@ -8,8 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-
-	platform_exec "guiforcores/bridge/platform/exec"
 )
 
 func DetectPackage(execPath string) PackageInfo {
@@ -73,7 +71,7 @@ func processFixedWebView2Runtime(basePath string) string {
 	log.Printf("Found CAB file: %s\n", cabFile)
 
 	cmd := exec.Command("expand.exe", "-F:*", cabFile, webviewDir)
-	platform_exec.SetCmdWindowHidden(cmd)
+	SetCmdWindowHidden(cmd)
 
 	log.Println("Extracting WebView2 Runtime...")
 	if err := cmd.Run(); err != nil {

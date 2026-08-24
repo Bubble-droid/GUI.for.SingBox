@@ -1,6 +1,6 @@
 //go:build !windows && !darwin && !linux
 
-package proxy
+package platform
 
 import "fmt"
 

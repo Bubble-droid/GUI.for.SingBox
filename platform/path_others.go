@@ -1,6 +1,6 @@
 //go:build !linux || non_xdg
 
-package path
+package platform
 
 import (
 	"log"

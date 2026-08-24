@@ -14,8 +14,8 @@ import (
 	"sync"
 	"time"
 
-	"guiforcores/bridge/config"
-	platform_path "guiforcores/bridge/platform/path"
+	"guiforcores/config"
+	"guiforcores/platform"
 )
 
 type requestTransportKey struct {
@@ -35,7 +35,7 @@ func resolvePath(rawPath string) string {
 		return cleanPath
 	}
 
-	resolvedPath := platform_path.Resolve(cleanPath)
+	resolvedPath := platform.Resolve(cleanPath)
 	if config.Info.IsDev {
 		log.Printf("Real Path: %s", resolvedPath)
 	}

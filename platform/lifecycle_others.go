@@ -1,6 +1,6 @@
 //go:build (!windows && !darwin && !linux) || dev
 
-package lifecycle
+package platform
 
 func DetectPackage(execPath string) PackageInfo {
 	return PackageInfo{}

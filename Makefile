@@ -50,11 +50,11 @@ PKG_VERSION = $(subst -,~,$(ARCHIVE_VERSION))
 DEB_ARCH = $(ARCH)
 RPM_ARCH = $(if $(filter amd64,$(ARCH)),x86_64,$(if $(filter arm64,$(ARCH)),aarch64,$(ARCH)))
 
-LDFLAGS_BASE = -X '$(GO_MODULE)/bridge/config.appVersion=$(APP_VERSION)'
+LDFLAGS_BASE = -X '$(GO_MODULE)/config.appVersion=$(APP_VERSION)'
 
 LDFLAGS_LINUX = $(LDFLAGS_BASE) \
-	-X '$(GO_MODULE)/bridge/config.singBoxVersion=$(STABLE_VER)' \
-	-X '$(GO_MODULE)/bridge/config.singBoxAlphaVersion=$(ALPHA_VER)'
+	-X '$(GO_MODULE)/config.singBoxVersion=$(STABLE_VER)' \
+	-X '$(GO_MODULE)/config.singBoxAlphaVersion=$(ALPHA_VER)'
 
 WAILS_FLAGS = -m -s -trimpath -skipbindings -devtools
 
