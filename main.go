@@ -12,6 +12,7 @@ import (
 	"guiforcores/bridge"
 	"guiforcores/cmd"
 	"guiforcores/config"
+	"guiforcores/icon"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -34,7 +35,7 @@ func main() {
 
 	app := bridge.CreateApp()
 
-	trayStart, trayEnd := bridge.CreateTray(app, appIcon)
+	trayStart, trayEnd := bridge.CreateTray(app, icon.AppIcon)
 	var trayStarted bool
 
 	uniqueID := config.Info.AppID
@@ -89,11 +90,11 @@ func main() {
 			About: &mac.AboutInfo{
 				Title:   config.Info.AppTitle,
 				Message: "© 2026 GUI.for.Cores",
-				Icon:    appIcon,
+				Icon:    icon.AppIcon,
 			},
 		},
 		Linux: &linux.Options{
-			Icon:                appIcon,
+			Icon:                icon.AppIcon,
 			WindowIsTranslucent: false,
 			ProgramName:         config.Info.AppID,
 			WebviewGpuPolicy:    linux.WebviewGpuPolicy(bridge.Config.WebviewGpuPolicy),

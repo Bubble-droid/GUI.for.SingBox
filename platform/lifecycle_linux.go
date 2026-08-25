@@ -12,13 +12,11 @@ import (
 	"strings"
 
 	"guiforcores/config"
+	"guiforcores/icon"
 
 	"github.com/adrg/xdg"
 	"github.com/wailsapp/wails/v2/pkg/menu"
 )
-
-//go:embed assets/appicon.png
-var appIcon []byte
 
 func InitAppEnv(execPath string) PackageInfo {
 	sysPkg := isSystemPackage(execPath)
@@ -96,7 +94,7 @@ Icon=application-exit
 }
 
 func installAppIcon() {
-	if len(appIcon) == 0 {
+	if len(icon.AppIcon) == 0 {
 		return
 	}
 
@@ -114,7 +112,7 @@ func installAppIcon() {
 	log.Println("Creating application icon")
 
 	_ = os.MkdirAll(filepath.Dir(userPath), 0755)
-	_ = os.WriteFile(userPath, appIcon, 0644)
+	_ = os.WriteFile(userPath, icon.AppIcon, 0644)
 }
 
 func createCoreSymlinks() {
