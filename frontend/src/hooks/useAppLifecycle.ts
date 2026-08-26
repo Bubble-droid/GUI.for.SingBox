@@ -3,47 +3,40 @@ import { onUnmounted } from 'vue'
 import { EventsOn, WindowHide } from '@wails/runtime/runtime'
 
 import { useAppSettingsStore } from '@/stores/appSettings'
+import { useProfilesStore } from '@/stores/profiles'
 import { useSubscribesStore } from '@/stores/subscribes'
 import { exitApp } from '@/utils/helper'
 import { modal, message } from '@/utils/interaction'
-import { sampleID } from '@/utils/others'
+import { isValidUrl } from '@/utils/is'
 
 import CommandView from '@/components/_common/CommandView.vue'
 import { modalStack } from '@/components/Modal/state'
 
 export const useAppLifecycle = () => {
   const appSettings = useAppSettingsStore()
+  const profilesStore = useProfilesStore()
   const subscribesStore = useSubscribesStore()
   let commandModal: ReturnType<typeof modal> | undefined
 
-  const offLaunchApp = EventsOn('onLaunchApp', ([arg]: string[]) => {
-    void (async () => {
-      if (!arg) return
+  const offLaunchApp = EventsOn('onLaunchApp', async (...args: string[]) => {
+    if (!args.length) return
 
-      let _url
-      let _name = sampleID()
-
-      const url = new URL(arg)
-      if (url.pathname === '//install-config/' || url.hostname === 'import-remote-profile') {
-        _url = url.searchParams.get('url')
-        _name = url.searchParams.get('name') ?? sampleID()
-      } else if (url.pathname.startsWith('//import-remote-profile')) {
-        _url = url.searchParams.get('url')
-        _name = decodeURIComponent(url.hash).slice(1) || sampleID()
+    for (const arg of args.flat()) {
+      if (!arg) {
+        continue
       }
-
-      if (!_url) {
-        message.error('URL missing')
-        return
-      }
-
       try {
-        await subscribesStore.importSubscribe(_name, _url)
+        if (isValidUrl(arg)) {
+          await subscribesStore.importSubscribe(arg)
+        } else {
+          await profilesStore.importProfile(arg)
+        }
         message.success('common.success')
       } catch (error) {
+        console.error(`Import failed for "${arg}"`, error)
         message.error(error)
       }
-    })()
+    }
   })
 
   const offBeforeExitApp = EventsOn('onBeforeExitApp', () => {

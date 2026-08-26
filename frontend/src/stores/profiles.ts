@@ -1,11 +1,12 @@
 // oxlint-disable unicorn/consistent-function-scoping
 import { createProfile } from '@defaults'
 import type { Profile } from '@profiles'
+import { restoreProfile } from '@restorer'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { parse } from 'yaml'
 
-import { ReadFile, WriteFile } from '@/bridge/io'
+import { FileExists, ReadFile, WriteFile } from '@/bridge/io'
 
 import { ProfilesFilePath } from '@/constant/app'
 import { eventBus } from '@/utils/eventBus'
@@ -72,6 +73,17 @@ export const useProfilesStore = defineStore('profiles', () => {
     eventBus.emit('profileChange', { id })
   }
 
+  const importProfile = async (path: string) => {
+    if (!(await FileExists(path))) {
+      throw new Error('No such file')
+    }
+    const content = await ReadFile(path)
+    const raw = JSON.parse(content)
+    const name = path.split('/').pop()
+    const profile = restoreProfile(raw, name)
+    await addProfile(profile)
+  }
+
   const getProfileById = (id: string) => profiles.value.find((v) => v.id === id)
 
   const getProfileTemplate = (name = ''): Profile => createProfile(name)
@@ -83,6 +95,7 @@ export const useProfilesStore = defineStore('profiles', () => {
     saveProfiles,
     addProfile,
     editProfile,
+    importProfile,
     deleteProfile,
     getProfileById,
     getProfileTemplate,

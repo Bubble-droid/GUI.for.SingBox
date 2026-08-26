@@ -52,8 +52,24 @@ export const useSubscribesStore = defineStore('subscribes', () => {
     }
   }
 
-  const importSubscribe = async (name: string, url: string) => {
-    await addSubscribe(getSubscribeTemplate(name, { url }))
+  const importSubscribe = async (url: string) => {
+    const validUrl = new URL(url)
+    const subUrl = validUrl.searchParams.get('url')
+    let subName = sampleID()
+    if (
+      validUrl.pathname === '//install-config/' ||
+      validUrl.hostname === 'import-remote-profile'
+    ) {
+      subName = validUrl.searchParams.get('name') || sampleID()
+    } else if (validUrl.pathname.startsWith('//import-remote-profile')) {
+      subName = decodeURIComponent(validUrl.hash).slice(1) || sampleID()
+    }
+
+    if (!subUrl) {
+      throw new Error('Subscription URL missing')
+    }
+
+    await addSubscribe(getSubscribeTemplate(subName, { url: subUrl }))
   }
 
   const deleteSubscribe = async (id: string) => {

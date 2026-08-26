@@ -57,6 +57,14 @@ export const isValidRulesJson = (str: string) => {
   }
 }
 
+export const isValidUrl = (str: string) => {
+  try {
+    return !!new URL(str)
+  } catch {
+    return false
+  }
+}
+
 export const isValidIPv4 = (ip: string) =>
   /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/u.test(ip)
 
