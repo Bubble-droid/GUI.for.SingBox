@@ -12,8 +12,8 @@ import type { TagMaps } from './types'
 export const generateHttpClients = (
   httpClients: HttpClientConfig[],
   maps: TagMaps,
-): SingBoxHttpClient[] => {
-  return httpClients
+): SingBoxHttpClient[] =>
+  httpClients
     .filter((hc) => hc.enable)
     .map((hc): SingBoxHttpClient => {
       const { tag, config } = hc
@@ -31,4 +31,3 @@ export const generateHttpClients = (
         tls: generateOutboundTls(tls),
       }
     })
-}

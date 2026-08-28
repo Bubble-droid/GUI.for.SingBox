@@ -7,12 +7,15 @@ type Result<T extends NetnsType> = Extract<NetnsConfig, { type: T }>
 
 export const createNetns = <T extends NetnsType>(type: T): Result<T> => {
   switch (type) {
-    case NetnsType.Default:
+    case NetnsType.Default: {
       return createNetnsDefault() as Result<T>
-    case NetnsType.Unshare:
+    }
+    case NetnsType.Unshare: {
       return createNetnsUnshare() as Result<T>
-    default:
+    }
+    default: {
       throw new Error(`Unexpected netns type: ${type}`)
+    }
   }
 }
 

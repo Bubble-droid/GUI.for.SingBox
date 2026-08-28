@@ -33,10 +33,14 @@ const fixMenuPos = (x: number, y: number) => {
   const { offsetWidth: clientWidth, offsetHeight: clientHeight } = document.body
   const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.value!
 
-  if (x + menuWidth > clientWidth) left -= x + menuWidth - clientWidth + 8
-  if (y + menuHeight > clientHeight) top -= y + menuHeight - clientHeight + 8
+  if (x + menuWidth > clientWidth) {
+    left -= x + menuWidth - clientWidth + 8
+  }
+  if (y + menuHeight > clientHeight) {
+    top -= y + menuHeight - clientHeight + 8
+  }
 
-  menuPosition.value = { left: left + 'px', top: top + 'px' }
+  menuPosition.value = { left: `${left}px`, top: `${top}px` }
 }
 
 const fixSecondaryMenuPos = () => {
@@ -49,22 +53,28 @@ const fixSecondaryMenuPos = () => {
   const { offsetWidth: clientWidth, offsetHeight: clientHeight } = document.body
   const { offsetWidth: sMenuWidth, offsetHeight: sMenuHeight } = secondaryMenuRef.value!
 
-  if (left + sMenuWidth + x > clientWidth) left -= x + menuWidth + sMenuWidth - clientWidth + 8
-  if (top + sMenuHeight + y > clientHeight) top -= sMenuHeight
+  if (left + sMenuWidth + x > clientWidth) {
+    left -= x + menuWidth + sMenuWidth - clientWidth + 8
+  }
+  if (top + sMenuHeight + y > clientHeight) {
+    top -= sMenuHeight
+  }
 
-  secondaryMenuPosition.value = { left: left + 'px', top: top + 'px' }
+  secondaryMenuPosition.value = { left: `${left}px`, top: `${top}px` }
 }
 
 watch(
   () => props.position,
-  ({ x, y }) => {
-    nextTick(() => fixMenuPos(x, y))
+  async ({ x, y }) => {
+    await nextTick()
+    fixMenuPos(x, y)
     secondaryMenu.value = undefined
   },
 )
 
-watch([() => secondaryMenu.value, () => props.position], () => {
-  nextTick(fixSecondaryMenuPos)
+watch([() => secondaryMenu.value, () => props.position], async () => {
+  await nextTick()
+  fixSecondaryMenuPos()
 })
 
 const onClick = () => {

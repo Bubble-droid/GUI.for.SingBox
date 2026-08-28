@@ -95,7 +95,7 @@ const handleDeleteRule = (index: number) => {
 
 const handleUse = (ruleset: any) => {
   const ids = fields.value.payload.split(',').filter(Boolean)
-  const idx = ids.findIndex((v) => v === ruleset.id)
+  const idx = ids.indexOf(ruleset.id)
   if (idx === -1) {
     ids.push(ruleset.id)
   } else {

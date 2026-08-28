@@ -75,7 +75,9 @@ export const migrateProfiles = async (
     }
   }
 
-  if (needSync) await save()
+  if (needSync) {
+    await save()
+  }
 }
 
 export const migrateSubscribes = async (
@@ -95,7 +97,9 @@ export const migrateSubscribes = async (
     }
   })
 
-  if (needSync) await save()
+  if (needSync) {
+    await save()
+  }
 }
 
 export const migrateRulesets = async (rulesets: App.RuleSet[], save: () => Promise<string>) => {
@@ -111,5 +115,7 @@ export const migrateRulesets = async (rulesets: App.RuleSet[], save: () => Promi
     }
   })
 
-  if (needSync) await save()
+  if (needSync) {
+    await save()
+  }
 }

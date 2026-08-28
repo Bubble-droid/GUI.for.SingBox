@@ -37,9 +37,7 @@ const columns = computed(() =>
         key: 'metadata.type',
         hidden: !appSettingsStore.app.connections.visibility['metadata.type'],
         sort: (a, b) => b['metadata'].type.localeCompare(a['metadata'].type),
-        customRender: ({ value, record }) => {
-          return value + '(' + record['metadata'].network + ')'
-        },
+        customRender: ({ value, record }) => `${value}(${record['metadata'].network})`,
       },
       {
         title: 'home.connections.processPath',
@@ -52,9 +50,7 @@ const columns = computed(() =>
         key: 'metadata.host',
         hidden: !appSettingsStore.app.connections.visibility['metadata.host'],
         sort: (a, b) => b['metadata'].host.localeCompare(a['metadata'].host),
-        customRender: ({ value, record }) => {
-          return value || record['metadata'].destinationIP
-        },
+        customRender: ({ value, record }) => value || record['metadata'].destinationIP,
       },
       {
         title: 'home.connections.sourceIP',
@@ -62,9 +58,7 @@ const columns = computed(() =>
         key: 'metadata.sourceIP',
         hidden: !appSettingsStore.app.connections.visibility['metadata.sourceIP'],
         sort: (a, b) => b['metadata'].sourceIP.localeCompare(a['metadata'].sourceIP),
-        customRender: ({ value, record }) => {
-          return value + ':' + record['metadata'].sourcePort
-        },
+        customRender: ({ value, record }) => `${value}:${record['metadata'].sourcePort}`,
       },
       {
         title: 'home.connections.destinationIP',
@@ -72,9 +66,7 @@ const columns = computed(() =>
         key: 'metadata.destinationIP',
         hidden: !appSettingsStore.app.connections.visibility['metadata.destinationIP'],
         sort: (a, b) => b['metadata'].destinationIP.localeCompare(a['metadata'].destinationIP),
-        customRender: ({ value, record }) => {
-          return value + ':' + record['metadata'].destinationPort
-        },
+        customRender: ({ value, record }) => `${value}:${record['metadata'].destinationPort}`,
       },
       {
         title: 'home.connections.rule',
@@ -82,16 +74,15 @@ const columns = computed(() =>
         key: 'rule',
         hidden: !appSettingsStore.app.connections.visibility['rule'],
         sort: (a, b) => b['rule'].localeCompare(a['rule']),
-        customRender: ({ value, record }) => {
-          return value + (record['rulePayload'] ? '::' + record['rulePayload'] : '')
-        },
+        customRender: ({ value, record }) =>
+          value + (record['rulePayload'] ? '::' + record['rulePayload'] : ''),
       },
       {
         title: 'home.connections.chains',
         key: 'chains',
         hidden: !appSettingsStore.app.connections.visibility['chains'],
         sort: (a, b) => b['chains'][0].localeCompare(a['chains'][0]),
-        customRender: ({ value }: { value: string[] }) => value.slice().toReversed().join(' :: '),
+        customRender: ({ value }: { value: string[] }) => [...value].toReversed().join(' :: '),
       },
       {
         title: 'home.connections.uploadSpeed',
@@ -100,7 +91,7 @@ const columns = computed(() =>
         minWidth: '90px',
         hidden: !appSettingsStore.app.connections.visibility['up'],
         sort: (a, b) => b['upload'] - b['up'] - (a['upload'] - a['up']),
-        customRender: ({ value, record }) => formatBytes(record['upload'] - value) + '/s',
+        customRender: ({ value, record }) => `${formatBytes(record['upload'] - value)}/s`,
       },
       {
         title: 'home.connections.downSpeed',
@@ -109,7 +100,7 @@ const columns = computed(() =>
         minWidth: '90px',
         hidden: !appSettingsStore.app.connections.visibility['down'],
         sort: (a, b) => b['download'] - b['down'] - (a['download'] - a['down']),
-        customRender: ({ value, record }) => formatBytes(record['download'] - value) + '/s',
+        customRender: ({ value, record }) => `${formatBytes(record['download'] - value)}/s`,
       },
       {
         title: 'home.connections.upload',
@@ -162,7 +153,9 @@ const menu: App.Menu[] = [
   {
     label: 'home.connections.close',
     handler: async (record: Record<string, any>) => {
-      if (!isActive.value) return
+      if (!isActive.value) {
+        return
+      }
       try {
         await deleteConnection(record['id'])
       } catch (error: any) {
@@ -177,58 +170,56 @@ const menu: App.Menu[] = [
       ['home.connections.addToProxy', 'proxy'],
       ['home.connections.addToReject', 'reject'],
     ] as const
-  ).map(([label, ruleset]) => {
-    return {
-      label,
-      handler: async (record: CoreApiConnectionsDataConnection) => {
-        const options: PickerItem<RuleCandidate>[] = []
-        if (record.metadata.host) {
+  ).map(([label, ruleset]) => ({
+    label,
+    handler: async (record: CoreApiConnectionsDataConnection) => {
+      const options: PickerItem<RuleCandidate>[] = []
+      if (record.metadata.host) {
+        options.push({
+          label: t('kernel.rules.type.domain'),
+          value: { domain: record.metadata.host },
+          description: record.metadata.host,
+        })
+        getDomainSuffixes(record.metadata.host).forEach((suffix) => {
           options.push({
-            label: t('kernel.rules.type.domain'),
-            value: { domain: record.metadata.host },
-            description: record.metadata.host,
-          })
-          getDomainSuffixes(record.metadata.host).forEach((suffix) => {
-            options.push({
-              label: t('kernel.rules.type.domain_suffix'),
-              value: {
-                domain_suffix: suffix,
-              },
-              description: suffix,
-            })
-          })
-        }
-        if (record.metadata.destinationIP) {
-          const destinationIP = record.metadata.destinationIP
-          options.push({
-            label: t('kernel.rules.type.ip_cidr'),
+            label: t('kernel.rules.type.domain_suffix'),
             value: {
-              ip_cidr: destinationIP + (isValidIPv6(destinationIP) ? '/128' : '/32'),
+              domain_suffix: suffix,
             },
-            description: destinationIP,
+            description: suffix,
           })
-        }
-        if (record.metadata.processPath) {
-          options.push({
-            label: t('kernel.rules.type.process_path'),
-            value: { process_path: record.metadata.processPath },
-            description: record.metadata.processPath,
-          })
-        }
-        const payloads = await picker.multi('rulesets.selectRuleType', options)
-        try {
-          await addToRuleSet(ruleset, payloads)
-          message.success('common.success')
-        } catch (error) {
-          message.error(error)
-          console.log(error)
-        }
-      },
-    }
-  }),
+        })
+      }
+      if (record.metadata.destinationIP) {
+        const destinationIP = record.metadata.destinationIP
+        options.push({
+          label: t('kernel.rules.type.ip_cidr'),
+          value: {
+            ip_cidr: destinationIP + (isValidIPv6(destinationIP) ? '/128' : '/32'),
+          },
+          description: destinationIP,
+        })
+      }
+      if (record.metadata.processPath) {
+        options.push({
+          label: t('kernel.rules.type.process_path'),
+          value: { process_path: record.metadata.processPath },
+          description: record.metadata.processPath,
+        })
+      }
+      const payloads = await picker.multi('rulesets.selectRuleType', options)
+      try {
+        await addToRuleSet(ruleset, payloads)
+        message.success('common.success')
+      } catch (error) {
+        message.error(error)
+        console.log(error)
+      }
+    },
+  })),
 ]
 
-const details = ref()
+const details = ref('')
 const isActive = ref(true)
 const keywords = ref('')
 const dataSource = ref<(CoreApiConnectionsData['connections'][0] & TrafficCacheType)[]>([])
@@ -240,7 +231,9 @@ const { t } = useI18n()
 const kernelApiStore = useKernelApiStore()
 
 const filteredConnections = computed(() => {
-  if (!keywords.value) return isActive.value ? dataSource.value : disconnectedData.value
+  if (!keywords.value) {
+    return isActive.value ? dataSource.value : disconnectedData.value
+  }
   return (isActive.value ? dataSource.value : disconnectedData.value).filter((connection) =>
     Object.values(connection.metadata).some((v) =>
       String(v).toLocaleLowerCase().includes(keywords.value.toLocaleLowerCase()),
@@ -272,7 +265,9 @@ const handleResetConnections = () => {
 }
 
 const unregisterConnectionsHandler = kernelApiStore.onConnections((data) => {
-  if (isPause.value) return
+  if (isPause.value) {
+    return
+  }
   const connections = data.connections || []
 
   dataSource.value.forEach((connection) => {

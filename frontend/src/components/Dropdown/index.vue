@@ -24,7 +24,9 @@ const show = ref(false)
 const transformOrigin = ref(props.placement === 'top' ? 'bottom' : 'top')
 
 const updatePosition = () => {
-  if (!domRef.value || !overlayRef.value || !show.value) return
+  if (!domRef.value || !overlayRef.value || !show.value) {
+    return
+  }
 
   const triggerRect = domRef.value.getBoundingClientRect()
   const overlayEl = overlayRef.value

@@ -125,7 +125,7 @@ const getCoreMemoryUsage = async (fallback: number) => {
   return useage
 }
 
-const unregisterMemoryHandler = kernelApiStore.onMemory(async (data) => {
+const unregisterMemoryHandler = kernelApiStore.onMemory((data) => {
   statistics.value.inuse = data.inuse
   if (appSettings.app.kernel.realMemoryUsage) {
     getCoreMemoryUsage(statistics.value.memUsage || data.inuse).then((usage) => {

@@ -4,8 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import { IsNotificationAvailable, RequestNotificationAuthorization } from '@wails/runtime/runtime'
 
-import { ScheduledTaskOptions } from '@/constant/app'
-import { ScheduledTasksType } from '@/constant/app'
+import { ScheduledTaskOptions, ScheduledTasksType } from '@/constant/app'
 import { usePluginsStore } from '@/stores/plugins'
 import { useRulesetsStore } from '@/stores/rulesets'
 import { useScheduledTasksStore } from '@/stores/scheduledtasks'
@@ -56,18 +55,21 @@ const handleSave = async () => {
   }
 
   switch (task.value.type) {
-    case ScheduledTasksType.UpdateSubscription:
+    case ScheduledTasksType.UpdateSubscription: {
       task.value.subscriptions = task.value.subscriptions.filter((id) =>
         subscribesStore.getSubscribeById(id),
       )
       break
-    case ScheduledTasksType.UpdateRuleset:
+    }
+    case ScheduledTasksType.UpdateRuleset: {
       task.value.rulesets = task.value.rulesets.filter((id) => rulesetsStore.getRulesetById(id))
       break
+    }
     case ScheduledTasksType.UpdatePlugin:
-    case ScheduledTasksType.RunPlugin:
+    case ScheduledTasksType.RunPlugin: {
       task.value.plugins = task.value.plugins.filter((id) => pluginsStore.getPluginById(id))
       break
+    }
   }
 
   loading.value = true
@@ -88,7 +90,7 @@ const handleSave = async () => {
 }
 
 const handleUse = (list: string[], id: string) => {
-  const idx = list.findIndex((v) => v === id)
+  const idx = list.indexOf(id)
   if (idx !== -1) {
     list.splice(idx, 1)
   } else {

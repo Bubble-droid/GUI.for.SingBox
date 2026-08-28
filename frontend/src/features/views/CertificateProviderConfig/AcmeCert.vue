@@ -28,11 +28,7 @@ const providerSelect = computed({
     return isPredefined ? model.value.provider : AcmeProvider.Custom
   },
   set(val) {
-    if (val === AcmeProvider.Custom) {
-      model.value.provider = '' as AcmeProvider
-    } else {
-      model.value.provider = val
-    }
+    model.value.provider = val === AcmeProvider.Custom ? ('' as AcmeProvider) : val
   },
 })
 
@@ -65,7 +61,7 @@ const [showEab, toggleEab] = useBool(false)
   <template v-if="isCustomProvider">
     <div class="form-item">
       {{ t('kernel.certificate_providers.acme.provider.custom') }}
-      <Input v-model.lazy="model.provider" clearable />
+      <Input v-model.lazy="model.provider as string" clearable />
     </div>
   </template>
   <div class="form-item">

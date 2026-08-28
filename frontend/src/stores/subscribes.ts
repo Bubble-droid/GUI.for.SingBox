@@ -6,8 +6,13 @@ import { parse } from 'yaml'
 import { ReadFile, WriteFile } from '@/bridge/io'
 import { Requests } from '@/bridge/net'
 
-import { DefaultSubscribeScript, SubscribesFilePath } from '@/constant/app'
-import { PluginTriggerEvent, RequestMethod, RequestProxyMode } from '@/constant/app'
+import {
+  DefaultSubscribeScript,
+  SubscribesFilePath,
+  PluginTriggerEvent,
+  RequestMethod,
+  RequestProxyMode,
+} from '@/constant/app'
 import { DefaultExcludeProtocols } from '@/constant/kernel'
 import { eventBus } from '@/utils/eventBus'
 import { GetRequestProxy } from '@/utils/helper'
@@ -74,7 +79,9 @@ export const useSubscribesStore = defineStore('subscribes', () => {
 
   const deleteSubscribe = async (id: string) => {
     const idx = subscribes.value.findIndex((v) => v.id === id)
-    if (idx === -1) return
+    if (idx === -1) {
+      return
+    }
     const backup = subscribes.value.splice(idx, 1)[0]!
     try {
       await saveSubscribes()
@@ -88,7 +95,9 @@ export const useSubscribesStore = defineStore('subscribes', () => {
 
   const editSubscribe = async (id: string, s: App.Subscription) => {
     const idx = subscribes.value.findIndex((v) => v.id === id)
-    if (idx === -1) return
+    if (idx === -1) {
+      return
+    }
     const backup = subscribes.value.splice(idx, 1, s)[0]!
     try {
       await saveSubscribes()
@@ -193,14 +202,14 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       return { id, tag, type }
     })
 
-    const fn = new window.AsyncFunction(
+    const fn = new globalThis.AsyncFunction<
+      [proxies: Recordable[], subscription: App.Subscription],
+      { proxies: Recordable[]; subscription: App.Subscription }
+    >(
       'proxies',
       'subscription',
       `${s.script}; return await ${PluginTriggerEvent.OnSubscribe}(proxies, subscription)`,
-    ) as (
-      proxies: Recordable[],
-      subscription: App.Subscription,
-    ) => Promise<{ proxies: Recordable[]; subscription: App.Subscription }>
+    )
 
     const { proxies: _proxies, subscription } = await fn(proxies, s)
 
@@ -219,8 +228,12 @@ export const useSubscribesStore = defineStore('subscribes', () => {
 
   const updateSubscribe = async (id: string, options: Partial<App.Subscription> = {}) => {
     const s = subscribes.value.find((v) => v.id === id)
-    if (!s) throw id + ' Not Found'
-    if (s.disabled) throw s.name + ' Disabled'
+    if (!s) {
+      throw `${id} Not Found`
+    }
+    if (s.disabled) {
+      throw `${s.name} Disabled`
+    }
     try {
       s.updating = true
       await _doUpdateSub(s, options)
@@ -261,7 +274,9 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       update,
     )
 
-    if (needSave) await saveSubscribes()
+    if (needSave) {
+      await saveSubscribes()
+    }
 
     eventBus.emit('subscriptionsChange', undefined)
 
@@ -273,8 +288,8 @@ export const useSubscribesStore = defineStore('subscribes', () => {
   const getSubscribeTemplate = (name = '', options: { url?: string } = {}): App.Subscription => {
     const id = sampleID()
     return {
-      id: id,
-      name: name,
+      id,
+      name,
       upload: 0,
       download: 0,
       total: 0,

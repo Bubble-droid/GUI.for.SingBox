@@ -3,8 +3,7 @@ import { onMounted, ref } from 'vue'
 
 import { ExitApp } from '@/bridge/app'
 
-import { WebviewGpuPolicyOptions, WindowStateOptions } from '@/constant/app'
-import { OS } from '@/constant/app'
+import { WebviewGpuPolicyOptions, WindowStateOptions, OS } from '@/constant/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useEnvStore } from '@/stores/env'
 import {
@@ -126,7 +125,7 @@ onMounted(async () => {
         :max="180"
         editable
         type="number"
-        @submit="onStartupDelayChange"
+        @confirm="onStartupDelayChange"
       >
         <template #suffix="{ showInput }">
           <span class="ml-4" @click="showInput">{{ $t('settings.startup.delay') }}</span>

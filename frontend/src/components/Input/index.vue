@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends InputType = 'text'">
 import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 
 import { ClipboardGetText } from '@wails/runtime/runtime'
@@ -6,14 +6,16 @@ import { ClipboardGetText } from '@wails/runtime/runtime'
 import useI18n from '@/lang'
 import { debounce } from '@/utils/others'
 
-import type { InputProps } from './types'
+import type { InputProps, InputType, InputModelValue } from './types'
 
-const props = withDefaults(defineProps<InputProps>(), {
-  modelValue: '',
+type ValueType = InputModelValue<T>
+
+const props = withDefaults(defineProps<InputProps<T>>(), {
+  modelValue: '' as any,
   modelModifiers: () => ({}),
   autoSize: false,
   placeholder: undefined,
-  type: 'text',
+  type: 'text' as any,
   lang: 'javascript',
   size: 'default',
   editable: false,
@@ -28,7 +30,11 @@ const props = withDefaults(defineProps<InputProps>(), {
   delay: 0,
 })
 
-const emits = defineEmits(['change', 'update:modelValue', 'submit'])
+const emits = defineEmits<{
+  'update:modelValue': [value: ValueType]
+  change: [value: ValueType]
+  confirm: [value: ValueType]
+}>()
 
 const showEdit = ref(false)
 const isComposing = ref(false)
@@ -40,27 +46,28 @@ const innerAllowPaste = computed(() => props.allowPaste && props.type !== 'code'
 
 const { t } = useI18n.global
 
-const validate = (val: string | number) => {
+const validate = (val: string | number): ValueType => {
   if (props.type === 'number') {
-    val = Number(val)
-    if (Number.isNaN(val)) {
+    let num = Number(val)
+    if (Number.isNaN(num)) {
       throw new TypeError('Please enter a valid number')
     }
     const { min, max } = props
     if (min !== undefined) {
-      val = val < min ? min : val
+      num = num < min ? min : num
     }
     if (max !== undefined) {
-      val = val > max ? max : val
+      num = num > max ? max : num
     }
+    return num as ValueType
   }
-  return val
+  return String(val) as ValueType
 }
 
 const emitInput = debounce((e: any) => {
   let val = validate(e.target.value)
   if (typeof val === 'string' && props.modelModifiers?.trim) {
-    val = val.trim()
+    val = val.trim() as ValueType
   }
   e.target.value = val
   emits('update:modelValue', val)
@@ -68,8 +75,12 @@ const emitInput = debounce((e: any) => {
 }, props.delay)
 
 const onInput = (e: any) => {
-  if (isComposing.value || e.isComposing) return
-  if (props.modelModifiers?.lazy) return
+  if (isComposing.value || e.isComposing) {
+    return
+  }
+  if (props.modelModifiers?.lazy) {
+    return
+  }
   emitInput(e)
 }
 
@@ -83,16 +94,22 @@ const onCompositionEnd = (e: CompositionEvent) => {
   emitInput(e)
 }
 
-const onKeydownEnter = (e: KeyboardEvent) => {
-  if (isComposing.value || e.isComposing || e.keyCode === 229) return
-  nextTick(() => inputRef.value?.blur())
+const onKeydownEnter = async (e: KeyboardEvent) => {
+  if (isComposing.value || e.isComposing || e.keyCode === 229) {
+    return
+  }
+  await nextTick()
+  inputRef.value?.blur()
 }
 
-const handleClear = () => {
-  const val = props.type === 'number' ? Math.min(props.min || 0, 0) : ''
+const handleClear = async () => {
+  const val = (props.type === 'number' ? Math.min(props.min || 0, 0) : '') as ValueType
   emits('update:modelValue', val)
   emits('change', val)
-  !props.editable && nextTick(() => inputRef.value?.focus())
+  if (!props.editable) {
+    await nextTick()
+    inputRef.value?.focus()
+  }
 }
 
 const handlePaste = async () => {
@@ -102,23 +119,26 @@ const handlePaste = async () => {
   emits('change', val)
 }
 
-const showInput = () => {
-  if (props.disabled) return
+const showInput = async () => {
+  if (props.disabled) {
+    return
+  }
   showEdit.value = true
-  nextTick(() => inputRef.value?.focus())
+  await nextTick()
+  inputRef.value?.focus()
 }
 
 const onSubmit = (e: any) => {
   let val = validate(e.target.value)
   if (typeof val === 'string' && props.modelModifiers?.trim) {
-    val = val.trim()
+    val = val.trim() as ValueType
     e.target.value = val
   }
   if (props.modelModifiers?.lazy) {
     emits('update:modelValue', val)
     emits('change', val)
   }
-  emits('submit', val)
+  emits('confirm', val)
   props.editable && (showEdit.value = false)
 }
 

@@ -1,4 +1,5 @@
-import { render, h, type VNode } from 'vue'
+import { render, h } from 'vue'
+import type { VNode } from 'vue'
 
 import i18n from '@/lang'
 
@@ -50,7 +51,7 @@ class MessageImpl implements Message {
   public instances: Record<string, MessageEntry>
 
   constructor() {
-    const ID = APP_TITLE + '-toast'
+    const ID = `${APP_TITLE}-toast`
     this.container = document.querySelector(`#${ID}`) ?? document.createElement('div')
     this.container.id = ID
     this.container.style.cssText = `
@@ -64,8 +65,9 @@ class MessageImpl implements Message {
     this.instances = {}
   }
 
-  private buildMessage = (icon: MessageIcon) => {
-    return (content: unknown, duration = 3_000, onClose?: () => void): MessageInstance => {
+  private readonly buildMessage =
+    (icon: MessageIcon) =>
+    (content: unknown, duration = 3000, onClose?: () => void): MessageInstance => {
       const id = sampleID()
       const dom = document.createElement('div')
 
@@ -130,7 +132,6 @@ class MessageImpl implements Message {
         destroy: onDestroy,
       }
     }
-  }
 
   public info = this.buildMessage('info')
   public warn = this.buildMessage('warn')
@@ -157,21 +158,19 @@ class MessageImpl implements Message {
 }
 
 class PickerImpl implements Picker {
-  public single = <T>(title: string, options: PickerItem<T>[], initialValue: T[] = []) => {
-    return this.buildPicker('single', title, options, initialValue)
-  }
+  public single = <T>(title: string, options: PickerItem<T>[], initialValue: T[] = []) =>
+    this.buildPicker('single', title, options, initialValue)
 
-  public multi = <T>(title: string, options: PickerItem<T>[], initialValue: T[] = []) => {
-    return this.buildPicker('multi', title, options, initialValue)
-  }
+  public multi = <T>(title: string, options: PickerItem<T>[], initialValue: T[] = []) =>
+    this.buildPicker('multi', title, options, initialValue)
 
   public resource = <T extends ResourceSelectType>(
     type: T,
     title: string,
     options?: Partial<ResourceSelectProps<ResourceTypeOf<T>>>,
     initialValue?: string[],
-  ): Promise<{ ids: string[]; items: ResourceResultMap[T][] }> => {
-    return new Promise((resolve) => {
+  ): Promise<{ ids: string[]; items: ResourceResultMap[T][] }> =>
+    new Promise((resolve) => {
       const dom = document.createElement('div')
       const vnode = h(ResourceSelectComp, {
         type: ResourceTypeMap[type],
@@ -190,15 +189,14 @@ class PickerImpl implements Picker {
       document.body.append(dom)
       render(vnode, dom)
     })
-  }
 
-  private buildPicker = <ValueType, PickerType extends 'single' | 'multi'>(
+  private readonly buildPicker = <ValueType, PickerType extends 'single' | 'multi'>(
     type: PickerType,
     title: string,
     options: PickerItem<ValueType>[],
     initialValue: ValueType[],
-  ): Promise<PickerType extends 'single' ? ValueType : ValueType[]> => {
-    return new Promise((resolve, reject) => {
+  ): Promise<PickerType extends 'single' ? ValueType : ValueType[]> =>
+    new Promise((resolve, reject) => {
       const { t } = i18n.global
       const dom = document.createElement('div')
       dom.style.cssText = ContainerCssText
@@ -220,11 +218,10 @@ class PickerImpl implements Picker {
       document.body.append(dom)
       render(vnode, dom)
     })
-  }
 }
 
-const buildConfirm = (title: string, message: string, options?: ConfirmOptions, cancel = true) => {
-  return new Promise((resolve, reject) => {
+const buildConfirm = (title: string, message: string, options?: ConfirmOptions, cancel = true) =>
+  new Promise((resolve, reject) => {
     const { t } = i18n.global
     const dom = document.createElement('div')
     dom.style.cssText = ContainerCssText
@@ -246,7 +243,6 @@ const buildConfirm = (title: string, message: string, options?: ConfirmOptions, 
     document.body.append(dom)
     render(vnode, dom)
   })
-}
 
 const prompt = <T>(
   title: string,
@@ -262,7 +258,9 @@ const prompt = <T>(
       title,
       initialValue,
       props,
-      onSubmit: resolve,
+      onConfirm: (value) => {
+        resolve(value as T)
+      },
       onCancel: () => {
         reject(new Error(t('common.canceled')))
       },
@@ -277,16 +275,14 @@ const prompt = <T>(
   })
 }
 
-const alert = (title: string, message: string, options?: ConfirmOptions) => {
-  return buildConfirm(title, message, { type: 'text', ...options }, false)
-}
+const alert = (title: string, message: string, options?: ConfirmOptions) =>
+  buildConfirm(title, message, { type: 'text', ...options }, false)
 
-const confirm = (title: string, message: string, options?: ConfirmOptions) => {
-  return buildConfirm(title, message, { type: 'text', ...options })
-}
+const confirm = (title: string, message: string, options?: ConfirmOptions) =>
+  buildConfirm(title, message, { type: 'text', ...options })
 
 const modal = (options: ModalProps = {}, slots: ModalSlots = {}) => {
-  const id = 'Modal-' + sampleID()
+  const id = `Modal-${sampleID()}`
 
   const container = document.createElement('div')
   container.id = id
@@ -296,7 +292,7 @@ const modal = (options: ModalProps = {}, slots: ModalSlots = {}) => {
   const [Modal, api] = useModal(
     {
       ...options,
-      container: '#' + id,
+      container: `#${id}`,
       afterDestroy() {
         options.afterDestroy?.()
         render(null, container)
@@ -313,13 +309,11 @@ const modal = (options: ModalProps = {}, slots: ModalSlots = {}) => {
   return api
 }
 
-export const createInteractionAPI = (): InteractionAPI => {
-  return {
-    message: new MessageImpl(),
-    picker: new PickerImpl(),
-    prompt,
-    alert,
-    confirm,
-    modal,
-  }
-}
+export const createInteractionAPI = (): InteractionAPI => ({
+  message: new MessageImpl(),
+  picker: new PickerImpl(),
+  prompt,
+  alert,
+  confirm,
+  modal,
+})

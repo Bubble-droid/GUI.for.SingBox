@@ -5,10 +5,10 @@ import { Plugins } from '@/assets/pluginApis'
 /**
  * Expose methods to be used by the plugin system
  */
-window.Plugins = Plugins
+globalThis.Plugins = Plugins
 
-window.Vue = Vue
+globalThis.Vue = Vue
 
-window.AsyncFunction = Object.getPrototypeOf(async function () {
-  /* empty */
+globalThis.AsyncFunction = Object.getPrototypeOf(async () => {
+  /* Empty */
 }).constructor

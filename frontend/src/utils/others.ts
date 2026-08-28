@@ -1,3 +1,4 @@
+// oxlint-disable promise/param-names
 import { stringify } from 'yaml'
 
 import { OS } from '@/constant/app'
@@ -15,7 +16,7 @@ export const omit = <T extends object, K extends keyof T>(obj: T, props: K[]): O
   const result = {} as T
   const omitSet = new Set(props)
   for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+    if (Object.hasOwn(obj, key)) {
       if (!omitSet.has(key as unknown as K)) {
         result[key] = obj[key]
       }
@@ -35,7 +36,7 @@ export const omitArray = <T, K extends keyof T>(arr: T[], fields: K[]): Omit<T, 
 }
 export const debounce = (fn: (...args: any) => any, wait: number) => {
   let timer: null | number = null
-  const _debuonce = function (...args: any) {
+  const _debuonce = (...args: any) => {
     return new Promise((resolve, reject) => {
       timer && clearTimeout(timer)
       timer = setTimeout(async () => {
@@ -48,17 +49,17 @@ export const debounce = (fn: (...args: any) => any, wait: number) => {
       }, wait)
     })
   }
-  _debuonce.cancel = function () {
+  _debuonce.cancel = () => {
     timer && clearTimeout(timer)
     timer = null
   }
   return _debuonce
 }
 
-export function throttle<T extends (...args: any[]) => void>(
+export const throttle = <T extends (...args: any[]) => void>(
   fn: T,
   delay: number,
-): (...args: Parameters<T>) => void {
+): ((...args: Parameters<T>) => void) => {
   let last = 0
   let timer: null | number = null
   let trailingArgs: Parameters<T> | null = null
@@ -82,7 +83,7 @@ export function throttle<T extends (...args: any[]) => void>(
 
     trailingArgs = args
     if (!timer) {
-      timer = window.setTimeout(() => {
+      timer = setTimeout(() => {
         timer = null
         if (trailingArgs) {
           invoke(trailingArgs)
@@ -106,15 +107,13 @@ export const ignoredError = async <F extends (...args: any[]) => Promise<any>>(
   }
 }
 
-export const sampleID = () => 'ID_' + Math.random().toString(36).substring(2, 10)
+export const sampleID = () => `ID_${Math.random().toString(36).substring(2, 10)}`
 
 export const generateSecureKey = (bits = 256) => {
   const bytes = bits / 8
   const array = new Uint8Array(bytes)
   crypto.getRandomValues(array)
-  return Array.from(array)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
+  return [...array].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 export const getValue = (obj: unknown, expr: string): unknown => {
@@ -137,24 +136,28 @@ interface RunPoolOptions {
   shouldCancel?: () => boolean
 }
 
-async function runPool<T, K>(
+const runPool = async <T, K>(
   poolLimit: number,
   array: T[],
   iteratorFn: IteratorFn<T, K>,
   options: RunPoolOptions = {},
-) {
+) => {
   const results: Promise<{ ok: true; value: K } | { ok: false; error: Error }>[] = []
   const activePromises = new Set<Promise<any>>()
   const { shouldPause, shouldCancel } = options
 
   for (const item of array) {
-    if (shouldCancel?.()) break
+    if (shouldCancel?.()) {
+      break
+    }
 
     if (shouldPause) {
       await shouldPause()
     }
 
-    if (shouldCancel?.()) break
+    if (shouldCancel?.()) {
+      break
+    }
 
     const promise = Promise.resolve()
       .then(() => iteratorFn(item, array))
@@ -166,7 +169,7 @@ async function runPool<T, K>(
     if (poolLimit < array.length) {
       activePromises.add(promise)
       const cleanup = () => activePromises.delete(promise)
-      promise.then(cleanup, cleanup)
+      promise.then(cleanup).catch(cleanup)
 
       if (activePromises.size >= poolLimit) {
         await Promise.race(activePromises)
@@ -224,7 +227,7 @@ export const createAsyncPool = <T, K>(
 }
 
 export const getUserAgent = (appSettings: App.AppSettings) => {
-  return appSettings.userAgent || APP_TITLE + '/' + APP_VERSION
+  return appSettings.userAgent || `${APP_TITLE}/${APP_VERSION}`
 }
 
 export const getGitHubApiAuthorization = (appSettings: App.AppSettings) => {
@@ -234,7 +237,9 @@ export const getGitHubApiAuthorization = (appSettings: App.AppSettings) => {
 const transformGitHubUrl = (url: string, appSettings: App.AppSettings) => {
   const mirror = appSettings.githubDownloadMirror
 
-  if (!appSettings.githubDownloadAcceleration || !mirror) return url
+  if (!appSettings.githubDownloadAcceleration || !mirror) {
+    return url
+  }
 
   try {
     const parsedUrl = new URL(url)
@@ -259,7 +264,7 @@ const transformGitHubUrl = (url: string, appSettings: App.AppSettings) => {
       return mirror.replaceAll('{url}', url)
     }
 
-    return mirror.replace(/\/+$/, '') + '/' + url
+    return `${mirror.replace(/\/+$/, '')}/${url}`
   } catch {
     return url
   }
@@ -387,7 +392,9 @@ export const deepAssign = (...args: any[]) => {
 }
 
 export const readonly = <T>(obj: T): T => {
-  if (typeof obj !== 'object' || obj === null) return obj
+  if (typeof obj !== 'object' || obj === null) {
+    return obj
+  }
   return new Proxy(obj, {
     get(target, key) {
       const result = Reflect.get(target, key)
@@ -448,10 +455,14 @@ export const stringifyNoFolding = (content: any) => {
 
 export const getDomainSuffixes = (host: string) => {
   const normalizedHost = host.trim().replace(/\.+$/, '').toLowerCase()
-  if (!normalizedHost || isValidIPv4(normalizedHost) || isValidIPv6(normalizedHost)) return []
+  if (!normalizedHost || isValidIPv4(normalizedHost) || isValidIPv6(normalizedHost)) {
+    return []
+  }
 
   const labels = normalizedHost.split('.').filter(Boolean)
-  if (labels.length < 2) return []
+  if (labels.length < 2) {
+    return []
+  }
 
   return labels.slice(0, -1).map((_, index) => labels.slice(index).join('.'))
 }
@@ -469,14 +480,16 @@ export const createTextMatcher = (include: string, exclude: string, flags = '') 
 const regexCache = new Map<string, RegExp>()
 
 export const buildSmartRegExp = (pattern: string, flags = '') => {
-  const key = pattern + '::' + flags
-  if (regexCache.has(key)) return regexCache.get(key)!
+  const key = `${pattern}::${flags}`
+  if (regexCache.has(key)) {
+    return regexCache.get(key)!
+  }
 
   let r
   try {
     r = new RegExp(pattern, flags)
   } catch {
-    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
     r = new RegExp(escaped, flags)
   }
 

@@ -7,8 +7,7 @@ import { parse } from 'yaml'
 import { Notify } from '@/bridge/app'
 import { ReadFile, WriteFile } from '@/bridge/io'
 
-import { ScheduledTasksFilePath } from '@/constant/app'
-import { ScheduledTasksType, PluginTriggerEvent } from '@/constant/app'
+import { ScheduledTasksFilePath, ScheduledTasksType, PluginTriggerEvent } from '@/constant/app'
 import { ignoredError, stringifyNoFolding } from '@/utils/others'
 
 import { StoreDep, useStoreDeps } from './deps'
@@ -21,7 +20,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
     const data = await ignoredError(ReadFile, ScheduledTasksFilePath)
     data && (scheduledtasks.value = parse(data))
 
-    scheduledtasks.value.forEach(async ({ disabled, cron, id }) => {
+    scheduledtasks.value.forEach(({ disabled, cron, id }) => {
       if (!disabled) {
         cronJobsMap[id] = new Cron(cron, () => {
           void runScheduledTask(id)
@@ -32,7 +31,9 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
 
   const runScheduledTask = async (id: string) => {
     const task = getScheduledTaskById(id)
-    if (!task) return undefined
+    if (!task) {
+      return undefined
+    }
 
     const logsStore = useStoreDeps(StoreDep.LogsStore)
 
@@ -53,7 +54,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
       name: task.name,
       startTime,
       endTime: Date.now(),
-      result: result,
+      result,
     }
 
     logsStore.recordScheduledTasksLog(log)
@@ -115,7 +116,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
         )
       }
       case ScheduledTasksType.RunScript: {
-        return withOutput([task.script], (script: string) => new window.AsyncFunction(script)())
+        return withOutput([task.script], (script: string) => new globalThis.AsyncFunction(script)())
       }
       default: {
         throw new Error(`Unknown scheduled task type: ${String(task.type)}`)
@@ -147,7 +148,9 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
 
   const deleteScheduledTask = async (id: string) => {
     const idx = scheduledtasks.value.findIndex((v) => v.id === id)
-    if (idx === -1) return
+    if (idx === -1) {
+      return
+    }
     const backup = scheduledtasks.value.splice(idx, 1)[0]!
     try {
       await saveScheduledTasks()
@@ -161,7 +164,9 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
 
   const editScheduledTask = async (id: string, s: App.ScheduledTask) => {
     const idx = scheduledtasks.value.findIndex((v) => v.id === id)
-    if (idx === -1) return
+    if (idx === -1) {
+      return
+    }
     const backup = scheduledtasks.value.splice(idx, 1, s)[0]!
     try {
       await saveScheduledTasks()

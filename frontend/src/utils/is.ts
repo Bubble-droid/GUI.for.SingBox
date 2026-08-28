@@ -4,7 +4,9 @@ import { parse } from 'yaml'
 import { normalizeBase64, normalizeErrorMessage } from './normalize'
 
 export const isValidBase64 = (str: string) => {
-  if (typeof str !== 'string') return false
+  if (typeof str !== 'string') {
+    return false
+  }
   if (str === '' || str.trim() === '') {
     return false
   }
@@ -20,7 +22,9 @@ export const isValidBase64 = (str: string) => {
 }
 
 export const isValidSubYAML = (str: string) => {
-  if (typeof str !== 'string') return false
+  if (typeof str !== 'string') {
+    return false
+  }
   try {
     const { proxies } = parse(str) as { proxies?: unknown }
     return !!proxies
@@ -30,7 +34,9 @@ export const isValidSubYAML = (str: string) => {
 }
 
 export const isValidSubJson = (str: string) => {
-  if (typeof str !== 'string') return false
+  if (typeof str !== 'string') {
+    return false
+  }
   try {
     const { outbounds } = JSON.parse(str) as { outbounds?: unknown }
     return !!outbounds
@@ -69,7 +75,7 @@ export const isValidIPv4 = (ip: string) =>
   /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/u.test(ip)
 
 const ipv6Segment = '[0-9a-fA-F]{1,4}'
-const ipv4Octet = '(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)'
+const ipv4Octet = String.raw`(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)`
 const ipv4Addr = `(${ipv4Octet}\\.){3}${ipv4Octet}`
 const ipv6RegExp = new RegExp(
   `^(` +
@@ -105,7 +111,7 @@ export const isNumber = (v: any) => typeof v === 'number'
 export const isValidCron = (pattern: string) => {
   try {
     const instance = new Cron(pattern, { paused: true })
-    return { ok: true, reason: null, instance: instance }
+    return { ok: true, reason: null, instance }
   } catch (error) {
     return { ok: false, reason: normalizeErrorMessage(error), instance: null }
   }

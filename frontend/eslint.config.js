@@ -18,8 +18,8 @@ export default withVueTs(
   globalIgnores(['**/dist/**', '**/wailsjs/**']),
 
   pluginVue.configs['flat/recommended'],
-  vueTsConfigs.recommended,
-  vueTsConfigs.stylistic,
+  vueTsConfigs.recommendedTypeChecked,
+  vueTsConfigs.stylisticTypeChecked,
 
   skipFormatting,
 
@@ -27,6 +27,10 @@ export default withVueTs(
 
   {
     rules: {
+      '@typescript-eslint/only-throw-error': 'off',
+      '@typescript-eslint/prefer-promise-reject-errors': 'off',
+      '@typescript-eslint/prefer-nullish-coalescing': 'off',
+      '@typescript-eslint/no-misused-promises': 'off',
       '@typescript-eslint/no-explicit-any': ['off'],
       'vue/no-v-html': ['off'],
       'vue/multi-word-component-names': [
@@ -37,6 +41,7 @@ export default withVueTs(
       ],
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-import-type-side-effects': 'error',
+      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {

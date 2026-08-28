@@ -41,7 +41,7 @@ const menuList: App.Menu[] = [
   },
   {
     label: 'subscribes.script',
-    handler: async (id: string) => {
+    handler: (id: string) => {
       const m = modal({ title: 'common.edit', width: '90' })
       m.setContent(SubscribeScript, { id }).open()
     },
@@ -142,7 +142,7 @@ const handleUpdateSubs = async () => {
     await subscribeStore.updateSubscribes()
     message.success('common.success')
   } catch (error: any) {
-    console.error('updateSubscribes: ', error)
+    console.error('updateSubscribes:', error)
     message.error(error)
   }
 }
@@ -159,7 +159,7 @@ const handleUpdateSub = async (s: App.Subscription, options?: Partial<App.Subscr
   try {
     await subscribeStore.updateSubscribe(s.id, options)
   } catch (error: any) {
-    console.error('updateSubscribe: ', error)
+    console.error('updateSubscribe:', error)
     message.error(error)
   }
 }
@@ -169,12 +169,12 @@ const handleDeleteSub = async (s: App.Subscription) => {
     await ignoredError(RemoveFile, s.path)
     await subscribeStore.deleteSubscribe(s.id)
   } catch (error: any) {
-    console.error('deleteSubscribe: ', error)
+    console.error('deleteSubscribe:', error)
     message.error(error)
   }
 }
 
-const handleDisableSub = async (s: App.Subscription) => {
+const handleDisableSub = (s: App.Subscription) => {
   s.disabled = !s.disabled
   subscribeStore.editSubscribe(s.id, s)
 }
@@ -185,8 +185,12 @@ const clacTrafficPercent = (s: App.Subscription) => ((s.upload + s.download) / s
 
 const clacTrafficStatus = (s: App.Subscription) => {
   const percent = clacTrafficPercent(s)
-  if (percent > 90) return 'danger'
-  if (percent > 80) return 'warning'
+  if (percent > 90) {
+    return 'danger'
+  }
+  if (percent > 80) {
+    return 'warning'
+  }
   return 'primary'
 }
 

@@ -6,8 +6,7 @@ import { Exec } from '@/bridge/exec'
 import { ReadDir, RemoveFile, UnzipZIPFile, UnzipTarGZFile, MoveFile } from '@/bridge/io'
 import { HttpCancel, Download, HttpGet } from '@/bridge/net'
 
-import { LanguageOptions, LocalesFilePath, RollingReleaseDirectory } from '@/constant/app'
-import { OS } from '@/constant/app'
+import { LanguageOptions, LocalesFilePath, RollingReleaseDirectory, OS } from '@/constant/app'
 import { loadLocale } from '@/lang'
 import { APP_VERSION, APP_VERSION_API, APP_ID } from '@/utils/env'
 import { confirm, message } from '@/utils/interaction'
@@ -44,7 +43,9 @@ export const useAppStore = defineStore('app', () => {
     localesLoading.value = true
     const dirs = await ReadDir(LocalesFilePath).catch(() => [])
     const localLanguage = dirs.flatMap((file) => {
-      if (file.isDir) return []
+      if (file.isDir) {
+        return []
+      }
       const [name, ext] = file.name.split('.')
       return name && ext === 'json' ? { label: name, value: name } : []
     })
@@ -65,7 +66,9 @@ export const useAppStore = defineStore('app', () => {
     target: keyof typeof customActions.value,
     actions: App.CustomAction | App.CustomAction[] | App.CustomActionFn | App.CustomActionFn[],
   ) => {
-    if (!customActions.value[target]) throw new Error('Target does not exist: ' + target)
+    if (!customActions.value[target]) {
+      throw new Error(`Target does not exist: ${target}`)
+    }
     const _actions = Array.isArray(actions) ? actions : [actions]
     _actions.forEach((action) => {
       action.id ??= sampleID()
@@ -79,7 +82,9 @@ export const useAppStore = defineStore('app', () => {
     return remove
   }
   const removeCustomActions = (target: keyof typeof customActions.value, id: string | string[]) => {
-    if (!customActions.value[target]) throw new Error('Target does not exist: ' + target)
+    if (!customActions.value[target]) {
+      throw new Error(`Target does not exist: ${target}`)
+    }
     const ids = Array.isArray(id) ? id : [id]
     customActions.value[target] = customActions.value[target].filter((a) => !ids.includes(a.id!))
   }
@@ -119,7 +124,7 @@ export const useAppStore = defineStore('app', () => {
         downloadCacheFile,
         undefined,
         (progress, total) => {
-          update(t('common.downloading') + ((progress / total) * 100).toFixed(2) + '%')
+          update(`${t('common.downloading') + ((progress / total) * 100).toFixed(2)}%`)
         },
         {
           CancelId: downloadCacheFile,
@@ -134,7 +139,7 @@ export const useAppStore = defineStore('app', () => {
       }
 
       if (os === OS.Darwin) {
-        const cur_pkg_bak = appPath + '.bak'
+        const cur_pkg_bak = `${appPath}.bak`
         await RemoveFile(downloadCacheFile)
         await MoveFile(appPath, cur_pkg_bak)
         await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_ID}.app`, appPath)
@@ -158,9 +163,13 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const checkForUpdates = async (showTips = false) => {
-    if (checkForUpdatesLoading.value || downloading.value) return
+    if (checkForUpdatesLoading.value || downloading.value) {
+      return
+    }
     if (envStore.env.isSystemPackage) {
-      if (showTips) message.info('about.updatesManagedByOS')
+      if (showTips) {
+        message.info('about.updatesManagedByOS')
+      }
       return
     }
     checkForUpdatesLoading.value = true
@@ -171,7 +180,9 @@ export const useAppStore = defineStore('app', () => {
         Authorization: getGitHubApiAuthorization(appSettingsStore.app),
       })
       const body = response.body as GitHubApiRelease
-      if (body.message) throw new Error(body.message)
+      if (body.message) {
+        throw new Error(body.message)
+      }
 
       const { tag_name, assets } = body
 
@@ -179,7 +190,9 @@ export const useAppStore = defineStore('app', () => {
       const assetName = `${APP_ID}-${tag_name.replace(/^v/u, '')}-${os}-${arch}${os === OS.Windows ? '.zip' : '.tar.gz'}`
 
       const asset = assets.find((v) => v.name === assetName)
-      if (!asset) throw new Error(`Asset Not Found: ${assetName}`)
+      if (!asset) {
+        throw new Error(`Asset Not Found: ${assetName}`)
+      }
       if (asset.uploader.login !== 'github-actions[bot]') {
         await confirm('common.warning', 'settings.kernel.risk', {
           type: 'text',

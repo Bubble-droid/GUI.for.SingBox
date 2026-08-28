@@ -52,8 +52,12 @@ export class WebSockets {
     const disconnect = () => {
       isManualClose = true
       if (ws) {
-        if (onMessage) ws.removeEventListener('message', onMessage)
-        if (onClose) ws.removeEventListener('close', onClose)
+        if (onMessage) {
+          ws.removeEventListener('message', onMessage)
+        }
+        if (onClose) {
+          ws.removeEventListener('close', onClose)
+        }
         onMessage = null
         onClose = null
         ws.close()

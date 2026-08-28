@@ -20,22 +20,22 @@ export const generateOutbounds = async (outbounds: OutboundConfig[], ctx: Genera
       tag: outbound.tag,
     }
     if (outbound.type === Outbound.UrlTest) {
-      _outbound['url'] = outbound.url
-      _outbound['interval'] = outbound.interval as NonNullable<
+      _outbound.url = outbound.url
+      _outbound.interval = outbound.interval as NonNullable<
         SingBoxOutboundOf<'urltest'>['interval']
       >
-      _outbound['tolerance'] = outbound.tolerance
+      _outbound.tolerance = outbound.tolerance
     }
     if (outbound.type === Outbound.Selector || outbound.type === Outbound.UrlTest) {
-      _outbound['interrupt_exist_connections'] = outbound.interrupt_exist_connections
-      _outbound['outbounds'] = []
+      _outbound.interrupt_exist_connections = outbound.interrupt_exist_connections
+      _outbound.outbounds = []
       const isTagMatching = createTextMatcher(outbound.include, outbound.exclude)
       for (const proxy of outbound.outbounds) {
         if (proxy.type === 'Built-in') {
           if (([Outbound.Direct, Outbound.Block] as string[]).includes(proxy.id)) {
             builtInProxiesSet.add(proxy.id)
           }
-          _outbound['outbounds'].push(proxy.tag)
+          _outbound.outbounds.push(proxy.tag)
         } else {
           const subId = proxy.type === 'Subscription' ? proxy.id : proxy.type
           let targetSub = SubscriptionCache[subId] ?? []
@@ -49,7 +49,7 @@ export const generateOutbounds = async (outbounds: OutboundConfig[], ctx: Genera
             }
           }
           if (proxy.type === 'Subscription') {
-            _outbound['outbounds'].push(
+            _outbound.outbounds.push(
               ...targetSub.map((v) => v.tag).filter((tag) => isTagMatching(tag)),
             )
             targetSub.forEach((v) => {
@@ -58,7 +58,7 @@ export const generateOutbounds = async (outbounds: OutboundConfig[], ctx: Genera
           } else {
             const _proxy = targetSub.find((v) => v.tag === proxy.tag)
             if (_proxy && isTagMatching(_proxy.tag)) {
-              _outbound['outbounds'].push(_proxy.tag)
+              _outbound.outbounds.push(_proxy.tag)
               proxiesSet.add(_proxy)
             }
           }
@@ -68,7 +68,7 @@ export const generateOutbounds = async (outbounds: OutboundConfig[], ctx: Genera
     result.push(_outbound)
   }
 
-  result.push(...proxiesSet, ...Array.from(builtInProxiesSet).map((v) => ({ type: v, tag: v })))
+  result.push(...proxiesSet, ...[...builtInProxiesSet].map((v) => ({ type: v, tag: v })))
 
   return result
 }

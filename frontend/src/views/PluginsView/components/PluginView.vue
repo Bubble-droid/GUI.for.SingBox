@@ -30,7 +30,9 @@ const handleCancel = inject('cancel') as any
 const handleSubmit = inject('submit') as any
 
 const handleSave = async () => {
-  if (!plugin.value) return
+  if (!plugin.value) {
+    return
+  }
   loading.value = true
   try {
     await WriteFile(plugin.value.path, code.value)
@@ -46,7 +48,9 @@ const handleSave = async () => {
 const testing = ref(false)
 
 const handleTest = async (event: PluginTriggerEvent, arg1?: any, arg2?: any) => {
-  if (!plugin.value || testing.value) return
+  if (!plugin.value || testing.value) {
+    return
+  }
   testing.value = true
   try {
     const metadataJSON = JSON.stringify({
@@ -63,7 +67,7 @@ const handleTest = async (event: PluginTriggerEvent, arg1?: any, arg2?: any) => 
       arg1 = metadataJSON
       arg2 = metadataJSON
     }
-    const fn = new window.AsyncFunction(
+    const fn = new globalThis.AsyncFunction(
       `const Plugin = ${metadataJSON};\n${code.value}\nreturn await ${event}(${arg1}, ${arg2})`,
     )
     await fn()

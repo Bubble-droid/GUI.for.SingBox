@@ -23,10 +23,13 @@ const emits = defineEmits<(e: 'change', val: boolean) => void>()
 
 const { t } = i18n.global
 
-const toggle = () => {
-  if (props.disabled) return
+const toggle = async () => {
+  if (props.disabled) {
+    return
+  }
   model.value = !model.value
-  nextTick(() => emits('change', model.value))
+  await nextTick()
+  emits('change', model.value)
 }
 </script>
 

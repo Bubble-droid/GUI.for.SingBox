@@ -150,7 +150,7 @@ const handleSave = async () => {
   loading.value = false
 }
 
-const handleAdd = async () => {
+const handleAdd = () => {
   const text = ref('')
   const m = modal({
     title: 'common.edit',
@@ -176,7 +176,9 @@ const onEditEnd = async (id: string, text: string): Promise<boolean | void> => {
   try {
     proxy = JSON.parse(text)
 
-    if (typeof proxy !== 'object') throw 'wrong format'
+    if (typeof proxy !== 'object') {
+      throw 'wrong format'
+    }
   } catch (error) {
     console.log(error)
     message.error(error)
@@ -205,7 +207,9 @@ const onEditEnd = async (id: string, text: string): Promise<boolean | void> => {
 }
 
 const initAllFieldsProxies = async () => {
-  if (allFieldsProxies.value.length) return
+  if (allFieldsProxies.value.length) {
+    return
+  }
   const content = (await ignoredError(ReadFile, sub.value!.path)) || '[]'
   allFieldsProxies.value = JSON.parse(content)
 }
@@ -213,7 +217,9 @@ const initAllFieldsProxies = async () => {
 const getProxyByTag = async (tag: string) => {
   await initAllFieldsProxies()
   const proxy = allFieldsProxies.value.find((v: any) => v.tag === tag)
-  if (!proxy) throw 'Proxy Not Found'
+  if (!proxy) {
+    throw 'Proxy Not Found'
+  }
   return proxy
 }
 

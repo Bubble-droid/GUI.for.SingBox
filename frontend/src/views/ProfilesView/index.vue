@@ -45,7 +45,7 @@ const secondaryMenusList: App.Menu[] = [
     handler: async (id: string) => {
       appSettingsStore.app.kernel.profile = id
       try {
-        const e = await kernelApiStore.stopCore().catch((err) => err)
+        const e = await kernelApiStore.stopCore().catch((error) => error)
         if (e && e !== 'The core is not running') {
           throw e
         }
@@ -58,10 +58,10 @@ const secondaryMenusList: App.Menu[] = [
   },
   {
     label: 'profiles.copy',
-    handler: async (id: string) => {
+    handler: (id: string) => {
       const p = deepClone(profilesStore.getProfileById(id)!)
       p.id = sampleID()
-      p.name = p.name + '(Copy)'
+      p.name += '(Copy)'
       profilesStore.addProfile(p)
       message.success('common.success')
     },
@@ -74,7 +74,9 @@ const secondaryMenusList: App.Menu[] = [
         const config = await generateConfig(p)
         const str = JSON.stringify(config, null, 2)
         const ok = await ClipboardSetText(str)
-        if (!ok) throw 'ClipboardSetText Error'
+        if (!ok) {
+          throw 'ClipboardSetText Error'
+        }
         message.success('common.success')
       } catch (error: any) {
         message.error(error.message || error)
@@ -107,7 +109,7 @@ const secondaryMenusList: App.Menu[] = [
   },
   {
     label: 'profiles.editSourceFile',
-    handler: async (id: string) => {
+    handler: (id: string) => {
       const profile = profilesStore.getProfileById(id)!
       const m = modal({ title: profile.name, width: '90', height: '90' })
       m.setContent(ProfileEditor, { profile }).open()
@@ -183,13 +185,15 @@ const handleDeleteProfile = async (p: Profile) => {
   try {
     await profilesStore.deleteProfile(p.id)
   } catch (error: any) {
-    console.error('deleteProfile: ', error)
+    console.error('deleteProfile:', error)
     message.error(error)
   }
 }
 
 const handleUseProfile = async (p: Profile) => {
-  if (appSettingsStore.app.kernel.profile === p.id) return
+  if (appSettingsStore.app.kernel.profile === p.id) {
+    return
+  }
 
   appSettingsStore.app.kernel.profile = p.id
 

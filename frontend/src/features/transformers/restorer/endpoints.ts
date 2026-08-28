@@ -29,26 +29,31 @@ import { restoreDialer, restoreUdpNat, restoreListen } from './shared'
 import type { IdMaps } from './types'
 
 export const restoreEndpoints = (
-  endpoints: SingBoxEndpoint[] = [],
   maps: IdMaps,
-): EndpointConfig[] => {
-  return endpoints.flatMap((raw): EndpointConfig[] => {
+  endpoints: SingBoxEndpoint[] = [],
+): EndpointConfig[] =>
+  endpoints.flatMap((raw): EndpointConfig[] => {
     switch (raw.type) {
-      case Endpoint.WireGuard:
+      case Endpoint.WireGuard: {
         return [restoreWireGuard(raw, maps)]
-      case Endpoint.Tailscale:
+      }
+      case Endpoint.Tailscale: {
         return [restoreTailscale(raw, maps)]
-      case Endpoint.OpenConnect:
+      }
+      case Endpoint.OpenConnect: {
         return [restoreOpenConnect(raw, maps)]
-      case Endpoint.OpenVpnClient:
+      }
+      case Endpoint.OpenVpnClient: {
         return [restoreOpenVpnClient(raw, maps)]
-      case Endpoint.OpenVpnServer:
+      }
+      case Endpoint.OpenVpnServer: {
         return [restoreOpenVpnServer(raw, maps)]
-      default:
+      }
+      default: {
         return []
+      }
     }
   })
-}
 
 const restorePeers = (
   peers: SingBoxEndpointOf<typeof Endpoint.WireGuard>['peers'] = [],

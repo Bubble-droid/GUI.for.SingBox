@@ -14,7 +14,8 @@ import NetnsConfig from '@views/NetnsConfig/NetnsConfig.vue'
 import NtpConfig from '@views/NtpConfig.vue'
 import OutboundsConfig from '@views/OutboundsConfig/OutboundsConfig.vue'
 import RouteConfig from '@views/RouteConfig.vue'
-import { ref, inject, computed, useTemplateRef, type Ref, h } from 'vue'
+import { ref, inject, computed, useTemplateRef, h } from 'vue'
+import type { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { ProfileStep, ProfileStepItems } from '@/constant/app.ts'
@@ -129,7 +130,7 @@ const handleSave = async () => {
     }
     await handleSubmit()
   } catch (error: any) {
-    console.error('handleSave: ', error)
+    console.error('handleSave:', error)
     message.error(error)
   }
   loading.value = false

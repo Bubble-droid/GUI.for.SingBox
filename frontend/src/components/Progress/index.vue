@@ -15,14 +15,14 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const innerStyle = computed(() => ({
-  width: (props.percent > 100 ? 100 : props.percent || 0) + '%',
+  width: `${props.percent > 100 ? 100 : props.percent || 0}%`,
 }))
 
 const circleStyle = computed(() => {
   const color = { warning: '#FFC107', danger: '#F44336', primary: 'var(--progress-inner-bg)' }[
     props.status
   ]
-  const radius = props.radius * 2 + 'px'
+  const radius = `${props.radius * 2}px`
   const percent = Math.min(props.percent || 0, 100)
   const mask = `radial-gradient(transparent ${props.radius * 0.6}px, #fff 0px)`
   const bg = `conic-gradient(${color} 0%, ${color} ${percent}%, var(--progress-bg) ${percent}%, var(--progress-bg) 100%)`
@@ -30,7 +30,7 @@ const circleStyle = computed(() => {
     width: radius,
     height: radius,
     background: bg,
-    mask: mask,
+    mask,
     '-webkit-mask': mask,
   }
 })

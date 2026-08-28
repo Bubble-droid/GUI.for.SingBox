@@ -1,18 +1,28 @@
 const isPlainObject = (val: unknown): val is Record<PropertyKey, unknown> => {
-  if (typeof val !== 'object' || val === null) return false
+  if (typeof val !== 'object' || val === null) {
+    return false
+  }
   const proto = Object.getPrototypeOf(val)
   return proto === null || proto === Object.prototype
 }
 
 const isInvalid = (val: unknown): boolean => {
-  if (!val) return true
-  if (Array.isArray(val)) return val.length === 0
-  if (isPlainObject(val)) return Object.keys(val).length === 0
+  if (!val) {
+    return true
+  }
+  if (Array.isArray(val)) {
+    return val.length === 0
+  }
+  if (isPlainObject(val)) {
+    return Object.keys(val).length === 0
+  }
   return false
 }
 
 const cleanValue = (val: unknown, deep: boolean): unknown => {
-  if (!deep) return val
+  if (!deep) {
+    return val
+  }
 
   if (Array.isArray(val)) {
     return val.map((item) => cleanValue(item, true)).filter((item) => !isInvalid(item))
@@ -59,7 +69,9 @@ export const cleanObject = <T extends object>(target: T, deep = false): Partial<
 type Many<T> = T | readonly T[]
 
 export const normalizeArray = <T>(value: Many<T> | null | undefined): T[] => {
-  if (value == null) return []
+  if (value == null) {
+    return []
+  }
   return Array.isArray(value) ? value : [value as T]
 }
 

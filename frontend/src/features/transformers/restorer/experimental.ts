@@ -6,8 +6,8 @@ import type { ExperimentalConfig } from '@profiles/experimental'
 import type { IdMaps } from './types'
 
 export const restoreExperimental = (
-  raw: SingBoxExperimental = {},
   maps: IdMaps,
+  raw: SingBoxExperimental = {},
 ): ExperimentalConfig => {
   const template = createExperimental()
   const { clash_api, cache_file } = raw

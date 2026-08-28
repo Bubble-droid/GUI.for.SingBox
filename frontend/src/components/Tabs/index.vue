@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="K extends string">
-import { computed, type Component, type VNodeChild } from 'vue'
+import { computed } from 'vue'
+import type { Component, VNodeChild } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 interface TabItemType<K extends string = string> {

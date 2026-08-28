@@ -14,7 +14,10 @@ const props = withDefaults(defineProps<Props>(), {
   size: 'default',
 })
 
-const emit = defineEmits(['change', 'update:modelValue'])
+const emit = defineEmits<{
+  change: [value: string[]]
+  'update:modelValue': [value: string[]]
+}>()
 
 const model = ref<string[]>([...props.modelValue])
 const { t } = useI18n()
@@ -37,7 +40,7 @@ watch(
 const isActive = (val: string) => model.value.includes(val)
 
 const handleSelect = (val: string) => {
-  const idx = model.value.findIndex((v) => v === val)
+  const idx = model.value.indexOf(val)
   if (idx === -1) {
     model.value.push(val)
   } else {

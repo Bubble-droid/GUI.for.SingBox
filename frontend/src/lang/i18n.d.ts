@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-empty-interface
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import type zh from './locale/zh'
 

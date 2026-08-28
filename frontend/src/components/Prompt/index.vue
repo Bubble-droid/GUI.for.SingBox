@@ -1,16 +1,22 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends InputType = 'text'">
 import { ref, unref } from 'vue'
 
 import useI18n from '@/lang'
 
+import type { InputType } from '@/components/Input/types'
+
 import type { PromptProps } from './types'
 
-const props = withDefaults(defineProps<PromptProps>(), {
+const props = withDefaults(defineProps<PromptProps<T>>(), {
   placeholder: '',
   initialValue: '',
 })
 
-const emits = defineEmits(['submit', 'cancel', 'finish'])
+const emits = defineEmits<{
+  confirm: [value: string | number]
+  cancel: []
+  finish: []
+}>()
 
 const type = typeof props.initialValue === 'string' ? 'text' : 'number'
 const value = ref(props.initialValue)
@@ -18,8 +24,10 @@ const value = ref(props.initialValue)
 const { t } = useI18n.global
 
 const handleSubmit = (e: Event) => {
-  if (e.type === 'keydown' && props.props.type === 'code') return
-  emits('submit', unref(value))
+  if (e.type === 'keydown' && props.props.type === 'code') {
+    return
+  }
+  emits('confirm', unref(value))
   emits('finish')
 }
 

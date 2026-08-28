@@ -1,4 +1,4 @@
-// oxlint-disable no-shadow
+// oxlint-disable no-shadow unicorn/prefer-object-from-entries
 import {
   RouteRuleType,
   DnsRuleType,
@@ -72,7 +72,9 @@ const generateExperimental = (experimental: App.Experimental, outbounds: App.Out
 
 const generateInbounds = (inbounds: App.Inbound[]) => {
   return inbounds.flatMap((inbound) => {
-    if (!inbound.enable) return []
+    if (!inbound.enable) {
+      return []
+    }
     if (inbound.type !== Inbound.Tun && inbound.type !== Inbound.Direct) {
       const users = inbound[inbound.type]!.users.map((user) => ({
         username: user.split(':')[0],
@@ -162,7 +164,7 @@ const generateOutbounds = async (outbounds: App.Outbound[], ctx: GenerateContext
     result.push(_outbound)
   }
 
-  result.push(...proxiesSet, ...Array.from(builtInProxiesSet).map((v) => ({ type: v, tag: v })))
+  result.push(...proxiesSet, ...[...builtInProxiesSet].map((v) => ({ type: v, tag: v })))
 
   return result
 }
@@ -300,7 +302,7 @@ const generateDns = (
         }
       }
       if (server.type === DnsServer.Hosts) {
-        extra['path'] = server.hosts_path.reduce((p, c) => p.concat(c.split(',')), [] as string[])
+        extra['path'] = server.hosts_path.reduce<string[]>((p, c) => p.concat(c.split(',')), [])
         extra['predefined'] = Object.entries(server.predefined).reduce(
           (p, [k, v]) => ({ ...p, [k]: v.split(',') }),
           {},
@@ -415,7 +417,7 @@ export const legacyGenerateConfig = async (
 
   // step 4
   if (enableScriptProcessing) {
-    const fn = new window.AsyncFunction(
+    const fn = new globalThis.AsyncFunction(
       'config',
       `${originalProfile.script.code}; return await onGenerate(config)`,
     )

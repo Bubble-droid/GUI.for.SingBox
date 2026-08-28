@@ -19,22 +19,25 @@ import { restoreDns01Challenge } from './shared'
 import type { IdMaps } from './types'
 
 export const restoreCertificateProviders = (
-  providers: SingBoxCertificateProvider[] = [],
   maps: IdMaps,
-): CertificateProviderConfig[] => {
-  return providers.flatMap((raw): CertificateProviderConfig[] => {
+  providers: SingBoxCertificateProvider[] = [],
+): CertificateProviderConfig[] =>
+  providers.flatMap((raw): CertificateProviderConfig[] => {
     switch (raw.type) {
-      case CertificateProviderType.Acme:
+      case CertificateProviderType.Acme: {
         return [restoreAcmeProvider(raw, maps)]
-      case CertificateProviderType.Tailscale:
+      }
+      case CertificateProviderType.Tailscale: {
         return [restoreTailscaleProvider(raw, maps)]
-      case CertificateProviderType.CloudflareOriginCa:
+      }
+      case CertificateProviderType.CloudflareOriginCa: {
         return [restoreCloudflareOriginCaProvider(raw, maps)]
-      default:
+      }
+      default: {
         return []
+      }
     }
   })
-}
 
 export const restoreAcmeProvider = (
   raw: SingBoxCertificateProviderOf<typeof CertificateProviderType.Acme>,

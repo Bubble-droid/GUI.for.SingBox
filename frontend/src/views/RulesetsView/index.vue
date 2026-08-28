@@ -43,7 +43,7 @@ const rulesetsStore = useRulesetsStore()
 const appSettingsStore = useAppSettingsStore()
 const profilesStore = useProfilesStore()
 
-const handleImportRuleset = async () => {
+const handleImportRuleset = () => {
   const m = modal({
     title: 'rulesets.hub',
     cancelText: 'common.close',
@@ -57,7 +57,7 @@ const handleImportRuleset = async () => {
   m.setContent(RulesetHub).open()
 }
 
-const handleShowRulesetForm = async (id?: string, isUpdate = false) => {
+const handleShowRulesetForm = (id?: string, isUpdate = false) => {
   const m = modal({
     title: isUpdate ? 'common.edit' : 'common.add',
     maxHeight: '90',
@@ -71,7 +71,7 @@ const handleUpdateRulesets = async () => {
     await rulesetsStore.updateRulesets()
     message.success('common.success')
   } catch (error: any) {
-    console.error('updateRulesets: ', error)
+    console.error('updateRulesets:', error)
     message.error(error)
   }
 }
@@ -89,7 +89,7 @@ const handleUpdateRuleset = async (r: App.RuleSet) => {
   try {
     await rulesetsStore.updateRuleset(r.id)
   } catch (error: any) {
-    console.error('updateRuleset: ', error)
+    console.error('updateRuleset:', error)
     message.error(error)
   }
 }
@@ -99,20 +99,24 @@ const handleDeleteRuleset = async (r: App.RuleSet) => {
     await ignoredError(RemoveFile, r.path)
     await rulesetsStore.deleteRuleset(r.id)
   } catch (error: any) {
-    console.error('deleteRuleset: ', error)
+    console.error('deleteRuleset:', error)
     message.error(error)
   }
 }
 
-const handleDisableRuleset = async (r: App.RuleSet) => {
+const handleDisableRuleset = (r: App.RuleSet) => {
   r.disabled = !r.disabled
   rulesetsStore.editRuleset(r.id, r)
 }
 
 const handleClearRuleset = async (id: string) => {
   const r = rulesetsStore.getRulesetById(id)
-  if (!r) return
-  if (r.format != RuleSetFormat.Source) return
+  if (!r) {
+    return
+  }
+  if (r.format != RuleSetFormat.Source) {
+    return
+  }
 
   try {
     await WriteFile(r.path, JSON.stringify(EmptyRuleSet, null, 2))
@@ -125,12 +129,16 @@ const handleClearRuleset = async (id: string) => {
 
 const handleAddRulesetToProfile = async (id: string) => {
   const ruleset = rulesetsStore.getRulesetById(id)
-  if (!ruleset) return
+  if (!ruleset) {
+    return
+  }
 
   try {
     const { items } = await picker.resource('profile', 'profiles.select', { max: 1, min: 1 })
     const profile = items[0]
-    if (!profile) return
+    if (!profile) {
+      return
+    }
 
     const insertionPointIndex = profile.route.rules.findIndex(
       (rule) => rule.type === RouteRuleType.InsertionPoint,
@@ -168,7 +176,9 @@ const handleAddRulesetToProfile = async (id: string) => {
       profile.outbounds[0]?.id || BuiltInOutbound[0]!,
     ])
 
-    if (!target) return
+    if (!target) {
+      return
+    }
 
     const nextProfile = deepClone(profile)
     let rulesetReferenceId = profileRuleset?.id

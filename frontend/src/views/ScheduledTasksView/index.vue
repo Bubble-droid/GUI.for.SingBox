@@ -2,8 +2,7 @@
 import { Cron } from 'croner'
 import { useI18n, I18nT } from 'vue-i18n'
 
-import { DraggableOptions, ViewOptions } from '@/constant/app'
-import { View } from '@/constant/app.ts'
+import { DraggableOptions, ViewOptions, View } from '@/constant/app'
 import { useAppSettingsStore } from '@/stores/appSettings.ts'
 import { useScheduledTasksStore } from '@/stores/scheduledtasks.ts'
 import { formatDate, formatRelativeTime } from '@/utils/format.ts'
@@ -71,12 +70,12 @@ const handleDeleteTask = async (s: App.ScheduledTask) => {
   try {
     await scheduledTasksStore.deleteScheduledTask(s.id)
   } catch (error: any) {
-    console.error('deleteSubscribe: ', error)
+    console.error('deleteSubscribe:', error)
     message.error(error)
   }
 }
 
-const handleDisableTask = async (s: App.ScheduledTask) => {
+const handleDisableTask = (s: App.ScheduledTask) => {
   s.disabled = !s.disabled
   scheduledTasksStore.editScheduledTask(s.id, s)
 }

@@ -21,18 +21,21 @@ import { restoreRouteRuleset, restoreRouteRules } from './route'
 import type { RestoreProfileOptions, IdMaps } from './types'
 
 const legacyBuildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<string> => {
-  if (!arr) return {}
+  if (!arr) {
+    return {}
+  }
   return arr.reduce((p, c, i) => ((p[c['tag']] = prefix + i), p), {})
 }
 
-const buildTagIdMapping = (prefix: string, arr: { tag?: string }[] = []): Map<string, string> => {
-  return new Map(
+const buildTagIdMapping = (prefix: string, arr: { tag?: string }[] = []): Map<string, string> =>
+  new Map(
     arr.flatMap((v, i) => {
-      if (v.tag === undefined || v.tag === '') return []
+      if (!v.tag) {
+        return []
+      }
       return [[v.tag, `${prefix}${i}`]]
     }),
   )
-}
 
 export const restoreProfile = (
   config: SingBoxConfig,
@@ -68,13 +71,13 @@ export const restoreProfile = (
     name,
     schema: ProfileSchemaVersion,
     log: { ...createLog(), ...(config.log as LogConfig) },
-    ntp: restoreNtp(config.ntp, idMaps),
-    experimental: restoreExperimental(config.experimental, idMaps),
+    ntp: restoreNtp(idMaps, config.ntp),
+    experimental: restoreExperimental(idMaps, config.experimental),
     certificate: restoreCertificate(config.certificate),
-    certificate_providers: restoreCertificateProviders(config.certificate_providers, idMaps),
-    http_clients: restoreHttpClients(config.http_clients, idMaps),
-    network_namespaces: restoreNetns(config.network_namespaces, idMaps),
-    endpoints: restoreEndpoints(config.endpoints as SingBoxEndpoint[], idMaps),
+    certificate_providers: restoreCertificateProviders(idMaps, config.certificate_providers),
+    http_clients: restoreHttpClients(idMaps, config.http_clients),
+    network_namespaces: restoreNetns(idMaps, config.network_namespaces),
+    endpoints: restoreEndpoints(idMaps, config.endpoints as SingBoxEndpoint[]),
     inbounds: restoreInbounds(config.inbounds ?? [], InboundsIds),
     outbounds: restoreOutbounds(
       config.outbounds ?? [],

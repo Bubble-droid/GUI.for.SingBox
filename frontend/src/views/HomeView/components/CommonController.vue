@@ -10,10 +10,14 @@ const kernelApiStore = useKernelApiStore()
 
 const createValueWatcher = <T>(initialValue: T, callback: (value: T) => Promise<void>) => {
   let lastValue = initialValue
-  return (newValue: T) => {
+  return async (newValue: T) => {
     if (newValue !== lastValue) {
       lastValue = newValue
-      callback(newValue).catch((e) => message.error(e.message || e))
+      try {
+        await callback(newValue)
+      } catch (error) {
+        message.error(error)
+      }
     }
   }
 }
@@ -56,7 +60,7 @@ const onInterfaceChange = createValueWatcher(
           editable
           auto-size
           class="w-full"
-          @submit="onMixedPortSubmit"
+          @confirm="onMixedPortSubmit"
         />
       </Card>
       <Card :title="t('kernel.inbounds.httpPort')">
@@ -69,7 +73,7 @@ const onInterfaceChange = createValueWatcher(
           editable
           auto-size
           class="w-full"
-          @submit="onPortSubmit"
+          @confirm="onPortSubmit"
         />
       </Card>
       <Card :title="t('kernel.inbounds.socksPort')">
@@ -82,7 +86,7 @@ const onInterfaceChange = createValueWatcher(
           :border="false"
           auto-size
           class="w-full"
-          @submit="onSocksPortSubmit"
+          @confirm="onSocksPortSubmit"
         />
       </Card>
       <Card :title="t('kernel.allow-lan')">
@@ -94,7 +98,7 @@ const onInterfaceChange = createValueWatcher(
           :options="TunStackOptions"
           :border="false"
           auto-size
-          @change="conStackChange"
+          @changed="conStackChange"
         />
       </Card>
       <Card :title="t('kernel.inbounds.tun.interface_name')">
@@ -104,7 +108,7 @@ const onInterfaceChange = createValueWatcher(
           :border="false"
           auto-size
           class="w-full"
-          @submit="onTunDeviceSubmit"
+          @confirm="onTunDeviceSubmit"
         />
       </Card>
       <Card :title="t('kernel.route.default_interface')">
@@ -112,7 +116,7 @@ const onInterfaceChange = createValueWatcher(
           v-model="kernelApiStore.config['interface-name']"
           :border="false"
           auto-size
-          @change="onInterfaceChange"
+          @changed="onInterfaceChange"
         />
       </Card>
       <Card :title="t('common.none')"> </Card>

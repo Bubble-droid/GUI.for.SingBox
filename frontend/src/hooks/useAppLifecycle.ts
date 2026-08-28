@@ -19,7 +19,9 @@ export const useAppLifecycle = () => {
   let commandModal: ReturnType<typeof modal> | undefined
 
   const offLaunchApp = EventsOn('onLaunchApp', async (...args: string[]) => {
-    if (!args.length) return
+    if (!args.length) {
+      return
+    }
 
     for (const arg of args.flat()) {
       if (!arg) {
@@ -55,7 +57,9 @@ export const useAppLifecycle = () => {
   const handleKeydown = (event: KeyboardEvent) => {
     if (((event.ctrlKey && event.shiftKey) || event.metaKey) && event.code === 'KeyP') {
       event.preventDefault()
-      if (event.repeat || commandModal) return
+      if (event.repeat || commandModal) {
+        return
+      }
 
       const m = modal({
         title: 'commands.title',

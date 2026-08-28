@@ -1,3 +1,4 @@
+// oxlint-disable typescript/consistent-type-imports
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 declare namespace App {
   type OS = 'windows' | 'linux' | 'darwin'

@@ -11,25 +11,29 @@ import { generateRule } from './shared'
 export const generateDnsServerURL = (dnsServer: DnsServerConfig) => {
   const { type, server_port, path, server, interface: _interface } = dnsServer
   switch (type) {
-    case DnsServer.Https:
-      return `https://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
-    case DnsServer.H3:
-      return `h3://${server}${server_port ? ':' + server_port : ''}${path ? path : ''}`
-    case DnsServer.Dhcp:
+    case DnsServer.Https: {
+      return `https://${server}${server_port ? `:${server_port}` : ''}${path || ''}`
+    }
+    case DnsServer.H3: {
+      return `h3://${server}${server_port ? `:${server_port}` : ''}${path || ''}`
+    }
+    case DnsServer.Dhcp: {
       return `dhcp://${_interface}`
-    case DnsServer.FakeIp:
-      return (
-        'fake-ip://' +
-        (dnsServer.inet4_range ? dnsServer.inet4_range : '') +
-        (dnsServer.inet6_range ? (dnsServer.inet4_range ? ',' : '') + dnsServer.inet6_range : '')
-      )
+    }
+    case DnsServer.FakeIp: {
+      return `fake-ip://${
+        dnsServer.inet4_range || ''
+      }${dnsServer.inet6_range ? (dnsServer.inet4_range ? ',' : '') + dnsServer.inet6_range : ''}`
+    }
     case DnsServer.Quic:
     case DnsServer.Tcp:
     case DnsServer.Udp:
-    case DnsServer.Tls:
-      return `${type}://${server}${server_port ? ':' + server_port : ''}`
-    default:
+    case DnsServer.Tls: {
+      return `${type}://${server}${server_port ? `:${server_port}` : ''}`
+    }
+    default: {
       return type
+    }
   }
 }
 
@@ -92,20 +96,22 @@ export const generateDns = (
         }
       }
       switch (server.type) {
-        case DnsServer.Hosts:
-          extra['path'] = server.hosts_path.reduce((p, c) => p.concat(c.split(',')), [] as string[])
-          extra['predefined'] = Object.entries(server.predefined).reduce(
-            (p, [k, v]) => ({ ...p, [k]: v.split(',') }),
-            {},
+        case DnsServer.Hosts: {
+          extra['path'] = server.hosts_path.flatMap((v) => v.split(','))
+          extra['predefined'] = Object.fromEntries(
+            Object.entries(server.predefined).map(([k, v]) => [k, v.split(',')]),
           )
           break
-        case DnsServer.Dhcp:
+        }
+        case DnsServer.Dhcp: {
           server.interface && (extra['interface'] = server.interface)
           break
-        case DnsServer.FakeIp:
+        }
+        case DnsServer.FakeIp: {
           server.inet4_range && (extra['inet4_range'] = server.inet4_range)
           server.inet6_range && (extra['inet6_range'] = server.inet6_range)
           break
+        }
       }
       return {
         tag: server.tag,

@@ -14,7 +14,9 @@ const props = withDefaults(defineProps<Props>(), {
   icon: 'info',
 })
 
-defineEmits(['close'])
+defineEmits<{
+  close: []
+}>()
 
 const { t } = i18n.global
 

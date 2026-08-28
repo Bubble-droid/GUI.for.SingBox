@@ -15,7 +15,9 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {})
 
-const emit = defineEmits(['config'])
+const emit = defineEmits<{
+  config: []
+}>()
 
 const { t } = useI18n()
 const kernelApiStore = useKernelApiStore()

@@ -4,7 +4,8 @@ import { DnsServer } from '@features/constant/kernel'
 import { DnsServerTypeOptions } from '@features/constant/options'
 import { generateDnsServerURL } from '@generator/dns'
 import type { DnsServerConfig } from '@profiles/dns'
-import { computed, h, ref, type VNode } from 'vue'
+import { computed, h, ref } from 'vue'
+import type { VNode } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
@@ -25,8 +26,8 @@ const model = defineModel<DnsServerConfig[]>({ required: true })
 let serverId = 0
 const fields = ref<DnsServerConfig>(createDnsServer())
 
-const isSupportDetourAndDomainResolver = computed(() => {
-  return [
+const isSupportDetourAndDomainResolver = computed(() =>
+  [
     DnsServer.Local,
     DnsServer.Tcp,
     DnsServer.Udp,
@@ -35,19 +36,19 @@ const isSupportDetourAndDomainResolver = computed(() => {
     DnsServer.Https,
     DnsServer.H3,
     DnsServer.Dhcp,
-  ].includes(fields.value.type as any)
-})
+  ].includes(fields.value.type as any),
+)
 
-const isSupportServerAndPort = computed(() => {
-  return [
+const isSupportServerAndPort = computed(() =>
+  [
     DnsServer.Tcp,
     DnsServer.Udp,
     DnsServer.Tls,
     DnsServer.Quic,
     DnsServer.Https,
     DnsServer.H3,
-  ].includes(fields.value.type as any)
-})
+  ].includes(fields.value.type as any),
+)
 
 const isSupportPath = computed(() =>
   [DnsServer.Https, DnsServer.H3].includes(fields.value.type as any),

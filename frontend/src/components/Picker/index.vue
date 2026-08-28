@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="ValueType = any, PickerType extends 'single' | 'multi' = 'single'">
-import { ref, toRaw, type Ref } from 'vue'
+import { ref, toRaw } from 'vue'
+import type { Ref } from 'vue'
 
 import useI18n from '@/lang'
 
@@ -25,7 +26,7 @@ const selected = ref(
 const { t } = useI18n.global
 
 const handleConfirm = () => {
-  const res: any = Array.from(selected.value).map((v) => toRaw(v))
+  const res: any = [...selected.value].map((v) => toRaw(v))
   if (props.type === 'single') {
     emit('confirm', res[0])
   } else {
@@ -45,13 +46,15 @@ const handleSelect = (option: PickerItem<ValueType>) => {
   if (isSelected(option.value)) {
     selected.value.delete(option.value)
   } else {
-    if (props.type === 'single') selected.value.clear()
+    if (props.type === 'single') {
+      selected.value.clear()
+    }
     selected.value.add(option.value)
     option.onSelect?.({
       value: option.value,
       option,
       options: props.options,
-      selected: Array.from(selected.value).map((v) => toRaw(v)),
+      selected: [...selected.value].map((v) => toRaw(v)),
     })
   }
 }

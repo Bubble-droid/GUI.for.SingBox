@@ -58,17 +58,17 @@ export const generateRoute = (
     rule_set: route.rule_set.map((ruleset) => {
       const extra: Partial<RuleSetConfig> = {}
       if (ruleset.type === RouteRuleType.Inline) {
-        extra['rules'] = JSON.parse(ruleset.rules) as string
+        extra.rules = JSON.parse(ruleset.rules) as string
       } else if (ruleset.type === RuleSetType.Local) {
         const localRuleset = ctx.getRuleSet(ruleset.path)
-        extra['path'] = localRuleset?.path.replace(/^data\//v, `${ctx.appEnv.appDataPath}/`) ?? ''
-        extra['format'] = ruleset.format
+        extra.path = localRuleset?.path.replace(/^data\//v, `${ctx.appEnv.appDataPath}/`) ?? ''
+        extra.format = ruleset.format
       } else if (ruleset.type === RuleSetType.Remote) {
-        extra['url'] = ruleset.url
-        extra['format'] = ruleset.format
-        extra['download_detour'] = getOutbound(ruleset.download_detour)!
+        extra.url = ruleset.url
+        extra.format = ruleset.format
+        extra.download_detour = getOutbound(ruleset.download_detour)!
         if (ruleset.update_interval) {
-          extra['update_interval'] = ruleset.update_interval
+          extra.update_interval = ruleset.update_interval
         }
       }
       return {

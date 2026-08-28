@@ -56,7 +56,9 @@ export const useCoreBranch = (isAlpha = false) => {
 
   const restartable = computed(() => {
     const { branch } = appSettings.app.kernel
-    if (!kernelApiStore.running) return false
+    if (!kernelApiStore.running) {
+      return false
+    }
     return localVersion.value && downloadCompleted.value && (branch === Branch.Alpha) === isAlpha
   })
 
@@ -87,11 +89,15 @@ export const useCoreBranch = (isAlpha = false) => {
       }
 
       const release = Array.isArray(body) ? body.find((v) => v.prerelease) : body
-      if (!release) throw new Error('Not Found')
+      if (!release) {
+        throw new Error('Not Found')
+      }
       const { assets, tag_name } = release
       const assetName = getKernelAssetFileName(tag_name.replace('v', ''))
       const asset = assets.find((v) => v.name === assetName)
-      if (!asset) throw new Error(`Asset Not Found: ${assetName}`)
+      if (!asset) {
+        throw new Error(`Asset Not Found: ${assetName}`)
+      }
       if (asset.uploader.login !== 'github-actions[bot]') {
         await confirm('common.warning', 'settings.kernel.risk', {
           type: 'text',
@@ -114,7 +120,7 @@ export const useCoreBranch = (isAlpha = false) => {
         downloadCacheFile,
         undefined,
         (progress, total) => {
-          const txt = t('common.downloading') + ((progress / total) * 100).toFixed(2) + '%'
+          const txt = `${t('common.downloading') + ((progress / total) * 100).toFixed(2)}%`
           downloadProgress.value = txt
         },
         {
@@ -161,7 +167,7 @@ export const useCoreBranch = (isAlpha = false) => {
     try {
       const res = await Exec(CoreFilePath, ['version'])
       versionDetail.value = res.trim()
-      return res.match(/version (\S+)/v)?.[1] ?? ''
+      return /version (\S+)/u.exec(res)?.[1] ?? ''
     } catch (error: any) {
       console.log(error)
       showTips && message.error(error)
@@ -183,7 +189,9 @@ export const useCoreBranch = (isAlpha = false) => {
       }
 
       const release = Array.isArray(body) ? body.find((v) => v.prerelease) : body
-      if (!release) throw new Error('Not Found')
+      if (!release) {
+        throw new Error('Not Found')
+      }
       const { tag_name } = release
       return tag_name.replace('v', '')
     } catch (error: any) {
@@ -196,7 +204,9 @@ export const useCoreBranch = (isAlpha = false) => {
   }
 
   const restartCore = async () => {
-    if (!kernelApiStore.running) return
+    if (!kernelApiStore.running) {
+      return
+    }
     try {
       await kernelApiStore.restartCore()
       downloadCompleted.value = false

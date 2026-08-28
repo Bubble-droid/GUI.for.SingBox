@@ -1,9 +1,11 @@
 import { Inbound } from '@features/constant/kernel'
 import type { InboundConfig } from '@profiles/inbounds'
 
-export const generateInbounds = (inbounds: InboundConfig[]) => {
-  return inbounds.flatMap((inbound) => {
-    if (!inbound.enable) return []
+export const generateInbounds = (inbounds: InboundConfig[]) =>
+  inbounds.flatMap((inbound) => {
+    if (!inbound.enable) {
+      return []
+    }
     if (inbound.type !== Inbound.Tun && inbound.type !== Inbound.Direct) {
       const users = inbound[inbound.type]!.users.map((user) => ({
         username: user.split(':')[0],
@@ -37,4 +39,3 @@ export const generateInbounds = (inbounds: InboundConfig[]) => {
     }
     return []
   })
-}

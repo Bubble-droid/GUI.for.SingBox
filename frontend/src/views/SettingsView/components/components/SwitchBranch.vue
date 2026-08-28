@@ -13,7 +13,9 @@ const kernelApiStore = useKernelApiStore()
 const handleUseBranch = async (branch: Branch) => {
   appSettings.app.kernel.branch = branch
 
-  if (!kernelApiStore.running) return
+  if (!kernelApiStore.running) {
+    return
+  }
 
   try {
     await kernelApiStore.restartCore()

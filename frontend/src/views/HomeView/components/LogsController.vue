@@ -54,7 +54,9 @@ const menus: App.Menu[] = (
 
       for (const [, bracketed, ipv4, domain, ipv6] of matches) {
         const token = bracketed ?? ipv4 ?? domain ?? ipv6
-        if (!token) continue
+        if (!token) {
+          continue
+        }
 
         let ip = token
         let prefix = 0
@@ -73,7 +75,7 @@ const menus: App.Menu[] = (
         if (prefix > 0) {
           options.push({
             label: t('kernel.rules.type.ip_cidr'),
-            value: { ip_cidr: ip + '/' + prefix },
+            value: { ip_cidr: `${ip}/${prefix}` },
             description: ip,
           })
         } else if (token.includes('.')) {

@@ -62,7 +62,9 @@ const createInteraction = () => {
   }
 
   const requireImpl = (): InteractionAPI => {
-    if (!impl) throw new Error('interaction API has not been registered yet')
+    if (!impl) {
+      throw new Error('interaction API has not been registered yet')
+    }
     return impl
   }
 

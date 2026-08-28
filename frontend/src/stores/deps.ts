@@ -50,7 +50,9 @@ const createStoreDeps = () => {
 
   const useStoreDeps = <K extends StoreDep>(key: K): StoreDeps[K] => {
     const provider = providers[key]
-    if (!provider) throw `Store dependency '${key}' has not been injected yet`
+    if (!provider) {
+      throw new Error(`Store dependency '${key}' has not been injected yet`)
+    }
     return provider()
   }
 

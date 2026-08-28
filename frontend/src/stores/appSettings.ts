@@ -21,8 +21,6 @@ import {
   DefaultTestTimeout,
   DefaultTestURL,
   UserFilePath,
-} from '@/constant/app'
-import {
   Theme,
   WindowStartState,
   Lang,

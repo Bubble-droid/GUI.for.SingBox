@@ -46,7 +46,7 @@ const columns: Column[] = [
     key: 'endTime',
     sort: (a, b) => b['endTime'] - b['startTime'] - (a['endTime'] - a['startTime']),
     customRender: ({ value, record }) => {
-      return ((value - record['startTime']) / 1000).toFixed(2) + 's'
+      return `${((value - record['startTime']) / 1000).toFixed(2)}s`
     },
   },
   {

@@ -54,7 +54,9 @@ let scrollEventCount = 0
 const resetScrollEventCount = debounce(() => (scrollEventCount = 0), 100)
 
 const onMouseWheel = (e: WheelEvent) => {
-  if (!kernelApiStore.running) return
+  if (!kernelApiStore.running) {
+    return
+  }
 
   const isScrollingDown = e.deltaY > 0
 

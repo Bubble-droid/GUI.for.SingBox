@@ -7,16 +7,17 @@ import { sampleID } from '@/utils/others'
 
 import type { IdMaps } from './types'
 
-export const restoreNetns = (raw: SingBoxNetns[] = [], maps: IdMaps): NetnsConfig[] => {
-  return raw.map((netns): NetnsConfig => {
+export const restoreNetns = (maps: IdMaps, raw: SingBoxNetns[] = []): NetnsConfig[] =>
+  raw.map((netns): NetnsConfig => {
     switch (netns.type) {
-      case NetnsType.Unshare:
+      case NetnsType.Unshare: {
         return restoreNetnsUnshare(netns, maps)
-      default:
+      }
+      default: {
         return restoreNetnsDefault(netns, maps)
+      }
     }
   })
-}
 
 export const restoreNetnsDefault = (
   raw: SingBoxNetnsOf<typeof NetnsType.Default>,

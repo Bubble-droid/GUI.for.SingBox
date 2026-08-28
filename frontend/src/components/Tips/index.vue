@@ -20,17 +20,16 @@ const { t } = useI18n()
 
 watch(
   () => props.position,
-  ({ x, y }) => {
+  async ({ x, y }) => {
     if (!fixedPosition.value.x && !fixedPosition.value.y) {
       fixedPosition.value = { x, y }
     }
-    nextTick(() => {
-      if (domRef.value) {
-        x = x - domRef.value.offsetWidth / 2
-        y -= domRef.value.offsetHeight * 2
-        fixedPosition.value = { x, y }
-      }
-    })
+    await nextTick()
+    if (domRef.value) {
+      x -= domRef.value.offsetWidth / 2
+      y -= domRef.value.offsetHeight * 2
+      fixedPosition.value = { x, y }
+    }
   },
 )
 </script>

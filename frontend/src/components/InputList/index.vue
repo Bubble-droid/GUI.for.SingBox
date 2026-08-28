@@ -23,32 +23,37 @@ const props = withDefaults(defineProps<Props>(), {
   autofocus: false,
 })
 
-const emit = defineEmits(['change', 'update:modelValue'])
+const emit = defineEmits<{
+  change: [list: string[]]
+  'update:modelValue': [list: string[]]
+}>()
 
 const innerList = ref<Item[]>(props.modelValue.map((v, i) => ({ value: v, id: i.toString() })))
 
 const editItem = ref<Item>()
 const inputVal = ref('')
-const inputRef = useTemplateRef<typeof Input>('inputRef')
+const inputRef = useTemplateRef('inputRef')
 
 const handleAdd = () => {
   const item = editItem.value
   editItem.value = undefined
-  if (!inputVal.value) return
+  if (!inputVal.value) {
+    return
+  }
   if (item) {
     item.value = inputVal.value
   } else {
     innerList.value.push({ value: inputVal.value, id: sampleID() })
   }
   inputVal.value = ''
-  inputRef.value?.['focus']()
+  inputRef.value?.focus()
   emitUpdate()
 }
 
 const handleEdit = (item: Item) => {
   editItem.value = item
   inputVal.value = editItem.value.value
-  inputRef.value?.['focus']()
+  inputRef.value?.focus()
 }
 
 const handleDel = (item: Item) => {

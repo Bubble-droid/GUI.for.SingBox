@@ -1,13 +1,13 @@
-import {
-  Dns01Provider,
-  type DomainStrategy,
-  type NetworkStrategy,
-  type TlsClientAuthentication,
-  type TlsEngine,
-  type TlsSpoofMethod,
-  type TlsVersion,
-  type UdpNatBehavior,
-  type UtlsFingerprint,
+import { Dns01Provider } from '@features/constant/kernel'
+import type {
+  DomainStrategy,
+  NetworkStrategy,
+  TlsClientAuthentication,
+  TlsEngine,
+  TlsSpoofMethod,
+  TlsVersion,
+  UdpNatBehavior,
+  UtlsFingerprint,
 } from '@features/constant/kernel'
 import type {
   TagItem,
@@ -247,7 +247,7 @@ export const createDns01Challenge = (provider?: Dns01Provider): Dns01Challenge =
     } as Dns01Challenge
   }
   switch (provider) {
-    case Dns01Provider.AliDns:
+    case Dns01Provider.AliDns: {
       return {
         ...base,
         provider: Dns01Provider.AliDns,
@@ -256,14 +256,16 @@ export const createDns01Challenge = (provider?: Dns01Provider): Dns01Challenge =
         region_id: '',
         security_token: '',
       }
-    case Dns01Provider.Cloudflare:
+    }
+    case Dns01Provider.Cloudflare: {
       return {
         ...base,
         provider: Dns01Provider.Cloudflare,
         api_token: '',
         zone_token: '',
       }
-    case Dns01Provider.AcmeDns:
+    }
+    case Dns01Provider.AcmeDns: {
       return {
         ...base,
         provider: Dns01Provider.AcmeDns,
@@ -272,7 +274,9 @@ export const createDns01Challenge = (provider?: Dns01Provider): Dns01Challenge =
         subdomain: '',
         server_url: '',
       }
-    default:
+    }
+    default: {
       throw new Error(`Unexpected DNS provider: ${provider as string}`)
+    }
   }
 }

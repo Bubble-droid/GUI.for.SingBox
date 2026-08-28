@@ -28,7 +28,9 @@ const { t } = useI18n()
 const rulesetsStore = useRulesetsStore()
 
 const handleSave = async () => {
-  if (!ruleset.value) return
+  if (!ruleset.value) {
+    return
+  }
   loading.value = true
   try {
     if (!isValidJson(rulesetContent.value)) {

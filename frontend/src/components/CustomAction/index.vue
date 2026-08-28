@@ -13,7 +13,7 @@ const api: App.CustomActionApi = {
   ref,
 }
 
-const computedActions = computed(() => Array.from(resolvedActionMap.value.values()))
+const computedActions = computed(() => [...resolvedActionMap.value.values()])
 
 const resolveDynamicField = <T>(field: T): T => (typeof field === 'function' ? field(api) : field)
 

@@ -6,14 +6,17 @@ import { deepClone } from '@/utils/others'
 
 interface Props {
   plugin: App.Plugin
-  modelValue?: Recordable | undefined
+  modelValue?: Recordable
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: () => ({}),
 })
 
-const emit = defineEmits(['change', 'update:modelValue'])
+const emit = defineEmits<{
+  change: [value: Recordable]
+  'update:modelValue': [value: Recordable]
+}>()
 
 const model = ref(deepClone(props.modelValue ?? {}))
 

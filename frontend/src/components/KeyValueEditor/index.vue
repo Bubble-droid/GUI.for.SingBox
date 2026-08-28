@@ -11,7 +11,10 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: () => ['key', 'value'],
 })
 
-const emit = defineEmits(['change', 'update:modelValue'])
+const emit = defineEmits<{
+  change: [obj: Recordable]
+  'update:modelValue': [obj: Recordable]
+}>()
 
 const entries = ref(Object.entries(props.modelValue))
 
@@ -56,7 +59,7 @@ const emitUpdate = () => {
         :placeholder="placeholder[0]"
         auto-size
         class="flex-1"
-        @submit="emitUpdate"
+        @confirm="emitUpdate"
       />
       <Button type="text" :icon-size="12" icon="close" @click="handleDel(i)" />
       <Input
@@ -64,7 +67,7 @@ const emitUpdate = () => {
         :placeholder="placeholder[1]"
         auto-size
         class="flex-1"
-        @submit="emitUpdate"
+        @confirm="emitUpdate"
       />
     </div>
     <Button type="primary" icon="add" @click="handleAdd" />

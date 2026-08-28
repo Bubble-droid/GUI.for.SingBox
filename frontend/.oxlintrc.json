@@ -1,26 +1,79 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "ignorePatterns": ["src/bridge/wailsjs/**"],
-  "plugins": ["eslint", "typescript", "unicorn", "oxc", "vue", "import", "import", "promise"],
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "promise", "vue"],
   "env": {
     "browser": true
   },
   "categories": {
     "correctness": "error",
-    "suspicious": "error",
-    "perf": "error"
+    "suspicious": "warn",
+    "perf": "error",
+    "style": "warn"
   },
   "rules": {
-    "typescript/no-unsafe-type-assertion": "off",
-    "oxc/no-map-spread": "off",
-    "oxc/no-accumulating-spread": "off",
     "no-underscore-dangle": "off",
     "no-await-in-loop": "off",
+    "no-magic-numbers": "off",
+    "no-ternary": "off",
+    "no-nested-ternary": "off",
+    "no-continue": "off",
+    "no-implicit-coercion": "off",
+    "no-template-curly-in-string": "off",
+    "capitalized-comments": "off",
+    "new-cap": "off",
+    "id-length": "off",
+    "init-declarations": "off",
+    "sort-imports": "off",
+    "sort-keys": "off",
+    "max-params": "off",
+    "max-statements": "off",
+    "arrow-body-style": "off",
+    "prefer-named-capture-group": "off",
+    "prefer-destructuring": "off",
+    "typescript/no-unsafe-type-assertion": "off",
+    "unicorn/no-null": "off",
+    "unicorn/prefer-spread": "off",
+    "unicorn/prefer-ternary": "off",
+    "unicorn/prefer-global-this": "off",
+    "unicorn/prefer-structured-clone": "off",
+    "unicorn/no-nested-ternary": "off",
+    "unicorn/numeric-separators-style": "off",
+    "unicorn/catch-error-name": "off",
+    "oxc/no-map-spread": "off",
+    "oxc/no-accumulating-spread": "off",
+    "import/prefer-default-export": "off",
+    "import/exports-last": "off",
+    "import/group-exports": "off",
+    "import/no-named-export": "off",
+    "import/no-namespace": "off",
+    "import/no-unassigned-import": "off",
+    "import/no-anonymous-default-export": "off",
+    "promise/avoid-new": "off",
+    "promise/prefer-await-to-callbacks": "off",
+    "promise/prefer-await-to-then": "off",
+    "vue/define-props-destructuring": "off",
     "no-unused-expressions": [
       "error",
       {
         "allowShortCircuit": true,
         "allowTernary": true
+      }
+    ],
+    "no-duplicate-imports": [
+      "error",
+      {
+        "allowSeparateTypeImports": true
+      }
+    ],
+    "unicorn/filename-case": [
+      "error",
+      {
+        "cases": {
+          "camelCase": true,
+          "pascalCase": true,
+          "lowercase": true
+        }
       }
     ],
     "oxc/no-barrel-file": [

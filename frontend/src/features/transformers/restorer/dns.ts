@@ -9,13 +9,15 @@ export const restoreDnsServers = (
   servers: SingBoxDnsServer[],
   DnsServersIds: Recordable<string>,
   OutboundsIds: Recordable<string>,
-): DnsServerConfig[] => {
-  return servers.flatMap((raw) => {
-    if (!raw['type']) return []
+): DnsServerConfig[] =>
+  servers.flatMap((raw) => {
+    if (!raw.type) {
+      return []
+    }
     const server = createDnsServer()
-    server.id = DnsServersIds[raw['tag']]!
-    server.tag = raw['tag']
-    server.type = raw['type'] as DnsServer
+    server.id = DnsServersIds[raw.tag]!
+    server.tag = raw.tag
+    server.type = raw.type as DnsServer
     if (
       (
         [
@@ -28,13 +30,13 @@ export const restoreDnsServers = (
           DnsServer.H3,
           DnsServer.Dhcp,
         ] as string[]
-      ).includes(raw['type'])
+      ).includes(raw.type)
     ) {
       if ('detour' in raw) {
-        server.detour = OutboundsIds[raw['detour']!]!
+        server.detour = OutboundsIds[raw.detour!]!
       }
       if ('domain_resolver' in raw) {
-        server.domain_resolver = DnsServersIds[raw['domain_resolver'] as string] as string
+        server.domain_resolver = DnsServersIds[raw.domain_resolver as string]!
       }
       if (
         (
@@ -46,56 +48,55 @@ export const restoreDnsServers = (
             DnsServer.Https,
             DnsServer.H3,
           ] as string[]
-        ).includes(raw['type'])
+        ).includes(raw.type)
       ) {
         if ('server' in raw) {
-          server.server = raw['server']
+          server.server = raw.server
         }
         if ('server_port' in raw) {
-          server.server_port = String(raw['server_port'])
+          server.server_port = String(raw.server_port)
         }
-        if (([DnsServer.Https, DnsServer.H3] as string[]).includes(raw['type']) && 'path' in raw) {
-          server.path = raw['path'] as string
+        if (([DnsServer.Https, DnsServer.H3] as string[]).includes(raw.type) && 'path' in raw) {
+          server.path = raw.path as string
         }
       }
     } else if (DnsServer.Hosts === server.type) {
       if ('path' in raw) {
-        server.hosts_path = raw['path'] as string[]
+        server.hosts_path = raw.path as string[]
       }
       if ('predefined' in raw) {
-        server.predefined = Object.entries<string[] | string>(raw['predefined']!).reduce(
+        server.predefined = Object.entries<string[] | string>(raw.predefined!).reduce<Recordable>(
           (p, [key, value]) => {
             p[key] = Array.isArray(value) ? value.join(',') : value
             return p
           },
-          {} as Recordable,
+          {},
         )
       }
     } else if (DnsServer.Dhcp === server.type) {
       if ('interface' in raw) {
-        server.interface = raw['interface'] as string
+        server.interface = raw.interface as string
       }
     } else if (DnsServer.FakeIp === server.type) {
       if ('inet4_range' in raw) {
-        server.inet4_range = raw['inet4_range']
+        server.inet4_range = raw.inet4_range
       }
       if ('inet6_range' in raw) {
-        server.inet6_range = raw['inet6_range']
+        server.inet6_range = raw.inet6_range
       }
     }
     return server
   })
-}
 
 export const restoreDnsRules = (
   rules: Recordable[],
   InboundsIds: Recordable,
   RouteRuleSetIds: Recordable,
   DnsServersIds: Recordable,
-): DnsRuleConfig[] => {
-  return rules.flatMap((raw: Recordable, i) => {
+): DnsRuleConfig[] =>
+  rules.flatMap((raw: Recordable, i) => {
     const rule = createDnsRule()
-    rule.id = 'rule-' + i
+    rule.id = `rule-${i}`
     rule.action = raw['action'] ?? DnsRuleAction.Route
 
     const hits = supportedRuleTypes.filter((key) => key in raw)
@@ -151,7 +152,7 @@ export const restoreDnsRules = (
           client_subnet: undefined,
           strategy: undefined,
           server: undefined,
-          ...supportedRuleTypes.reduce((p, c) => ((p[c] = undefined), p), {} as Recordable),
+          ...supportedRuleTypes.reduce<Recordable>((p, c) => ((p[c] = undefined), p), {}),
         },
         null,
         2,
@@ -170,4 +171,3 @@ export const restoreDnsRules = (
     }
     return rule
   })
-}

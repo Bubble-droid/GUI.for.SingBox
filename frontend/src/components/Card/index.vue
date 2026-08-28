@@ -14,9 +14,9 @@ const props = defineProps<Props>()
 
 const slots = useSlots()
 
-const hasTitle = computed(() => {
-  return slots.extra || slots['title-prefix'] || slots['title-suffix'] || props.title
-})
+const hasTitle = computed(
+  () => slots.extra || slots['title-prefix'] || slots['title-suffix'] || props.title,
+)
 </script>
 
 <template>

@@ -25,7 +25,7 @@ export const SwitchPermissions = async (enable: boolean) => {
   const args = enable
     ? [
         'add',
-        'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers',
+        String.raw`HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers`,
         '/v',
         appPath,
         '/t',
@@ -36,7 +36,7 @@ export const SwitchPermissions = async (enable: boolean) => {
       ]
     : [
         'delete',
-        'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers',
+        String.raw`HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers`,
         '/v',
         appPath,
         '/f',
@@ -49,7 +49,7 @@ export const CheckPermissions = async () => {
   try {
     const out = await Exec('reg', [
       'query',
-      'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers',
+      String.raw`HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers`,
       '/v',
       appPath,
       '/t',
@@ -78,12 +78,12 @@ export const RunWithOsaScript = (
   options: { admin?: boolean; wait?: boolean } = {},
 ) => {
   const { admin = false, wait = true, ...others } = options
-  const escapedArgs = args.map((arg) => `'${arg.replaceAll("'", "'\\''")}'`).join(' ')
+  const escapedArgs = args.map((arg) => `'${arg.replaceAll("'", String.raw`'\''`)}'`).join(' ')
   let shellCmd = `${path} ${escapedArgs}`.trim()
   if (!wait) {
     shellCmd += ' > /dev/null 2>&1 &'
   }
-  const escapedShellCmd = shellCmd.replaceAll('\\', '\\\\').replaceAll('"', '\\"')
+  const escapedShellCmd = shellCmd.replaceAll('\\', String.raw`\\`).replaceAll('"', String.raw`\"`)
   let appleScript = `do shell script "${escapedShellCmd}"`
   if (admin) {
     appleScript += ' with administrator privileges'
@@ -133,7 +133,9 @@ export const GetRequestProxy = (mode?: App.RequestProxyMode, customProxy?: strin
 
   if (requestProxyMode === RequestProxyMode.Kernel) {
     const kernelProxy = kernelApiProxy.getProxyEndpoint()
-    if (!kernelProxy) return ''
+    if (!kernelProxy) {
+      return ''
+    }
 
     const { schema, host, port, username, password } = kernelProxy
     const formattedHost = formatProxyHost(host)
@@ -226,7 +228,9 @@ export const handleUseProxy = async (
   group: Pick<CoreApiProxy, 'type' | 'name' | 'now'>,
   proxy: Partial<CoreApiProxy>,
 ) => {
-  if (group.type !== 'Selector' || group.now === proxy.name) return
+  if (group.type !== 'Selector' || group.now === proxy.name) {
+    return
+  }
   const promises: Promise<null>[] = []
   const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
   const kernelApiStore = useStoreDeps(StoreDep.KernelApiStore)
@@ -246,7 +250,9 @@ export const handleUseProxy = async (
 export const handleChangeMode = async (mode: 'direct' | 'global' | 'rule') => {
   const kernelApiStore = useStoreDeps(StoreDep.KernelApiStore)
 
-  if (mode === kernelApiStore.config.mode) return
+  if (mode === kernelApiStore.config.mode) {
+    return
+  }
 
   void kernelApiStore.updateConfig('mode', mode)
 

@@ -15,7 +15,9 @@ withDefaults(defineProps<Props>(), {
   bordered: true,
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits<{
+  close: []
+}>()
 
 const show = ref(true)
 const handleClose = () => {

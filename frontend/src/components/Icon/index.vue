@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { icons, type IconName } from './icons'
+import { icons } from './icons'
+import type { IconName } from './icons'
 
 interface Props {
   icon: IconName
@@ -11,7 +12,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), { size: 16, color: 'var(--color)' })
 
-const sizeWithUnit = computed(() => props.size + 'px')
+const sizeWithUnit = computed(() => `${props.size}px`)
 </script>
 
 <template>

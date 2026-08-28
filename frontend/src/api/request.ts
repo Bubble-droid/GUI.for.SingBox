@@ -26,12 +26,12 @@ export class Request {
   constructor(options: RequestOptions = {}) {
     this.base = options.base ?? ''
     this.bearer = options.bearer ?? ''
-    this.timeout = options.timeout ?? 10000
+    this.timeout = options.timeout ?? 10_000
     this.responseType = options.responseType ?? ResponseType.JSON
     this.beforeRequest = options.beforeRequest ?? (() => 0)
   }
 
-  private request = async <T>(
+  private readonly request = async <T>(
     url: string,
     options: { method: Method; body?: Record<string, any> },
   ) => {
@@ -53,7 +53,7 @@ export class Request {
 
     if (['GET'].includes(options.method)) {
       const query = new URLSearchParams(options.body ?? {}).toString()
-      query && (url += '?' + query)
+      query && (url += `?${query}`)
     }
 
     if (['POST', 'PUT', 'PATCH'].includes(options.method)) {

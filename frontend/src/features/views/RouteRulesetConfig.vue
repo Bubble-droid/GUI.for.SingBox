@@ -56,7 +56,9 @@ const handleDelete = (index: number) => {
 const showLost = () => message.warn('kernel.route.rule_set.notFound')
 
 const hasLost = (ruleset: RuleSetConfig) => {
-  if (ruleset.type !== RuleSetType.Local) return false
+  if (ruleset.type !== RuleSetType.Local) {
+    return false
+  }
   return !rulesetsStore.getRulesetById(ruleset.path)
 }
 

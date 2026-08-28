@@ -36,15 +36,21 @@ const groups = computed(() => {
       if (indexA === -1 && indexB === -1) {
         return a.name.localeCompare(b.name)
       }
-      if (indexA === -1) return 1
-      if (indexB === -1) return -1
+      if (indexA === -1) {
+        return 1
+      }
+      if (indexB === -1) {
+        return -1
+      }
       return indexA - indexB
     })
 })
 
 const filteredPlugins = computed(() => {
   const keyword = keywords.value.trim()
-  if (!keyword) return groups.value
+  if (!keyword) {
+    return groups.value
+  }
   const match = createTextMatcher(keyword.toLocaleLowerCase(), '')
   return groups.value
     .map((group) => ({
@@ -60,8 +66,8 @@ const handleAddPlugin = async (plugin: App.Plugin) => {
   loadingSet.value.add(plugin.id)
   try {
     await pluginsStore.addPlugin(deepClone(plugin))
-  } catch (err: any) {
-    message.error(err.message || err)
+  } catch (error: any) {
+    message.error(error.message || error)
   } finally {
     loadingSet.value.delete(plugin.id)
   }
@@ -71,8 +77,8 @@ const handleUpdatePluginHub = async () => {
   try {
     await pluginsStore.updatePluginHub()
     message.success('plugins.updateSuccess')
-  } catch (err: any) {
-    message.error(err.message || err)
+  } catch (error: any) {
+    message.error(error.message || error)
   }
 }
 

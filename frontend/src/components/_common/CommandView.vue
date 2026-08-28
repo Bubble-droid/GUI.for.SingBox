@@ -17,7 +17,7 @@ const props = defineProps<{
 const loading = ref(false)
 const userInput = ref('')
 const selected = ref(0)
-const inputRef = useTemplateRef<typeof Input>('inputRef')
+const inputRef = useTemplateRef('inputRef')
 const commands = ref(getCommands())
 const commandsRefMap: Record<string, HTMLElement> = {}
 
@@ -36,7 +36,9 @@ const appSettings = useAppSettingsStore()
 const pluginsStore = usePluginsStore()
 
 const handleExecCommand = async (index: number) => {
-  if (loading.value) return
+  if (loading.value) {
+    return
+  }
 
   loading.value = true
   try {
@@ -47,11 +49,14 @@ const handleExecCommand = async (index: number) => {
     message.error(error.message || error)
   }
   loading.value = false
-  nextTick(inputRef.value!['focus'])
+  await nextTick()
+  inputRef.value?.focus()
 }
 
 const onKeydown = async (ev: KeyboardEvent) => {
-  if (loading.value) return
+  if (loading.value) {
+    return
+  }
 
   if (ev.code === 'ArrowUp') {
     selected.value = selected.value - 1 < 0 ? 0 : selected.value - 1
@@ -70,7 +75,8 @@ const onKeydown = async (ev: KeyboardEvent) => {
     if (hitCommand.value.length > 0) {
       await handleExecCommand(selected.value)
     } else {
-      nextTick(inputRef.value!['focus'])
+      await nextTick()
+      inputRef.value?.focus()
     }
   }
 }

@@ -13,8 +13,8 @@ import {
 import type { IdMaps } from './types'
 
 export const restoreHttpClients = (
-  httpClients: SingBoxHttpClient[] = [],
   maps: IdMaps,
+  httpClients: SingBoxHttpClient[] = [],
 ): HttpClientConfig[] => {
   const template = createHttpClient()
   return httpClients.map((raw) => {

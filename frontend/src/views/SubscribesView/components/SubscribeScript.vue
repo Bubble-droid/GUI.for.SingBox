@@ -24,7 +24,9 @@ const handleCancel = inject('cancel') as any
 const handleSubmit = inject('submit') as any
 
 const handleSave = async () => {
-  if (!subscribe.value) return
+  if (!subscribe.value) {
+    return
+  }
   loading.value = true
   try {
     subscribe.value.script = code.value

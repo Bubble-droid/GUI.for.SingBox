@@ -1,26 +1,17 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends SelectModelValue = string, M extends boolean = false">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { deepClone } from '@/utils/others'
 
-type SelectValue = string | number
+import type { SelectModelValue, SelectProps, SelectValueType } from './types'
 
-interface Props {
-  modelValue?: SelectValue | SelectValue[] | undefined
-  options?: { label: string; value: SelectValue }[]
-  multiple?: boolean
-  border?: boolean
-  size?: 'default' | 'small'
-  placeholder?: string
-  autoSize?: boolean
-  clearable?: boolean
-}
+type ModelValue = SelectValueType<T, M>
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<SelectProps<T, M>>(), {
   modelValue: undefined,
   options: () => [],
-  multiple: false,
+  multiple: false as any,
   border: true,
   size: 'default',
   placeholder: '',
@@ -28,16 +19,21 @@ const props = withDefaults(defineProps<Props>(), {
   clearable: false,
 })
 
-const emit = defineEmits(['change', 'update:modelValue'])
+const emit = defineEmits<{
+  changed: [value: ModelValue]
+  'update:modelValue': [value: ModelValue]
+}>()
 
-const model = ref<SelectValue | SelectValue[] | undefined>(
-  props.multiple ? deepClone(props.modelValue ?? []) : props.modelValue,
+const model = ref<T | T[] | undefined>(
+  props.multiple ? deepClone((props.modelValue as T[]) ?? []) : (props.modelValue as T | undefined),
 )
 
 const { t } = useI18n()
 
 const innerClearable = computed(() => {
-  if (!props.clearable) return false
+  if (!props.clearable) {
+    return false
+  }
   if (props.multiple) {
     return Array.isArray(model.value) && model.value.length > 0
   }
@@ -45,18 +41,15 @@ const innerClearable = computed(() => {
 })
 
 const optionsValueLabelMapping = computed(() =>
-  props.options.reduce(
-    (p, c) => {
-      p[c.value] = c.label ?? c.value
-      return p
-    },
-    {} as Record<string | number, SelectValue>,
-  ),
+  props.options.reduce<Record<SelectModelValue, SelectModelValue>>((p, c) => {
+    p[c.value] = c.label ?? c.value
+    return p
+  }, {}),
 )
 
 const displayLabel = computed(() => {
   if (props.multiple) {
-    const selected = (Array.isArray(model.value) ? model.value : []) as SelectValue[]
+    const selected = (Array.isArray(model.value) ? model.value : []) as T[]
     if (selected.length === 0) {
       return props.placeholder || 'common.none'
     }
@@ -85,20 +78,20 @@ watch(
   { deep: true },
 )
 
-const isSelected = (val: SelectValue) => {
+const isSelected = (val: T) => {
   if (props.multiple) {
     return Array.isArray(model.value) && model.value.includes(val)
   }
   return model.value === val
 }
 
-const handleSelect = (value: SelectValue) => {
+const handleSelect = (value: T) => {
   const oldModel = JSON.stringify(model.value)
   if (props.multiple) {
     if (!Array.isArray(model.value)) {
       model.value = []
     }
-    const list = model.value as SelectValue[]
+    const list = model.value as T[]
     const idx = list.indexOf(value)
     if (idx === -1) {
       list.push(value)
@@ -107,12 +100,12 @@ const handleSelect = (value: SelectValue) => {
     }
     if (oldModel !== JSON.stringify(model.value)) {
       emit('update:modelValue', model.value)
-      emit('change', model.value)
+      emit('changed', model.value)
     }
   } else if (value !== model.value) {
     model.value = value
     emit('update:modelValue', model.value)
-    emit('change', model.value)
+    emit('changed', model.value)
   }
   internalUpdate = true
 }
@@ -120,12 +113,12 @@ const handleSelect = (value: SelectValue) => {
 const handleClear = () => {
   if (props.multiple) {
     model.value = []
-    emit('update:modelValue', [])
-    emit('change', [])
+    emit('update:modelValue', [] as unknown as ModelValue)
+    emit('changed', [] as unknown as ModelValue)
   } else {
     model.value = ''
-    emit('update:modelValue', '')
-    emit('change', '')
+    emit('update:modelValue', '' as ModelValue)
+    emit('changed', '' as ModelValue)
   }
   internalUpdate = true
 }
@@ -183,11 +176,11 @@ const handleClear = () => {
             }
           "
         >
-          <div class="realtive w-full">
+          <div class="relative w-full">
             <div v-if="isSelected(o.value)" class="absolute left-8">
               <Icon icon="selected" :size="18" />
             </div>
-            <div class="">
+            <div>
               {{ t(o.label ?? String(o.value)) }}
             </div>
           </div>

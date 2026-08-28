@@ -5,7 +5,9 @@ import { generateDialer } from './shared'
 import type { TagMaps } from './types'
 
 export const generateNtp = (ntp: NtpConfig, maps: TagMaps): SingBoxNtp => {
-  if (!ntp.enabled) return {} as SingBoxNtp
+  if (!ntp.enabled) {
+    return {} as SingBoxNtp
+  }
   const { dialer, ...rest } = ntp
   return {
     ...(rest as SingBoxNtp),

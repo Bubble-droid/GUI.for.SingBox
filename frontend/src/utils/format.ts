@@ -1,18 +1,20 @@
 import i18n from '@/lang'
 
-export function formatBytes(bytes: number, decimals = 1): string {
-  if (bytes === 0) return '0 B'
+export const formatBytes = (bytes: number, decimals = 1): string => {
+  if (bytes === 0) {
+    return '0 B'
+  }
 
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
   const i = Math.max(0, Math.floor(Math.log(bytes) / Math.log(k)))
-  const formattedValue = parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))
+  const formattedValue = parseFloat((bytes / k ** i).toFixed(decimals))
 
   return `${formattedValue} ${sizes[i]}`
 }
 
-export function formatRelativeTime(d: string | number) {
+export const formatRelativeTime = (d: string | number) => {
   const formatter = new Intl.RelativeTimeFormat(i18n.global.locale.value, { numeric: 'auto' })
   const date = new Date(d)
   const now = Date.now()
@@ -21,7 +23,9 @@ export function formatRelativeTime(d: string | number) {
   const isSameDay = formatDate(d, 'YYYY-MM-DD') === formatDate(now, 'YYYY-MM-DD')
 
   // now
-  if (diffMs === 0) return formatter.format(0, 'second')
+  if (diffMs === 0) {
+    return formatter.format(0, 'second')
+  }
 
   const units: { unit: Intl.RelativeTimeFormatUnit; threshold: number }[] = [
     { unit: 'year', threshold: 365 * 24 * 60 * 60 * 1000 },
@@ -33,15 +37,19 @@ export function formatRelativeTime(d: string | number) {
   ]
 
   for (const { unit, threshold } of units) {
-    if (unit === 'day' && isSameDay) continue
+    if (unit === 'day' && isSameDay) {
+      continue
+    }
     const amount = Math.round(diffMs / threshold)
-    if (Math.abs(amount) > 0) return formatter.format(amount, unit)
+    if (Math.abs(amount) > 0) {
+      return formatter.format(amount, unit)
+    }
   }
 
   return formatter.format(Math.round(diffMs / 1000), 'second')
 }
 
-export function formatDate(timestamp: number | string, format: string) {
+export const formatDate = (timestamp: number | string, format: string) => {
   const date = new Date(timestamp)
 
   const map: Record<string, any> = {
@@ -56,6 +64,6 @@ export function formatDate(timestamp: number | string, format: string) {
   return format.replace(/YYYY|MM|DD|HH|mm|ss/g, (matched) => map[matched])
 }
 
-export function formatProxyHost(host: string) {
+export const formatProxyHost = (host: string) => {
   return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host
 }

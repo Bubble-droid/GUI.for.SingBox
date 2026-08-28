@@ -47,18 +47,24 @@ type Result<T extends Endpoint> = Extract<EndpointConfig, { type: T }>
 
 export const createEndpoint = <T extends Endpoint>(type: T): Result<T> => {
   switch (type) {
-    case Endpoint.WireGuard:
+    case Endpoint.WireGuard: {
       return createWireGuard() as Result<T>
-    case Endpoint.Tailscale:
+    }
+    case Endpoint.Tailscale: {
       return createTailscale() as Result<T>
-    case Endpoint.OpenConnect:
+    }
+    case Endpoint.OpenConnect: {
       return createOpenConnect() as Result<T>
-    case Endpoint.OpenVpnClient:
+    }
+    case Endpoint.OpenVpnClient: {
       return createOpenVpnClient() as Result<T>
-    case Endpoint.OpenVpnServer:
+    }
+    case Endpoint.OpenVpnServer: {
       return createOpenVpnServer() as Result<T>
-    default:
+    }
+    default: {
       throw new Error(`Unexpected endpoint type: ${type}`)
+    }
   }
 }
 

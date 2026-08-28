@@ -19,13 +19,17 @@ class TypedEventBus<Events extends Record<string, any>> {
 
   off<K extends keyof Events>(event: K, handler: (data: Events[K]) => void) {
     const list = this.handlers[event]
-    if (!list) return
+    if (!list) {
+      return
+    }
     this.handlers[event] = list.filter((h) => h !== handler)
   }
 
   emit<K extends keyof Events>(event: K, data: Events[K]) {
     const list = this.handlers[event]
-    if (!list) return
+    if (!list) {
+      return
+    }
     list.forEach((h) => h(data))
   }
 }

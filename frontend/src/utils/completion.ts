@@ -22,7 +22,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnEnabled,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::enabled'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::enabled')}`,
       },
     ),
     snippetCompletion(
@@ -31,7 +31,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnDisabled,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::disabled'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::disabled')}`,
       },
     ),
     snippetCompletion(
@@ -40,7 +40,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnDispose,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::dispose'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::dispose')}`,
       },
     ),
     snippetCompletion(
@@ -49,7 +49,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnInstall,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::install'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::install')}`,
       },
     ),
     snippetCompletion(
@@ -58,7 +58,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnUninstall,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::uninstall'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::uninstall')}`,
       },
     ),
     snippetCompletion(
@@ -67,7 +67,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnManual,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::manual'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::manual')}`,
       },
     ),
     snippetCompletion(
@@ -76,7 +76,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnTrayUpdate,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::tray::update'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::tray::update')}`,
       },
     ),
     snippetCompletion(
@@ -85,7 +85,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnSubscribe,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::subscribe'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::subscribe')}`,
       },
     ),
     snippetCompletion(
@@ -94,7 +94,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnGenerate,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::generate'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::generate')}`,
       },
     ),
     snippetCompletion(
@@ -103,7 +103,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnStartup,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::startup'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::startup')}`,
       },
     ),
     snippetCompletion(
@@ -112,7 +112,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnShutdown,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::shutdown'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::shutdown')}`,
       },
     ),
     snippetCompletion(
@@ -121,7 +121,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnCoreStarted,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::core::started'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::core::started')}`,
       },
     ),
     snippetCompletion(
@@ -130,7 +130,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnCoreStopped,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::core::stopped'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::core::stopped')}`,
       },
     ),
     snippetCompletion(
@@ -139,7 +139,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnBeforeCoreStart,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::before::core::start'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::before::core::start')}`,
       },
     ),
     snippetCompletion(
@@ -148,7 +148,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnBeforeCoreStop,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::before::core::stop'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::before::core::stop')}`,
       },
     ),
     snippetCompletion(
@@ -157,7 +157,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnReady,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::ready'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::ready')}`,
       },
     ),
     snippetCompletion(
@@ -166,7 +166,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnReload,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::reload'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::reload')}`,
       },
     ),
     snippetCompletion(
@@ -175,7 +175,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnTask,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::task'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::task')}`,
       },
     ),
     snippetCompletion(
@@ -184,7 +184,7 @@ export const getCompletions = (pluginScope?: any) => {
       {
         label: PluginTriggerEvent.OnConfigure,
         type: 'keyword',
-        detail: t('plugin.trigger') + ' ' + t('plugin.on::configure'),
+        detail: `${t('plugin.trigger')} ${t('plugin.on::configure')}`,
       },
     ),
     /**
@@ -245,7 +245,9 @@ export const getCompletions = (pluginScope?: any) => {
      */
     (context: CompletionContext) => {
       const word = context.matchBefore(/\w*/)
-      if (!word || context.explicit) return null
+      if (!word || context.explicit) {
+        return null
+      }
 
       const codeCompletion = localCompletionSource(context) || { options: [] }
 

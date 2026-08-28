@@ -51,10 +51,10 @@ export const StartServer = async (
   const _options: Required<ServerOptions> = {
     Cert: '',
     Key: '',
-    StaticPath: '', // default: /static
+    StaticPath: '', // Default: /static
     StaticRoute: '/static/',
     StaticHeaders: {},
-    UploadPath: '', // default: /upload
+    UploadPath: '', // Default: /upload
     UploadRoute: '/upload',
     UploadHeaders: {},
     MaxUploadSize: 50 * 1024 * 1024, // 50MB
@@ -71,7 +71,7 @@ export const StartServer = async (
         Request['id'],
         Request['method'],
         Request['url'],
-        Request['headers'],
+        Recordable<string[]>,
         Request['body'],
       ]
       try {
@@ -80,7 +80,7 @@ export const StartServer = async (
             id: requestId,
             method,
             url,
-            headers: Object.entries(headers).reduce((p, c) => ({ ...p, [c[0]]: c[1][0] }), {}),
+            headers: Object.fromEntries(Object.entries(headers).map(([k, v]) => [k, v[0] ?? ''])),
             body,
           },
           {
@@ -95,13 +95,13 @@ export const StartServer = async (
             },
           },
         )
-      } catch (err: any) {
-        console.log('Server handler err:', err, requestId)
+      } catch (error: any) {
+        console.log('Server handler err:', error, requestId)
         EventsEmit(
           requestId,
           500,
           JSON.stringify({ 'Content-Type': 'text/plain; charset=utf-8' }),
-          normalizeErrorMessage(err),
+          normalizeErrorMessage(error),
           JSON.stringify({ Mode: 'Text' }),
         )
       }

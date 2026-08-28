@@ -21,14 +21,18 @@ export const createCertificateProvider = <T extends CertificateProviderType>(
   type: T,
 ): Result<T> => {
   switch (type) {
-    case CertificateProviderType.Acme:
+    case CertificateProviderType.Acme: {
       return createAcmeProvider() as Result<T>
-    case CertificateProviderType.Tailscale:
+    }
+    case CertificateProviderType.Tailscale: {
       return createTailscaleProvider() as Result<T>
-    case CertificateProviderType.CloudflareOriginCa:
+    }
+    case CertificateProviderType.CloudflareOriginCa: {
       return createCloudflareOriginCaProvider() as Result<T>
-    default:
+    }
+    default: {
       throw new Error(`Unexpected certificate provider type: ${type}`)
+    }
   }
 }
 

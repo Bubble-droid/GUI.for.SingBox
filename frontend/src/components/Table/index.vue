@@ -50,15 +50,17 @@ const handleChangeSortField = (field: string) => {
 }
 
 const tableData = computed(() => {
-  if (!sortField.value || !sortFunc.value) return props.dataSource
-  const sorted = props.dataSource.slice().toSorted(sortFunc.value)
-  if (sortReverse.value) sorted.reverse()
+  if (!sortField.value || !sortFunc.value) {
+    return props.dataSource
+  }
+  const sorted = [...props.dataSource].toSorted(sortFunc.value)
+  if (sortReverse.value) {
+    sorted.reverse()
+  }
   return sorted
 })
 
-const tableColumns = computed(() => {
-  return props.columns.filter((column) => !column.hidden)
-})
+const tableColumns = computed(() => props.columns.filter((column) => !column.hidden))
 
 const renderCell = (column: Column, record: Recordable) => {
   const value = getValue(record, column.key)

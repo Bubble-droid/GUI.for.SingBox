@@ -32,9 +32,15 @@ const strokeColors = computed(() => {
 const maxValue = computed(() => {
   const maxUpload = Math.max(...props.series[0]!, props.height)
   const maxDownload = Math.max(...props.series[1]!, props.height)
-  if (showLines.value[0] && showLines.value[1]) return Math.max(maxUpload, maxDownload)
-  if (showLines.value[0]) return maxUpload
-  if (showLines.value[1]) return maxDownload
+  if (showLines.value[0] && showLines.value[1]) {
+    return Math.max(maxUpload, maxDownload)
+  }
+  if (showLines.value[0]) {
+    return maxUpload
+  }
+  if (showLines.value[1]) {
+    return maxDownload
+  }
   return props.height
 })
 
@@ -51,7 +57,9 @@ const updateChart = () => {
   const paddingY = height / 8
   height -= paddingY
   points.value = props.series.map((s, index) => {
-    if (!showLines.value[index]) return ''
+    if (!showLines.value[index]) {
+      return ''
+    }
     const newS = [...s]
     if (newS.length < MAX_HISTORY) {
       newS.unshift(...Array.from({ length: MAX_HISTORY - s.length }, () => 0))
@@ -60,11 +68,11 @@ const updateChart = () => {
     const point = newS.reduce((p, c, i) => {
       const x = Math.floor(i * spacing) + padding
       const y = Math.floor(height - (c / maxValue.value) * height) + paddingY - 6
-      return i === 0 ? x + ',' + y : p + ',' + x + ',' + y
+      return i === 0 ? `${x},${y}` : `${p},${x},${y}`
     }, '')
-    const startPos = padding + ',' + (props.height - 6)
-    const endPos = Math.floor((MAX_HISTORY - 1) * spacing + padding) + ',' + (props.height - 6)
-    return startPos + ',' + point + ',' + endPos
+    const startPos = `${padding},${props.height - 6}`
+    const endPos = `${Math.floor((MAX_HISTORY - 1) * spacing + padding)},${props.height - 6}`
+    return `${startPos},${point},${endPos}`
   })
 }
 

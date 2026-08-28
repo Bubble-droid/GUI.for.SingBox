@@ -17,12 +17,14 @@ withDefaults(defineProps<Props>(), {
   multiple: false as any,
 })
 
-const emits = defineEmits<(e: 'change', val: ModelType) => void>()
+const emits = defineEmits<{
+  changed: [value: ModelType]
+}>()
 
 const options = ref<{ label: string; value: string }[]>([])
 
 const onChange = (val: ModelType) => {
-  emits('change', val)
+  emits('changed', val)
 }
 
 onMounted(async () => {
@@ -38,6 +40,6 @@ onMounted(async () => {
     :options="options"
     :border="border"
     :multiple="multiple"
-    @change="onChange"
+    @changed="onChange"
   />
 </template>

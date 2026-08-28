@@ -2,8 +2,7 @@ import { PredefinedClashModeOptions } from '@features/constant/options'
 
 import { RestartApp } from '@/bridge/app'
 
-import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { PluginTrigger, PluginTriggerEvent } from '@/constant/app'
+import { ColorOptions, ThemeOptions, PluginTrigger, PluginTriggerEvent } from '@/constant/app'
 import useI18n from '@/lang'
 import { useAppStore } from '@/stores/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
@@ -223,7 +222,9 @@ export const getCommands = () => {
       children: pluginsStore.plugins.flatMap((plugin) => {
         const hasTrigger = !!plugin.triggers.find((trigger) => trigger === PluginTrigger.OnManual)
         const hasMenus = !!Object.keys(plugin.menus).length
-        if (!hasTrigger && !hasMenus) return []
+        if (!hasTrigger && !hasMenus) {
+          return []
+        }
         const children: Command[] = []
         if (hasTrigger) {
           children.push({

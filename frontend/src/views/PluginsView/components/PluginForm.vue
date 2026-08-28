@@ -2,8 +2,7 @@
 import { ref, inject, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { PluginsTriggerOptions, DraggableOptions } from '@/constant/app'
-import { PluginTrigger } from '@/constant/app'
+import { PluginsTriggerOptions, DraggableOptions, PluginTrigger } from '@/constant/app'
 import { useBool } from '@/hooks/useBool'
 import { usePluginsStore } from '@/stores/plugins'
 import { message } from '@/utils/interaction'
@@ -90,7 +89,7 @@ const handleSave = async () => {
   loading.value = false
 }
 
-const handleAddParam = async () => {
+const handleAddParam = () => {
   plugin.value.configuration.push({
     id: sampleID(),
     title: '',

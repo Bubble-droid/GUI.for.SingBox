@@ -1,21 +1,24 @@
-export interface InputProps {
-  modelValue?: string | number | undefined
+export type InputType = 'number' | 'text' | 'code'
+
+export type InputModelValue<T extends InputType = 'text'> = T extends 'number' ? number : string
+
+export interface InputProps<T extends InputType = 'text'> {
+  modelValue?: InputModelValue<T>
   modelModifiers?: {
     lazy?: boolean
     trim?: boolean
-    [key: string]: boolean | undefined
   }
   autoSize?: boolean
-  placeholder?: string | undefined
-  type?: 'number' | 'text' | 'code'
+  placeholder?: string
+  type?: T
   lang?: 'yaml' | 'json' | 'javascript'
   size?: 'default' | 'small'
   editable?: boolean
   clearable?: boolean
   allowPaste?: boolean
   autofocus?: boolean
-  min?: number | undefined
-  max?: number | undefined
+  min?: number
+  max?: number
   maxWidth?: boolean
   disabled?: boolean
   border?: boolean

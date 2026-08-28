@@ -21,9 +21,7 @@ export const UpdateTrayAndMenus = Bridge.UpdateTrayAndMenus
 
 export const GetEnv = <T extends string | undefined = undefined>(
   key?: T,
-): Promise<T extends string ? string : App.AppEnv> => {
-  return Bridge.GetEnv(key ?? '')
-}
+): Promise<T extends string ? string : App.AppEnv> => Bridge.GetEnv(key ?? '')
 
 export const IsStartup = Bridge.IsStartup
 

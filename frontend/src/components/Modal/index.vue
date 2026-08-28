@@ -46,7 +46,7 @@ const hasOpened = ref(open.value)
 const cancelLoading = ref(false)
 const submitLoading = ref(false)
 
-const modalZindex = ref()
+const modalZindex = ref<number>()
 const [isMaximize, toggleMaximize] = useBool(false)
 const [isMinimize, toggleMinimize] = useBool(false)
 
@@ -69,8 +69,8 @@ const handleAction = async (isOk: boolean, waitForAnimation = true) => {
   open.value = false
 
   if (waitForAnimation) {
-    afterLeavePromise = new Promise((r) => {
-      resolveAfterLeave = r
+    afterLeavePromise = new Promise((resolve) => {
+      resolveAfterLeave = resolve
     })
     await afterLeavePromise
   }
@@ -93,12 +93,12 @@ const handleCancel = () => handleAction(false)
 const onMaskClick = () => props.maskClosable && handleCancel()
 
 const contentStyle = computed(() => ({
-  maxHeight: props.maxHeight + '%',
-  maxWidth: props.maxWidth + '%',
-  minWidth: isMaximize.value ? '100%' : props.minWidth ? props.minWidth + '%' : '0',
-  minHeight: isMaximize.value ? '100%' : props.minHeight ? props.minHeight + '%' : '0',
-  width: props.width + '%',
-  height: props.height + '%',
+  maxHeight: `${props.maxHeight}%`,
+  maxWidth: `${props.maxWidth}%`,
+  minWidth: isMaximize.value ? '100%' : props.minWidth ? `${props.minWidth}%` : '0',
+  minHeight: isMaximize.value ? '100%' : props.minHeight ? `${props.minHeight}%` : '0',
+  width: `${props.width}%`,
+  height: `${props.height}%`,
 }))
 
 const shouldRender = computed(() => open.value || isMinimize.value || hasOpened.value)
@@ -124,7 +124,7 @@ const closeFn = () => {
     lastEscTime = 0
     closeMessage?.()
   } else {
-    const { destroy } = message.info('common.pressAgainToClose', 1_000)
+    const { destroy } = message.info('common.pressAgainToClose', 1000)
     closeMessage = destroy
     lastEscTime = now
   }
@@ -147,7 +147,7 @@ const minimizeModal = markRaw({
 })
 
 const removeMinimizedModal = () => {
-  const idx = modalMinimized.value.findIndex((m) => m === minimizeModal)
+  const idx = modalMinimized.value.indexOf(minimizeModal)
   if (idx !== -1) {
     modalMinimized.value.splice(idx, 1)
   }
@@ -173,7 +173,7 @@ watch(open, (v) => {
       handleMinimize()
     }
     closeMessage?.()
-    const idx = modalStack.findIndex((fn) => fn === closeFn)
+    const idx = modalStack.indexOf(closeFn)
     if (idx !== -1) {
       modalStack.splice(idx, 1)
     }

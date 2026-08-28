@@ -32,33 +32,25 @@ import type { TagMaps } from './types'
 export const generateDomainResolver = (
   resolver: DomainResolver,
   maps: TagMaps,
-): SingBoxDomainResolver => {
-  return {
-    ...(resolver as SingBoxDomainResolver),
-    server: maps.dnsServers.get(resolver.server) ?? '',
-  }
-}
+): SingBoxDomainResolver => ({
+  ...(resolver as SingBoxDomainResolver),
+  server: maps.dnsServers.get(resolver.server) ?? '',
+})
 
-export const generateDialer = (dialer: Dialer, maps: TagMaps): SingBoxDialer => {
-  return {
-    ...(dialer as SingBoxDialer),
-    netns: maps.netns.get(dialer.netns) ?? '',
-    detour: maps.outbounds.get(dialer.detour) ?? '',
-    domain_resolver: generateDomainResolver(dialer.domain_resolver, maps),
-  }
-}
+export const generateDialer = (dialer: Dialer, maps: TagMaps): SingBoxDialer => ({
+  ...(dialer as SingBoxDialer),
+  netns: maps.netns.get(dialer.netns) ?? '',
+  detour: maps.outbounds.get(dialer.detour) ?? '',
+  domain_resolver: generateDomainResolver(dialer.domain_resolver, maps),
+})
 
-export const generateUdpNat = (udpNat: UdpNat): SingBoxUdpNat => {
-  return { ...(udpNat as SingBoxUdpNat) }
-}
+export const generateUdpNat = (udpNat: UdpNat): SingBoxUdpNat => ({ ...(udpNat as SingBoxUdpNat) })
 
-export const generateListen = (listen: Listen, maps: TagMaps): SingBoxListen => {
-  return {
-    ...(listen as SingBoxListen),
-    netns: maps.netns.get(listen.netns) ?? '',
-    detour: maps.inbounds.get(listen.detour) ?? '',
-  }
-}
+export const generateListen = (listen: Listen, maps: TagMaps): SingBoxListen => ({
+  ...(listen as SingBoxListen),
+  netns: maps.netns.get(listen.netns) ?? '',
+  detour: maps.inbounds.get(listen.detour) ?? '',
+})
 
 export const generateRule = (
   rule: RouteRuleConfig | DnsRuleConfig,
@@ -70,22 +62,27 @@ export const generateRule = (
 
   const extra: Recordable = { action: rule.action, invert: rule.invert ? true : undefined }
   switch (rule.type) {
-    case RouteRuleType.Inline:
+    case RouteRuleType.Inline: {
       deepAssign(extra, JSON.parse(rule.payload))
       break
-    case RouteRuleType.RuleSet:
+    }
+    case RouteRuleType.RuleSet: {
       extra[rule.type] = rule.payload.split(',').map((id) => getRuleset(id))
       break
-    case RouteRuleType.Inbound:
+    }
+    case RouteRuleType.Inbound: {
       extra[rule.type] = getInbound(rule.payload)
       break
+    }
     case DnsRuleType.IpIsPrivate:
-    case DnsRuleType.IpAcceptAny:
+    case DnsRuleType.IpAcceptAny: {
       extra[rule.type] = rule.payload === 'true'
       break
-    case RouteRuleType.ClashMode:
+    }
+    case RouteRuleType.ClashMode: {
       extra[rule.type] = rule.payload
       break
+    }
     default: {
       extra[rule.type] = rule.payload.split(',').map((val) => {
         if (rule.type === RouteRuleType.Port || rule.type === RouteRuleType.SourcePort) {
@@ -107,7 +104,9 @@ export const generateInboundTls = (
   tls: InboundTlsConfig,
   maps: TagMaps,
 ): SingBoxInboundTls | undefined => {
-  if (!tls.enabled) return undefined
+  if (!tls.enabled) {
+    return undefined
+  }
   const { enabled: _, ech, reality, ...rest } = tls
   return {
     ...rest,
@@ -128,7 +127,9 @@ export const generateInboundTls = (
 }
 
 export const generateOutboundTls = (tls: OutboundTlsConfig): SingBoxOutboundTls | undefined => {
-  if (!tls.enabled) return undefined
+  if (!tls.enabled) {
+    return undefined
+  }
   const { enabled: _, ech, utls, reality, ...rest } = tls
   return {
     ...rest,
@@ -139,9 +140,8 @@ export const generateOutboundTls = (tls: OutboundTlsConfig): SingBoxOutboundTls 
   } as SingBoxOutboundTls
 }
 
-export const generateHttp2Options = (http2: Http2Options): SingBoxHttp2 => {
-  return { ...http2 } as SingBoxHttp2
-}
+export const generateHttp2Options = (http2: Http2Options): SingBoxHttp2 =>
+  ({ ...http2 }) as SingBoxHttp2
 
 export const generateQuicOptions = (quic: QuicOptions): SingBoxQuic => {
   const { initial_packet_size, disable_path_mtu_discovery, ...rest } = quic
@@ -155,9 +155,8 @@ export const generateQuicOptions = (quic: QuicOptions): SingBoxQuic => {
 export const generateDns01Challenge = (
   dns01: Dns01Challenge,
   maps: TagMaps,
-): SingBoxDns01Challenge => {
-  return {
+): SingBoxDns01Challenge =>
+  ({
     ...dns01,
     resolvers: dns01.resolvers.map((v) => maps.dnsServers.get(v)),
-  } as unknown as SingBoxDns01Challenge
-}
+  }) as unknown as SingBoxDns01Challenge

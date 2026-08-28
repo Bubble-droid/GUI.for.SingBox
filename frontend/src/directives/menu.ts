@@ -24,7 +24,9 @@ const updateMenus = (el: HTMLElement, binding: DirectiveBinding<App.Menu[]>) => 
   }
 
   const previous = menuHandlers.get(el)
-  if (previous) el.removeEventListener('contextmenu', previous)
+  if (previous) {
+    el.removeEventListener('contextmenu', previous)
+  }
   el.addEventListener('contextmenu', onContextMenu)
   menuHandlers.set(el, onContextMenu)
 }
@@ -38,7 +40,9 @@ export default {
   },
   unmounted(el) {
     const handler = menuHandlers.get(el)
-    if (handler) el.removeEventListener('contextmenu', handler)
+    if (handler) {
+      el.removeEventListener('contextmenu', handler)
+    }
     menuHandlers.delete(el)
   },
 } satisfies Directive<HTMLElement, App.Menu[]>

@@ -47,7 +47,7 @@ const handleSubmit = async () => {
       await rulesetsStore.editRuleset(props.id, ruleset.value)
       handleCancel()
     } catch (error: any) {
-      console.error('editRuleset: ', error)
+      console.error('editRuleset:', error)
       message.error(error)
     }
 
@@ -60,7 +60,7 @@ const handleSubmit = async () => {
     await rulesetsStore.addRuleset(ruleset.value)
     handleCancel()
   } catch (error: any) {
-    console.error('addRuleset: ', error)
+    console.error('addRuleset:', error)
     message.error(error)
   }
 

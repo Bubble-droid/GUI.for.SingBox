@@ -85,7 +85,9 @@ export const useEnvStore = defineStore('env', () => {
       await kernelApiStore.updateConfig('inbound', null)
     }
     proxyEndpoint = kernelApiStore.getProxyEndpoint()
-    if (!proxyEndpoint) throw new Error('home.overview.needPort')
+    if (!proxyEndpoint) {
+      throw new Error('home.overview.needPort')
+    }
     const server = `${formatProxyHost(proxyEndpoint.host)}:${proxyEndpoint.port}`
     await SetSystemProxy(true, server, proxyEndpoint.proxyType, proxyBypassList, services)
     systemProxy.value = true
@@ -99,13 +101,18 @@ export const useEnvStore = defineStore('env', () => {
   }
 
   const switchSystemProxy = async (enable: boolean) => {
-    if (enable) await setSystemProxy()
-    else await clearSystemProxy()
+    if (enable) {
+      await setSystemProxy()
+    } else {
+      await clearSystemProxy()
+    }
   }
 
   const setSystemDNS = async (proxy: boolean) => {
     const supportedSystems: App.OS[] = [OS.Linux, OS.Darwin]
-    if (!supportedSystems.includes(env.value.os)) return
+    if (!supportedSystems.includes(env.value.os)) {
+      return
+    }
     const servers = proxy ? appSettings.app.systemProxyDNS : appSettings.app.systemDefaultDNS
     await SetSystemDNS(servers, appSettings.app.systemProxyServices)
     systemDNSSet.value = proxy

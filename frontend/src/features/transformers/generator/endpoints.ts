@@ -12,30 +12,32 @@ import type {
 import { generateDialer, generateUdpNat, generateListen } from './shared'
 import type { TagMaps } from './types'
 
-export const generateEndpoints = (
-  endpoints: EndpointConfig[],
-  maps: TagMaps,
-): SingBoxEndpoint[] => {
-  return endpoints
+export const generateEndpoints = (endpoints: EndpointConfig[], maps: TagMaps): SingBoxEndpoint[] =>
+  endpoints
     .filter((ep) => ep.enable)
     .map((ep): SingBoxEndpoint => {
       const { type } = ep
       switch (type) {
-        case Endpoint.WireGuard:
+        case Endpoint.WireGuard: {
           return generateWireGuard(ep, maps)
-        case Endpoint.Tailscale:
+        }
+        case Endpoint.Tailscale: {
           return generateTailscale(ep, maps)
-        case Endpoint.OpenConnect:
+        }
+        case Endpoint.OpenConnect: {
           return generateOpenConnect(ep, maps)
-        case Endpoint.OpenVpnClient:
+        }
+        case Endpoint.OpenVpnClient: {
           return generateOpenVpnClient(ep, maps)
-        case Endpoint.OpenVpnServer:
+        }
+        case Endpoint.OpenVpnServer: {
           return generateOpenVpnServer(ep, maps)
-        default:
+        }
+        default: {
           throw new Error(`Unexpected endpoint type: ${type as string}`)
+        }
       }
     })
-}
 
 export const generateWireGuard = (
   wireguard: EndpointWireGuard,

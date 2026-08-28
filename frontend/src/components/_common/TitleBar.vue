@@ -36,7 +36,7 @@ const pinWindow = () => {
   WindowSetAlwaysOnTop(isPinned.value)
 }
 
-const closeWindow = async () => {
+const closeWindow = () => {
   if (appSettingsStore.app.exitOnClose) {
     exitApp()
   } else {

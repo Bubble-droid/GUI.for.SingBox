@@ -82,11 +82,10 @@ const getRequestAppSettings = () => useStoreDeps(StoreDep.AppSettingsStore).app
 
 const transformResponseHeaders = (
   headers: Record<string, string | string[]>,
-): Response['headers'] => {
-  return Object.fromEntries(
+): Response['headers'] =>
+  Object.fromEntries(
     Object.entries(headers).map(([key, value]) => [key, value.length > 1 ? value : value[0]!]),
   )
-}
 
 const transformResponseBody = (body: Response['body'], headers: Response['headers']) => {
   if (headers['Content-Type']?.includes('application/json')) {
@@ -107,9 +106,9 @@ const transformRequest = async (
   const transformedHeaders = { 'User-Agent': getUserAgent(getRequestAppSettings()), ...headers }
 
   if (transformedHeaders['Content-Type']?.includes('application/json')) {
-    body && (body = JSON.stringify(body))
+    body &&= JSON.stringify(body)
   } else if (transformedHeaders['Content-Type']?.includes('application/x-www-form-urlencoded')) {
-    body && (body = new URLSearchParams(body as string).toString())
+    body &&= new URLSearchParams(body as string).toString()
   }
 
   const transformedReqOpts = await mergeRequestOptions(options)
@@ -131,8 +130,9 @@ interface RequestWithProgressOptions {
   Method?: Request['method']
 }
 
-const requestWithProgress = (fnName: 'Download' | 'Upload') => {
-  return async (
+const requestWithProgress =
+  (fnName: 'Download' | 'Upload') =>
+  async (
     url: Request['url'],
     path: string,
     headers: Request['headers'] = {},
@@ -173,14 +173,16 @@ const requestWithProgress = (fnName: 'Download' | 'Upload') => {
       EventsOff(progressEvent)
     }
 
-    if (!flag) throw new Error(respBody)
+    if (!flag) {
+      throw new Error(respBody)
+    }
 
     return transformResponse(status, respHeaders, respBody)
   }
-}
 
-const requestWithBody = (method: Extract<App.RequestMethod, 'PUT' | 'POST' | 'PATCH'>) => {
-  return async (url: string, headers: Request['headers'] = {}, body = {}, options = {}) => {
+const requestWithBody =
+  (method: Extract<App.RequestMethod, 'PUT' | 'POST' | 'PATCH'>) =>
+  async (url: string, headers: Request['headers'] = {}, body = {}, options = {}) => {
     const [_headers, _body, _options] = await transformRequest(headers, body, options)
 
     const {
@@ -196,18 +198,16 @@ const requestWithBody = (method: Extract<App.RequestMethod, 'PUT' | 'POST' | 'PA
       _options,
     )
 
-    if (!flag) throw new Error(respBody)
+    if (!flag) {
+      throw new Error(respBody)
+    }
 
     return transformResponse(status, respHeaders, respBody)
   }
-}
 
-const requestWithoutBody = (methd: Extract<App.RequestMethod, 'GET' | 'HEAD' | 'DELETE'>) => {
-  return async (
-    url: string,
-    headers: Request['headers'] = {},
-    options: Request['options'] = {},
-  ) => {
+const requestWithoutBody =
+  (method: Extract<App.RequestMethod, 'GET' | 'HEAD' | 'DELETE'>) =>
+  async (url: string, headers: Request['headers'] = {}, options: Request['options'] = {}) => {
     const [_headers, , _options] = await transformRequest(headers, null, options)
 
     const {
@@ -216,18 +216,19 @@ const requestWithoutBody = (methd: Extract<App.RequestMethod, 'GET' | 'HEAD' | '
       headers: respHeaders,
       body,
     } = await Bridge.Requests(
-      methd,
+      method,
       transformRequestUrl(url, getRequestAppSettings()),
       _headers,
       '',
       _options,
     )
 
-    if (!flag) throw new Error(body)
+    if (!flag) {
+      throw new Error(body)
+    }
 
     return transformResponse(status, respHeaders, body)
   }
-}
 
 interface RequestWithAutoTransform extends Request {
   autoTransformBody?: boolean
@@ -265,7 +266,9 @@ export const Requests = async (options: RequestWithAutoTransform) => {
     finalReqOpts,
   )
 
-  if (!flag) throw new Error(respBody)
+  if (!flag) {
+    throw new Error(respBody)
+  }
 
   const transformedHeaders = transformResponseHeaders(respHeaders)
   const transformBody = options.autoTransformBody ?? true
@@ -294,18 +297,24 @@ export const HttpCancel = (cancelId: string) => {
 
 export const TcpPing = async (address: string, options: NetOptions = {}) => {
   const { flag, data } = await Bridge.TcpPing(address, mergeNetOptions(options))
-  if (!flag) throw new Error(data)
+  if (!flag) {
+    throw new Error(data)
+  }
   return Number(data)
 }
 
 export const TcpRequest = async (address: string, payload: string, options: NetOptions = {}) => {
   const { flag, data } = await Bridge.TcpRequest(address, payload, mergeNetOptions(options))
-  if (!flag) throw new Error(data)
+  if (!flag) {
+    throw new Error(data)
+  }
   return data
 }
 
 export const UdpRequest = async (address: string, payload: string, options: NetOptions = {}) => {
   const { flag, data } = await Bridge.UdpRequest(address, payload, mergeNetOptions(options))
-  if (!flag) throw new Error(data)
+  if (!flag) {
+    throw new Error(data)
+  }
   return data
 }

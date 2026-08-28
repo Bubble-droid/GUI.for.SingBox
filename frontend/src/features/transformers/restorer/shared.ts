@@ -131,7 +131,9 @@ export const restoreInboundTls = (
   maps: IdMaps,
 ): InboundTlsConfig => {
   const template = createInboundTls()
-  if (!raw) return template
+  if (!raw) {
+    return template
+  }
 
   const { dialer, rest: handshakeRest } = restoreDialer(raw.reality?.handshake ?? {}, maps)
 
@@ -167,7 +169,9 @@ export const restoreInboundTls = (
 
 export const restoreOutboundTls = (raw: SingBoxOutboundTls | undefined): OutboundTlsConfig => {
   const template = createOutboundTls()
-  if (!raw) return template
+  if (!raw) {
+    return template
+  }
 
   return {
     ...template,
@@ -227,7 +231,9 @@ export const restoreDns01Challenge = (
   maps: IdMaps,
 ): Dns01Challenge => {
   const template = createDns01Challenge(raw?.provider)
-  if (!raw) return template
+  if (!raw) {
+    return template
+  }
 
   return {
     ...template,

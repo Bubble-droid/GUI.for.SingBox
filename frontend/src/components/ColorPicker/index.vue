@@ -11,7 +11,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const model = defineModel<string>({ default: '#000000' })
 
-const emit = defineEmits(['change'])
+const emit = defineEmits<{
+  change: [value: string]
+}>()
 
 const inputRef = useTemplateRef('inputRef')
 

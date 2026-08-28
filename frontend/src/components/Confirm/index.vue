@@ -23,7 +23,11 @@ const props = withDefaults(defineProps<Props>(), {
   options: () => ({ type: 'text' }),
 })
 
-const emits = defineEmits(['confirm', 'cancel', 'finish'])
+const emits = defineEmits<{
+  confirm: [value: boolean]
+  cancel: []
+  finish: []
+}>()
 
 const { t } = useI18n.global
 

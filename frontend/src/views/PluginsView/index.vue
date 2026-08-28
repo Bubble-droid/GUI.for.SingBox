@@ -91,7 +91,7 @@ const handleUpdatePluginHub = async () => {
     await pluginsStore.updatePluginHub()
     message.success('plugins.updateSuccess')
   } catch (error: any) {
-    console.error('handleUpdatePluginHub: ', error)
+    console.error('handleUpdatePluginHub:', error)
     message.error(error)
   }
 }
@@ -101,7 +101,7 @@ const handleUpdatePlugins = async () => {
     await pluginsStore.updatePlugins()
     message.success('common.success')
   } catch (error: any) {
-    console.error('handleUpdatePlugins: ', error)
+    console.error('handleUpdatePlugins:', error)
     message.error(error)
   }
 }
@@ -111,7 +111,7 @@ const handleUpdatePlugin = async (s: App.Plugin) => {
     await pluginsStore.updatePlugin(s.id)
     message.success('common.success')
   } catch (error: any) {
-    console.error('handleUpdatePlugin: ', error)
+    console.error('handleUpdatePlugin:', error)
     message.error(error)
   }
 }
@@ -120,7 +120,7 @@ const handleDeletePlugin = async (p: App.Plugin) => {
   try {
     await pluginsStore.deletePlugin(p.id)
   } catch (error: any) {
-    console.error('handleDeletePlugin: ', error)
+    console.error('handleDeletePlugin:', error)
     message.error(error)
   }
 }
@@ -132,7 +132,7 @@ const handleDisablePlugin = async (p: App.Plugin) => {
   try {
     await pluginsStore.editPlugin(p.id, nextPlugin)
   } catch (error: any) {
-    console.error('handleDisablePlugin: ', error)
+    console.error('handleDisablePlugin:', error)
     message.error(error)
   }
 }
@@ -158,7 +158,7 @@ const generateMenus = (p: App.Plugin) => {
   if (p.configuration.length) {
     builtInMenus.push({
       label: 'plugins.configuration',
-      handler: async () => {
+      handler: () => {
         const m = modal({ title: 'plugins.configuration' })
         m.setContent(PluginConfigurator, { plugin: p }).open()
       },

@@ -30,7 +30,9 @@ watch(keywords, () => (currentPage.value = 1))
 
 const filteredList = computed(() => {
   const tokens = keywords.value.trim().split(/\s+/).filter(Boolean)
-  if (tokens.length === 0) return rulesetsStore.rulesetHub.list
+  if (tokens.length === 0) {
+    return rulesetsStore.rulesetHub.list
+  }
   const lowered = tokens.map((token) => token.toLocaleLowerCase())
   return rulesetsStore.rulesetHub.list.filter((ruleset) => {
     const fields = [ruleset.name, ruleset.type, ruleset.description].map((f) =>
@@ -58,8 +60,8 @@ const getRulesetUrlAndSuffix = (ruleset: App.RulesetHub['list'][number], format:
 
 const handleAddRuleset = async (ruleset: App.RulesetHub['list'][number], format: RuleSetFormat) => {
   const [url, suffix] = getRulesetUrlAndSuffix(ruleset, format)
-  const id = ruleset.type + '_' + ruleset.name + '.' + format
-  const file = ruleset.type + '_' + ruleset.name + suffix
+  const id = `${ruleset.type}_${ruleset.name}.${format}`
+  const file = `${ruleset.type}_${ruleset.name}${suffix}`
   try {
     await rulesetsStore.addRuleset({
       id,
@@ -68,7 +70,7 @@ const handleAddRuleset = async (ruleset: App.RulesetHub['list'][number], format:
       disabled: false,
       type: 'Http',
       format,
-      path: 'data/rulesets/' + file,
+      path: `data/rulesets/${file}`,
       url,
       count: ruleset.count,
     })
@@ -90,7 +92,9 @@ const handleAddRulesetToProfile = async (
   try {
     const { items } = await picker.resource('profile', 'profiles.select', { min: 1, max: 1 })
     const profile = items[0]
-    if (!profile) return
+    if (!profile) {
+      return
+    }
 
     const insertionPointIndex = profile.route.rules.findIndex(
       (rule) => rule.type === RouteRuleType.InsertionPoint,
@@ -128,7 +132,9 @@ const handleAddRulesetToProfile = async (
       profile.outbounds[0]?.id || BuiltInOutbound[0]!,
     ])
 
-    if (!target) return
+    if (!target) {
+      return
+    }
 
     const nextProfile = deepClone(profile)
     let rulesetReferenceId = profileRuleset?.id
@@ -179,7 +185,7 @@ const handleUpdatePluginHub = async () => {
 }
 
 const isAlreadyAdded = (ruleset: App.RulesetHub['list'][number], format: RuleSetFormat) => {
-  const id = ruleset.type + '_' + ruleset.name + '.' + format
+  const id = `${ruleset.type}_${ruleset.name}.${format}`
   return rulesetsStore.getRulesetById(id)
 }
 
@@ -194,7 +200,7 @@ const modalSlots = {
           current: currentPage.value,
           'onUpdate:current': (current: number) => (currentPage.value = current),
           total: filteredList.value.length,
-          pageSize: pageSize,
+          pageSize,
           size: 'small',
           class: 'mr-auto',
         })

@@ -20,9 +20,11 @@ const scrollRef = ref<HTMLElement | null>(null)
 const hasOverflow = ref(false)
 let resizeObserver: ResizeObserver | undefined
 
-function updateOverflow() {
+const updateOverflow = () => {
   const el = scrollRef.value
-  if (!el) return
+  if (!el) {
+    return
+  }
 
   hasOverflow.value = el.scrollHeight > el.clientHeight
 }
@@ -30,11 +32,11 @@ function updateOverflow() {
 const spacing = computed(() => {
   const pr = hasOverflow.value ? props.pr - 8 - 6 : props.pr
   return {
-    paddingLeft: props.pl + 'px',
+    paddingLeft: `${props.pl}px`,
     marginRight: hasOverflow.value ? '8px' : undefined,
-    paddingRight: pr > 0 ? pr + 'px' : undefined,
-    paddingTop: props.pt + 'px',
-    paddingBottom: props.pb + 'px',
+    paddingRight: pr > 0 ? `${pr}px` : undefined,
+    paddingTop: `${props.pt}px`,
+    paddingBottom: `${props.pb}px`,
   }
 })
 

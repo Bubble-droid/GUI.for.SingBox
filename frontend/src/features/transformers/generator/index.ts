@@ -22,9 +22,8 @@ import { generateOutbounds } from './outbounds'
 import { generateRoute } from './route'
 import type { GenerateConfigOptions, TagMaps } from './types'
 
-const buildIdTagMapping = (items: TagItem[]): Map<string, string> => {
-  return new Map(items.map((v) => [v.id, v.tag]))
-}
+const buildIdTagMapping = (items: TagItem[]): Map<string, string> =>
+  new Map(items.map((v) => [v.id, v.tag]))
 
 export const generateConfig = async (
   originalProfile: Profile,
@@ -97,10 +96,10 @@ export const generateConfig = async (
 
   // step 4
   if (enableScriptProcessing) {
-    const fn = new window.AsyncFunction(
+    const fn = new globalThis.AsyncFunction(
       'config',
       `${originalProfile.script.code}; return await onGenerate(config)`,
-    ) as (c: Recordable) => MaybePromise<Recordable>
+    )
     try {
       config = await fn(config)
     } catch (error) {

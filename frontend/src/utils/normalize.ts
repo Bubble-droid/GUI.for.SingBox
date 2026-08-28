@@ -7,14 +7,22 @@ export const normalizeProxyHost = (host: string) => {
 
 export const normalizeRequestProxy = (proxy: string) => {
   const trimmed = proxy.trim()
-  if (!trimmed) return ''
-  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) return trimmed
+  if (!trimmed) {
+    return ''
+  }
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) {
+    return trimmed
+  }
   return `http://${trimmed}`
 }
 
 export const normalizeErrorMessage = (error: unknown) => {
-  if (typeof error === 'string') return error
-  if (error instanceof Error) return error.message
+  if (typeof error === 'string') {
+    return error
+  }
+  if (error instanceof Error) {
+    return error.message
+  }
   return String(error)
 }
 

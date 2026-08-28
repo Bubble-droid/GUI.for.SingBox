@@ -14,13 +14,11 @@ import { createRoute } from './route'
 
 export const ProfileSchemaVersion = 'v0.8.0'
 
-export const createMixin = (): MixinConfig => {
-  return { priority: 'mixin', format: 'json', config: '{}' }
-}
+export const createMixin = (): MixinConfig => ({ priority: 'mixin', format: 'json', config: '{}' })
 
-export const createScript = (): ScriptConfig => {
-  return { code: `const onGenerate = async (config) => {\n  return config\n}` }
-}
+export const createScript = (): ScriptConfig => ({
+  code: `const onGenerate = async (config) => {\n  return config\n}`,
+})
 
 export const createProfile = (name = ''): Profile => ({
   id: sampleID(),

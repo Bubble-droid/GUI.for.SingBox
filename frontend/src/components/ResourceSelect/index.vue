@@ -1,5 +1,6 @@
 <script lang="ts" setup generic="T extends ResourceType">
-import { computed, nextTick, onMounted, type SetupContext, type Slot } from 'vue'
+import { computed, nextTick, onMounted } from 'vue'
+import type { SetupContext, Slot } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { usePluginsStore } from '@/stores/plugins'
@@ -33,8 +34,8 @@ const props = withDefaults(defineProps<ResourceSelectProps<T>>(), {
 const model = defineModel<string[]>({ default: () => [] })
 
 const emit = defineEmits<{
-  (e: 'change', val: string[], items: ResourceItemMap<T>[]): void
-  (e: 'submit', val: string[], items: ResourceItemMap<T>[]): void
+  change: [val: string[], items: ResourceItemMap<T>[]]
+  submit: [val: string[], items: ResourceItemMap<T>[]]
 }>()
 
 const { t } = useI18n()
@@ -65,25 +66,21 @@ const resourceConfig = computed<ResourceConfig<T>>(() => {
       list: rulesetsStore.rulesets,
       getById: rulesetsStore.getRulesetById,
       getName: (item) => item.name,
-      getDescription: (item) => {
-        return `${item.type} / ${item.format}`
-      },
+      getDescription: (item) => `${item.type} / ${item.format}`,
     },
     plugin: {
       title: 'plugins.select',
       list: pluginsStore.plugins,
       getById: pluginsStore.getPluginById,
       getName: (item) => item.name,
-      getDescription: (item) => {
-        return item.description || item.type
-      },
+      getDescription: (item) => item.description || item.type,
     },
     scheduledtask: {
       title: 'scheduledtasks.select',
       list: scheduledTasksStore.scheduledtasks,
       getById: scheduledTasksStore.getScheduledTaskById,
       getName: (item) => item.name,
-      getDescription: (item) => t('scheduledtask.' + item.type),
+      getDescription: (item) => t(`scheduledtask.${item.type}`),
     },
   }
 
@@ -123,12 +120,11 @@ const open = () => {
 
 const isBelowMinSelection = computed(() => model.value.length < props.min)
 
-const getItems = (val = model.value) => {
-  return val.flatMap((id) => {
+const getItems = (val = model.value) =>
+  val.flatMap((id) => {
     const item = resourceConfig.value.getById(id)
     return item ? [item] : []
   })
-}
 
 const handleSelect = (item: ResourceItemMap<T>) => {
   const id = item.id
@@ -150,9 +146,10 @@ const handleSelect = (item: ResourceItemMap<T>) => {
   emit('change', nextValue, getItems(nextValue))
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (props.openImmediate) {
-    nextTick(open)
+    await nextTick()
+    open()
   }
 })
 </script>

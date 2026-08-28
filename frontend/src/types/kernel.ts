@@ -1,6 +1,8 @@
+import type { TunStack } from '@features/constant/kernel'
+
 export interface CoreApiConfigTun {
   enable: boolean
-  stack: string
+  stack: TunStack
   device: string
 }
 

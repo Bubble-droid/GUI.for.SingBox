@@ -5,7 +5,7 @@ import BranchDetail from './components/BranchDetail.vue'
 import CoreConfiguration from './components/CoreConfig.vue'
 import SwitchBranch from './components/SwitchBranch.vue'
 
-const handleCoreConfiguraion = async (isAlpha: boolean) => {
+const handleCoreConfiguraion = (isAlpha: boolean) => {
   const m = modal({ title: 'settings.kernel.config.name', minWidth: '70' })
   m.setContent(CoreConfiguration, { isAlpha }).open()
 }

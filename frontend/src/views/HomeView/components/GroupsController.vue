@@ -10,8 +10,8 @@ import {
   DefaultControllerSensitivity,
   DefaultTestTimeout,
   DefaultTestURL,
+  ControllerCloseMode,
 } from '@/constant/app'
-import { ControllerCloseMode } from '@/constant/app'
 import { useBool } from '@/hooks/useBool'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useKernelApiStore } from '@/stores/kernelApi'
@@ -67,9 +67,15 @@ const groups = computed(() => {
           return { ...proxies[proxy]!, delay }
         })
         .toSorted((a, b) => {
-          if (!appSettings.app.kernel.sortByDelay || a.delay === b.delay) return 0
-          if (!a.delay) return 1
-          if (!b.delay) return -1
+          if (!appSettings.app.kernel.sortByDelay || a.delay === b.delay) {
+            return 0
+          }
+          if (!a.delay) {
+            return 1
+          }
+          if (!b.delay) {
+            return -1
+          }
           return a.delay - b.delay
         })
 
@@ -84,7 +90,7 @@ const groups = computed(() => {
 })
 
 const useProxyWithCatchError = (group: any, proxy: any) => {
-  handleUseProxy(group, proxy).catch((err: any) => message.error(err.message || err))
+  handleUseProxy(group, proxy).catch((error: any) => message.error(error.message || error))
 }
 
 const toggleExpanded = (group: string) => {
@@ -124,10 +130,10 @@ const handleGroupDelay = async (group: string) => {
           appSettings.app.kernel.testTimeout || DefaultTestTimeout,
         )
         success += 1
-        _proxy && _proxy.history.push({ delay })
+        _proxy?.history.push({ delay })
       } catch {
         failure += 1
-        _proxy && _proxy.history.push({ delay: 0 })
+        _proxy?.history.push({ delay: 0 })
       }
       update(`Testing... ${index} / ${_group.all.length}, success: ${success} failure: ${failure}`)
       loadingSet.value.delete(proxy)
@@ -166,9 +172,9 @@ const handleProxyDelay = async (proxy: string) => {
       appSettings.app.kernel.testTimeout || DefaultTestTimeout,
     )
     const _proxy = kernelApiStore.proxies[proxy]
-    _proxy && _proxy.history.push({ delay })
+    _proxy?.history.push({ delay })
   } catch (error: any) {
-    message.error(error + ': ' + proxy)
+    message.error(`${error}: ${proxy}`)
   }
   loadingSet.value.delete(proxy)
 }
@@ -191,10 +197,18 @@ const locateGroup = (group: any, chain: string) => {
 }
 
 const delayColor = (delay = 0) => {
-  if (delay === 0) return 'var(--level-0-color)'
-  if (delay < 500) return 'var(--level-1-color)'
-  if (delay < 1000) return 'var(--level-2-color)'
-  if (delay < 1500) return 'var(--level-3-color)'
+  if (delay === 0) {
+    return 'var(--level-0-color)'
+  }
+  if (delay < 500) {
+    return 'var(--level-1-color)'
+  }
+  if (delay < 1000) {
+    return 'var(--level-2-color)'
+  }
+  if (delay < 1500) {
+    return 'var(--level-3-color)'
+  }
   return 'var(--level-4-color)'
 }
 

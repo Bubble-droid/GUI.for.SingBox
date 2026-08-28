@@ -85,7 +85,7 @@ const handleEdit = (index: number) => {
 
 const handleUse = (ruleset: any) => {
   const ids = fields.value.payload.split(',').filter(Boolean)
-  const idx = ids.findIndex((v) => v === ruleset.id)
+  const idx = ids.indexOf(ruleset.id)
   if (idx === -1) {
     ids.push(ruleset.id)
   } else {
@@ -105,9 +105,7 @@ const handleDelete = (index: number) => {
 
 const showLost = () => message.warn('kernel.route.rules.invalid')
 
-const isSupportPayload = computed(() => {
-  return ![RouteRuleType.RuleSet].includes(fields.value.type as any)
-})
+const isSupportPayload = computed(() => ![RouteRuleType.RuleSet].includes(fields.value.type as any))
 
 const isInsertionPointMissing = computed(
   () => !model.value.some((rule) => rule.type === RouteRuleType.InsertionPoint),

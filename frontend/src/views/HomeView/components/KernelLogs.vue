@@ -18,7 +18,9 @@ const modalSlots = {
         type: 'text',
         icon: 'file',
         onClick: async () => {
-          if (logsStore.isEmpty) return
+          if (logsStore.isEmpty) {
+            return
+          }
           await ClipboardSetText(logsStore.kernelLogs.join('\n'))
           message.success('common.success')
         },

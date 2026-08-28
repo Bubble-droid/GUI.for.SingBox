@@ -30,7 +30,9 @@ const MixinFormatOptions = [
 ] as const
 
 const onFormatChange = (val: 'json' | 'yaml' | Event, old?: 'json' | 'yaml') => {
-  if (typeof val !== 'string') return
+  if (typeof val !== 'string') {
+    return
+  }
   try {
     const config = parse(model.value.mixin.config)
     if (config) {
@@ -40,11 +42,11 @@ const onFormatChange = (val: 'json' | 'yaml' | Event, old?: 'json' | 'yaml') => 
         model.value.mixin.config = stringify(config)
       }
     }
-  } catch (e: any) {
+  } catch (error: any) {
     if (old) {
       model.value.mixin.format = old
     }
-    message.error(e.message || e)
+    message.error(error.message || error)
   }
 }
 </script>

@@ -13,23 +13,26 @@ import type { TagMaps } from './types'
 export const generateCertificateProviders = (
   providers: CertificateProviderConfig[],
   maps: TagMaps,
-): SingBoxCertificateProvider[] => {
-  return providers
+): SingBoxCertificateProvider[] =>
+  providers
     .filter((cp) => cp.enable)
     .map((cp): SingBoxCertificateProvider => {
       const { type } = cp
       switch (type) {
-        case CertificateProviderType.Acme:
+        case CertificateProviderType.Acme: {
           return generateAcmeProvider(cp, maps)
-        case CertificateProviderType.Tailscale:
+        }
+        case CertificateProviderType.Tailscale: {
           return generateTailscaleProvider(cp, maps)
-        case CertificateProviderType.CloudflareOriginCa:
+        }
+        case CertificateProviderType.CloudflareOriginCa: {
           return generateCloudflareOriginCaProvider(cp, maps)
-        default:
+        }
+        default: {
           throw new Error(`Unexpected certificate provider type: ${type as string}`)
+        }
       }
     })
-}
 
 export const generateAcmeProvider = (
   acme: CertificateProviderAcme,

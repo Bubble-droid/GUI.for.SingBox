@@ -1,4 +1,5 @@
-import { ref, defineComponent, h, computed, type VNode, type ComponentPublicInstance } from 'vue'
+import { ref, defineComponent, h, computed } from 'vue'
+import type { VNode, ComponentPublicInstance } from 'vue'
 
 import ModalComp from './index.vue'
 import type { ModalProps, ModalSlots } from './types.ts'
@@ -68,7 +69,9 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
           {
             ..._props,
             ref: (el: ComponentPublicInstance<{ modalSlots: ModalSlots }> | null) => {
-              if (el?.modalSlots) this.patchSlots(el?.modalSlots ?? {})
+              if (el?.modalSlots) {
+                this.patchSlots(el?.modalSlots ?? {})
+              }
             },
           },
           _slots,

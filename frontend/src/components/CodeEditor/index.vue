@@ -33,7 +33,10 @@ interface Props {
   plugin?: Record<string, any> | undefined
 }
 
-const emit = defineEmits(['change', 'update:modelValue'])
+const emit = defineEmits<{
+  change: [content: string]
+  'update:modelValue': [content: string]
+}>()
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   lang: 'json',
@@ -136,31 +139,31 @@ const initEditor = () => {
 
   const extensions = [
     basicSetup,
-    // keymap
+    // Keymap
     keymap.of([
       indentWithTab,
       {
         key: 'Shift-Alt-f',
-        run: function (v: EditorView) {
+        run: (v: EditorView) => {
           formatDoc(v)
           return true
         },
       },
     ]),
-    // code wrap
+    // Code wrap
     EditorView.lineWrapping,
-    // placeholder
+    // Placeholder
     Placeholder(props.placeholder),
-    // theme
+    // Theme
     themeCompartment.of(
       appSettings.themeMode === Theme.Dark ? [EditorView.theme({}, { dark: true }), oneDark] : [],
     ),
     ...(props.lang === 'javascript'
       ? [autocompletion({ override: getCompletions(props.plugin) })]
       : []),
-    // lint
+    // Lint
     ...(props.lang === 'json' ? [linter(jsonParseLinter())] : []),
-    // lang
+    // Lang
     ...(['javascript', 'json', 'yaml'].includes(props.lang)
       ? [{ javascript, json, yaml }[props.lang]()]
       : []),

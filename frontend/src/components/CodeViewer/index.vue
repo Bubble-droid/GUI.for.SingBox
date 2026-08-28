@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// oxlint-disable import/no-unassigned-import
 import Prism from 'prismjs'
 import { computed } from 'vue'
 
@@ -67,7 +66,9 @@ const rawLang = computed(() => props.lang.trim())
 
 const normalizedLang = computed(() => {
   const lang = rawLang.value.toLowerCase().split(/\s+/)[0] || ''
-  if (plainLangs.has(lang)) return ''
+  if (plainLangs.has(lang)) {
+    return ''
+  }
   return langAliases[lang] || lang
 })
 
@@ -76,7 +77,9 @@ const grammar = computed(() => Prism.languages[normalizedLang.value])
 
 const html = computed(() => {
   const code = props.modelValue || ''
-  if (!grammar.value || !normalizedLang.value) return escapeHtml(code)
+  if (!grammar.value || !normalizedLang.value) {
+    return escapeHtml(code)
+  }
   return Prism.highlight(code, grammar.value, normalizedLang.value)
 })
 

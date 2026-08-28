@@ -39,16 +39,16 @@ const handleSave = async () => {
     await pluginsStore.manualTrigger(
       props.plugin.id,
       PluginTriggerEvent.OnConfigure,
-      Object.assign({}, originalSettings, settings.value),
-      Object.assign({}, originalSettings, oldSettings),
+      { ...originalSettings, ...settings.value },
+      { ...originalSettings, ...oldSettings },
     )
   } catch (error: any) {
     const errors = [
-      props.plugin.id + ' Not Found',
+      `${props.plugin.id} Not Found`,
       'is Missing source code',
       'Disabled',
-      "Can't find variable: " + PluginTriggerEvent.OnConfigure,
-      PluginTriggerEvent.OnConfigure + ' is not defined',
+      `Can't find variable: ${PluginTriggerEvent.OnConfigure}`,
+      `${PluginTriggerEvent.OnConfigure} is not defined`,
     ]
     if (errors.every((v) => !error.includes(v))) {
       message.error(error)

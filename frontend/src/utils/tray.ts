@@ -3,8 +3,7 @@ import { PredefinedClashModeOptions } from '@features/constant/options'
 import { Notify, ShowMainWindow, RestartApp, UpdateTrayAndMenus } from '@/bridge/app'
 import { EventsOff, EventsOn } from '@wails/runtime/runtime'
 
-import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { OS } from '@/constant/app'
+import { ColorOptions, ThemeOptions, OS } from '@/constant/app'
 import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 
@@ -42,12 +41,12 @@ const generateUniqueEventsForMenu = (menus: App.MenuItem[]) => {
   EventsOn('onMenuItemClick', (id) => MenuItemHandlerMap[id]?.())
 
   let index = 0
-  function processMenu(menu: App.MenuItem) {
+  const processMenu = (menu: App.MenuItem) => {
     const _menu = { ...menu, text: t(menu.text || ''), tooltip: t(menu.tooltip || '') }
     const { event, children } = menu
 
     if (event) {
-      _menu.event = index + '_' + menu.text
+      _menu.event = `${index}_${menu.text}`
       MenuItemHandlerMap[_menu.event] = event as any
     }
 
@@ -78,7 +77,9 @@ const getTrayMenus = () => {
 
   if (!groupMenusHidden) {
     const { proxies } = kernelApiStore
-    if (!proxies) return []
+    if (!proxies) {
+      return []
+    }
     const hiddenList = new Set(
       (profilesStore.currentProfile?.outbounds || []).flatMap((v) => (v.hidden ? v.tag : [])),
     )
@@ -108,9 +109,15 @@ const getTrayMenus = () => {
             return { ...proxies[proxy], delay }
           })
           .toSorted((a, b) => {
-            if (!appSettings.app.kernel.sortByDelay || a.delay === b.delay) return 0
-            if (!a.delay) return 1
-            if (!b.delay) return -1
+            if (!appSettings.app.kernel.sortByDelay || a.delay === b.delay) {
+              return 0
+            }
+            if (!a.delay) {
+              return 1
+            }
+            if (!b.delay) {
+              return -1
+            }
             return a.delay - b.delay
           })
         return { ...group, all }
@@ -328,7 +335,7 @@ export const updateTrayAndMenus = debounce(async () => {
   const isDarwin = useStoreDeps(StoreDep.EnvStore).env.os === OS.Darwin
   const title = isDarwin ? '' : APP_TITLE
 
-  const tray = { icon: trayIcons, title, tooltip: APP_TITLE + ' ' + APP_VERSION }
+  const tray = { icon: trayIcons, title, tooltip: `${APP_TITLE} ${APP_VERSION}` }
 
   const [finalTray, finalMenus] = await pluginsStore.onTrayUpdateTrigger(tray, trayMenus)
 

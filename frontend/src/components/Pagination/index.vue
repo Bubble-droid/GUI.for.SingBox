@@ -14,7 +14,9 @@ const pageNum = computed(() => Math.ceil(props.total / props.pageSize))
 const pages = computed(() => {
   const total = pageNum.value
   const current = model.value
-  if (total <= 8) return range(1, total)
+  if (total <= 8) {
+    return range(1, total)
+  }
   if (current <= 4) {
     return [...range(1, 7), 'next', total] as const
   } else if (current >= total - 3) {
@@ -23,9 +25,9 @@ const pages = computed(() => {
   return [1, 'prev', ...range(current - 2, current + 2), 'next', total] as const
 })
 
-const range = (start: number, end: number) => {
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i)
-}
+const range = (start: number, end: number) =>
+  Array.from({ length: end - start + 1 }, (_, i) => start + i)
+
 const handlePrev = () => (model.value = Math.max(1, model.value - 1))
 const handleNext = () => (model.value = Math.min(pageNum.value, model.value + 1))
 const handleJump = (page: number | 'prev' | 'next') => {

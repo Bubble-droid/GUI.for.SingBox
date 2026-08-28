@@ -48,7 +48,9 @@ export const useRulesetsStore = defineStore('rulesets', () => {
 
   const deleteRuleset = async (id: string) => {
     const idx = rulesets.value.findIndex((v) => v.id === id)
-    if (idx === -1) return
+    if (idx === -1) {
+      return
+    }
     const backup = rulesets.value.splice(idx, 1)[0]!
     try {
       await saveRulesets()
@@ -62,7 +64,9 @@ export const useRulesetsStore = defineStore('rulesets', () => {
 
   const editRuleset = async (id: string, r: App.RuleSet) => {
     const idx = rulesets.value.findIndex((v) => v.id === id)
-    if (idx === -1) return
+    if (idx === -1) {
+      return
+    }
     const backup = rulesets.value.splice(idx, 1, r)[0]!
     try {
       await saveRulesets()
@@ -131,8 +135,12 @@ export const useRulesetsStore = defineStore('rulesets', () => {
 
   const updateRuleset = async (id: string) => {
     const r = rulesets.value.find((v) => v.id === id)
-    if (!r) throw id + ' Not Found'
-    if (r.disabled) throw r.name + ' Disabled'
+    if (!r) {
+      throw `${id} Not Found`
+    }
+    if (r.disabled) {
+      throw `${r.name} Disabled`
+    }
     try {
       r.updating = true
       await _doUpdateRuleset(r)
@@ -171,7 +179,9 @@ export const useRulesetsStore = defineStore('rulesets', () => {
       update,
     )
 
-    if (needSave) await saveRulesets()
+    if (needSave) {
+      await saveRulesets()
+    }
 
     eventBus.emit('rulesetsChange', undefined)
 

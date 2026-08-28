@@ -10,8 +10,8 @@ export const restoreRouteRuleset = (
   RouteRuleSetIds: Recordable,
   OutboundsIds: Recordable,
   ctx: RestoreContext,
-): RuleSetConfig[] => {
-  return rulesets.flatMap((raw) => {
+): RuleSetConfig[] =>
+  rulesets.flatMap((raw) => {
     const ruleset = createRouteRuleset()
     ruleset.id = RouteRuleSetIds[raw['tag']]
     ruleset.type = raw['type']
@@ -49,7 +49,6 @@ export const restoreRouteRuleset = (
     }
     return ruleset
   })
-}
 
 export const restoreRouteRules = (
   rules: Recordable[],
@@ -57,11 +56,11 @@ export const restoreRouteRules = (
   OutboundsIds: Recordable,
   RouteRuleSetIds: Recordable,
   DnsServersIds: Recordable,
-): RouteRuleConfig[] => {
-  return rules.flatMap((raw, i) => {
+): RouteRuleConfig[] =>
+  rules.flatMap((raw, i) => {
     const rule = createRouteRule()
 
-    rule.id = 'rule-' + i
+    rule.id = `rule-${i}`
     rule.action = raw['action'] ?? RouteRuleAction.Route
 
     const hits = supportedRuleTypes.filter((key) => key in raw)
@@ -108,7 +107,7 @@ export const restoreRouteRules = (
           ...raw,
           action: undefined,
           invert: undefined,
-          ...supportedRuleTypes.reduce((p, c) => ((p[c] = undefined), p), {} as Recordable),
+          ...supportedRuleTypes.reduce<Recordable>((p, c) => ((p[c] = undefined), p), {}),
         },
         null,
         2,
@@ -130,4 +129,3 @@ export const restoreRouteRules = (
     }
     return rule
   })
-}

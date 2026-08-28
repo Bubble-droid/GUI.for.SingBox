@@ -2,11 +2,8 @@ import { createInboundTun, createInboundDirect, createInboundMixed } from '@defa
 import { Inbound } from '@features/constant/kernel'
 import type { InboundConfig } from '@profiles/inbounds'
 
-export const restoreInbounds = (
-  inbounds: Recordable[],
-  InboundsIds: Recordable,
-): InboundConfig[] => {
-  return inbounds.flatMap((raw) => {
+export const restoreInbounds = (inbounds: Recordable[], InboundsIds: Recordable): InboundConfig[] =>
+  inbounds.flatMap((raw) => {
     if (
       ![Inbound.Mixed, Inbound.Http, Inbound.Socks, Inbound.Tun, Inbound.Direct].includes(
         raw['type'],
@@ -59,9 +56,8 @@ export const restoreInbounds = (
           udp_fragment: raw['udp_fragment'] ?? template.listen.udp_fragment,
         },
         users:
-          raw['users']?.map((user: any) => user.username + ':' + user.password) ?? template.users,
+          raw['users']?.map((user: any) => `${user.username}:${user.password}`) ?? template.users,
       }
     }
     return inbound
   })
-}

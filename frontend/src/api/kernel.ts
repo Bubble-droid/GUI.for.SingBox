@@ -41,10 +41,10 @@ const resolveController = (controller: string, defaultPort: number) => {
   }
 
   if (trimmed.startsWith('[')) {
-    const match = trimmed.match(/^\[([^\]]+)\](?::(\d+))?$/v)
+    const match = /^\[(?<host>[^\]]+)\](?::(?<port>\d+))?$/u.exec(trimmed)
     return {
-      host: normalizeProxyHost(match?.[1] ?? ''),
-      port: Number(match?.[2] ?? defaultPort),
+      host: normalizeProxyHost(match?.groups?.['host'] ?? ''),
+      port: Number(match?.groups?.['port'] ?? defaultPort),
     }
   }
 
@@ -70,7 +70,7 @@ const setupCoreApi = (protocol: 'http' | 'ws') => {
 
   if (profile) {
     const controller = profile.experimental.clash_api.external_controller || '127.0.0.1:20123'
-    const { host, port } = resolveController(controller, 20123)
+    const { host, port } = resolveController(controller, 20_123)
     base = `${protocol}://${formatProxyHost(host)}:${port}`
     bearer = profile.experimental.clash_api.secret
   }
@@ -128,25 +128,24 @@ const createCoreWSHandlerRegister = <K extends WsKey>(key: K) => {
   }
 }
 
-// restful api
+// Restful api
 export const probeApiAvailability = () => request.get('/version')
 export const getConfigs = () => request.get<CoreApiConfig>(Api.Configs)
 export const setConfigs = (body: Partial<CoreApiConfig> = {}) =>
   request.patch<null>(Api.Configs, body)
 export const getProxies = () => request.get<CoreApiProxies>(Api.Proxies)
 export const getConnections = () => request.get<CoreApiConnections>(Api.Connections)
-export const deleteConnection = (id: string) => request.delete<null>(Api.Connections + '/' + id)
-export const useProxy = (group: string, proxy: string) => {
-  return request.put<null>(Api.Proxies + '/' + group, { name: proxy })
-}
-export const getProxyDelay = (proxy: string, url: string, timeout: number) => {
-  return request.get<Record<string, number>>(Api.ProxyDelay.replace('{0}', proxy), {
+export const deleteConnection = (id: string) => request.delete<null>(`${Api.Connections}/${id}`)
+export const useProxy = (group: string, proxy: string) =>
+  request.put<null>(`${Api.Proxies}/${group}`, { name: proxy })
+
+export const getProxyDelay = (proxy: string, url: string, timeout: number) =>
+  request.get<Record<string, number>>(Api.ProxyDelay.replace('{0}', proxy), {
     url,
     timeout,
   })
-}
 
-// websocket api
+// Websocket api
 export const onLogs = createCoreWSHandlerRegister('logs')
 export const onMemory = createCoreWSHandlerRegister('memory')
 export const onTraffic = createCoreWSHandlerRegister('traffic')
