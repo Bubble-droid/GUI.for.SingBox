@@ -5,10 +5,7 @@ import * as Bridge from '@/bridge'
 import * as Stores from '@/stores'
 import * as Utils from '@/utils'
 
-/**
- * Expose methods to be used by the plugin system
- */
-window.Plugins = {
+const PluginApis = {
   ...Bridge,
   ...Utils,
   ...Stores,
@@ -16,8 +13,15 @@ window.Plugins = {
     parse,
     stringify,
   },
-}
+} as const
+
+/**
+ * Expose methods to be used by the plugin system
+ */
+window.Plugins = PluginApis
 
 window.Vue = Vue
 
 window.AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
+
+export type PluginApis = typeof PluginApis
