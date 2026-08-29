@@ -9,7 +9,7 @@ import * as Utils from '@/utils'
 /**
  * Expose methods to be used by the plugin system
  */
-window.Plugins = {
+const PluginApis = {
   ...Bridge,
   ...Utils,
   ...Stores,
@@ -18,8 +18,12 @@ window.Plugins = {
     stringify,
   },
   DOMPurify,
-}
+} as const
+
+window.Plugins = PluginApis
 
 window.Vue = Vue
 
 window.AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
+
+export type PluginApis = typeof PluginApis
