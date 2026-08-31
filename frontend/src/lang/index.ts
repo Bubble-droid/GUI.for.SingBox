@@ -4,6 +4,8 @@ import { ReadFile } from '@/bridge/io'
 
 import { LocalesFilePath, Lang } from '@/constant/app'
 
+import type { Recordable } from '@/types'
+
 import en from './locale/en'
 import zh from './locale/zh'
 

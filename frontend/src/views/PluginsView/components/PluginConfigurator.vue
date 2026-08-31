@@ -9,6 +9,8 @@ import { message } from '@/utils/interaction.ts'
 
 import Button from '@/components/Button/index.vue'
 
+import type { App, Recordable } from '@/types'
+
 import PluginConfigItem from './PluginConfigItem.vue'
 
 interface Props {

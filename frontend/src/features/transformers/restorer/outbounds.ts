@@ -4,6 +4,8 @@ import type { OutboundConfig, ProxyConfig } from '@profiles/outbounds'
 
 import { createTextMatcher } from '@/utils/others'
 
+import type { App, Recordable } from '@/types'
+
 import type { GuiOutbound, RestoreContext } from './types'
 
 export const restoreOutbounds = (

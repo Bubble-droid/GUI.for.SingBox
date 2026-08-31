@@ -5,6 +5,8 @@ import type {
   DomainStrategy,
 } from '@features/constant/kernel'
 
+import type { Recordable } from '@/types'
+
 import type { TagItem } from './shared'
 
 export interface DnsServerConfig extends TagItem {

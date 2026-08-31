@@ -1,6 +1,7 @@
 import type { usePluginsStore } from '@/stores/plugins'
 import type { useRulesetsStore } from '@/stores/rulesets'
 import type { useSubscribesStore } from '@/stores/subscribes'
+import type { App } from '@/types'
 
 export interface GenerateConfigOptions {
   enableStableConfigCompat?: boolean

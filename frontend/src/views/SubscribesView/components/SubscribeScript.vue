@@ -7,6 +7,8 @@ import { message } from '@/utils/interaction'
 
 import Button from '@/components/Button/index.vue'
 
+import type { App } from '@/types'
+
 interface Props {
   id: string
 }

@@ -7,6 +7,8 @@ import {
 
 import { sampleID } from '@/utils/others'
 
+import type { App } from '@/types'
+
 export const RestartApp = Bridge.RestartApp
 
 export const ExitApp = Bridge.ExitApp

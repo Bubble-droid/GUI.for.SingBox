@@ -5,6 +5,8 @@ import { restoreProfile } from '@restorer'
 
 import { RequestProxyMode } from '@/constant/app'
 
+import type { App } from '@/types'
+
 import { legacyGenerateConfig } from './generator'
 import { normalizeErrorMessage } from './normalize'
 import { deepAssign } from './others'

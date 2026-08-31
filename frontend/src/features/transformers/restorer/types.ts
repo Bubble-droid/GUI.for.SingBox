@@ -2,6 +2,7 @@ import type { Profile } from '@profiles'
 import type { OutboundConfig } from '@profiles/outbounds'
 
 import type { useSubscribesStore } from '@/stores/subscribes'
+import type { App } from '@/types'
 
 export type GuiOutbound = Pick<OutboundConfig, 'exclude' | 'include' | 'hidden' | 'icon' | 'tag'>
 

@@ -6,6 +6,8 @@ import { StoreDep, useStoreDeps } from '@/stores/deps'
 import { GetRequestProxy } from '@/utils/helper'
 import { getUserAgent, sampleID, transformRequestUrl } from '@/utils/others'
 
+import type { App } from '@/types'
+
 interface NetOptions {
   Mode?: 'Binary' | 'Text'
   Timeout?: number

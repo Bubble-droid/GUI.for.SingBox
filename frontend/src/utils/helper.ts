@@ -10,6 +10,7 @@ import { OS, RequestProxyMode } from '@/constant/app'
 import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 
+import type { App, Recordable } from '@/types'
 import type { CoreApiProxy } from '@/types/kernel'
 import type { RuleCandidate } from '@/types/views'
 

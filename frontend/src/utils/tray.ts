@@ -8,6 +8,7 @@ import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 
 import type { Lang } from '@/constant/app'
+import type { App, Recordable } from '@/types'
 
 import { APP_TITLE, APP_VERSION } from './env'
 import { handleUseProxy, handleChangeMode, exitApp } from './helper'

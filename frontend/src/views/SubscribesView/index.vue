@@ -15,6 +15,8 @@ import { formatBytes, formatDate, formatRelativeTime } from '@/utils/format.ts'
 import { message, modal } from '@/utils/interaction.ts'
 import { ignoredError, debounce } from '@/utils/others.ts'
 
+import type { App } from '@/types'
+
 import ProxiesEditor from './components/ProxiesEditor.vue'
 import ProxiesView from './components/ProxiesView.vue'
 import SubscribeForm from './components/SubscribeForm.vue'

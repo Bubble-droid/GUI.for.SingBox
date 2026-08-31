@@ -3,6 +3,8 @@ import { DnsServer, DnsRuleAction, RouteRuleType } from '@features/constant/kern
 import type { SingBoxDnsServer } from '@features/types/sing-box'
 import type { DnsServerConfig, DnsRuleConfig } from '@profiles/dns'
 
+import type { Recordable } from '@/types'
+
 import { supportedRuleTypes } from './shared'
 
 export const restoreDnsServers = (

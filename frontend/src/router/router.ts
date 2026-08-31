@@ -1,9 +1,9 @@
-import type { IconType } from '@/components/Icon/index.vue'
+import type { IconName } from '@/components/Icon/icons'
 
 declare module 'vue-router' {
   interface RouteMeta {
     name: string
-    icon?: IconType
+    icon?: IconName
     hidden?: boolean
   }
 }

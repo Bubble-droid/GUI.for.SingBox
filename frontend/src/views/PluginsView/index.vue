@@ -13,6 +13,8 @@ import { deepClone, debounce } from '@/utils/others.ts'
 
 import Button from '@/components/Button/index.vue'
 
+import type { App } from '@/types'
+
 import PluginChangelog from './components/PluginChangelog.vue'
 import PluginConfigurator from './components/PluginConfigurator.vue'
 import PluginForm from './components/PluginForm.vue'

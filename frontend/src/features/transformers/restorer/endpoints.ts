@@ -25,6 +25,8 @@ import type { openconnect_tncc_certificate } from '@zhexin/typebox/endpoint'
 
 import { sampleID } from '@/utils/others'
 
+import type { Recordable } from '@/types'
+
 import { restoreDialer, restoreUdpNat, restoreListen } from './shared'
 import type { IdMaps } from './types'
 

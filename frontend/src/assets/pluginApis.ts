@@ -71,5 +71,3 @@ export const Plugins = Object.freeze({
   ...Stores,
   YAML: Object.freeze({ parse, stringify }),
 })
-
-export type PluginsApi = typeof Plugins

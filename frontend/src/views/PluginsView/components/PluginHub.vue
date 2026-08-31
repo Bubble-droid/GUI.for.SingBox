@@ -6,6 +6,8 @@ import { usePluginsStore } from '@/stores/plugins.ts'
 import { message, modal } from '@/utils/interaction.ts'
 import { createTextMatcher, deepClone } from '@/utils/others.ts'
 
+import type { App } from '@/types'
+
 import PluginSource from './PluginSource.vue'
 
 const keywords = ref('')

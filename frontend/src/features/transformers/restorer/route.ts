@@ -2,6 +2,8 @@ import { createRouteRuleset, createRouteRule } from '@defaults/route'
 import { RuleSetType, RouteRuleAction, RouteRuleType } from '@features/constant/kernel'
 import type { RuleSetConfig, RouteRuleConfig } from '@profiles/route'
 
+import type { Recordable } from '@/types'
+
 import { supportedRuleTypes } from './shared'
 import type { RestoreContext } from './types'
 

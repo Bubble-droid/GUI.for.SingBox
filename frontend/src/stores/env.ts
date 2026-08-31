@@ -8,6 +8,8 @@ import { formatProxyHost } from '@/utils/format'
 import { ignoredError } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
+import type { App } from '@/types'
+
 import { StoreDep, useStoreDeps } from './deps'
 
 export const useEnvStore = defineStore('env', () => {

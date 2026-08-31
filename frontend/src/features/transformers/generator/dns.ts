@@ -6,6 +6,8 @@ import type { RuleSetConfig } from '@profiles/route'
 
 import { deepAssign } from '@/utils/others'
 
+import type { Recordable } from '@/types'
+
 import { generateRule } from './shared'
 
 export const generateDnsServerURL = (dnsServer: DnsServerConfig) => {

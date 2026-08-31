@@ -4,6 +4,7 @@ import { useProfilesStore } from '@/stores/profiles'
 import { formatProxyHost } from '@/utils/format'
 import { normalizeProxyHost } from '@/utils/normalize'
 
+import type { Recordable } from '@/types'
 import type {
   CoreApiConfig,
   CoreApiProxies,

@@ -37,6 +37,8 @@ import { message } from '@/utils/interaction'
 import { debounce, ignoredError, deepClone } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
+import type { App } from '@/types'
+
 import { StoreDep, useStoreDeps } from './deps'
 
 export const useAppSettingsStore = defineStore('app-settings', () => {

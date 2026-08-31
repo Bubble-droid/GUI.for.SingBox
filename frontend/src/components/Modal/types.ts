@@ -1,3 +1,5 @@
+import type { MaybePromise } from '@/types'
+
 export interface ModalProps {
   title?: string | undefined
   footer?: boolean

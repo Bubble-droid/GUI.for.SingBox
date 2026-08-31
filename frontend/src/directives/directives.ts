@@ -5,7 +5,7 @@ import type platform from './platform'
 import type tips from './tips'
 
 declare module 'vue' {
-  export interface GlobalDirectives {
+  interface GlobalDirectives {
     vDraggable: typeof vDraggable
     vMenu: typeof menu
     vTips: typeof tips

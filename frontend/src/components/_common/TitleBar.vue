@@ -21,6 +21,8 @@ import { APP_TITLE, APP_VERSION } from '@/utils/env'
 import { exitApp, reloadApp } from '@/utils/helper'
 import { debounce } from '@/utils/others'
 
+import type { App } from '@/types'
+
 const isPinned = ref(false)
 const isMaximised = ref(false)
 

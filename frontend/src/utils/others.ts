@@ -4,6 +4,8 @@ import { stringify } from 'yaml'
 import { OS } from '@/constant/app'
 import appDts from '@/types/app.d.ts?raw'
 
+import type { App } from '@/types'
+
 import { APP_ID, APP_TITLE, APP_VERSION } from './env'
 import { isValidIPv4, isValidIPv6 } from './is'
 import { normalizeBase64 } from './normalize'

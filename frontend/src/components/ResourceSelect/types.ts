@@ -1,5 +1,7 @@
 import type { Profile } from '@profiles'
 
+import type { App } from '@/types'
+
 export type ResourceType = 'profile' | 'subscription' | 'ruleset' | 'plugin' | 'scheduledtask'
 export type ResourceItem = Profile | App.Subscription | App.RuleSet | App.Plugin | App.ScheduledTask
 

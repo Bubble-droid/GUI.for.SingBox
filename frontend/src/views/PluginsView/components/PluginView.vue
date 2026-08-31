@@ -12,6 +12,8 @@ import { ignoredError, deepClone } from '@/utils/others'
 import Button from '@/components/Button/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'
 
+import type { App } from '@/types'
+
 interface Props {
   id: string
 }

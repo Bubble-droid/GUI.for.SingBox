@@ -1,5 +1,6 @@
 import kernel from '@features/i18n/en/kernel'
-import type { DefineLocaleMessage } from 'vue-i18n'
+
+import type { MessageSchema } from '../i18n'
 
 export default {
   common: {
@@ -560,4 +561,4 @@ export default {
     title: 'Commands',
     noMatching: 'No matching commands',
   },
-} satisfies DefineLocaleMessage
+} satisfies MessageSchema

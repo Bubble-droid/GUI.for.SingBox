@@ -1,5 +1,7 @@
 import type { HttpEngine, HttpVersion } from '@features/constant/kernel'
 
+import type { Recordable } from '@/types'
+
 import type { Dialer, Http2Options, OutboundTlsConfig, QuicOptions, Switchable } from './shared'
 
 export interface HttpClientConfig extends Switchable {

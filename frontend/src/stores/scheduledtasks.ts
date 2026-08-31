@@ -10,6 +10,8 @@ import { ReadFile, WriteFile } from '@/bridge/io'
 import { ScheduledTasksFilePath, ScheduledTasksType, PluginTriggerEvent } from '@/constant/app'
 import { ignoredError, stringifyNoFolding } from '@/utils/others'
 
+import type { App, Recordable } from '@/types'
+
 import { StoreDep, useStoreDeps } from './deps'
 
 export const useScheduledTasksStore = defineStore('scheduledtasks', () => {

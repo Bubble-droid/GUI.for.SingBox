@@ -2,6 +2,8 @@ import type { Directive, DirectiveBinding } from 'vue'
 
 import { useEnvStore } from '@/stores/env'
 
+import type { App } from '@/types'
+
 const updateVisibility = (el: HTMLElement, binding: DirectiveBinding<App.OS[]>) => {
   const envStore = useEnvStore()
   const supports = binding.value

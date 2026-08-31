@@ -6,6 +6,8 @@ import { ReadFile } from '@/bridge/io'
 
 import { createTextMatcher } from '@/utils/others'
 
+import type { Recordable } from '@/types'
+
 import type { GenerateContext } from './types'
 
 export const generateOutbounds = async (outbounds: OutboundConfig[], ctx: GenerateContext) => {

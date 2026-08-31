@@ -4,6 +4,8 @@ import { ref, watch } from 'vue'
 import { message } from '@/utils/interaction'
 import { deepClone } from '@/utils/others'
 
+import type { App, Recordable } from '@/types'
+
 interface Props {
   plugin: App.Plugin
   modelValue?: Recordable

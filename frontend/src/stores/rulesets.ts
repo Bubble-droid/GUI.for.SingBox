@@ -14,6 +14,8 @@ import { isValidRulesJson } from '@/utils/is'
 import { migrateRulesets } from '@/utils/migration'
 import { ignoredError, omitArray, stringifyNoFolding, asyncPool } from '@/utils/others'
 
+import type { App } from '@/types'
+
 export const useRulesetsStore = defineStore('rulesets', () => {
   const rulesets = ref<App.RuleSet[]>([])
   const rulesetHub = ref<App.RulesetHub>({ geosite: '', geoip: '', list: [] })

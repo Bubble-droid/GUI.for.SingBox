@@ -5,6 +5,8 @@ import vMenu from '@/directives/menu'
 import useI18n from '@/lang'
 import { getValue } from '@/utils/others'
 
+import type { App, Recordable } from '@/types'
+
 export interface Column {
   title: string
   key: string

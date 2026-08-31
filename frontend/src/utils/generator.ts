@@ -20,6 +20,8 @@ import { ReadFile, WriteFile } from '@/bridge/io'
 import { Branch } from '@/constant/app'
 import { CoreConfigFilePath } from '@/constant/kernel'
 
+import type { App, Recordable } from '@/types'
+
 import { APP_TITLE } from './env'
 import { deepAssign, createTextMatcher, deepClone } from './others'
 

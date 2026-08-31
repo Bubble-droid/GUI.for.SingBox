@@ -20,6 +20,8 @@ import { deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 
+import type { App } from '@/types'
+
 interface Props {
   id?: string
 }

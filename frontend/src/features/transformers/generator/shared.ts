@@ -27,6 +27,8 @@ import type {
 
 import { deepAssign } from '@/utils/others'
 
+import type { Recordable } from '@/types'
+
 import type { TagMaps } from './types'
 
 export const generateDomainResolver = (

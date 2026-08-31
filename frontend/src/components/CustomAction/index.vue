@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, h, isVNode, ref, resolveComponent, watch } from 'vue'
 
+import type { App } from '@/types'
+
 interface Props {
   actions: (App.CustomAction | App.CustomActionFn)[]
 }

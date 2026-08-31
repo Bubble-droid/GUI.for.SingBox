@@ -76,12 +76,7 @@
         }
       }
     ],
-    "oxc/no-barrel-file": [
-      "error",
-      {
-        "threshold": 1
-      }
-    ],
+    "oxc/no-barrel-file": "error",
     "import/no-cycle": "error"
   },
   "options": {

@@ -27,6 +27,8 @@ import {
   asyncPool,
 } from '@/utils/others'
 
+import type { App, Recordable } from '@/types'
+
 import { StoreDep, useStoreDeps } from './deps'
 
 export const useSubscribesStore = defineStore('subscribes', () => {

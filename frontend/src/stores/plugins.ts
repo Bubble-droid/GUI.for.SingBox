@@ -28,6 +28,8 @@ import {
 } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
+import type { App, Recordable, MaybePromise } from '@/types'
+
 import { StoreDep, useStoreDeps } from './deps'
 
 declare global {

@@ -4,6 +4,8 @@ import type { HttpClientConfig } from '@profiles/http_client'
 
 import { sampleID } from '@/utils/others'
 
+import type { Recordable } from '@/types'
+
 import {
   restoreDialer,
   restoreHttp2Options,
