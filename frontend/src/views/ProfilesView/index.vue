@@ -18,7 +18,7 @@ import { deepClone, sampleID, debounce } from '@/utils/others.ts'
 
 import CodeViewer from '@/components/CodeViewer/index.vue'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 import ProfileEditor from './components/ProfileEditor.vue'
 import ProfileForm from './components/ProfileForm.vue'

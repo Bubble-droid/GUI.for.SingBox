@@ -5,7 +5,8 @@ import vMenu from '@/directives/menu'
 import useI18n from '@/lang'
 import { getValue } from '@/utils/others'
 
-import type { App, Recordable } from '@/types'
+import type * as App from '@/types/app'
+import type { Recordable } from '@/types/typescript'
 
 export interface Column {
   title: string

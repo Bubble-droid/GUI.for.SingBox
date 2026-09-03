@@ -1,10 +1,8 @@
 import { ref, defineComponent, h, computed } from 'vue'
 import type { VNode, ComponentPublicInstance } from 'vue'
 
-import ModalComp from './index.vue'
-import type { ModalProps, ModalSlots } from './types.ts'
-
-export const Modal = ModalComp
+import Modal from './index.vue'
+import type { ModalProps, ModalSlots } from './types'
 
 export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}) => {
   const open = ref(false)

@@ -1,13 +1,12 @@
 <script setup lang="ts">
+import type { Mixin, Script } from '@profiles'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { parse, stringify } from 'yaml'
 
 import { message } from '@/utils/interaction'
 
-import type { App } from '@/types'
-
-const model = defineModel<{ mixin: App.Mixin; script: App.Script }>({
+const model = defineModel<{ mixin: Mixin; script: Script }>({
   required: true,
 })
 

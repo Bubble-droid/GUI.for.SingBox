@@ -10,8 +10,8 @@ import { OS, RequestProxyMode } from '@/constant/app'
 import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 
-import type { App, Recordable } from '@/types'
 import type { CoreApiProxy } from '@/types/kernel'
+import type { Recordable } from '@/types/typescript'
 import type { RuleCandidate } from '@/types/views'
 
 import { APP_ID } from './env'
@@ -123,7 +123,7 @@ const requestProxyCache: { proxyPromise: Promise<string> | null; lastAccessTime:
   lastAccessTime: 0,
 }
 
-export const GetRequestProxy = (mode?: App.RequestProxyMode, customProxy?: string) => {
+export const GetRequestProxy = (mode?: RequestProxyMode, customProxy?: string) => {
   const appSettings = useStoreDeps(StoreDep.AppSettingsStore)
   const kernelApiProxy = useStoreDeps(StoreDep.KernelApiStore)
   const requestProxyMode = mode ?? appSettings.app.requestProxyMode

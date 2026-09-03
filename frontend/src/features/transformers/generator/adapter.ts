@@ -1,5 +1,5 @@
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 export const _adaptToStableBranch = (_: Recordable) => {
-  /* empty */
+  return
 }

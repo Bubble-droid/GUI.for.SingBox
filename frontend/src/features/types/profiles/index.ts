@@ -1,5 +1,3 @@
-import type { App } from '@/types'
-
 import type { CertificateConfig } from './certificate'
 import type { CertificateProviderConfig } from './certificate_provider'
 import type { DnsConfig } from './dns'
@@ -12,6 +10,18 @@ import type { NetnsConfig } from './netns'
 import type { NtpConfig } from './ntp'
 import type { OutboundConfig } from './outbounds'
 import type { RouteConfig } from './route'
+
+type MixinPriority = 'mixin' | 'gui'
+
+export interface Mixin {
+  priority: MixinPriority
+  format: 'json' | 'yaml'
+  config: string
+}
+
+export interface Script {
+  code: string
+}
 
 export interface Profile {
   id: string
@@ -29,6 +39,6 @@ export interface Profile {
   outbounds: OutboundConfig[]
   route: RouteConfig
   dns: DnsConfig
-  mixin: App.Mixin
-  script: App.Script
+  mixin: Mixin
+  script: Script
 }

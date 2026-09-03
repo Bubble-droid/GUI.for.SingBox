@@ -5,6 +5,8 @@
     "package.json": "package-lock.json, pnpm*, .oxlint*, eslint*, .oxfmtrc*, .editorconfig, .lintstagedrc*, golar.config.*"
   },
   "editor.codeActionsOnSave": {
+    "source.fixAll.ts": "never",
+    "source.removeUnused.ts": "never",
     "source.fixAll": "explicit",
     "source.removeUnusedImports": "explicit",
     "source.addMissingImports.ts": "explicit"

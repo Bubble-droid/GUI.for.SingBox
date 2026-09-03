@@ -3,7 +3,7 @@ import type { Directive, DirectiveBinding } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { sleep } from '@/utils/others'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 const menuHandlers = new WeakMap<HTMLElement, (e: MouseEvent) => void>()
 

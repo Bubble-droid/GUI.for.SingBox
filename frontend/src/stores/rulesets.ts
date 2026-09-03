@@ -14,7 +14,7 @@ import { isValidRulesJson } from '@/utils/is'
 import { migrateRulesets } from '@/utils/migration'
 import { ignoredError, omitArray, stringifyNoFolding, asyncPool } from '@/utils/others'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 export const useRulesetsStore = defineStore('rulesets', () => {
   const rulesets = ref<App.RuleSet[]>([])

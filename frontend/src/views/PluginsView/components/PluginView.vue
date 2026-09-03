@@ -12,7 +12,7 @@ import { ignoredError, deepClone } from '@/utils/others'
 import Button from '@/components/Button/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 interface Props {
   id: string

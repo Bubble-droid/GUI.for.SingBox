@@ -5,7 +5,7 @@ import { useAppSettingsStore } from '@/stores/appSettings'
 import { usePluginsStore } from '@/stores/plugins'
 import PluginConfigItem from '@/views/PluginsView/components/PluginConfigItem.vue'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 const appSettingsStore = useAppSettingsStore()
 const pluginsStore = usePluginsStore()

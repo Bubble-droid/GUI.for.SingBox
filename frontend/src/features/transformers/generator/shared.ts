@@ -27,7 +27,7 @@ import type {
 
 import { deepAssign } from '@/utils/others'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 import type { TagMaps } from './types'
 

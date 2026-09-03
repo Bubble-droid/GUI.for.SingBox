@@ -4,13 +4,13 @@ import { useProfilesStore } from '@/stores/profiles'
 import { formatProxyHost } from '@/utils/format'
 import { normalizeProxyHost } from '@/utils/normalize'
 
-import type { Recordable } from '@/types'
 import type {
   CoreApiConfig,
   CoreApiProxies,
   CoreApiConnections,
   CoreApiWsDataMap,
 } from '@/types/kernel'
+import type { Recordable } from '@/types/typescript'
 
 type WsKey = keyof CoreApiWsDataMap
 interface WsChannel<K extends WsKey> {

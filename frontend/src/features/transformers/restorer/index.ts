@@ -6,7 +6,7 @@ import type { LogConfig } from '@profiles/log'
 
 import { sampleID } from '@/utils/others'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 import { restoreCertificate } from './certificate'
 import { restoreCertificateProviders } from './certificate_provider'

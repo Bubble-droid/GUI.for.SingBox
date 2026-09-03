@@ -15,7 +15,7 @@ import { formatBytes, formatDate, formatRelativeTime } from '@/utils/format.ts'
 import { message, modal } from '@/utils/interaction.ts'
 import { ignoredError, debounce } from '@/utils/others.ts'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 import ProxiesEditor from './components/ProxiesEditor.vue'
 import ProxiesView from './components/ProxiesView.vue'

@@ -8,7 +8,7 @@ import { formatProxyHost } from '@/utils/format'
 import { ignoredError } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 import { StoreDep, useStoreDeps } from './deps'
 
@@ -21,7 +21,7 @@ export const useEnvStore = defineStore('env', () => {
     appVersion: '',
     basePath: '',
     appPath: '',
-    os: '' as App.OS,
+    os: '' as OS,
     arch: '',
     isPrivileged: false,
     isSystemPackage: false,
@@ -111,7 +111,7 @@ export const useEnvStore = defineStore('env', () => {
   }
 
   const setSystemDNS = async (proxy: boolean) => {
-    const supportedSystems: App.OS[] = [OS.Linux, OS.Darwin]
+    const supportedSystems: OS[] = [OS.Linux, OS.Darwin]
     if (!supportedSystems.includes(env.value.os)) {
       return
     }

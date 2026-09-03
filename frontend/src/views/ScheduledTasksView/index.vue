@@ -9,7 +9,7 @@ import { formatDate, formatRelativeTime } from '@/utils/format.ts'
 import { modal, message, alert } from '@/utils/interaction.ts'
 import { debounce } from '@/utils/others.ts'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 import ScheduledTaskForm from './components/ScheduledTaskForm.vue'
 import ScheduledTasksLogs from './components/ScheduledTasksLogs.vue'

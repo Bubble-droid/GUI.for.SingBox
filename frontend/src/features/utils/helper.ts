@@ -1,4 +1,4 @@
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 const isPlainObject = (val: unknown): val is Record<PropertyKey, unknown> => {
   if (typeof val !== 'object' || val === null) {

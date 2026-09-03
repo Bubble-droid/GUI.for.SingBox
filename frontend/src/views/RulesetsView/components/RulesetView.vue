@@ -11,7 +11,7 @@ import { deepClone, ignoredError } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 interface Props {
   id: string

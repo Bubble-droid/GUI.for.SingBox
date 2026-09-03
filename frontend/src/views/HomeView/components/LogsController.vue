@@ -11,7 +11,7 @@ import { isValidIPv4, isValidIPv6 } from '@/utils/is'
 import { buildSmartRegExp, getDomainSuffixes } from '@/utils/others'
 
 import type { PickerItem } from '@/components/Picker/types'
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 import type { CoreApiLogsData } from '@/types/kernel'
 import type { RuleCandidate } from '@/types/views'
 

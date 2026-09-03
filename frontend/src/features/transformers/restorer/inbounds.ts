@@ -2,7 +2,7 @@ import { createInboundTun, createInboundDirect, createInboundMixed } from '@defa
 import { Inbound } from '@features/constant/kernel'
 import type { InboundConfig } from '@profiles/inbounds'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 export const restoreInbounds = (inbounds: Recordable[], InboundsIds: Recordable): InboundConfig[] =>
   inbounds.flatMap((raw) => {

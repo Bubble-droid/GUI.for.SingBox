@@ -4,7 +4,7 @@ import type { HttpClientConfig } from '@profiles/http_client'
 
 import { sampleID } from '@/utils/others'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 import {
   restoreDialer,

@@ -5,13 +5,13 @@ import { restoreProfile } from '@restorer'
 
 import { RequestProxyMode } from '@/constant/app'
 
-import type { App } from '@/types'
+import type { Subscription, RuleSet } from '@/types/app'
 
-import { legacyGenerateConfig } from './generator'
+import { message } from './interaction'
 import { normalizeErrorMessage } from './normalize'
 import { deepAssign } from './others'
 
-const getSubIds = (profile: Profile | App.Profile) => {
+const getSubIds = (profile: Profile) => {
   return profile.outbounds.reduce((p, c) => {
     c.outbounds.forEach((outbound) => {
       if (outbound.type !== 'Built-in') {
@@ -23,10 +23,7 @@ const getSubIds = (profile: Profile | App.Profile) => {
   }, new Set<string>())
 }
 
-export const migrateProfiles = async (
-  profiles: (Profile | App.Profile)[],
-  save: () => Promise<string>,
-) => {
+export const migrateProfiles = async (profiles: Profile[], save: () => Promise<string>) => {
   let needSync = false
 
   profiles.forEach((profile) => {
@@ -47,20 +44,12 @@ export const migrateProfiles = async (
   const template = createProfile()
 
   for (const [i, p] of profiles.entries()) {
+    if (!Object.hasOwn(p, 'schema')) {
+      message.warn(`Please manual migrate the profile [${p.name}]`)
+      continue
+    }
     const subIds = getSubIds(p)
     try {
-      if (!('schema' in p)) {
-        const newConfig = await legacyGenerateConfig(p)
-        const newProfile = restoreProfile(newConfig, p.name, {
-          profile: p,
-          subscriptionIds: [...subIds],
-        })
-
-        profiles[i] = newProfile
-        needSync = true
-        continue
-      }
-
       if (p.schema !== ProfileSchemaVersion) {
         const newConfig = await generateConfig(deepAssign(template, p))
         const newProfile = restoreProfile(newConfig, p.name, {
@@ -71,7 +60,7 @@ export const migrateProfiles = async (
         needSync = true
       }
     } catch (error) {
-      const msg = `Failed to migrate profile [${p.name || p.id}]: ${normalizeErrorMessage(error)}`
+      const msg = `Failed to migrate profile [${p.name}]: ${normalizeErrorMessage(error)}`
       console.error(msg)
       throw error
     }
@@ -83,7 +72,7 @@ export const migrateProfiles = async (
 }
 
 export const migrateSubscribes = async (
-  subscribes: App.Subscription[],
+  subscribes: Subscription[],
   save: () => Promise<string>,
 ) => {
   let needSync = false
@@ -104,11 +93,11 @@ export const migrateSubscribes = async (
   }
 }
 
-export const migrateRulesets = async (rulesets: App.RuleSet[], save: () => Promise<string>) => {
+export const migrateRulesets = async (rulesets: RuleSet[], save: () => Promise<string>) => {
   let needSync = false
 
   rulesets.forEach((ruleset) => {
-    const legacyRuleset = ruleset as App.RuleSet & { tag?: string }
+    const legacyRuleset = ruleset as RuleSet & { tag?: string }
 
     if (typeof ruleset.name === 'undefined' && legacyRuleset.tag) {
       ruleset.name = legacyRuleset.tag

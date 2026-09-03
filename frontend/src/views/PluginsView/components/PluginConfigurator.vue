@@ -9,7 +9,8 @@ import { message } from '@/utils/interaction.ts'
 
 import Button from '@/components/Button/index.vue'
 
-import type { App, Recordable } from '@/types'
+import type * as App from '@/types/app'
+import type { Recordable } from '@/types/typescript.ts'
 
 import PluginConfigItem from './PluginConfigItem.vue'
 

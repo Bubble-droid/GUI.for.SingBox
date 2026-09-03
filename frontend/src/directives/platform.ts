@@ -2,9 +2,9 @@ import type { Directive, DirectiveBinding } from 'vue'
 
 import { useEnvStore } from '@/stores/env'
 
-import type { App } from '@/types'
+import type { OS } from '@/constant/app'
 
-const updateVisibility = (el: HTMLElement, binding: DirectiveBinding<App.OS[]>) => {
+const updateVisibility = (el: HTMLElement, binding: DirectiveBinding<OS[]>) => {
   const envStore = useEnvStore()
   const supports = binding.value
   el.style.display = supports.includes(envStore.env.os) ? '' : 'none'
@@ -17,4 +17,4 @@ export default {
   updated(el, binding) {
     updateVisibility(el, binding)
   },
-} satisfies Directive<HTMLElement, App.OS[]>
+} satisfies Directive<HTMLElement, OS[]>

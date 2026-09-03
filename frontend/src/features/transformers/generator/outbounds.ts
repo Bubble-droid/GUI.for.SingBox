@@ -6,7 +6,7 @@ import { ReadFile } from '@/bridge/io'
 
 import { createTextMatcher } from '@/utils/others'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 import type { GenerateContext } from './types'
 

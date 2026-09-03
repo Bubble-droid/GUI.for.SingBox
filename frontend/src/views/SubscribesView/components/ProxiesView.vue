@@ -14,7 +14,8 @@ import Button from '@/components/Button/index.vue'
 import CodeEditor from '@/components/CodeEditor/index.vue'
 import CodeViewer from '@/components/CodeViewer/index.vue'
 
-import type { App, Recordable } from '@/types'
+import type * as App from '@/types/app'
+import type { Recordable } from '@/types/typescript'
 
 interface Props {
   sub: App.Subscription

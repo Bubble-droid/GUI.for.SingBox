@@ -1,11 +1,6 @@
 import type { OutboundId } from './shared'
 
-export interface ExperimentalConfig {
-  clash_api: ClashApiConfig
-  cache_file: CacheFileConfig
-}
-
-export interface ClashApiConfig {
+interface ClashApiConfig {
   external_controller: string
   external_ui: string
   external_ui_download_url: string
@@ -16,10 +11,15 @@ export interface ClashApiConfig {
   access_control_allow_private_network: boolean
 }
 
-export interface CacheFileConfig {
+interface CacheFileConfig {
   enabled: boolean
   path: string
   cache_id: string
   store_fakeip: boolean
   store_dns: boolean
+}
+
+export interface ExperimentalConfig {
+  clash_api: ClashApiConfig
+  cache_file: CacheFileConfig
 }

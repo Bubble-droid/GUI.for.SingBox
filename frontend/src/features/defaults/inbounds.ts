@@ -1,3 +1,4 @@
+import type { Network } from '@features/constant/kernel'
 import { TunStack, Inbound } from '@features/constant/kernel'
 import type { InboundConfig } from '@profiles/inbounds'
 
@@ -44,7 +45,7 @@ export const createInboundDirect = (): NonNullable<InboundConfig['direct']> => (
     tcp_multi_path: false,
     udp_fragment: false,
   },
-  network: '',
+  network: '' as Network,
 })
 
 export const createInboundTun = (): NonNullable<InboundConfig['tun']> => ({

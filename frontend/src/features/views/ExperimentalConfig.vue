@@ -58,7 +58,7 @@ const { t } = useI18n()
     </div>
     <div class="form-item">
       {{ t('kernel.experimental.clash_api.default_mode') }}
-      <Select v-model="model.clash_api.default_mode" :options="PredefinedClashModeOptions" />
+      <Select v-model="model.clash_api.default_mode as any" :options="PredefinedClashModeOptions" />
     </div>
     <div class="form-item">
       {{ t('kernel.experimental.clash_api.access_control_allow_private_network') }}

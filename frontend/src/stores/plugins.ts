@@ -28,7 +28,8 @@ import {
 } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
-import type { App, Recordable, MaybePromise } from '@/types'
+import type * as App from '@/types/app'
+import type { Recordable, MaybePromise } from '@/types/typescript'
 
 import { StoreDep, useStoreDeps } from './deps'
 

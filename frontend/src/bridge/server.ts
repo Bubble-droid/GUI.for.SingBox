@@ -3,7 +3,7 @@ import { EventsOn, EventsEmit, EventsOff } from '@wails/runtime/runtime'
 
 import { normalizeErrorMessage } from '@/utils/normalize'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 interface Request {
   id: string

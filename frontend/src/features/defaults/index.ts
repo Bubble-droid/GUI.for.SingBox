@@ -1,8 +1,6 @@
-import type { Profile } from '@profiles'
+import type { Mixin, Profile, Script } from '@profiles'
 
 import { sampleID } from '@/utils/others'
-
-import type { App } from '@/types'
 
 import { createCertificate } from './certificate'
 import { createDns } from './dns'
@@ -15,9 +13,9 @@ import { createRoute } from './route'
 
 export const ProfileSchemaVersion = 'v0.8.0'
 
-export const createMixin = (): App.Mixin => ({ priority: 'mixin', format: 'json', config: '{}' })
+export const createMixin = (): Mixin => ({ priority: 'mixin', format: 'json', config: '{}' })
 
-export const createScript = (): App.Script => ({
+export const createScript = (): Script => ({
   code: `const onGenerate = async (config) => {\n  return config\n}`,
 })
 

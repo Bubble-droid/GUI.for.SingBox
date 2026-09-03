@@ -1,4 +1,4 @@
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 import type { ComponentOption } from '@/types/views'
 
 import {

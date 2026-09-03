@@ -6,7 +6,7 @@ import { usePluginsStore } from '@/stores/plugins.ts'
 import { message, modal } from '@/utils/interaction.ts'
 import { createTextMatcher, deepClone } from '@/utils/others.ts'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 import PluginSource from './PluginSource.vue'
 

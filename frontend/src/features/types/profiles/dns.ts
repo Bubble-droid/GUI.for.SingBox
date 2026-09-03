@@ -5,7 +5,7 @@ import type {
   DomainStrategy,
 } from '@features/constant/kernel'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 import type { TagItem } from './shared'
 

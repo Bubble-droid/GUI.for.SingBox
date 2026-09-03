@@ -15,7 +15,7 @@ export interface InboundConfig extends TagItem {
   enable: boolean
   direct?: {
     listen: InboundListen
-    network: Network | ''
+    network: Network
   }
   mixed?: {
     listen: InboundListen

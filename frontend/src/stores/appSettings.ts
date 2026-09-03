@@ -37,7 +37,7 @@ import { message } from '@/utils/interaction'
 import { debounce, ignoredError, deepClone } from '@/utils/others'
 import { updateTrayAndMenus } from '@/utils/tray'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 import { StoreDep, useStoreDeps } from './deps'
 
@@ -193,7 +193,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
   }
 
   const applyAppSettings = {
-    theme(theme: App.Theme) {
+    theme(theme: Theme) {
       const isAuto = theme === Theme.Auto
       if (isAuto) {
         themeMode.value = mediaQueryList.matches ? Theme.Dark : Theme.Light
@@ -207,7 +207,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
         void loadLocale(lang)
       }
     },
-    color(color: App.Color, primary: string, secondary: string) {
+    color(color: Color, primary: string, secondary: string) {
       if (color !== Color.Custom) {
         ;({ primary, secondary } = Colors[color] ?? { primary, secondary })
       }
@@ -272,14 +272,14 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
   watch(app, onAppSettingsChange, { deep: true })
 
   /* Apply AppTheme */
-  const themeMode = ref<Extract<App.Theme, 'light' | 'dark'>>(Theme.Light)
+  const themeMode = ref<Extract<Theme, 'light' | 'dark'>>(Theme.Light)
   const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)')
   mediaQueryList.addEventListener('change', ({ matches }) => {
     if (app.value.theme === Theme.Auto) {
       themeMode.value = matches ? Theme.Dark : Theme.Light
     }
   })
-  const setAppTheme = (theme: Extract<App.Theme, 'light' | 'dark'>) => {
+  const setAppTheme = (theme: Extract<Theme, 'light' | 'dark'>) => {
     if (document.startViewTransition) {
       document.startViewTransition(() => {
         document.body.setAttribute('theme-mode', theme)

@@ -13,7 +13,7 @@ import { useRulesetsStore } from '@/stores/rulesets'
 import { useSubscribesStore } from '@/stores/subscribes'
 
 import type { Lang } from '@/constant/app'
-import type { MaybePromise } from '@/types'
+import type { MaybePromise } from '@/types/typescript'
 
 import { handleChangeMode, reloadApp, exitApp } from './helper'
 import { message } from './interaction'

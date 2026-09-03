@@ -1,7 +1,7 @@
-import type { MaybePromise } from '@/types'
+import type { MaybePromise } from '@/types/typescript'
 
 export interface ModalProps {
-  title?: string | undefined
+  title?: string
   footer?: boolean
   maxHeight?: string
   maxWidth?: string
@@ -16,7 +16,7 @@ export interface ModalProps {
   cancelText?: string
   submitText?: string
   maskClosable?: boolean
-  class?: string | undefined
+  class?: string
   container?: string
   destroyOnClose?: boolean
   toolbar?: {
@@ -24,18 +24,18 @@ export interface ModalProps {
     minimize?: boolean
     close?: boolean
   }
-  onOk?: (() => MaybePromise<boolean | void>) | undefined
-  onCancel?: (() => MaybePromise<boolean | void>) | undefined
-  beforeClose?: ((isOk: boolean) => MaybePromise<boolean | void>) | undefined
-  afterClose?: ((isOk: boolean) => void) | undefined
-  afterDestroy?: (() => void) | undefined
+  onOk?: () => MaybePromise<boolean | void>
+  onCancel?: () => MaybePromise<boolean | void>
+  beforeClose?: (isOk: boolean) => MaybePromise<boolean | void>
+  afterClose?: (isOk: boolean) => void
+  afterDestroy?: () => void
 }
 
 export interface ModalSlots {
-  default?: (() => any) | undefined
-  title?: (() => any) | undefined
-  toolbar?: (() => any) | undefined
-  action?: (() => any) | undefined
-  cancel?: (() => any) | undefined
-  submit?: (() => any) | undefined
+  default?: () => any
+  title?: () => any
+  toolbar?: () => any
+  action?: () => any
+  cancel?: () => any
+  submit?: () => any
 }

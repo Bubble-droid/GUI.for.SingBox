@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 interface Props {
   modelValue?: Recordable

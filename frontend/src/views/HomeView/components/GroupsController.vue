@@ -20,7 +20,7 @@ import { handleUseProxy } from '@/utils/helper'
 import { message } from '@/utils/interaction'
 import { buildSmartRegExp, createAsyncPool, sleep, ignoredError } from '@/utils/others'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 const expandedSet = ref<Set<string>>(new Set())
 const loadingSet = ref<Set<string>>(new Set())

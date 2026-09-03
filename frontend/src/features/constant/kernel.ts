@@ -11,7 +11,7 @@ import type {
   SingBoxCertificateProviderOf,
 } from '@features/types/sing-box'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 import type { ValueOf } from '@/types/utils'
 
 export const LogLevel = {

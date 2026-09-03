@@ -6,8 +6,6 @@ import { StoreDep, useStoreDeps } from '@/stores/deps'
 import { GetRequestProxy } from '@/utils/helper'
 import { getUserAgent, sampleID, transformRequestUrl } from '@/utils/others'
 
-import type { App } from '@/types'
-
 interface NetOptions {
   Mode?: 'Binary' | 'Text'
   Timeout?: number
@@ -35,7 +33,7 @@ type StreamEvent =
     }
 
 interface Request {
-  method: App.RequestMethod
+  method: RequestMethod
   url: string
   headers?: {
     'Content-Type'?: 'application/json' | 'application/x-www-form-urlencoded' | 'text/plain'
@@ -183,7 +181,7 @@ const requestWithProgress =
   }
 
 const requestWithBody =
-  (method: Extract<App.RequestMethod, 'PUT' | 'POST' | 'PATCH'>) =>
+  (method: Extract<RequestMethod, 'PUT' | 'POST' | 'PATCH'>) =>
   async (url: string, headers: Request['headers'] = {}, body = {}, options = {}) => {
     const [_headers, _body, _options] = await transformRequest(headers, body, options)
 
@@ -208,7 +206,7 @@ const requestWithBody =
   }
 
 const requestWithoutBody =
-  (method: Extract<App.RequestMethod, 'GET' | 'HEAD' | 'DELETE'>) =>
+  (method: Extract<RequestMethod, 'GET' | 'HEAD' | 'DELETE'>) =>
   async (url: string, headers: Request['headers'] = {}, options: Request['options'] = {}) => {
     const [_headers, , _options] = await transformRequest(headers, null, options)
 

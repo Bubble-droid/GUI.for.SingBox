@@ -27,7 +27,8 @@ import {
   asyncPool,
 } from '@/utils/others'
 
-import type { App, Recordable } from '@/types'
+import type * as App from '@/types/app'
+import type { Recordable } from '@/types/typescript'
 
 import { StoreDep, useStoreDeps } from './deps'
 

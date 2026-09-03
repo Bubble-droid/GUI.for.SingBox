@@ -16,7 +16,7 @@ import { formatDate, formatRelativeTime } from '@/utils/format.ts'
 import { modal, message, picker } from '@/utils/interaction.ts'
 import { ignoredError, deepClone, debounce } from '@/utils/others.ts'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 import RulesetForm from './components/RulesetForm.vue'
 import RulesetHub from './components/RulesetHub.vue'

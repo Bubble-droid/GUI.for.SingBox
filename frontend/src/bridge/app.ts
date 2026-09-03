@@ -7,7 +7,7 @@ import {
 
 import { sampleID } from '@/utils/others'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 export const RestartApp = Bridge.RestartApp
 

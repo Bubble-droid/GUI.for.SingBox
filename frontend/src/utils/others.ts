@@ -4,7 +4,7 @@ import { stringify } from 'yaml'
 import { OS } from '@/constant/app'
 import appDts from '@/types/app.d.ts?raw'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 import { APP_ID, APP_TITLE, APP_VERSION } from './env'
 import { isValidIPv4, isValidIPv6 } from './is'
@@ -276,7 +276,7 @@ export const transformRequestUrl = (url: string, appSettings: App.AppSettings) =
   return transformGitHubUrl(url, appSettings)
 }
 
-export const getAutoStartConfiguration = (os: App.OS, appPath: string, delay = 30) => {
+export const getAutoStartConfiguration = (os: OS, appPath: string, delay = 30) => {
   if (os === OS.Windows) {
     const xml = /*xml*/ `<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">

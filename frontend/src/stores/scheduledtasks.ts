@@ -10,7 +10,8 @@ import { ReadFile, WriteFile } from '@/bridge/io'
 import { ScheduledTasksFilePath, ScheduledTasksType, PluginTriggerEvent } from '@/constant/app'
 import { ignoredError, stringifyNoFolding } from '@/utils/others'
 
-import type { App, Recordable } from '@/types'
+import type * as App from '@/types/app'
+import type { Recordable } from '@/types/typescript'
 
 import { StoreDep, useStoreDeps } from './deps'
 

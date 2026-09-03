@@ -6,7 +6,7 @@ import type { RuleSetConfig } from '@profiles/route'
 
 import { deepAssign } from '@/utils/others'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 import { generateRule } from './shared'
 

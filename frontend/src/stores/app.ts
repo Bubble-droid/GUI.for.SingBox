@@ -12,7 +12,7 @@ import { APP_VERSION, APP_VERSION_API, APP_ID } from '@/utils/env'
 import { confirm, message } from '@/utils/interaction'
 import { sleep, sampleID, getGitHubApiAuthorization } from '@/utils/others'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 import type { GitHubApiRelease } from '@/types/github'
 
 import { StoreDep, useStoreDeps } from './deps'

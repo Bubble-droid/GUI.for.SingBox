@@ -5,7 +5,7 @@ import { scopeCompletionSource, localCompletionSource, snippets } from '@codemir
 import { PluginTriggerEvent } from '@/constant/app'
 import i18n from '@/lang'
 
-import type { Recordable } from '@/types'
+import type { Recordable } from '@/types/typescript'
 
 export const getCompletions = (pluginScope?: any) => {
   const { t } = i18n.global

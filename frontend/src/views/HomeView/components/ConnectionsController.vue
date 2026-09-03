@@ -16,7 +16,7 @@ import { getDomainSuffixes } from '@/utils/others'
 
 import type { PickerItem } from '@/components/Picker/types'
 import type { Column } from '@/components/Table/index.vue'
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 import type { CoreApiConnectionsData, CoreApiConnectionsDataConnection } from '@/types/kernel'
 import type { RuleCandidate } from '@/types/views.ts'
 

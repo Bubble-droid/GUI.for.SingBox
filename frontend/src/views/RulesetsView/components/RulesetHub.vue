@@ -15,7 +15,7 @@ import { deepClone } from '@/utils/others'
 import Button from '@/components/Button/index.vue'
 import Pagination from '@/components/Pagination/index.vue'
 
-import type { App } from '@/types'
+import type * as App from '@/types/app'
 
 const pageSize = 27
 const rulesetFormats = [RuleSetFormat.Source, RuleSetFormat.Binary]
