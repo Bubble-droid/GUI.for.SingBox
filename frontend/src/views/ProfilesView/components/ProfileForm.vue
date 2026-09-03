@@ -18,7 +18,7 @@ import { ref, inject, computed, useTemplateRef, h } from 'vue'
 import type { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ProfileStep, ProfileStepItems } from '@/constant/app.ts'
+import { ProfileStep, ProfileStepItems } from '@/constant/app'
 import { useProfilesStore } from '@/stores/profiles.ts'
 import { message, modal } from '@/utils/interaction.ts'
 import { deepClone } from '@/utils/others.ts'

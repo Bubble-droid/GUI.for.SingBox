@@ -1,6 +1,6 @@
 import { stringify } from 'yaml'
 
-import { OS } from '@/constant/app'
+import { OS } from '@/enums/app'
 
 import type * as App from '@/types/app'
 

@@ -3,7 +3,8 @@ import { onMounted, ref } from 'vue'
 
 import { ExitApp } from '@/bridge/app'
 
-import { WebviewGpuPolicyOptions, WindowStateOptions, OS } from '@/constant/app'
+import { WebviewGpuPolicyOptions, WindowStateOptions } from '@/constant/app'
+import { OS } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useEnvStore } from '@/stores/env'
 import {

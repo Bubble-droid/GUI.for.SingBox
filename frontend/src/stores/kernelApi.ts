@@ -21,13 +21,13 @@ import {
   destroyWebsocket,
   probeApiAvailability,
 } from '@/api/kernel'
-import { Branch } from '@/constant/app'
 import {
   CoreConfigFilePath,
   CoreLogFilePath,
   CorePidFilePath,
   CoreWorkingDirectory,
 } from '@/constant/kernel'
+import { Branch } from '@/enums/app'
 import { eventBus } from '@/utils/eventBus'
 import { generateConfigFile } from '@/utils/generator'
 import { getKernelFileName, getKernelRuntimeArgs, getKernelRuntimeEnv } from '@/utils/helper'

@@ -2,7 +2,8 @@ import { PredefinedClashModeOptions } from '@features/constant/options'
 
 import { RestartApp } from '@/bridge/app'
 
-import { ColorOptions, ThemeOptions, PluginTrigger, PluginTriggerEvent } from '@/constant/app'
+import { ThemeOptions, ColorOptions } from '@/constant/app'
+import { PluginTrigger, PluginTriggerEvent } from '@/enums/app'
 import useI18n from '@/lang'
 import { useAppStore } from '@/stores/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
@@ -12,7 +13,7 @@ import { usePluginsStore } from '@/stores/plugins'
 import { useRulesetsStore } from '@/stores/rulesets'
 import { useSubscribesStore } from '@/stores/subscribes'
 
-import type { Lang } from '@/constant/app'
+import type { Lang } from '@/enums/app'
 import type { MaybePromise } from '@/types/typescript'
 
 import { handleChangeMode, reloadApp, exitApp } from './helper'

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { OS } from '@/constant/app'
+import { OS } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useEnvStore } from '@/stores/env'
 

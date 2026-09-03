@@ -10,8 +10,8 @@ import {
   DefaultControllerSensitivity,
   DefaultTestTimeout,
   DefaultTestURL,
-  ControllerCloseMode,
 } from '@/constant/app'
+import { ControllerCloseMode } from '@/enums/app'
 import { useBool } from '@/hooks/useBool'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useKernelApiStore } from '@/stores/kernelApi'

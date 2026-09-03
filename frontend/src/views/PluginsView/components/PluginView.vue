@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import { WriteFile, ReadFile } from '@/bridge/io'
 
-import { PluginTriggerEvent } from '@/constant/app'
+import { PluginTriggerEvent } from '@/enums/app'
 import { usePluginsStore } from '@/stores/plugins'
 import { message } from '@/utils/interaction'
 import { ignoredError, deepClone } from '@/utils/others'

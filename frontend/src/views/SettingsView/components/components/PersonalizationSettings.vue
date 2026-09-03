@@ -2,14 +2,8 @@
 import { MakeDir, OpenDir } from '@/bridge/io'
 import { BrowserOpenURL } from '@wails/runtime/runtime'
 
-import {
-  ColorOptions,
-  DefaultFontFamily,
-  LocalesFilePath,
-  ThemeOptions,
-  Color,
-  OS,
-} from '@/constant/app'
+import { ColorOptions, DefaultFontFamily, LocalesFilePath, ThemeOptions } from '@/constant/app'
+import { Color, OS } from '@/enums/app'
 import { appPages } from '@/router/pages'
 import { useAppStore } from '@/stores/app'
 import { useAppSettingsStore } from '@/stores/appSettings'

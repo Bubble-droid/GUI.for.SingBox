@@ -7,13 +7,8 @@ import { parse } from 'yaml'
 import { ReadFile, WriteFile, RemoveFile } from '@/bridge/io'
 import { HttpGet, Requests } from '@/bridge/net'
 
-import {
-  PluginHubFilePath,
-  PluginsFilePath,
-  PluginTrigger,
-  PluginTriggerEvent,
-  RequestMethod,
-} from '@/constant/app'
+import { PluginsFilePath, PluginHubFilePath } from '@/constant/app'
+import { PluginTrigger, PluginTriggerEvent, RequestMethod } from '@/enums/app'
 import { confirm } from '@/utils/interaction'
 import { isNumber } from '@/utils/is'
 import { normalizeErrorMessage } from '@/utils/normalize'

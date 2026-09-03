@@ -4,7 +4,7 @@ import type { Profile } from '@profiles'
 import type { TagItem } from '@profiles/shared'
 import { parse } from 'yaml'
 
-import { Branch } from '@/constant/app'
+import { Branch } from '@/enums/app'
 import { normalizeErrorMessage } from '@/utils/normalize'
 import { deepClone, deepAssign } from '@/utils/others'
 

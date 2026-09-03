@@ -6,14 +6,9 @@ import { parse } from 'yaml'
 import { ReadFile, WriteFile } from '@/bridge/io'
 import { Requests } from '@/bridge/net'
 
-import {
-  DefaultSubscribeScript,
-  SubscribesFilePath,
-  PluginTriggerEvent,
-  RequestMethod,
-  RequestProxyMode,
-} from '@/constant/app'
+import { SubscribesFilePath, DefaultSubscribeScript } from '@/constant/app'
 import { DefaultExcludeProtocols } from '@/constant/kernel'
+import { PluginTriggerEvent, RequestMethod, RequestProxyMode } from '@/enums/app'
 import { eventBus } from '@/utils/eventBus'
 import { GetRequestProxy } from '@/utils/helper'
 import { isValidSubJson, isValidSubYAML, isValidBase64 } from '@/utils/is'

@@ -3,11 +3,12 @@ import { PredefinedClashModeOptions } from '@features/constant/options'
 import { Notify, ShowMainWindow, RestartApp, UpdateTrayAndMenus } from '@/bridge/app'
 import { EventsOff, EventsOn } from '@wails/runtime/runtime'
 
-import { ColorOptions, ThemeOptions, OS } from '@/constant/app'
+import { ThemeOptions, ColorOptions } from '@/constant/app'
+import { OS } from '@/enums/app'
 import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 
-import type { Lang } from '@/constant/app'
+import type { Lang } from '@/enums/app'
 import type * as App from '@/types/app'
 import type { Recordable } from '@/types/typescript'
 

@@ -12,7 +12,7 @@ import {
 } from '@wails/runtime/runtime'
 
 import logo from '@/assets/logo'
-import { OS } from '@/constant/app'
+import { OS } from '@/enums/app'
 import { useAppStore } from '@/stores/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useEnvStore } from '@/stores/env'

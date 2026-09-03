@@ -3,7 +3,7 @@ import { generateConfig } from '@generator'
 import type { Profile } from '@profiles'
 import { restoreProfile } from '@restorer'
 
-import { RequestProxyMode } from '@/constant/app'
+import { RequestProxyMode } from '@/enums/app'
 
 import type { Subscription, RuleSet } from '@/types/app'
 

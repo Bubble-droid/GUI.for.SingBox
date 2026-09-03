@@ -15,7 +15,7 @@ import type {
   View,
   WebviewGpuPolicy,
   WindowStartState,
-} from '@/constant/app'
+} from '@/enums/app'
 
 import type { Recordable } from './typescript'
 

@@ -2,7 +2,7 @@ import type { Directive, DirectiveBinding } from 'vue'
 
 import { useEnvStore } from '@/stores/env'
 
-import type { OS } from '@/constant/app'
+import type { OS } from '@/enums/app'
 
 const updateVisibility = (el: HTMLElement, binding: DirectiveBinding<OS[]>) => {
   const envStore = useEnvStore()

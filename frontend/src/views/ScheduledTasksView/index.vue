@@ -2,7 +2,8 @@
 import { Cron } from 'croner'
 import { useI18n, I18nT } from 'vue-i18n'
 
-import { DraggableOptions, ViewOptions, View } from '@/constant/app'
+import { DraggableOptions, ViewOptions } from '@/constant/app'
+import { View } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores/appSettings.ts'
 import { useScheduledTasksStore } from '@/stores/scheduledtasks.ts'
 import { formatDate, formatRelativeTime } from '@/utils/format.ts'

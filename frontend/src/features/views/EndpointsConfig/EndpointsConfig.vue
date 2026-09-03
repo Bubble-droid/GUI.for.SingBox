@@ -9,7 +9,7 @@ import UdpNatConfig from '@views/Shared/UdpNatConfig.vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { DraggableOptions } from '@/constant/app'
+import { DraggableOptions } from '@/constant/app.ts'
 import { useBool } from '@/hooks/useBool.ts'
 import { message } from '@/utils/interaction.ts'
 import { deepClone } from '@/utils/others.ts'

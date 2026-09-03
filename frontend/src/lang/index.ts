@@ -2,7 +2,8 @@ import { createI18n } from 'vue-i18n'
 
 import { ReadFile } from '@/bridge/io'
 
-import { LocalesFilePath, Lang } from '@/constant/app'
+import { LocalesFilePath } from '@/constant/app'
+import { Lang } from '@/enums/app'
 
 import type { Recordable } from '@/types/typescript'
 

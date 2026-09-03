@@ -9,8 +9,8 @@ import {
   DefaultTestURL,
   RequestMethodOptions,
   SubscriptionRequestProxyModeOptions,
-  RequestProxyMode,
 } from '@/constant/app'
+import { RequestProxyMode } from '@/enums/app'
 import { useBool } from '@/hooks/useBool'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useSubscribesStore } from '@/stores/subscribes'

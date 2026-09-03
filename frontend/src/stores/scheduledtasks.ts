@@ -7,7 +7,8 @@ import { parse } from 'yaml'
 import { Notify } from '@/bridge/app'
 import { ReadFile, WriteFile } from '@/bridge/io'
 
-import { ScheduledTasksFilePath, ScheduledTasksType, PluginTriggerEvent } from '@/constant/app'
+import { ScheduledTasksFilePath } from '@/constant/app'
+import { ScheduledTasksType, PluginTriggerEvent } from '@/enums/app'
 import { ignoredError, stringifyNoFolding } from '@/utils/others'
 
 import type * as App from '@/types/app'

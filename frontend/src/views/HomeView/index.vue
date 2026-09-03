@@ -3,7 +3,7 @@ import { ref, watch, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import logo from '@/assets/logo'
-import { ControllerCloseMode } from '@/constant/app.ts'
+import { ControllerCloseMode } from '@/enums/app.ts'
 import { useAppSettingsStore } from '@/stores/appSettings.ts'
 import { useKernelApiStore } from '@/stores/kernelApi.ts'
 import { useProfilesStore } from '@/stores/profiles.ts'

@@ -7,7 +7,7 @@ import { parse } from 'yaml'
 import { ReadFile, WriteFile, CopyFile } from '@/bridge/io'
 import { HttpGet, Download } from '@/bridge/net'
 
-import { RulesetHubFilePath, RulesetsFilePath } from '@/constant/app'
+import { RulesetsFilePath, RulesetHubFilePath } from '@/constant/app'
 import { EmptyRuleSet } from '@/constant/kernel'
 import { eventBus } from '@/utils/eventBus'
 import { isValidRulesJson } from '@/utils/is'

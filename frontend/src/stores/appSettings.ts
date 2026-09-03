@@ -12,15 +12,18 @@ import {
 } from '@wails/runtime/runtime'
 
 import {
-  Colors,
+  DefaultFontFamily,
   DefaultCardColumns,
+  DefaultTestURL,
+  DefaultTestTimeout,
   DefaultConcurrencyLimit,
   DefaultControllerSensitivity,
-  DefaultFontFamily,
   DefaultPluginHubSources,
-  DefaultTestTimeout,
-  DefaultTestURL,
   UserFilePath,
+  Colors,
+} from '@/constant/app'
+import { DefaultConnections, DefaultCoreConfig } from '@/constant/kernel'
+import {
   Theme,
   WindowStartState,
   Lang,
@@ -30,8 +33,7 @@ import {
   ControllerCloseMode,
   Branch,
   RequestProxyMode,
-} from '@/constant/app'
-import { DefaultConnections, DefaultCoreConfig } from '@/constant/kernel'
+} from '@/enums/app'
 import i18n, { loadLocale } from '@/lang'
 import { message } from '@/utils/interaction'
 import { debounce, ignoredError, deepClone } from '@/utils/others'

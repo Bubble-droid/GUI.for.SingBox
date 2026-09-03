@@ -3,12 +3,8 @@ import { computed, ref } from 'vue'
 
 import { HttpGet } from '@/bridge/net'
 
-import {
-  DefaultTestTimeout,
-  DefaultTestURL,
-  RequestProxyModeOptions,
-  RequestProxyMode,
-} from '@/constant/app'
+import { DefaultTestTimeout, DefaultTestURL, RequestProxyModeOptions } from '@/constant/app'
+import { RequestProxyMode } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { APP_TITLE, APP_VERSION } from '@/utils/env'
 import { GetRequestProxy } from '@/utils/helper'
