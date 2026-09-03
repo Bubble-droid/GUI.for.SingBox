@@ -97,8 +97,8 @@ importers:
         specifier: ^0.9.1
         version: 0.9.1(@typescript/typescript6@6.0.2)(vue@3.5.41(@typescript/typescript6@6.0.2))
       '@zhexin/typebox':
-        specifier: ^1.14.30
-        version: 1.14.30
+        specifier: ^1.14.31
+        version: 1.14.31
       eslint:
         specifier: ^10.8.0
         version: 10.8.0
@@ -121,8 +121,8 @@ importers:
         specifier: ^4.8.1
         version: 4.8.1
       lint-staged:
-        specifier: ^17.3.0
-        version: 17.3.0
+        specifier: ^17.4.1
+        version: 17.4.1
       npm-run-all2:
         specifier: ^9.0.3
         version: 9.0.3
@@ -1055,8 +1055,8 @@ packages:
       vue:
         optional: true
 
-  '@zhexin/typebox@1.14.30':
-    resolution: {integrity: sha512-pxyh0cBPUrPR1yknnjpw5Gljl2GiKQAHIqNvNjowMCndtV914v/Y2y88yYUWqduPu3t7Ysk9QblFHwJk/nwCZw==}
+  '@zhexin/typebox@1.14.31':
+    resolution: {integrity: sha512-zRE9M0sgur0Mv1ZwFnZktjtm7m9wwsnMHUXqS8Nk5YBPDy8ED8fgaAeXqPTl9LWxAiKAcDj72lu58/evPQk0ig==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -1485,8 +1485,8 @@ packages:
     resolution: {integrity: sha512-WkUDrojuJs0xkgGf2udWxa3yGBRxPtxUkB79i6aCZLRgc7PM8fZe9TosfPDcvEpQZbuFASnHYmRLBLUbmLOIIA==}
     engines: {node: '>= 12.0.0'}
 
-  lint-staged@17.3.0:
-    resolution: {integrity: sha512-woZS3vNe3UKqBaLPvbLOtKRY4tLANpWQhom12MGWqC8Mh1lCOO+WgSwmX2amjJAqTY9BkXYW87fCUH5H9Ph6xw==}
+  lint-staged@17.4.1:
+    resolution: {integrity: sha512-FmJeudcalbSfg1du+JCfvi5vS6Qt08KgbfLWiHinbef+2JJwUZwAWVoaO1AcJVUTWPfk0t30PMQNwPAeCzYQ+Q==}
     engines: {node: '>=22.22.1'}
     hasBin: true
 
@@ -1657,6 +1657,10 @@ packages:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
 
+  picomatch@4.0.7:
+    resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
+    engines: {node: '>=12'}
+
   pidtree@1.0.0:
     resolution: {integrity: sha512-avfAvjB9Dd0wdj3rjJX//yS+G79OO0KrS5pJHFJENjYGX6N4SMgEDBBI/yFy0lloOYSaC6XQxzpOAMPfSYFV/Q==}
     engines: {node: '>=18'}
@@ -1780,8 +1784,8 @@ packages:
   style-mod@4.1.3:
     resolution: {integrity: sha512-i/n8VsZydrugj3Iuzll8+x/00GH2vnYsk1eomD8QiRrSAeW6ItbCQDtfXCeJHd0iwiNagqjQkvpvREEPtW3IoQ==}
 
-  tinyexec@1.2.4:
-    resolution: {integrity: sha512-SHf/r48b7vOrjve9PxJo3MN5v5yuyjHvdUcrQffT3WXMUfnGmHDVbC4k3sHJaJTgZCwpUplIaAo5ANtMyp3YHg==}
+  tinyexec@1.3.0:
+    resolution: {integrity: sha512-QKAl9m8gWWGHV8jZcPeym6j+XULi6tOf1mT83WYJ4Lk2ytW/uwAWkrP0uFsdoYMdueVJ0qs26wZ+23xeB4ibNQ==}
     engines: {node: '>=18'}
 
   tinyglobby@0.2.17:
@@ -2748,7 +2752,7 @@ snapshots:
       typescript: '@typescript/typescript6@6.0.2'
       vue: 3.5.41(@typescript/typescript6@6.0.2)
 
-  '@zhexin/typebox@1.14.30': {}
+  '@zhexin/typebox@1.14.31': {}
 
   acorn-jsx@5.3.2(acorn@8.18.0):
     dependencies:
@@ -3136,11 +3140,11 @@ snapshots:
       lightningcss-win32-arm64-msvc: 1.33.0
       lightningcss-win32-x64-msvc: 1.33.0
 
-  lint-staged@17.3.0:
+  lint-staged@17.4.1:
     dependencies:
-      picomatch: 4.0.5
+      picomatch: 4.0.7
       string-argv: 0.3.2
-      tinyexec: 1.2.4
+      tinyexec: 1.3.0
     optionalDependencies:
       yaml: 2.9.0
 
@@ -3329,6 +3333,8 @@ snapshots:
 
   picomatch@4.0.5: {}
 
+  picomatch@4.0.7: {}
+
   pidtree@1.0.0: {}
 
   pinia@4.0.2(@typescript/typescript6@6.0.2)(@vue/devtools-api@8.2.1)(vue@3.5.41(@typescript/typescript6@6.0.2)):
@@ -3453,7 +3459,7 @@ snapshots:
 
   style-mod@4.1.3: {}
 
-  tinyexec@1.2.4: {}
+  tinyexec@1.3.0: {}
 
   tinyglobby@0.2.17:
     dependencies:
