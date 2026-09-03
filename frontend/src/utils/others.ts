@@ -1,16 +1,12 @@
-// oxlint-disable promise/param-names
 import { stringify } from 'yaml'
 
 import { OS } from '@/constant/app'
-import appDts from '@/types/app.d.ts?raw'
 
 import type * as App from '@/types/app'
 
 import { APP_ID, APP_TITLE, APP_VERSION } from './env'
 import { isValidIPv4, isValidIPv6 } from './is'
 import { normalizeBase64 } from './normalize'
-
-export const getAppDts = () => appDts
 
 export const deepClone = <T>(json: T): T => JSON.parse(JSON.stringify(json))
 
@@ -96,7 +92,7 @@ export const throttle = <T extends (...args: any[]) => void>(
   }
 }
 
-export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const ignoredError = async <F extends (...args: any[]) => Promise<any>>(
   fn: F,
