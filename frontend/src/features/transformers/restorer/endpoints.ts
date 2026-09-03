@@ -277,7 +277,7 @@ export const restoreOpenVpnClient = (
       },
       dialer,
       udpNat,
-    },
+    } as EndpointOpenVpnClient['config'],
   }
 }
 

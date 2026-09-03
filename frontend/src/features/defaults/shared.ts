@@ -170,7 +170,7 @@ export const createInboundTls = (): InboundTlsConfig => ({
       dialer: createDialer(),
     },
     private_key: '',
-    short_id: '',
+    short_id: [],
     max_time_difference: '',
   },
 })
@@ -214,7 +214,7 @@ export const createOutboundTls = (): OutboundTlsConfig => ({
   reality: {
     enabled: false,
     public_key: '',
-    short_id: '',
+    short_id: [],
   },
 })
 

@@ -168,7 +168,7 @@ const [showTls, toggleShow] = useBool(false)
         </div>
         <div class="form-item" :class="{ 'items-start': !!model.reality.short_id.length }">
           {{ t('kernel.shared.tls.reality.short_id') }}
-          <Input v-model="model.reality.short_id" clearable />
+          <InputList v-model="model.reality.short_id" />
         </div>
         <div class="form-item">
           {{ t('kernel.shared.tls.reality.max_time_difference') }}

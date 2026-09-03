@@ -112,7 +112,7 @@ export interface InboundTlsReality {
   enabled: boolean
   handshake: InboundTlsRealityHandshake
   private_key: string
-  short_id: string
+  short_id: string[]
   max_time_difference: string
 }
 
@@ -155,7 +155,7 @@ export interface OutboundUtls {
 export interface OutboundTlsReality {
   enabled: boolean
   public_key: string
-  short_id: string
+  short_id: string[]
 }
 
 export interface OutboundTlsConfig {

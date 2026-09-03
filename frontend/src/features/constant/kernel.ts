@@ -317,12 +317,6 @@ export const NetworkStrategy = {
   Default: 'default',
   Fallback: 'fallback',
   Hybrid: 'hybrid',
-  Wifi: 'wifi',
-  Cellular: 'cellular',
-  Ethernet: 'ethernet',
-  Wifi_only: 'wifi_only',
-  CellularOnly: 'cellular_only',
-  EthernetOnly: 'ethernet_only',
 } as const satisfies Recordable<SingBoxDialer['network_strategy']>
 
 export type NetworkStrategy = ValueOf<typeof NetworkStrategy>

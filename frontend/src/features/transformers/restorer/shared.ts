@@ -32,6 +32,7 @@ import type {
   Http2Options,
   QuicOptions,
   Dns01Challenge,
+  OutboundUtls,
 } from '@profiles/shared'
 
 import type { IdMaps } from './types'
@@ -106,7 +107,7 @@ export const restoreUdpNat = <T extends object>(
   const udpNat = {
     ...template,
     ...target,
-  } as UdpNat
+  }
   return { udpNat, rest: result.rest }
 }
 
@@ -163,6 +164,7 @@ export const restoreInboundTls = (
         ...handshakeRest,
         dialer,
       },
+      short_id: normalizeArray(raw.reality?.short_id),
     },
   }
 }
@@ -192,10 +194,11 @@ export const restoreOutboundTls = (raw: SingBoxOutboundTls | undefined): Outboun
     utls: {
       ...template.utls,
       ...raw.utls,
-    },
+    } as OutboundUtls,
     reality: {
       ...template.reality,
       ...raw.reality,
+      short_id: normalizeArray(raw.reality?.short_id),
     },
   }
 }
