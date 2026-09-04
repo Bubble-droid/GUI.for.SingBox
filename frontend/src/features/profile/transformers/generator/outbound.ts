@@ -1,5 +1,5 @@
 import { OutboundType } from '@profile/constant/kernel'
-import type { OutboundItem } from '@profile/types/profiles/outbounds'
+import type { OutboundItem } from '@profile/types/profiles/outbound'
 import type { Outbound, OutboundOf } from '@profile/types/sing-box/config'
 
 import { ReadFile } from '@/bridge/io'

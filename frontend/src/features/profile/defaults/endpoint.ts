@@ -39,7 +39,7 @@ import type {
   OpenConnectEndpoint,
   OpenVpnClientEndpoint,
   OpenVpnServerEndpoint,
-} from '@profile/types/profiles/endpoints'
+} from '@profile/types/profiles/endpoint'
 
 import { createSwitchable, createUdpNat, createDialer, createListen } from './shared'
 

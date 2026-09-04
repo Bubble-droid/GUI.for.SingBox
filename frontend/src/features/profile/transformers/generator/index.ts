@@ -32,12 +32,12 @@ import { deepClone, deepAssign } from '@/utils/others'
 import type { Recordable } from '@/types/typescript'
 
 import { _adaptToStableBranch } from './adapter'
-import { generateCertProviders } from './certificate_provider'
+import { generateCertProviders } from './cert-provider'
 import { getGenerateContext } from './context'
 import { generateDns } from './dns'
-import { generateEndpoints } from './endpoints'
-import { generateInbounds } from './inbounds'
-import { generateOutbounds } from './outbounds'
+import { generateEndpoints } from './endpoint'
+import { generateInbounds } from './inbound'
+import { generateOutbounds } from './outbound'
 import { generateRoute } from './route'
 import {
   generateQuicOptions,

@@ -4,7 +4,7 @@ import type {
   CertProviderItem,
   CloudflareCertProvider,
   TailscaleCertProvider,
-} from '@profile/types/profiles/certificate_provider'
+} from '@profile/types/profiles/cert-provider'
 import type { CertificateProvider, CertificateProviderOf } from '@profile/types/sing-box/config'
 
 import { generateDns01Challenge } from './shared'

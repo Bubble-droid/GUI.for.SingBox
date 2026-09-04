@@ -10,7 +10,7 @@ import type {
   CertProviderItem,
   CloudflareCertProvider,
   TailscaleCertProvider,
-} from '@profile/types/profiles/certificate_provider'
+} from '@profile/types/profiles/cert-provider'
 
 import { createDns01Challenge, createSwitchable } from './shared'
 

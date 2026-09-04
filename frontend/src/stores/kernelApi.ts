@@ -1,5 +1,5 @@
 import { RuleSetType, TunStack, InboundType } from '@profile/constant/kernel'
-import { createInboundMixed } from '@profile/defaults/inbounds'
+import { createInboundMixed } from '@profile/defaults/inbound'
 import { generateConfigFile } from '@profile/transformers/generator'
 import { restoreProfile } from '@profile/transformers/restorer'
 import type { Profile } from '@profile/types/profiles'

@@ -19,8 +19,8 @@ import {
   TlsCipherSuiteOptions,
   NetworkOptions,
 } from '@profile/constant/options'
-import { createOpenVpnServerRemoteItem, createOpenVpnPullFilter } from '@profile/defaults/endpoints'
-import type { OpenVpnClientEndpoint } from '@profile/types/profiles/endpoints'
+import { createOpenVpnServerRemoteItem, createOpenVpnPullFilter } from '@profile/defaults/endpoint'
+import type { OpenVpnClientEndpoint } from '@profile/types/profiles/endpoint'
 import { useI18n } from 'vue-i18n'
 
 const model = defineModel<OpenVpnClientEndpoint['config']>({ required: true })

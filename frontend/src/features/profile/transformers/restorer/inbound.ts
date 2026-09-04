@@ -3,8 +3,8 @@ import {
   createInboundTun,
   createInboundDirect,
   createInboundMixed,
-} from '@profile/defaults/inbounds'
-import type { InboundItem } from '@profile/types/profiles/inbounds'
+} from '@profile/defaults/inbound'
+import type { InboundItem } from '@profile/types/profiles/inbound'
 
 import type { Recordable } from '@/types/typescript'
 

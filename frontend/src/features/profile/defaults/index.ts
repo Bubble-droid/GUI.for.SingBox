@@ -14,8 +14,8 @@ import type {
 import { generateSecureKey, sampleID } from '@/utils/others'
 
 import { createDns } from './dns'
-import { createInbounds } from './inbounds'
-import { createOutbounds } from './outbounds'
+import { createInbounds } from './inbound'
+import { createOutbounds } from './outbound'
 import { createRoute } from './route'
 import {
   createDialer,

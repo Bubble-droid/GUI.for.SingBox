@@ -6,7 +6,7 @@ import type {
   OpenVpnServerEndpoint,
   TailscaleEndpoint,
   WireGuardEndpoint,
-} from '@profile/types/profiles/endpoints'
+} from '@profile/types/profiles/endpoint'
 import type { Endpoint, EndpointOf } from '@profile/types/sing-box/config'
 
 import { generateDialer, generateUdpNat, generateListen } from './shared'

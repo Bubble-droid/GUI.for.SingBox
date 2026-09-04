@@ -1,6 +1,6 @@
 import type { Network } from '@profile/constant/kernel'
 import { InboundType, TunStack } from '@profile/constant/kernel'
-import type { InboundItem } from '@profile/types/profiles/inbounds'
+import type { InboundItem } from '@profile/types/profiles/inbound'
 
 import { DefaultInboundIds } from './shared'
 

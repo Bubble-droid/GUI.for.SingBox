@@ -3,7 +3,7 @@ import Dns01ChallengeConfig from '@profile/components/Shared/Dns01ChallengeConfi
 import PortInput from '@profile/components/Shared/PortInput.vue'
 import { AcmeProvider } from '@profile/constant/kernel'
 import { AcmeProviderOptions, AcmeKeyTypeOptions } from '@profile/constant/options'
-import type { AcmeCertProvider } from '@profile/types/profiles/certificate_provider'
+import type { AcmeCertProvider } from '@profile/types/profiles/cert-provider'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

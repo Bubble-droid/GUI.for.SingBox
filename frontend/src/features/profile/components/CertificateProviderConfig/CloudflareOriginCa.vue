@@ -3,7 +3,7 @@ import {
   CloudflareOriginCaRequestTypeOptions,
   CloudflareOriginCaValidityOptions,
 } from '@profile/constant/options'
-import type { CloudflareCertProvider } from '@profile/types/profiles/certificate_provider'
+import type { CloudflareCertProvider } from '@profile/types/profiles/cert-provider'
 import { useI18n } from 'vue-i18n'
 
 import type { OptionItem } from '@/types/component'

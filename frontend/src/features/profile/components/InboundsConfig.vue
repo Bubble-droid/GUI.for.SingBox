@@ -7,8 +7,8 @@ import {
   createInboundHttp,
   createInboundSocks,
   createInboundTun,
-} from '@profile/defaults/inbounds'
-import type { InboundItem } from '@profile/types/profiles/inbounds'
+} from '@profile/defaults/inbound'
+import type { InboundItem } from '@profile/types/profiles/inbound'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'

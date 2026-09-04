@@ -1,7 +1,7 @@
 import { RouteActionKind, RouteRuleType, RuleSetType } from '@profile/constant/kernel'
 import type { DnsSection } from '@profile/types/profiles/dns'
-import type { InboundItem } from '@profile/types/profiles/inbounds'
-import type { OutboundItem } from '@profile/types/profiles/outbounds'
+import type { InboundItem } from '@profile/types/profiles/inbound'
+import type { OutboundItem } from '@profile/types/profiles/outbound'
 import type { RouteSection, RuleSetItem } from '@profile/types/profiles/route'
 
 import { deepAssign } from '@/utils/others'

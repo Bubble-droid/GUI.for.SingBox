@@ -2,12 +2,12 @@ import type { CertStore, HttpEngine, HttpVersion, LogLevel } from '@profile/cons
 
 import type { Recordable } from '@/types/typescript'
 
-import type { CertProviderItem } from './certificate_provider'
+import type { CertProviderItem } from './cert-provider'
 import type { DnsSection } from './dns'
-import type { EndpointItem } from './endpoints'
-import type { InboundItem } from './inbounds'
+import type { EndpointItem } from './endpoint'
+import type { InboundItem } from './inbound'
 import type { NetnsItem } from './netns'
-import type { OutboundItem } from './outbounds'
+import type { OutboundItem } from './outbound'
 import type { RouteSection } from './route'
 import type {
   DialerForm,

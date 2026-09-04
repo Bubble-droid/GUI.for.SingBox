@@ -1,4 +1,4 @@
-import kernel from '@profile/i18n/zh/kernel'
+import kernel from '@profile/locales/zh'
 
 export default {
   common: {

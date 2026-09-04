@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { OutboundType } from '@profile/constant/kernel.ts'
-import { createOutbound } from '@profile/defaults/outbounds.ts'
-import type { OutboundItem } from '@profile/types/profiles/outbounds.ts'
+import { createOutbound } from '@profile/defaults/outbound.ts'
+import type { OutboundItem } from '@profile/types/profiles/outbound.ts'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

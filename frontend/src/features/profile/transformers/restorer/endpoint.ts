@@ -7,7 +7,7 @@ import {
   createOpenVpnPullFilter,
   createOpenVpnPushDnsServer,
   createEndpoint,
-} from '@profile/defaults/endpoints'
+} from '@profile/defaults/endpoint'
 import type {
   EndpointItem,
   OpenConnectEndpoint,
@@ -18,7 +18,7 @@ import type {
   TailscaleEndpoint,
   WireGuardEndpoint,
   WireGuardPeer,
-} from '@profile/types/profiles/endpoints'
+} from '@profile/types/profiles/endpoint'
 import type { Endpoint, EndpointOf } from '@profile/types/sing-box/config'
 import { normalizeArray } from '@profile/utils/helper'
 import type { openconnect_tncc_certificate } from '@zhexin/typebox/endpoint'

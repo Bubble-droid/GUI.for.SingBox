@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import PortInput from '@profile/components/Shared/PortInput.vue'
-import { createWireGuardPeer } from '@profile/defaults/endpoints'
-import type { WireGuardEndpoint } from '@profile/types/profiles/endpoints'
+import { createWireGuardPeer } from '@profile/defaults/endpoint'
+import type { WireGuardEndpoint } from '@profile/types/profiles/endpoint'
 import { useI18n } from 'vue-i18n'
 
 const model = defineModel<WireGuardEndpoint['config']>({ required: true })

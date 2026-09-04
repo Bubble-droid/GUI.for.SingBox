@@ -6,8 +6,8 @@ import {
   OpenConnectReportedOsOptions,
   OpenConnectCompressionModeOptions,
 } from '@profile/constant/options'
-import { createOpenConnectFormEntry, createOpenConnectTnccCert } from '@profile/defaults/endpoints'
-import type { OpenConnectEndpoint } from '@profile/types/profiles/endpoints'
+import { createOpenConnectFormEntry, createOpenConnectTnccCert } from '@profile/defaults/endpoint'
+import type { OpenConnectEndpoint } from '@profile/types/profiles/endpoint'
 import { useI18n } from 'vue-i18n'
 
 const model = defineModel<OpenConnectEndpoint['config']>({ required: true })

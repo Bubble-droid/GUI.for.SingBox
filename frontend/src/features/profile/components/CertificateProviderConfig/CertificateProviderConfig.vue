@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { CertProviderType } from '@profile/constant/kernel.ts'
 import { CertificateProviderTypeOptions } from '@profile/constant/options.ts'
-import { createCertProvider } from '@profile/defaults/certificate_provider.ts'
-import type { CertProviderItem } from '@profile/types/profiles/certificate_provider.ts'
+import { createCertProvider } from '@profile/defaults/cert-provider.ts'
+import type { CertProviderItem } from '@profile/types/profiles/cert-provider.ts'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

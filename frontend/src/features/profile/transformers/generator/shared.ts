@@ -1,6 +1,6 @@
 import { RouteRuleType, DnsRuleType } from '@profile/constant/kernel'
 import type { DnsRuleItem } from '@profile/types/profiles/dns'
-import type { InboundItem } from '@profile/types/profiles/inbounds'
+import type { InboundItem } from '@profile/types/profiles/inbound'
 import type { RouteRuleItem, RuleSetItem } from '@profile/types/profiles/route'
 import type {
   DialerForm,

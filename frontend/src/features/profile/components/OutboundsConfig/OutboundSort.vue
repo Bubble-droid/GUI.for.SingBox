@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { OutboundChild, OutboundItem } from '@profile/types/profiles/outbounds'
+import type { OutboundChild, OutboundItem } from '@profile/types/profiles/outbound'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'

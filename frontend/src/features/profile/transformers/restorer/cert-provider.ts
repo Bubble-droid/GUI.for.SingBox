@@ -1,12 +1,12 @@
 import type { AcmeProvider } from '@profile/constant/kernel'
 import { CertProviderType } from '@profile/constant/kernel'
-import { createCertProvider } from '@profile/defaults/certificate_provider'
+import { createCertProvider } from '@profile/defaults/cert-provider'
 import type {
   AcmeCertProvider,
   CertProviderItem,
   CloudflareCertProvider,
   TailscaleCertProvider,
-} from '@profile/types/profiles/certificate_provider'
+} from '@profile/types/profiles/cert-provider'
 import type { CertificateProvider, CertificateProviderOf } from '@profile/types/sing-box/config'
 import { normalizeArray } from '@profile/utils/helper'
 

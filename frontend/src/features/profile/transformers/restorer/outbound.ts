@@ -1,6 +1,6 @@
 import { OutboundType } from '@profile/constant/kernel'
-import { createOutbound } from '@profile/defaults/outbounds'
-import type { OutboundChild, OutboundItem } from '@profile/types/profiles/outbounds'
+import { createOutbound } from '@profile/defaults/outbound'
+import type { OutboundChild, OutboundItem } from '@profile/types/profiles/outbound'
 
 import { createTextMatcher } from '@/utils/others'
 

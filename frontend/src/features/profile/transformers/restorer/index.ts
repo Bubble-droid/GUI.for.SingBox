@@ -32,13 +32,13 @@ import { sampleID } from '@/utils/others'
 
 import type { Recordable } from '@/types/typescript'
 
-import { restoreCertProviders } from './certificate_provider'
+import { restoreCertProviders } from './cert-provider'
 import { getRestoreContext } from './context'
 import { restoreDnsServers, restoreDnsRules } from './dns'
-import { restoreEndpoints } from './endpoints'
-import { restoreInbounds } from './inbounds'
+import { restoreEndpoints } from './endpoint'
+import { restoreInbounds } from './inbound'
 import { restoreNetns } from './netns'
-import { restoreOutbounds } from './outbounds'
+import { restoreOutbounds } from './outbound'
 import { restoreRouteRules, restoreRuleSet } from './route'
 import {
   restoreDialer,

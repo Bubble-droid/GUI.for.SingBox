@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import PortInput from '@profile/components/Shared/PortInput.vue'
-import type { TailscaleEndpoint } from '@profile/types/profiles/endpoints'
+import type { TailscaleEndpoint } from '@profile/types/profiles/endpoint'
 import { useI18n } from 'vue-i18n'
 
 const model = defineModel<TailscaleEndpoint['config']>({ required: true })

@@ -1,3 +1,3 @@
-import type kernel from './zh/kernel'
+import type kernel from './zh'
 
 export type MessageSchema = typeof kernel

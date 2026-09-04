@@ -1,5 +1,5 @@
 import { OutboundType } from '@profile/constant/kernel'
-import type { OutboundItem } from '@profile/types/profiles/outbounds'
+import type { OutboundItem } from '@profile/types/profiles/outbound'
 
 import { DefaultTestURL } from '@/constant/app'
 import i18n from '@/lang'

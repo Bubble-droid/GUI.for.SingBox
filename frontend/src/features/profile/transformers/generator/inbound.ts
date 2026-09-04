@@ -1,5 +1,5 @@
 import { InboundType } from '@profile/constant/kernel'
-import type { InboundItem } from '@profile/types/profiles/inbounds'
+import type { InboundItem } from '@profile/types/profiles/inbound'
 
 export const generateInbounds = (inbounds: InboundItem[]) =>
   inbounds.flatMap((inbound) => {
