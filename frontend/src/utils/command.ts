@@ -1,4 +1,4 @@
-import { PredefinedClashModeOptions } from '@features/constant/options'
+import { PredefinedClashModeOptions } from '@profile/constant/options'
 
 import { RestartApp } from '@/bridge/app'
 

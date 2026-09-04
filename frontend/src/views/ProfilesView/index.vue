@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { generateConfig } from '@generator'
-import type { Profile } from '@profiles'
+import { generateConfig } from '@profile/transformers/generator/index.ts'
+import type { Profile } from '@profile/types/profiles/index.ts'
 import { useI18n, I18nT } from 'vue-i18n'
 
 import { ClipboardSetText } from '@wails/runtime/runtime.js'

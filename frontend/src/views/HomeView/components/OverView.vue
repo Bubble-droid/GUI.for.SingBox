@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PredefinedClashModeOptions } from '@features/constant/options.ts'
+import { PredefinedClashModeOptions } from '@profile/constant/options.ts'
 import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -1,19 +1,16 @@
-<script setup lang="ts" generic="T extends string | number | boolean = string | number | boolean">
+<script setup lang="ts" generic="T extends string | number | boolean = string">
 import { useI18n } from 'vue-i18n'
 
-import type { ComponentOption } from '@/types/views'
+import type { OptionItem } from '@/types/component'
 
 interface Props {
-  options?: readonly ComponentOption<T>[]
+  options?: readonly OptionItem<T>[]
   size?: 'default' | 'small'
 }
 
 const model = defineModel<T>({ required: true })
 
-withDefaults(defineProps<Props>(), {
-  options: () => [],
-  size: 'default',
-})
+const { options = [], size = 'default' } = defineProps<Props>()
 
 const emits = defineEmits<{
   change: [val: T, oldVal?: T]

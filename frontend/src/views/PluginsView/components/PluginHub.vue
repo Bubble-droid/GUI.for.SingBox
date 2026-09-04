@@ -6,7 +6,7 @@ import { usePluginsStore } from '@/stores/plugins.ts'
 import { message, modal } from '@/utils/interaction.ts'
 import { createTextMatcher, deepClone } from '@/utils/others.ts'
 
-import type * as App from '@/types/app'
+import type { AppPlugin } from '@/types/app.ts'
 
 import PluginSource from './PluginSource.vue'
 
@@ -19,7 +19,7 @@ const loadingSet = ref(new Set<string>())
 const groupOrders = ['Recommended', 'Extensions', 'Tools', 'Fun', 'Examples', 'Development']
 
 const groups = computed(() => {
-  const map: Record<string, App.Plugin[]> = {}
+  const map: Record<string, AppPlugin[]> = {}
   pluginsStore.pluginHub.forEach((plugin) => {
     const group = plugin.group || 'Others'
     if (!map[group]) {
@@ -64,7 +64,7 @@ const filteredPlugins = computed(() => {
     .filter((group) => group.plugins.length)
 })
 
-const handleAddPlugin = async (plugin: App.Plugin) => {
+const handleAddPlugin = async (plugin: AppPlugin) => {
   loadingSet.value.add(plugin.id)
   try {
     await pluginsStore.addPlugin(deepClone(plugin))

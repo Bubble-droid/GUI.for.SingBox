@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Mixin, Script } from '@profiles'
+import type { Mixin, Script } from '@profile/types/profiles'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { parse, stringify } from 'yaml'

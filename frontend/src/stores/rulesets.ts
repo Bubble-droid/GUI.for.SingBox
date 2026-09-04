@@ -1,5 +1,5 @@
 // oxlint-disable unicorn/consistent-function-scoping
-import { RuleSetFormat } from '@features/constant/kernel'
+import { RuleSetFormat } from '@profile/constant/kernel'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { parse } from 'yaml'
@@ -14,11 +14,11 @@ import { isValidRulesJson } from '@/utils/is'
 import { migrateRulesets } from '@/utils/migration'
 import { ignoredError, omitArray, stringifyNoFolding, asyncPool } from '@/utils/others'
 
-import type * as App from '@/types/app'
+import type { AppRuleSet, RulesetHub } from '@/types/app'
 
 export const useRulesetsStore = defineStore('rulesets', () => {
-  const rulesets = ref<App.RuleSet[]>([])
-  const rulesetHub = ref<App.RulesetHub>({ geosite: '', geoip: '', list: [] })
+  const rulesets = ref<AppRuleSet[]>([])
+  const rulesetHub = ref<RulesetHub>({ geosite: '', geoip: '', list: [] })
 
   const setupRulesets = async () => {
     const data = await ignoredError(ReadFile, RulesetsFilePath)
@@ -35,7 +35,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
     return WriteFile(RulesetsFilePath, stringifyNoFolding(r))
   }
 
-  const addRuleset = async (r: App.RuleSet) => {
+  const addRuleset = async (r: AppRuleSet) => {
     rulesets.value.push(r)
     try {
       await saveRulesets()
@@ -64,7 +64,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
     eventBus.emit('rulesetChange', { id })
   }
 
-  const editRuleset = async (id: string, r: App.RuleSet) => {
+  const editRuleset = async (id: string, r: AppRuleSet) => {
     const idx = rulesets.value.findIndex((v) => v.id === id)
     if (idx === -1) {
       return
@@ -80,7 +80,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
     eventBus.emit('rulesetChange', { id })
   }
 
-  const _doUpdateRuleset = async (r: App.RuleSet) => {
+  const _doUpdateRuleset = async (r: AppRuleSet) => {
     if (r.format === RuleSetFormat.Source) {
       let body = ''
       let isExist = true
@@ -159,7 +159,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
   const updateRulesets = async () => {
     let needSave = false
 
-    const update = async (r: App.RuleSet) => {
+    const update = async (r: AppRuleSet) => {
       const result = { ok: true, id: r.id, name: r.name, result: '' }
       try {
         r.updating = true

@@ -9,13 +9,13 @@ import { message } from '@/utils/interaction.ts'
 
 import Button from '@/components/Button/index.vue'
 
-import type * as App from '@/types/app'
+import type { AppPlugin } from '@/types/app.ts'
 import type { Recordable } from '@/types/typescript.ts'
 
 import PluginConfigItem from './PluginConfigItem.vue'
 
 interface Props {
-  plugin: App.Plugin
+  plugin: AppPlugin
 }
 
 const props = defineProps<Props>()

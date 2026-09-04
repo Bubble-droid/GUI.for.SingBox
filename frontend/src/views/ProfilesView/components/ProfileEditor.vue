@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { generateConfig } from '@generator'
-import type { Profile } from '@profiles'
-import { restoreProfile } from '@restorer'
+import { generateConfig } from '@profile/transformers/generator'
+import { restoreProfile } from '@profile/transformers/restorer'
+import type { Profile } from '@profile/types/profiles'
 import { ref, inject, h, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 

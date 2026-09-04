@@ -14,6 +14,7 @@ import { confirm, message } from '@/utils/interaction'
 import { sleep, sampleID, getGitHubApiAuthorization } from '@/utils/others'
 
 import type * as App from '@/types/app'
+import type { OptionItem } from '@/types/component'
 import type { GitHubApiRelease } from '@/types/github'
 
 import { StoreDep, useStoreDeps } from './deps'
@@ -40,7 +41,7 @@ export const useAppStore = defineStore('app', () => {
 
   /* i18n */
   const localesLoading = ref(false)
-  const locales = ref<{ label: string; value: string }[]>([])
+  const locales = ref<OptionItem[]>([])
   const loadLocales = async (delay = true, reload = true) => {
     localesLoading.value = true
     const dirs = await ReadDir(LocalesFilePath).catch(() => [])

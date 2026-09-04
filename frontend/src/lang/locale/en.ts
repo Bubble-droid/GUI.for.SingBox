@@ -1,4 +1,4 @@
-import kernel from '@features/i18n/en/kernel'
+import kernel from '@profile/i18n/en/kernel'
 
 import type { MessageSchema } from '../i18n'
 

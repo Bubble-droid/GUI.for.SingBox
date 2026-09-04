@@ -1,4 +1,4 @@
-import type { TunStack } from '@features/constant/kernel'
+import type { TunStack } from '@profile/constant/kernel'
 
 export interface CoreApiConfigTun {
   enable: boolean

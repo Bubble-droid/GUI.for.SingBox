@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRouteRuleset, createRouteRule } from '@defaults/route'
-import { RuleSetFormat, RouteRuleType, RuleSetType } from '@features/constant/kernel'
+import { RuleSetFormat, RouteRuleType, RuleSetType } from '@profile/constant/kernel'
+import { createRouteRuleset, createRouteRule } from '@profile/defaults/route'
 import { computed, h, inject, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

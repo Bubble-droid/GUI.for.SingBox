@@ -1,4 +1,4 @@
-import { Outbound } from '@features/constant/kernel'
+import { OutboundType } from '@profile/constant/kernel'
 
 export const CoreWorkingDirectory = 'data/sing-box'
 export const CorePidFilePath = `${CoreWorkingDirectory}/pid.txt`
@@ -13,7 +13,7 @@ export const EmptyRuleSet = {
 
 export const DefaultExcludeProtocols = 'direct|reject|selector|urltest|block|dns|shadowsocksr'
 
-export const BuiltInOutbound = [Outbound.Direct, Outbound.Block]
+export const BuiltInOutbound = [OutboundType.Direct, OutboundType.Block]
 
 export const DefaultConnections = () => ({
   visibility: {

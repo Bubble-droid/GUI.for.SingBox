@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { LogLevelOptions } from '@features/constant/options'
+import { LogLevelOptions } from '@profile/constant/options'
 import { ref, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -12,8 +12,8 @@ import { buildSmartRegExp, getDomainSuffixes } from '@/utils/others'
 
 import type { PickerItem } from '@/components/Picker/types'
 import type * as App from '@/types/app'
+import type { RuleCandidate } from '@/types/component'
 import type { CoreApiLogsData } from '@/types/kernel'
-import type { RuleCandidate } from '@/types/views'
 
 const logType = ref<'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'panic'>('info')
 const keywords = ref('')

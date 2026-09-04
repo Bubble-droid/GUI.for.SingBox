@@ -1,4 +1,4 @@
-import type { ComponentOption } from '@/types/views'
+import type { OptionItem } from '@/types/component'
 
 export type SelectModelValue = string | number
 
@@ -9,7 +9,7 @@ export type SelectValueType<
 
 export interface SelectProps<T extends SelectModelValue = string, M extends boolean = false> {
   modelValue?: SelectValueType<T, M>
-  options?: ComponentOption<T>[]
+  options?: OptionItem<T>[]
   multiple?: M
   border?: boolean
   size?: 'default' | 'small'

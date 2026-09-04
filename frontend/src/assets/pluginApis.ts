@@ -1,3 +1,5 @@
+import * as generator from '@profile/transformers/generator'
+import * as restorer from '@profile/transformers/restorer'
 import { parse, stringify } from 'yaml'
 
 import * as bridgeApp from '@/bridge/app'
@@ -8,8 +10,6 @@ import * as bridgeNet from '@/bridge/net'
 import * as bridgeServer from '@/bridge/server'
 import * as bridgeRuntime from '@wails/runtime/runtime'
 
-import * as utilsGenerator from '@/features/transformers/generator'
-import * as restorer from '@/features/transformers/restorer'
 import * as storesApp from '@/stores/app'
 import * as storesAppSettings from '@/stores/appSettings'
 import * as storesEnv from '@/stores/env'
@@ -42,7 +42,7 @@ const Bridge = {
 const Utils = {
   ...utilsEnv,
   ...utilsFormat,
-  ...utilsGenerator,
+  ...generator,
   ...restorer,
   ...utilsIs,
   ...utilsOthers,

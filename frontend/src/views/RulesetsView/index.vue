@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRouteRuleset, createRouteRule } from '@defaults/route.ts'
-import { RuleSetFormat, RouteRuleType, RuleSetType } from '@features/constant/kernel.ts'
+import { RuleSetFormat, RouteRuleType, RuleSetType } from '@profile/constant/kernel'
+import { createRouteRule, createRouteRuleset } from '@profile/defaults/route.ts'
 import { computed } from 'vue'
 import { useI18n, I18nT } from 'vue-i18n'
 
@@ -16,13 +16,13 @@ import { formatDate, formatRelativeTime } from '@/utils/format.ts'
 import { modal, message, picker } from '@/utils/interaction.ts'
 import { ignoredError, deepClone, debounce } from '@/utils/others.ts'
 
-import type * as App from '@/types/app'
+import type { Menu, AppRuleSet } from '@/types/app.ts'
 
 import RulesetForm from './components/RulesetForm.vue'
 import RulesetHub from './components/RulesetHub.vue'
 import RulesetView from './components/RulesetView.vue'
 
-const sourceMenuList: App.Menu[] = [
+const sourceMenuList: Menu[] = [
   {
     label: 'rulesets.editRuleset',
     handler: (id: string) => handleEditRulesetList(id),
@@ -87,7 +87,7 @@ const handleEditRulesetList = (id: string) => {
   m.setContent(RulesetView, { id }).open()
 }
 
-const handleUpdateRuleset = async (r: App.RuleSet) => {
+const handleUpdateRuleset = async (r: AppRuleSet) => {
   try {
     await rulesetsStore.updateRuleset(r.id)
   } catch (error: any) {
@@ -96,7 +96,7 @@ const handleUpdateRuleset = async (r: App.RuleSet) => {
   }
 }
 
-const handleDeleteRuleset = async (r: App.RuleSet) => {
+const handleDeleteRuleset = async (r: AppRuleSet) => {
   try {
     await ignoredError(RemoveFile, r.path)
     await rulesetsStore.deleteRuleset(r.id)
@@ -106,7 +106,7 @@ const handleDeleteRuleset = async (r: App.RuleSet) => {
   }
 }
 
-const handleDisableRuleset = (r: App.RuleSet) => {
+const handleDisableRuleset = (r: AppRuleSet) => {
   r.disabled = !r.disabled
   rulesetsStore.editRuleset(r.id, r)
 }
@@ -208,8 +208,8 @@ const handleAddRulesetToProfile = async (id: string) => {
   }
 }
 
-const generateMenus = (r: App.RuleSet) => {
-  const addToProfileMenu: App.Menu = {
+const generateMenus = (r: AppRuleSet) => {
+  const addToProfileMenu: Menu = {
     label: 'rulesets.addToProfile',
     handler: (id: string) => handleAddRulesetToProfile(id),
   }

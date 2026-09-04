@@ -1,7 +1,7 @@
 // oxlint-disable unicorn/consistent-function-scoping
-import { createProfile } from '@defaults'
-import type { Profile } from '@profiles'
-import { restoreProfile } from '@restorer'
+import { createProfile } from '@profile/defaults'
+import { restoreProfile } from '@profile/transformers/restorer'
+import type { Profile } from '@profile/types/profiles'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { parse } from 'yaml'

@@ -1,9 +1,10 @@
-import type { Profile } from '@profiles'
+import type { Profile } from '@profile/types/profiles'
+import type { RuleSet } from '@profile/types/sing-box/route'
 
-import type * as App from '@/types/app'
+import type { Subscription, ScheduledTask, AppRuleSet, AppPlugin } from '@/types/app'
 
 export type ResourceType = 'profile' | 'subscription' | 'ruleset' | 'plugin' | 'scheduledtask'
-export type ResourceItem = Profile | App.Subscription | App.RuleSet | App.Plugin | App.ScheduledTask
+export type ResourceItem = Profile | Subscription | RuleSet | AppPlugin | ScheduledTask
 
 export type ResourceItemMap<T extends ResourceType> = Pick<ResourceResultMap, ResourceType>[T]
 
@@ -19,15 +20,15 @@ export interface ResourceSelectProps<T extends ResourceType> {
 
 export interface ResourceResultMap {
   profile: Profile
-  subscription: App.Subscription
-  ruleset: App.RuleSet
-  plugin: App.Plugin
-  scheduledtask: App.ScheduledTask
+  subscription: Subscription
+  ruleset: AppRuleSet
+  plugin: AppPlugin
+  scheduledtask: ScheduledTask
   1: Profile
-  2: App.Subscription
-  3: App.RuleSet
-  4: App.Plugin
-  5: App.ScheduledTask
+  2: Subscription
+  3: RuleSet
+  4: AppPlugin
+  5: ScheduledTask
 }
 
 export type ResourceSelectType = keyof ResourceResultMap

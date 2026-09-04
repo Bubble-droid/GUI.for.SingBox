@@ -2,9 +2,11 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import type { OptionItem } from '@/types/component'
+
 interface Props {
   modelValue?: string[]
-  options?: { label: string; value: string }[]
+  options?: OptionItem[]
   size?: 'default' | 'small'
 }
 

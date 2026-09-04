@@ -1,11 +1,11 @@
-import { createProfile, ProfileSchemaVersion } from '@defaults'
-import { generateConfig } from '@generator'
-import type { Profile } from '@profiles'
-import { restoreProfile } from '@restorer'
+import { createProfile, ProfileSchemaVersion } from '@profile/defaults'
+import { generateConfig } from '@profile/transformers/generator'
+import { restoreProfile } from '@profile/transformers/restorer'
+import type { Profile } from '@profile/types/profiles'
 
 import { RequestProxyMode } from '@/enums/app'
 
-import type { Subscription, RuleSet } from '@/types/app'
+import type { Subscription, AppRuleSet } from '@/types/app'
 
 import { message } from './interaction'
 import { normalizeErrorMessage } from './normalize'
@@ -93,11 +93,11 @@ export const migrateSubscribes = async (
   }
 }
 
-export const migrateRulesets = async (rulesets: RuleSet[], save: () => Promise<string>) => {
+export const migrateRulesets = async (rulesets: AppRuleSet[], save: () => Promise<string>) => {
   let needSync = false
 
   rulesets.forEach((ruleset) => {
-    const legacyRuleset = ruleset as RuleSet & { tag?: string }
+    const legacyRuleset = ruleset as AppRuleSet & { tag?: string }
 
     if (typeof ruleset.name === 'undefined' && legacyRuleset.tag) {
       ruleset.name = legacyRuleset.tag

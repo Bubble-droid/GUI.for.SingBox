@@ -11,7 +11,7 @@ import { deepClone, ignoredError } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 
-import type * as App from '@/types/app'
+import type { AppRuleSet } from '@/types/app'
 
 interface Props {
   id: string
@@ -20,7 +20,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const loading = ref(false)
-const ruleset = ref<App.RuleSet>()
+const ruleset = ref<AppRuleSet>()
 const rulesetContent = ref<string>('')
 
 const handleCancel = inject('cancel') as any

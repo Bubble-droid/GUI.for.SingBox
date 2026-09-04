@@ -1,4 +1,4 @@
-import { RuleSetFormat } from '@features/constant/kernel'
+import { RuleSetFormat } from '@profile/constant/kernel'
 
 import { GetSystemProxy, GetEnv, ExitApp } from '@/bridge/app'
 import { Exec } from '@/bridge/exec'
@@ -10,9 +10,9 @@ import { OS, RequestProxyMode } from '@/enums/app'
 import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 
+import type { RuleCandidate } from '@/types/component'
 import type { CoreApiProxy } from '@/types/kernel'
 import type { Recordable } from '@/types/typescript'
-import type { RuleCandidate } from '@/types/views'
 
 import { APP_ID } from './env'
 import { formatProxyHost } from './format'

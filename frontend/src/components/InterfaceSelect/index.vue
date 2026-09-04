@@ -3,6 +3,8 @@ import { onMounted, ref } from 'vue'
 
 import { GetInterfaces } from '@/bridge/app'
 
+import type { OptionItem } from '@/types/component'
+
 interface Props {
   border?: boolean
   multiple?: M
@@ -21,7 +23,7 @@ const emits = defineEmits<{
   changed: [value: ModelType]
 }>()
 
-const options = ref<{ label: string; value: string }[]>([])
+const options = ref<OptionItem[]>([])
 
 const onChange = (val: ModelType) => {
   emits('changed', val)

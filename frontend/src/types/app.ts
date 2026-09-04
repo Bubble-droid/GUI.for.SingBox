@@ -1,4 +1,4 @@
-import type { RuleSetFormat } from '@features/constant/kernel'
+import type { RuleSetFormat } from '@profile/constant/kernel'
 import type * as VueModule from 'vue'
 
 import type {
@@ -135,7 +135,7 @@ export interface AppSettings {
   pages: string[]
 }
 
-export interface Plugin {
+export interface AppPlugin {
   id: string
   version: string
   name: string
@@ -216,7 +216,7 @@ export interface Subscription {
   updating?: boolean
 }
 
-export interface RuleSet {
+export interface AppRuleSet {
   id: string
   name: string
   updateTime: number

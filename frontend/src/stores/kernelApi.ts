@@ -1,8 +1,9 @@
-import { createInboundMixed } from '@defaults/inbounds'
-import { Inbound, TunStack, RuleSetType } from '@features/constant/kernel'
-import type { SingBoxConfig } from '@features/types/sing-box'
-import type { Profile } from '@profiles'
-import { restoreProfile } from '@restorer'
+import { RuleSetType, TunStack, InboundType } from '@profile/constant/kernel'
+import { createInboundMixed } from '@profile/defaults/inbounds'
+import { generateConfigFile } from '@profile/transformers/generator'
+import { restoreProfile } from '@profile/transformers/restorer'
+import type { Profile } from '@profile/types/profiles'
+import type { SingBoxConfig } from '@profile/types/sing-box/config'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 
@@ -29,7 +30,6 @@ import {
 } from '@/constant/kernel'
 import { Branch } from '@/enums/app'
 import { eventBus } from '@/utils/eventBus'
-import { generateConfigFile } from '@/utils/generator'
 import { getKernelFileName, getKernelRuntimeArgs, getKernelRuntimeEnv } from '@/utils/helper'
 import { message } from '@/utils/interaction'
 import { normalizeProxyHost } from '@/utils/normalize'
@@ -40,7 +40,7 @@ import type { CoreApiConfig, CoreApiConfigTun, CoreApiProxy } from '@/types/kern
 
 import { StoreDep, useStoreDeps } from './deps'
 
-type ProxyType = typeof Inbound.Mixed | typeof Inbound.Http | typeof Inbound.Socks
+type ProxyType = typeof InboundType.Mixed | typeof InboundType.Http | typeof InboundType.Socks
 interface ProxyEndpoint {
   schema: 'http' | 'socks5'
   host: string
@@ -55,12 +55,12 @@ interface TunPatchOptions extends Partial<CoreApiConfigTun> {
   interface_name?: string
 }
 
-type TunType = typeof Inbound.Tun
+type TunType = typeof InboundType.Tun
 type TunPatchField = TunType | `${TunType}-${'stack' | 'device'}` | 'interface-name'
-type TunPatchMep = Record<TunPatchField, TunPatchOptions>
+type TunPatchMap = Record<TunPatchField, TunPatchOptions>
 
 interface ConfigUpdateMap
-  extends Pick<CoreApiConfig, 'mode' | 'allow-lan'>, PortPatchMap, TunPatchMep {
+  extends Pick<CoreApiConfig, 'mode' | 'allow-lan'>, PortPatchMap, TunPatchMap {
   inbound: null
 }
 
@@ -173,9 +173,9 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       }
       const inbound = runtimeProfile.inbounds.find(
         (v) =>
-          (v.type === Inbound.Mixed && v.mixed?.listen.listen_port) ??
-          (v.type === Inbound.Http && v.http?.listen.listen_port) ??
-          (v.type === Inbound.Socks && v.socks?.listen.listen_port),
+          (v.type === InboundType.Mixed && v.mixed?.listen.listen_port) ??
+          (v.type === InboundType.Http && v.http?.listen.listen_port) ??
+          (v.type === InboundType.Socks && v.socks?.listen.listen_port),
       )
       if (!inbound) {
         throw new Error('home.overview.needPort')
@@ -210,7 +210,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
         return
       }
       runtimeProfile.inbounds.forEach((inbound) => {
-        if (inbound.type === Inbound.Tun) {
+        if (inbound.type === InboundType.Tun) {
           return
         }
         inbound[inbound.type]!.listen.listen = allowLan ? '0.0.0.0' : '127.0.0.1'
@@ -221,7 +221,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       if (!runtimeProfile) {
         return
       }
-      const inbound = runtimeProfile.inbounds.find((v) => v.type === Inbound.Tun)
+      const inbound = runtimeProfile.inbounds.find((v) => v.type === InboundType.Tun)
       if (!inbound) {
         throw new Error('home.overview.needTun')
       }
@@ -450,19 +450,19 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
   const getProxyProfileOptions = (proxyType: ProxyType) => {
     const inboundTypeMap = {
-      mixed: Inbound.Mixed,
-      http: Inbound.Http,
-      socks: Inbound.Socks,
-    } satisfies Record<ProxyType, Inbound>
+      mixed: InboundType.Mixed,
+      http: InboundType.Http,
+      socks: InboundType.Socks,
+    } satisfies Record<ProxyType, InboundType>
 
     const inbound = runtimeProfile?.inbounds.find(
       (item) => item.enable && item.type === inboundTypeMap[proxyType],
     )
 
     const inboundOptions =
-      proxyType === Inbound.Mixed
+      proxyType === InboundType.Mixed
         ? inbound?.mixed
-        : proxyType === Inbound.Http
+        : proxyType === InboundType.Http
           ? inbound?.http
           : inbound?.socks
 

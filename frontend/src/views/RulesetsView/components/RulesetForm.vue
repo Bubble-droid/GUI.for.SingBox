@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { RuleSetFormat } from '@features/constant/kernel'
-import { RuleSetFormatOptions } from '@features/constant/options'
+import { RuleSetFormat } from '@profile/constant/kernel'
+import { RuleSetFormatOptions } from '@profile/constant/options'
 import { ref, inject, watch, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -10,7 +10,7 @@ import { sampleID, deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 
-import type * as App from '@/types/app'
+import type { AppRuleSet } from '@/types/app'
 
 interface Props {
   id?: string
@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const loading = ref(false)
 
-const ruleset = ref<App.RuleSet>({
+const ruleset = ref<AppRuleSet>({
   id: sampleID(),
   name: '',
   updateTime: 0,

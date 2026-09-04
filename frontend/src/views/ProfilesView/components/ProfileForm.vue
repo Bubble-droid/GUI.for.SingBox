@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { Endpoint } from '@features/constant/kernel.ts'
-import { generateConfig } from '@generator'
-import type { Profile } from '@profiles'
-import CertificateConfig from '@views/CertificateConfig.vue'
-import CertificateProviderConfig from '@views/CertificateProviderConfig/CertificateProviderConfig.vue'
-import DnsConfig from '@views/DnsConfig.vue'
-import EndpointsConfig from '@views/EndpointsConfig/EndpointsConfig.vue'
-import ExperimentalConfig from '@views/ExperimentalConfig.vue'
-import HttpClientsConfig from '@views/HttpClientsConfig.vue'
-import InboundsConfig from '@views/InboundsConfig.vue'
-import LogConfig from '@views/LogConfig.vue'
-import NetnsConfig from '@views/NetnsConfig/NetnsConfig.vue'
-import NtpConfig from '@views/NtpConfig.vue'
-import OutboundsConfig from '@views/OutboundsConfig/OutboundsConfig.vue'
-import RouteConfig from '@views/RouteConfig.vue'
+import CertificateConfig from '@profile/components/CertificateConfig.vue'
+import CertificateProviderConfig from '@profile/components/CertificateProviderConfig/CertificateProviderConfig.vue'
+import DnsConfig from '@profile/components/DnsConfig.vue'
+import EndpointsConfig from '@profile/components/EndpointsConfig/EndpointsConfig.vue'
+import ExperimentalConfig from '@profile/components/ExperimentalConfig.vue'
+import HttpClientsConfig from '@profile/components/HttpClientsConfig.vue'
+import InboundsConfig from '@profile/components/InboundsConfig.vue'
+import LogConfig from '@profile/components/LogConfig.vue'
+import NetnsConfig from '@profile/components/NetnsConfig/NetnsConfig.vue'
+import NtpConfig from '@profile/components/NtpConfig.vue'
+import OutboundsConfig from '@profile/components/OutboundsConfig/OutboundsConfig.vue'
+import RouteConfig from '@profile/components/RouteConfig.vue'
+import { EndpointType } from '@profile/constant/kernel.ts'
+import { generateConfig } from '@profile/transformers/generator/index.ts'
+import type { Profile } from '@profile/types/profiles/index.ts'
 import { ref, inject, computed, useTemplateRef, h } from 'vue'
 import type { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -27,7 +27,7 @@ import Button from '@/components/Button/index.vue'
 import CodeViewer from '@/components/CodeViewer/index.vue'
 import Dropdown from '@/components/Dropdown/index.vue'
 
-import type { ComponentOption } from '@/types/views.ts'
+import type { OptionItem } from '@/types/component.ts'
 
 import MixinAndScriptConfig from './MixinAndScriptConfig.vue'
 
@@ -58,8 +58,8 @@ const currentStep = ref(props.step)
 
 const profile = ref<Profile>(profilesStore.getProfileTemplate())
 
-const httpClientOptions = computed<ComponentOption[]>(() =>
-  profile.value.http_clients
+const httpClientOptions = computed<OptionItem[]>(() =>
+  profile.value.httpClients
     .filter((v) => v.enable)
     .map((v) => ({
       label: v.tag,
@@ -67,8 +67,8 @@ const httpClientOptions = computed<ComponentOption[]>(() =>
     })),
 )
 
-const netnsOptions = computed<ComponentOption[]>(() =>
-  profile.value.network_namespaces
+const netnsOptions = computed<OptionItem[]>(() =>
+  profile.value.netns
     .filter((ns) => ns.enable)
     .map((ns) => ({
       label: ns.tag,
@@ -76,16 +76,16 @@ const netnsOptions = computed<ComponentOption[]>(() =>
     })),
 )
 
-const tailscaleOptions = computed<ComponentOption[]>(() =>
+const tailscaleOptions = computed<OptionItem[]>(() =>
   profile.value.endpoints
-    .filter((v) => v.enable && v.type === Endpoint.Tailscale)
+    .filter((v) => v.enable && v.type === EndpointType.Tailscale)
     .map((v) => ({
       label: v.tag,
       value: v.id,
     })),
 )
 
-const inboundOptions = computed<ComponentOption[]>(() =>
+const inboundOptions = computed<OptionItem[]>(() =>
   [...profile.value.endpoints, ...profile.value.inbounds]
     .filter((v) => v.enable)
     .map((v) => ({
@@ -94,14 +94,14 @@ const inboundOptions = computed<ComponentOption[]>(() =>
     })),
 )
 
-const outboundOptions = computed<ComponentOption[]>(() =>
+const outboundOptions = computed<OptionItem[]>(() =>
   [...profile.value.endpoints.filter((v) => v.enable), ...profile.value.outbounds].map((v) => ({
     label: v.tag,
     value: v.id,
   })),
 )
 
-const dnsServerOptions = computed<ComponentOption[]>(() =>
+const dnsServerOptions = computed<OptionItem[]>(() =>
   profile.value.dns.servers.map((v) => ({ label: v.tag, value: v.id })),
 )
 
@@ -309,12 +309,12 @@ defineExpose({ modalSlots })
       <ExperimentalConfig v-model="profile.experimental" :outbound-options="outboundOptions" />
     </div>
     <div v-if="currentStep === ProfileStep.Certificate">
-      <CertificateConfig v-model="profile.certificate" />
+      <CertificateConfig v-model="profile.cert" />
     </div>
     <div v-if="currentStep === ProfileStep.CertProviders">
       <CertificateProviderConfig
         ref="certProvidersRef"
-        v-model="profile.certificate_providers"
+        v-model="profile.certProviders"
         :http-client-options="httpClientOptions"
         :tailscale-options="tailscaleOptions"
         :dns-server-options="dnsServerOptions"
@@ -323,14 +323,14 @@ defineExpose({ modalSlots })
     <div v-if="currentStep === ProfileStep.HttpClients">
       <HttpClientsConfig
         ref="httpClientsRef"
-        v-model="profile.http_clients"
+        v-model="profile.httpClients"
         :netns-options="netnsOptions"
         :outbound-options="outboundOptions"
         :dns-server-options="dnsServerOptions"
       />
     </div>
     <div v-if="currentStep === ProfileStep.Netns">
-      <NetnsConfig ref="netnsRef" v-model="profile.network_namespaces" />
+      <NetnsConfig ref="netnsRef" v-model="profile.netns" />
     </div>
     <div v-if="currentStep === ProfileStep.Endpoints">
       <EndpointsConfig

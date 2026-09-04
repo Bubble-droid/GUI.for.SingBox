@@ -1,4 +1,4 @@
-import { PredefinedClashModeOptions } from '@features/constant/options'
+import { PredefinedClashModeOptions } from '@profile/constant/options'
 
 import { Notify, ShowMainWindow, RestartApp, UpdateTrayAndMenus } from '@/bridge/app'
 import { EventsOff, EventsOn } from '@wails/runtime/runtime'

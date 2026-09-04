@@ -11,7 +11,7 @@ import { sampleID, deepClone } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 
-import type * as App from '@/types/app'
+import type { AppPlugin } from '@/types/app'
 
 interface Props {
   id?: string
@@ -22,7 +22,7 @@ const props = defineProps<Props>()
 const official = computed(() => pluginsStore.findPluginInHubById(plugin.value.id))
 const loading = ref(false)
 const pluginID = sampleID()
-const plugin = ref<App.Plugin>({
+const plugin = ref<AppPlugin>({
   id: pluginID,
   version: 'v1.0.0',
   name: '',

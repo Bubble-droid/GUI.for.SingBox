@@ -1,0 +1,177 @@
+<script lang="ts" setup>
+import { RuleSetFormat, RuleSetType } from '@profile/constant/kernel'
+import { RuleSetFormatOptions, RuleSetTypeOptions } from '@profile/constant/options'
+import { createRouteRuleset } from '@profile/defaults/route'
+import type { RuleSetItem } from '@profile/types/profiles/route'
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+import { DraggableOptions } from '@/constant/app'
+import { useBool } from '@/hooks/useBool'
+import { useRulesetsStore } from '@/stores/rulesets'
+import { message } from '@/utils/interaction'
+import { deepClone } from '@/utils/others'
+
+import type { OptionItem } from '@/types/component'
+
+interface Props {
+  outboundOptions: OptionItem[]
+}
+
+defineProps<Props>()
+
+const model = defineModel<RuleSetItem[]>({ required: true })
+
+let rulesetId = 0
+const fields = ref<RuleSetItem>(createRouteRuleset())
+
+const { t } = useI18n()
+const [showEditModal] = useBool(false)
+const rulesetsStore = useRulesetsStore()
+
+const handleAdd = () => {
+  rulesetId = -1
+  fields.value = createRouteRuleset()
+  showEditModal.value = true
+}
+
+defineExpose({ handleAdd })
+
+const handleAddEnd = () => {
+  if (rulesetId === -1) {
+    model.value.unshift(fields.value)
+  } else {
+    model.value[rulesetId] = fields.value
+  }
+}
+
+const handleEdit = (index: number) => {
+  rulesetId = index
+  fields.value = deepClone(model.value[index]!)
+  showEditModal.value = true
+}
+
+const handleDelete = (index: number) => {
+  model.value.splice(index, 1)
+}
+
+const showLost = () => message.warn('kernel.route.rule_set.notFound')
+
+const hasLost = (ruleset: RuleSetItem) => {
+  if (ruleset.type !== RuleSetType.Local) {
+    return false
+  }
+  return !rulesetsStore.getRulesetById(ruleset.path)
+}
+
+const handleUse = (ruleset: any) => {
+  fields.value.path = ruleset.id
+  fields.value.tag = ruleset.name
+  fields.value.format = ruleset.format
+}
+</script>
+
+<template>
+  <Empty v-if="model.length === 0">
+    <template #description>
+      <Button icon="add" type="primary" size="small" @click="handleAdd">
+        {{ t('common.add') }}
+      </Button>
+    </template>
+  </Empty>
+
+  <div v-draggable="[model, DraggableOptions]">
+    <Card v-for="(ruleset, index) in model" :key="ruleset.id" class="mb-2">
+      <div class="flex items-center py-2">
+        <div class="font-bold">
+          <span
+            v-if="hasLost(ruleset)"
+            class="cursor-pointer"
+            :style="{ color: 'rgb(200, 193, 11)' }"
+            @click="showLost"
+          >
+            [ ! ]
+          </span>
+          <Tag color="cyan">{{ ruleset.tag }}</Tag>
+          <Tag>
+            {{ t('kernel.route.rule_set.type.' + ruleset.type) }}
+            {{
+              t(
+                'kernel.route.rule_set.format.' +
+                  (ruleset.type === RuleSetType.Inline ? RuleSetFormat.Source : ruleset.format),
+              )
+            }}
+          </Tag>
+          <template v-if="ruleset.type === RuleSetType.Inline">
+            {{ ruleset.rules }}
+          </template>
+        </div>
+        <div class="ml-auto">
+          <Button icon="edit" type="text" size="small" @click="handleEdit(index)" />
+          <Button icon="delete" type="text" size="small" @click="handleDelete(index)" />
+        </div>
+      </div>
+    </Card>
+  </div>
+
+  <Modal
+    v-model:open="showEditModal"
+    :on-ok="handleAddEnd"
+    title="kernel.route.tab.rule_set"
+    max-width="80"
+    max-height="80"
+  >
+    <div class="form-item">
+      {{ t('kernel.route.rule_set.tag') }}
+      <Input v-model="fields.tag" autofocus />
+    </div>
+    <div class="form-item">
+      {{ t('kernel.route.rule_set.type.name') }}
+      <Radio v-model="fields.type" :options="RuleSetTypeOptions" />
+    </div>
+    <template v-if="fields.type === RuleSetType.Local">
+      <Divider>{{ t('kernel.route.tab.rule_set') }}</Divider>
+      <div class="grid grid-cols-3 gap-8">
+        <Empty
+          v-if="rulesetsStore.rulesets.length === 0"
+          :description="t('kernel.route.rule_set.empty')"
+        />
+        <template v-else>
+          <Card
+            v-for="ruleset in rulesetsStore.rulesets"
+            :key="ruleset.id"
+            v-tips="ruleset.path"
+            :title="ruleset.name"
+            :selected="fields.path === ruleset.id"
+            @click="handleUse(ruleset)"
+          >
+            <div class="text-12">
+              {{ ruleset.path }}
+            </div>
+          </Card>
+        </template>
+      </div>
+    </template>
+    <template v-else-if="fields.type === RuleSetType.Remote">
+      <div class="form-item">
+        {{ t('kernel.route.rule_set.format.name') }}
+        <Radio v-model="fields.format" :options="RuleSetFormatOptions" />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.route.rule_set.url') }}
+        <Input v-model="fields.url" />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.route.rule_set.download_detour') }}
+        <Select v-model="fields.download_detour" :options="outboundOptions" clearable />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.route.rule_set.update_interval') }}
+        <Input v-model="fields.update_interval" editable />
+      </div>
+    </template>
+    <template v-else-if="fields.type === RuleSetType.Inline">
+      <CodeEditor v-model="fields.rules" lang="json" editable />
+    </template>
+  </Modal>
+</template>
