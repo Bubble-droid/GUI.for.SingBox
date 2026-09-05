@@ -10,11 +10,11 @@ import type { NetnsItem } from './netns'
 import type { OutboundItem } from './outbound'
 import type { RouteSection } from './route'
 import type {
-  DialerForm,
-  Http2Form,
+  DialerFormData,
+  Http2FormData,
   OutboundId,
-  OutboundTlsForm,
-  QuicForm,
+  OutboundTlsFormData,
+  QuicFormData,
   Switchable,
 } from './shared'
 
@@ -42,7 +42,7 @@ export interface NtpSection {
   server: string
   server_port: number
   interval: string
-  dialer: DialerForm
+  dialer: DialerFormData
 }
 
 export interface CertSection {
@@ -58,10 +58,10 @@ export interface HttpClientItem extends Switchable {
     version: HttpVersion
     disable_version_fallback: boolean
     headers: Recordable<string>
-    http2: Http2Form
-    quic: QuicForm
-    tls: OutboundTlsForm
-    dialer: DialerForm
+    http2: Http2FormData
+    quic: QuicFormData
+    tls: OutboundTlsFormData
+    dialer: DialerFormData
   }
 }
 

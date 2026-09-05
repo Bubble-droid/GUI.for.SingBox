@@ -34,7 +34,7 @@ export interface Switchable extends ProfileBase {
   enable: boolean
 }
 
-export interface ListenForm {
+export interface ListenFormData {
   listen: string
   listen_port: number
   bind_interface: string
@@ -51,7 +51,7 @@ export interface ListenForm {
   detour: InboundId
 }
 
-export interface DnsRouteOptionsForm {
+export interface DnsRouteOptionsFormData {
   disable_cache: boolean
   disable_optimistic_cache: boolean
   rewrite_ttl: number
@@ -59,12 +59,12 @@ export interface DnsRouteOptionsForm {
   client_subnet: string
 }
 
-export interface DomainResolverForm extends DnsRouteOptionsForm {
+export interface DomainResolverFormData extends DnsRouteOptionsFormData {
   server: DnsServerId
   strategy: DomainStrategy
 }
 
-export interface DialerForm {
+export interface DialerFormData {
   detour: OutboundId
   bind_interface: string
   inet4_bind_address: string
@@ -81,7 +81,7 @@ export interface DialerForm {
   tcp_keep_alive: string
   tcp_keep_alive_interval: string
   udp_fragment: boolean
-  domain_resolver: DomainResolverForm
+  domain_resolver: DomainResolverFormData
   network_strategy: NetworkStrategy
   network_type: NetworkType[]
   fallback_network_type: NetworkType[]
@@ -89,7 +89,7 @@ export interface DialerForm {
   network_fallback_delay: string
 }
 
-export interface UdpNatForm {
+export interface UdpNatFormData {
   udp_timeout: string
   udp_mapping: UdpNatBehavior
   udp_filtering: UdpNatBehavior
@@ -105,7 +105,7 @@ export interface InboundTlsEch {
 export interface InboundTlsRealityHandshake {
   server: string
   server_port: number
-  dialer: DialerForm
+  dialer: DialerFormData
 }
 
 export interface InboundTlsReality {
@@ -116,7 +116,7 @@ export interface InboundTlsReality {
   max_time_difference: string
 }
 
-export interface InboundTlsForm {
+export interface InboundTlsFormData {
   enabled: boolean
   server_name: string
   alpn: string[]
@@ -158,7 +158,7 @@ export interface OutboundTlsReality {
   short_id: string[]
 }
 
-export interface OutboundTlsForm {
+export interface OutboundTlsFormData {
   enabled: boolean
   engine: TlsEngine
   disable_sni: boolean
@@ -189,7 +189,7 @@ export interface OutboundTlsForm {
   reality: OutboundTlsReality
 }
 
-export interface Http2Form {
+export interface Http2FormData {
   idle_timeout: string
   keep_alive_period: string
   stream_receive_window: string
@@ -197,7 +197,7 @@ export interface Http2Form {
   max_concurrent_streams: number
 }
 
-export interface QuicForm extends Http2Form {
+export interface QuicFormData extends Http2FormData {
   initial_packet_size: number
   disable_path_mtu_discovery: boolean
 }
@@ -232,4 +232,4 @@ export interface AcmeDnsChallenge extends Dns01ChallengeBase {
   server_url: string
 }
 
-export type Dns01ChallengeForm = AliDnsChallenge | CloudflareChallenge | AcmeDnsChallenge
+export type Dns01ChallengeFormData = AliDnsChallenge | CloudflareChallenge | AcmeDnsChallenge

@@ -6,7 +6,7 @@ import type {
   CloudflareValidity,
 } from '@profile/constant/kernel'
 
-import type { Switchable, HttpClientId, Dns01ChallengeForm } from './shared'
+import type { Switchable, HttpClientId, Dns01ChallengeFormData } from './shared'
 
 type TailscaleId = string
 
@@ -29,7 +29,7 @@ export interface AcmeCertProvider extends Switchable {
     alternative_http_port: number
     alternative_tls_port: number
     external_account: ExternalAccount
-    dns01_challenge: Dns01ChallengeForm
+    dns01_challenge: Dns01ChallengeFormData
     key_type: AcmeKeyType
     profile: string
     http_client: HttpClientId

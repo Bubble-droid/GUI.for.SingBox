@@ -11,16 +11,16 @@ import {
   createDns01Challenge,
 } from '@profile/defaults/shared'
 import type {
-  DialerForm,
-  Dns01ChallengeForm,
-  DomainResolverForm,
-  Http2Form,
-  InboundTlsForm,
-  ListenForm,
-  OutboundTlsForm,
+  DialerFormData,
+  Dns01ChallengeFormData,
+  DomainResolverFormData,
+  Http2FormData,
+  InboundTlsFormData,
+  ListenFormData,
+  OutboundTlsFormData,
   OutboundUtls,
-  QuicForm,
-  UdpNatForm,
+  QuicFormData,
+  UdpNatFormData,
 } from '@profile/types/profiles/shared'
 import type {
   DialerOptions,
@@ -63,14 +63,14 @@ export const supportedRuleTypes = [
 export const restoreDomainResolver = (
   maps: IdMaps,
   raw?: DomainResolverOptions | string,
-): DomainResolverForm => {
+): DomainResolverFormData => {
   const template = createDomainResolver()
   const normalizedResolver = raw
     ? typeof raw === 'string'
       ? { ...template, server: raw }
       : splitProps(raw, template).target
     : template
-  const resolver: DomainResolverForm = {
+  const resolver: DomainResolverFormData = {
     ...template,
     ...normalizedResolver,
     server: maps.dnsServers.get(normalizedResolver.server) ?? '',
@@ -81,12 +81,12 @@ export const restoreDomainResolver = (
 export const restoreDialer = <T extends object>(
   raw: T,
   maps: IdMaps,
-): { dialer: DialerForm; rest: Omit<T, keyof DialerForm> } => {
+): { dialer: DialerFormData; rest: Omit<T, keyof DialerFormData> } => {
   const template = createDialer()
   const result = splitProps(raw, template)
   const target = result.target as DialerOptions
   const resolver = restoreDomainResolver(maps, target.domain_resolver)
-  const dialer: DialerForm = {
+  const dialer: DialerFormData = {
     ...template,
     ...target,
     network_type: normalizeArray(target.network_type),
@@ -100,7 +100,7 @@ export const restoreDialer = <T extends object>(
 
 export const restoreUdpNat = <T extends object>(
   raw: T,
-): { udpNat: UdpNatForm; rest: Omit<T, keyof UdpNatForm> } => {
+): { udpNat: UdpNatFormData; rest: Omit<T, keyof UdpNatFormData> } => {
   const template = createUdpNat()
   const result = splitProps(raw, template)
   const target = result.target as UdpNatOptions
@@ -114,11 +114,11 @@ export const restoreUdpNat = <T extends object>(
 export const restoreListen = <T extends object>(
   raw: T,
   maps: IdMaps,
-): { listen: ListenForm; rest: Omit<T, keyof ListenForm> } => {
+): { listen: ListenFormData; rest: Omit<T, keyof ListenFormData> } => {
   const template = createListen()
   const result = splitProps(raw, template)
   const target = result.target as unknown as ListenOptions
-  const listen: ListenForm = {
+  const listen: ListenFormData = {
     ...template,
     ...target,
     netns: maps.netns.get(target.netns ?? '') ?? '',
@@ -127,7 +127,7 @@ export const restoreListen = <T extends object>(
   return { listen, rest: result.rest }
 }
 
-export const restoreInboundTls = (maps: IdMaps, raw?: InboundTlsOptions): InboundTlsForm => {
+export const restoreInboundTls = (maps: IdMaps, raw?: InboundTlsOptions): InboundTlsFormData => {
   const template = createInboundTls()
   if (!raw) {
     return template
@@ -166,7 +166,7 @@ export const restoreInboundTls = (maps: IdMaps, raw?: InboundTlsOptions): Inboun
   }
 }
 
-export const restoreOutboundTls = (raw?: OutboundTlsOptions): OutboundTlsForm => {
+export const restoreOutboundTls = (raw?: OutboundTlsOptions): OutboundTlsFormData => {
   const template = createOutboundTls()
   if (!raw) {
     return template
@@ -202,11 +202,11 @@ export const restoreOutboundTls = (raw?: OutboundTlsOptions): OutboundTlsForm =>
 
 export const restoreHttp2Options = <T extends Record<string, unknown>>(
   raw: T,
-): { http2: Http2Form; rest: Omit<T, keyof Http2Form> } => {
+): { http2: Http2FormData; rest: Omit<T, keyof Http2FormData> } => {
   const template = createHttp2Options()
   const result = splitProps(raw, template)
   const target = result.target as Http2Options
-  const http2: Http2Form = {
+  const http2: Http2FormData = {
     ...template,
     ...target,
   }
@@ -215,11 +215,11 @@ export const restoreHttp2Options = <T extends Record<string, unknown>>(
 
 export const restoreQuicOptions = <T extends Record<string, unknown>>(
   raw: T,
-): { quic: QuicForm; rest: Omit<T, keyof QuicForm> } => {
+): { quic: QuicFormData; rest: Omit<T, keyof QuicFormData> } => {
   const template = createQuicOptions()
   const result = splitProps(raw, template)
   const target = result.target as QuicOptions
-  const quic: QuicForm = {
+  const quic: QuicFormData = {
     ...template,
     ...target,
   }
@@ -229,7 +229,7 @@ export const restoreQuicOptions = <T extends Record<string, unknown>>(
 export const restoreDns01Challenge = (
   maps: IdMaps,
   raw?: Dns01ChallengeOptions,
-): Dns01ChallengeForm => {
+): Dns01ChallengeFormData => {
   const template = createDns01Challenge(raw?.provider)
   if (!raw) {
     return template
@@ -241,5 +241,5 @@ export const restoreDns01Challenge = (
     resolvers: normalizeArray(raw.resolvers)
       .map((v) => maps.dnsServers.get(v))
       .filter(Boolean) as string[],
-  } as Dns01ChallengeForm
+  } as Dns01ChallengeFormData
 }

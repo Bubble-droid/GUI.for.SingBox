@@ -7,7 +7,7 @@ type TypeBox = Required<
   typebox<string, string, string, string, string, string, string, string, string>
 >
 
-export type Config = {
+type Config = {
   [K in keyof TypeBox]?: TypeBox[K] extends readonly unknown[] ? ItemOf<TypeBox[K]>[] : TypeBox[K]
 }
 

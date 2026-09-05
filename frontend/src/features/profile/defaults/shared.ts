@@ -14,16 +14,16 @@ import type {
   ProfileBase,
   Switchable,
   Dns01ChallengeBase,
-  DomainResolverForm,
-  DialerForm,
-  UdpNatForm,
-  ListenForm,
-  InboundTlsForm,
-  OutboundTlsForm,
-  Http2Form,
-  QuicForm,
-  Dns01ChallengeForm,
-  DnsRouteOptionsForm,
+  DomainResolverFormData,
+  DialerFormData,
+  UdpNatFormData,
+  ListenFormData,
+  InboundTlsFormData,
+  OutboundTlsFormData,
+  Http2FormData,
+  QuicFormData,
+  Dns01ChallengeFormData,
+  DnsRouteOptionsFormData,
 } from '@profile/types/profiles/shared'
 
 import { sampleID } from '@/utils/others'
@@ -74,7 +74,7 @@ export const createSwitchable = (): Switchable => ({
   enable: true,
 })
 
-export const createDnsRouteOptions = (): DnsRouteOptionsForm => ({
+export const createDnsRouteOptions = (): DnsRouteOptionsFormData => ({
   disable_cache: false,
   disable_optimistic_cache: false,
   rewrite_ttl: 0,
@@ -82,13 +82,13 @@ export const createDnsRouteOptions = (): DnsRouteOptionsForm => ({
   client_subnet: '',
 })
 
-export const createDomainResolver = (): DomainResolverForm => ({
+export const createDomainResolver = (): DomainResolverFormData => ({
   ...createDnsRouteOptions(),
   server: '',
   strategy: '' as DomainStrategy,
 })
 
-export const createDialer = (): DialerForm => ({
+export const createDialer = (): DialerFormData => ({
   detour: '',
   bind_interface: '',
   inet4_bind_address: '',
@@ -113,14 +113,14 @@ export const createDialer = (): DialerForm => ({
   network_fallback_delay: '',
 })
 
-export const createUdpNat = (): UdpNatForm => ({
+export const createUdpNat = (): UdpNatFormData => ({
   udp_timeout: '',
   udp_mapping: '' as UdpNatBehavior,
   udp_filtering: '' as UdpNatBehavior,
   udp_nat_max: 0,
 })
 
-export const createListen = (): ListenForm => ({
+export const createListen = (): ListenFormData => ({
   listen: '',
   listen_port: 0,
   bind_interface: '',
@@ -137,7 +137,7 @@ export const createListen = (): ListenForm => ({
   detour: '',
 })
 
-export const createInboundTls = (): InboundTlsForm => ({
+export const createInboundTls = (): InboundTlsFormData => ({
   enabled: false,
   server_name: '',
   alpn: [],
@@ -175,7 +175,7 @@ export const createInboundTls = (): InboundTlsForm => ({
   },
 })
 
-export const createOutboundTls = (): OutboundTlsForm => ({
+export const createOutboundTls = (): OutboundTlsFormData => ({
   enabled: false,
   engine: '' as TlsEngine,
   disable_sni: false,
@@ -218,7 +218,7 @@ export const createOutboundTls = (): OutboundTlsForm => ({
   },
 })
 
-export const createHttp2Options = (): Http2Form => ({
+export const createHttp2Options = (): Http2FormData => ({
   idle_timeout: '',
   keep_alive_period: '',
   stream_receive_window: '',
@@ -226,13 +226,13 @@ export const createHttp2Options = (): Http2Form => ({
   max_concurrent_streams: 0,
 })
 
-export const createQuicOptions = (): QuicForm => ({
+export const createQuicOptions = (): QuicFormData => ({
   ...createHttp2Options(),
   initial_packet_size: 0,
   disable_path_mtu_discovery: false,
 })
 
-export const createDns01Challenge = (provider?: Dns01Provider): Dns01ChallengeForm => {
+export const createDns01Challenge = (provider?: Dns01Provider): Dns01ChallengeFormData => {
   const base: Dns01ChallengeBase = {
     ttl: '',
     propagation_delay: '',
@@ -244,7 +244,7 @@ export const createDns01Challenge = (provider?: Dns01Provider): Dns01ChallengeFo
     return {
       ...base,
       provider: '' as Dns01Provider,
-    } as Dns01ChallengeForm
+    } as Dns01ChallengeFormData
   }
   switch (provider) {
     case Dns01Provider.AliDns: {

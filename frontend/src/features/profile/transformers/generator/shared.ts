@@ -3,15 +3,15 @@ import type { DnsRuleItem } from '@profile/types/profiles/dns'
 import type { InboundItem } from '@profile/types/profiles/inbound'
 import type { RouteRuleItem, RuleSetItem } from '@profile/types/profiles/route'
 import type {
-  DialerForm,
-  Dns01ChallengeForm,
-  DomainResolverForm,
-  Http2Form,
-  InboundTlsForm,
-  ListenForm,
-  OutboundTlsForm,
-  QuicForm,
-  UdpNatForm,
+  DialerFormData,
+  Dns01ChallengeFormData,
+  DomainResolverFormData,
+  Http2FormData,
+  InboundTlsFormData,
+  ListenFormData,
+  OutboundTlsFormData,
+  QuicFormData,
+  UdpNatFormData,
 } from '@profile/types/profiles/shared'
 import type {
   DialerOptions,
@@ -32,32 +32,32 @@ import type { Recordable } from '@/types/typescript'
 import type { TagMaps } from './types'
 
 export const generateDomainResolver = (
-  resolver: DomainResolverForm,
+  resolver: DomainResolverFormData,
   maps: TagMaps,
 ): DomainResolverOptions => ({
   ...(resolver as DomainResolverOptions),
   server: maps.dnsServers.get(resolver.server) ?? '',
 })
 
-export const generateDialer = (dialer: DialerForm, maps: TagMaps): DialerOptions => ({
+export const generateDialer = (dialer: DialerFormData, maps: TagMaps): DialerOptions => ({
   ...(dialer as DialerOptions),
   netns: maps.netns.get(dialer.netns) ?? '',
   detour: maps.outbounds.get(dialer.detour) ?? '',
   domain_resolver: generateDomainResolver(dialer.domain_resolver, maps),
 })
 
-export const generateUdpNat = (udpNat: UdpNatForm): UdpNatOptions => ({
+export const generateUdpNat = (udpNat: UdpNatFormData): UdpNatOptions => ({
   ...(udpNat as UdpNatOptions),
 })
 
-export const generateListen = (listen: ListenForm, maps: TagMaps): ListenOptions => ({
+export const generateListen = (listen: ListenFormData, maps: TagMaps): ListenOptions => ({
   ...(listen as ListenOptions),
   netns: maps.netns.get(listen.netns) ?? '',
   detour: maps.inbounds.get(listen.detour) ?? '',
 })
 
 export const generateInboundTls = (
-  tls: InboundTlsForm,
+  tls: InboundTlsFormData,
   maps: TagMaps,
 ): InboundTlsOptions | undefined => {
   if (!tls.enabled) {
@@ -82,7 +82,7 @@ export const generateInboundTls = (
   } as InboundTlsOptions
 }
 
-export const generateOutboundTls = (tls: OutboundTlsForm): OutboundTlsOptions | undefined => {
+export const generateOutboundTls = (tls: OutboundTlsFormData): OutboundTlsOptions | undefined => {
   if (!tls.enabled) {
     return undefined
   }
@@ -96,11 +96,11 @@ export const generateOutboundTls = (tls: OutboundTlsForm): OutboundTlsOptions | 
   } as OutboundTlsOptions
 }
 
-export const generateHttp2Options = (http2: Http2Form): Http2Options => ({
+export const generateHttp2Options = (http2: Http2FormData): Http2Options => ({
   ...(http2 as Http2Options),
 })
 
-export const generateQuicOptions = (quic: QuicForm): QuicOptions => {
+export const generateQuicOptions = (quic: QuicFormData): QuicOptions => {
   const { initial_packet_size, disable_path_mtu_discovery, ...rest } = quic
   return {
     ...generateHttp2Options(rest),
@@ -110,7 +110,7 @@ export const generateQuicOptions = (quic: QuicForm): QuicOptions => {
 }
 
 export const generateDns01Challenge = (
-  dns01: Dns01ChallengeForm,
+  dns01: Dns01ChallengeFormData,
   maps: TagMaps,
 ): Dns01ChallengeOptions => ({
   ...(dns01 as Dns01ChallengeOptions),

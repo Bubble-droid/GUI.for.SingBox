@@ -26,7 +26,7 @@ import type {
   EndpointType,
 } from '@profile/constant/kernel'
 
-import type { DialerForm, ListenForm, Switchable, UdpNatForm } from './shared'
+import type { DialerFormData, ListenFormData, Switchable, UdpNatFormData } from './shared'
 
 export interface WireGuardPeer {
   address: string
@@ -49,8 +49,8 @@ export interface WireGuardEndpoint extends Switchable {
     listen_port: number
     peers: WireGuardPeer[]
     workers: number
-    dialer: DialerForm
-    udpNat: UdpNatForm
+    dialer: DialerFormData
+    udpNat: UdpNatFormData
   }
 }
 
@@ -82,7 +82,7 @@ export interface TailscaleEndpoint extends Switchable {
     system_interface_mtu: number
     udp_timeout: string
     ssh_server: SshServer
-    dialer: DialerForm
+    dialer: DialerFormData
   }
 }
 
@@ -197,8 +197,8 @@ export interface OpenConnectEndpoint extends Switchable {
     allow_insecure_crypto: boolean
     tls: OpenConnectTls
     form_entries: OpenConnectFormEntry[]
-    udpNat: UdpNatForm
-    dialer: DialerForm
+    udpNat: UdpNatFormData
+    dialer: DialerFormData
   }
 }
 
@@ -302,8 +302,8 @@ export interface OpenVpnClientEndpoint extends Switchable {
     tls_timeout: string
     handshake_window: string
     explicit_exit_notify: number
-    udpNat: UdpNatForm
-    dialer: DialerForm
+    udpNat: UdpNatFormData
+    dialer: DialerFormData
   }
 }
 
@@ -397,8 +397,8 @@ export interface OpenVpnServerEndpoint extends Switchable {
     renegotiate_bytes: number
     renegotiate_packets: number
     handshake_window: string
-    listen: ListenForm
-    udpNat: UdpNatForm
+    listen: ListenFormData
+    udpNat: UdpNatFormData
   }
 }
 

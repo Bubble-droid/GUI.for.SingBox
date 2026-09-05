@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ProfileModal from '@profile/components/ProfileModal.vue'
 import { generateConfig } from '@profile/transformers/generator/index.ts'
 import type { Profile } from '@profile/types/profiles/index.ts'
 import { useI18n, I18nT } from 'vue-i18n'
@@ -21,7 +22,6 @@ import CodeViewer from '@/components/CodeViewer/index.vue'
 import type * as App from '@/types/app'
 
 import ProfileEditor from './components/ProfileEditor.vue'
-import ProfileForm from './components/ProfileForm.vue'
 
 const { t } = useI18n()
 const appStore = useAppStore()
@@ -174,7 +174,7 @@ const generateMenus = (profile: Profile) => {
 
 const handleShowProfileForm = (id?: string, step = 0) => {
   const m = modal({ title: id ? 'common.edit' : 'common.add', minWidth: '70' })
-  m.setContent(ProfileForm, { id, step }).open()
+  m.setContent(ProfileModal, { id, step }).open()
 }
 
 const handleDeleteProfile = async (p: Profile) => {
