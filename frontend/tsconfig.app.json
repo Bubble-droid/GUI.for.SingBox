@@ -9,9 +9,14 @@
     "lib": ["ESNext", "DOM"],
 
     "paths": {
-      "@wails/*": ["./src/bridge/wailsjs/*"],
       "@profile/*": ["./src/features/profile/*"],
       "@features/*": ["./src/features/*"],
+
+      "@components/*": ["./src/components/*"],
+      "@stores/*": ["./src/stores/*"],
+      "@utils/*": ["./src/utils/*"],
+
+      "@wails/*": ["./src/bridge/wailsjs/*"],
       "@/*": ["./src/*"]
     },
 
