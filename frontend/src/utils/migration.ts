@@ -62,7 +62,6 @@ export const migrateProfiles = async (profiles: Profile[], save: () => Promise<s
     } catch (error) {
       const msg = `Failed to migrate profile [${p.name}]: ${normalizeErrorMessage(error)}`
       console.error(msg)
-      throw error
     }
   }
 
