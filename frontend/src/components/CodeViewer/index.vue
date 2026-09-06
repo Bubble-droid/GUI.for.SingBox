@@ -20,16 +20,13 @@ import 'prismjs/components/prism-markdown'
 import 'prismjs/components/prism-diff'
 
 interface Props {
-  modelValue?: string
   lang?: string
   copyable?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: '',
-  lang: '',
-  copyable: true,
-})
+const model = defineModel<string>({ required: true })
+
+const { lang = '', copyable = true } = defineProps<Props>()
 
 const langAliases: Record<string, string> = {
   cjs: 'javascript',
@@ -62,21 +59,21 @@ const escapeHtml = (str: string) =>
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;')
 
-const rawLang = computed(() => props.lang.trim())
+const rawLang = computed(() => lang.trim())
 
 const normalizedLang = computed(() => {
-  const lang = rawLang.value.toLowerCase().split(/\s+/)[0] || ''
-  if (plainLangs.has(lang)) {
+  const targetLang = rawLang.value.toLowerCase().split(/\s+/)[0] || ''
+  if (plainLangs.has(targetLang)) {
     return ''
   }
-  return langAliases[lang] || lang
+  return langAliases[targetLang] || targetLang
 })
 
 const displayLang = computed(() => rawLang.value || 'text')
 const grammar = computed(() => Prism.languages[normalizedLang.value])
 
 const html = computed(() => {
-  const code = props.modelValue || ''
+  const code = model.value || ''
   if (!grammar.value || !normalizedLang.value) {
     return escapeHtml(code)
   }
@@ -84,7 +81,7 @@ const html = computed(() => {
 })
 
 const onCopy = async () => {
-  const ok = await ClipboardSetText(props.modelValue || '')
+  const ok = await ClipboardSetText(model.value || '')
   ok ? message.success('common.copied') : message.error('ClipboardSetText Error')
 }
 </script>

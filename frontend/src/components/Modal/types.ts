@@ -16,7 +16,7 @@ export interface ModalProps {
   cancelText?: string
   submitText?: string
   maskClosable?: boolean
-  class?: string
+  className?: string
   container?: string
   destroyOnClose?: boolean
   toolbar?: {

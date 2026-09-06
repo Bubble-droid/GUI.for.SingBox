@@ -8,7 +8,6 @@ export type SelectValueType<
 > = M extends true ? T[] : T
 
 export interface SelectProps<T extends SelectModelValue = string, M extends boolean = false> {
-  modelValue?: SelectValueType<T, M>
   options?: OptionItem<T>[]
   multiple?: M
   border?: boolean

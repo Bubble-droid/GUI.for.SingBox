@@ -17,10 +17,7 @@ interface Props {
   isUpdate?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  id: '',
-  isUpdate: false,
-})
+const { id = '', isUpdate } = defineProps<Props>()
 
 const loading = ref(false)
 
@@ -44,9 +41,9 @@ const handleCancel = inject('cancel') as any
 const handleSubmit = async () => {
   loading.value = true
 
-  if (props.isUpdate) {
+  if (isUpdate) {
     try {
-      await rulesetsStore.editRuleset(props.id, ruleset.value)
+      await rulesetsStore.editRuleset(id, ruleset.value)
       handleCancel()
     } catch (error: any) {
       console.error('editRuleset:', error)
@@ -101,8 +98,8 @@ watch(
   },
 )
 
-if (props.isUpdate) {
-  const r = rulesetsStore.getRulesetById(props.id)
+if (isUpdate) {
+  const r = rulesetsStore.getRulesetById(id)
   if (r) {
     ruleset.value = deepClone(r)
   }

@@ -11,9 +11,9 @@ interface Props {
   outboundOptions: OptionItem[]
 }
 
-defineProps<Props>()
-
 const model = defineModel<ExperimentalSection>({ required: true })
+
+defineProps<Props>()
 
 const { t } = useI18n()
 </script>

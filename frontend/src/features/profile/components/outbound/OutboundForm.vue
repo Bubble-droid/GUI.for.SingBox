@@ -2,31 +2,36 @@
 import { OutboundType } from '@profile/constant/kernel'
 import { OutboundOptions } from '@profile/constant/options'
 import type { OutboundItem } from '@profile/types/profiles/outbound'
-import { ref, toRefs } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { BuiltInOutbound } from '@/constant/kernel'
 import { useSubscribesStore } from '@/stores/subscribes'
 
 interface Props {
-  outbound: OutboundItem
   outbounds: OutboundItem[]
 }
 
-const props = defineProps<Props>()
-const { outbound } = toRefs(props)
+const outbound = defineModel<OutboundItem>({ required: true })
+
+const { outbounds } = defineProps<Props>()
 
 const { t } = useI18n()
 const subscribesStore = useSubscribesStore()
 const expandedSet = ref<Set<string>>(new Set(['Built-in', 'Subscription']))
 
-const outboundGroups = [
+const isGroupType = computed(
+  () =>
+    outbound.value.type === OutboundType.Selector || outbound.value.type === OutboundType.UrlTest,
+)
+
+const outboundGroups = computed(() => [
   {
     id: 'Built-in',
     name: 'kernel.outbounds.builtIn',
     proxies: [
       ...BuiltInOutbound.map((v) => ({ id: v, tag: v, type: 'Built-In' })),
-      ...props.outbounds.map(({ id, tag, type }) => ({ id, tag, type: type as string })),
+      ...outbounds.map(({ id, tag, type }) => ({ id, tag, type: String(type) })),
     ],
   },
   {
@@ -39,7 +44,7 @@ const outboundGroups = [
     })),
   },
   ...subscribesStore.subscribes.map(({ id, name, proxies }) => ({ id, name, proxies })),
-]
+])
 
 const handleAddProxy = (groupID: string, proxyID: string, proxyName: string) => {
   if (groupID === 'Built-in' && proxyID === outbound.value.id) {
@@ -72,21 +77,17 @@ const isExpanded = (key: string) => expandedSet.value.has(key)
     {{ t('kernel.outbounds.tag') }}
     <Input v-model="outbound.tag" autofocus />
   </div>
+
   <div class="form-item">
     {{ t('kernel.outbounds.type') }}
     <Radio v-model="outbound.type" :options="OutboundOptions" />
   </div>
-  <template
-    v-if="OutboundType.Selector === outbound.type || OutboundType.UrlTest === outbound.type"
-  >
+
+  <template v-if="isGroupType">
     <div class="form-item">
       {{ t('kernel.outbounds.hidden') }}
       <Switch v-model="outbound.hidden" />
     </div>
-    <!-- <div class="form-item">
-      {{ t('kernel.outbounds.interrupt_exist_connections') }}
-      <Switch v-model="outbound.interrupt_exist_connections" />
-    </div> -->
     <div class="form-item">
       {{ t('kernel.outbounds.include') }}
       <Input v-model="outbound.include" placeholder="keywords1|keywords2" />
@@ -103,9 +104,11 @@ const isExpanded = (key: string) => expandedSet.value.has(key)
       <Input v-model="outbound.icon" clearable placeholder="https://" />
     </div>
   </template>
-  <template v-if="OutboundType.Direct === outbound.type || OutboundType.Block === outbound.type">
+
+  <template v-if="!isGroupType">
     <Empty :description="t('kernel.outbounds.directDesc')" />
   </template>
+
   <template v-else-if="outbound.type === OutboundType.UrlTest">
     <div class="form-item">
       {{ t('kernel.outbounds.url') }}
@@ -120,7 +123,8 @@ const isExpanded = (key: string) => expandedSet.value.has(key)
       <Input v-model="outbound.tolerance" type="number" />
     </div>
   </template>
-  <template v-if="[OutboundType.Selector, OutboundType.UrlTest].includes(outbound.type as any)">
+
+  <template v-if="isGroupType">
     <Divider>
       {{ t('kernel.outbounds.refsOutbound') }} & {{ t('kernel.outbounds.refsSubscription') }}
     </Divider>
@@ -139,6 +143,7 @@ const isExpanded = (key: string) => expandedSet.value.has(key)
           class="action-expand"
         />
       </Button>
+
       <div v-show="isExpanded(group.id)">
         <Empty
           v-if="group.proxies.length === 0"

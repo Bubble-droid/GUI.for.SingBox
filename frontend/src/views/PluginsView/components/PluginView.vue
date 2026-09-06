@@ -18,7 +18,7 @@ interface Props {
   id: string
 }
 
-const props = defineProps<Props>()
+const { id } = defineProps<Props>()
 
 const loading = ref(false)
 const plugin = ref<AppPlugin>()
@@ -56,7 +56,7 @@ const handleTest = async (event: PluginTriggerEvent, arg1?: any, arg2?: any) => 
   testing.value = true
   try {
     const metadataJSON = JSON.stringify({
-      ...pluginsStore.getPluginMetadata(props.id),
+      ...pluginsStore.getPluginMetadata(id),
       Mode: 'Dev',
     })
     if (event === PluginTriggerEvent.OnSubscribe) {
@@ -90,10 +90,10 @@ const initPluginCode = async (p: AppPlugin) => {
   code.value = content
 }
 
-const p = pluginsStore.getPluginById(props.id)
+const p = pluginsStore.getPluginById(id)
 if (p) {
   plugin.value = deepClone(p)
-  metadata.value = pluginsStore.getPluginMetadata(props.id)
+  metadata.value = pluginsStore.getPluginMetadata(id)
   initPluginCode(p)
 }
 

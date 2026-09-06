@@ -18,12 +18,9 @@ interface Props {
   cancel?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  cancel: true,
-  options: () => ({ type: 'text' }),
-})
+const { message, options = { type: 'text' }, cancel = true } = defineProps<Props>()
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   confirm: [value: boolean]
   cancel: []
   finish: []
@@ -32,23 +29,23 @@ const emits = defineEmits<{
 const { t } = useI18n.global
 
 const content = computed(() => {
-  if (typeof props.message !== 'string') {
-    return JSON.stringify(props.message, null, 2)
+  if (typeof message !== 'string') {
+    return JSON.stringify(message, null, 2)
   }
-  if (props.options.type === 'text') {
-    return t(props.message)
+  if (options.type === 'text') {
+    return t(message)
   }
-  return props.message
+  return message
 })
 
 const handleConfirm = () => {
-  emits('confirm', true)
-  emits('finish')
+  emit('confirm', true)
+  emit('finish')
 }
 
 const handleCancel = () => {
-  emits('cancel')
-  emits('finish')
+  emit('cancel')
+  emit('finish')
 }
 </script>
 

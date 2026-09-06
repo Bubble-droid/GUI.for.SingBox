@@ -13,8 +13,8 @@ interface Props {
   inboundOptions: OptionItem[]
 }
 
-defineProps<Props>()
 const model = defineModel<ListenFormData>({ required: true })
+defineProps<Props>()
 const { t } = useI18n()
 
 const [showListen, toggleShow] = useBool(false)

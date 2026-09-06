@@ -7,7 +7,7 @@ interface Props {
   actions: (App.CustomAction | App.CustomActionFn)[]
 }
 
-const props = defineProps<Props>()
+const { actions } = defineProps<Props>()
 
 const resolvedActionMap = ref(new Map<string, App.CustomAction>())
 const api: App.CustomActionApi = {
@@ -25,10 +25,10 @@ const renderCustomActionSlot = (slot: App.CustomAction['componentSlots']) => {
 }
 
 watch(
-  () => props.actions,
-  (actions) => {
+  () => actions,
+  (values) => {
     const newMap = new Map<string, App.CustomAction>()
-    for (const action of actions) {
+    for (const action of values) {
       const id = action.id!
       if (resolvedActionMap.value.has(id)) {
         newMap.set(id, resolvedActionMap.value.get(id)!)

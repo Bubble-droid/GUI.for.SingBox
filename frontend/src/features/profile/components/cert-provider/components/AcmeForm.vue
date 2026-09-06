@@ -16,8 +16,8 @@ interface Props {
   dnsServerOptions: OptionItem[]
 }
 
-defineProps<Props>()
 const model = defineModel<AcmeCertProvider['config']>({ required: true })
+defineProps<Props>()
 const { t } = useI18n()
 
 const providerSelect = computed({

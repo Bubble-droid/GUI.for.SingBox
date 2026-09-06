@@ -1,73 +1,62 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
-
 import { message } from '@/utils/interaction'
-import { deepClone } from '@/utils/others'
 
 import type { AppPlugin } from '@/types/app'
 import type { Recordable } from '@/types/typescript'
 
 interface Props {
   plugin: AppPlugin
-  modelValue?: Recordable
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: () => ({}),
-})
+const model = defineModel<Recordable>({ default: () => ({}) })
+
+defineProps<Props>()
 
 const emit = defineEmits<{
   change: [value: Recordable]
-  'update:modelValue': [value: Recordable]
 }>()
 
-const model = ref(deepClone(props.modelValue ?? {}))
+const isSameValue = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
-let internalUpdate = false
+const updateModel = (mutator: (draft: Recordable) => void) => {
+  const next = { ...model.value }
+  mutator(next)
+  model.value = next
+  emit('change', next)
+}
 
-watch(
-  () => props.modelValue,
-  (val) => {
-    if (!internalUpdate) {
-      model.value = val
+const getOptions = (options?: string[]) => {
+  return (
+    options?.map((opt) => {
+      const [label, value = label] = opt.split(',')
+      return { label, value }
+    }) ?? []
+  )
+}
+
+const resolveComponent = (componentName: string) => {
+  return componentName === 'CodeViewer' ? 'CodeEditor' : componentName
+}
+
+const onChange = (key: string, originalValue: unknown, value: unknown) => {
+  updateModel((draft) => {
+    if (isSameValue(originalValue, value)) {
+      delete draft[key]
+    } else {
+      draft[key] = value
     }
-    internalUpdate = false
-  },
-  { deep: true },
-)
-
-const getOptions = (val: string[]) => {
-  return val.map((v) => {
-    const arr = v.split(',')
-    return { label: arr[0], value: arr[1] || arr[0] }
   })
 }
 
-const emitUpdate = () => {
-  const val = deepClone(model.value)
-  emit('update:modelValue', val)
-  emit('change', val)
-  internalUpdate = true
-}
-
-const onChange = (key: string, originalValue: any, value: any) => {
-  // TODO: array order
-  if (JSON.stringify(originalValue) === JSON.stringify(value)) {
-    delete model.value[key]
-  } else {
-    model.value[key] = value
-  }
-  emitUpdate()
-}
-
 const handleReset = (key: string) => {
-  delete model.value[key]
-  emitUpdate()
+  updateModel((draft) => {
+    delete draft[key]
+  })
 }
 
 const handleResetAll = () => {
   model.value = {}
-  emitUpdate()
+  emit('change', {})
   message.success('common.success')
 }
 
@@ -76,7 +65,8 @@ defineExpose({ reset: handleResetAll })
 
 <template>
   <div class="flex flex-col gap-8">
-    <slot name="header" v-bind="{ handleResetAll }"></slot>
+    <slot name="header" :handle-reset-all="handleResetAll" />
+
     <Card
       v-for="(conf, index) in plugin.configuration"
       :key="conf.id"
@@ -94,15 +84,17 @@ defineExpose({ reset: handleResetAll })
           @click="handleReset(conf.key)"
         />
       </template>
+
       <div class="mb-8 text-12">{{ conf.description }}</div>
+
       <component
-        :is="(conf.component as any) === 'CodeViewer' ? 'CodeEditor' : conf.component"
+        :is="resolveComponent(conf.component)"
         :model-value="model[conf.key] ?? conf.value"
         :options="getOptions(conf.options)"
         :autofocus="false"
         editable
         lang="yaml"
-        @change="(val: any) => onChange(conf.key, conf.value, val)"
+        @change="(val: unknown) => onChange(conf.key, conf.value, val)"
       />
     </Card>
   </div>

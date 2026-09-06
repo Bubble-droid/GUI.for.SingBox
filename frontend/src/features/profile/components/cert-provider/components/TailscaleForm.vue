@@ -8,8 +8,8 @@ interface Props {
   tailscaleOptions: OptionItem[]
 }
 
-defineProps<Props>()
 const model = defineModel<TailscaleCertProvider['config']>({ required: true })
+defineProps<Props>()
 const { t } = useI18n()
 </script>
 

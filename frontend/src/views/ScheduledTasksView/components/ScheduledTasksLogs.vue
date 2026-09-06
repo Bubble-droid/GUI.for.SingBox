@@ -13,13 +13,13 @@ interface Props {
   id?: string
 }
 
-const props = withDefaults(defineProps<Props>(), { id: '' })
+const { id = '' } = defineProps<Props>()
 
 const { t } = useI18n()
 const logsStore = useLogsStore()
 const pluginsStore = useScheduledTasksStore()
 
-const plugin = ref(pluginsStore.getScheduledTaskById(props.id)?.name || '')
+const plugin = ref(pluginsStore.getScheduledTaskById(id)?.name || '')
 const keywords = ref('')
 
 const columns: Column[] = [

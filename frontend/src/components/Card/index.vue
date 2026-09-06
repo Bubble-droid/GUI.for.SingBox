@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
 
-import vTips from '@/directives/tips'
-
 interface Props {
   title?: string
   subtitle?: string
@@ -10,12 +8,12 @@ interface Props {
   disabled?: boolean
 }
 
-const props = defineProps<Props>()
+const { title = '', subtitle = '' } = defineProps<Props>()
 
 const slots = useSlots()
 
 const hasTitle = computed(
-  () => slots.extra || slots['title-prefix'] || slots['title-suffix'] || props.title,
+  () => slots.extra || slots['title-prefix'] || slots['title-suffix'] || title,
 )
 </script>
 

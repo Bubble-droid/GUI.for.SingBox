@@ -8,39 +8,39 @@ import { sampleID } from '@/utils/others'
 import { IS_IN_MODAL, modalStack, modalZIndexCounter, modalMinimized } from './state'
 import type { ModalProps, ModalSlots } from './types.ts'
 
-const slots = defineSlots<ModalSlots>()
+const open = defineModel<boolean>('open', { default: false })
 
-const props = withDefaults(defineProps<ModalProps>(), {
-  title: '',
-  footer: true,
-  maxHeight: '90',
-  maxWidth: '90',
-  minWidth: '60',
-  minHeight: '',
-  width: '',
-  height: '',
-  px: 16,
-  py: 16,
-  cancel: true,
-  submit: true,
-  cancelText: 'common.cancel',
-  submitText: 'common.save',
-  maskClosable: false,
-  class: undefined,
-  container: 'body',
-  destroyOnClose: true,
-  toolbar: () => ({
+const {
+  title = '',
+  footer = true,
+  maxHeight = '90',
+  maxWidth = '90',
+  minWidth = '60',
+  minHeight = '',
+  width = '',
+  height = '',
+  px = 16,
+  py = 16,
+  cancel = true,
+  submit = true,
+  cancelText = 'common.cancel',
+  submitText = 'common.save',
+  maskClosable = false,
+  className,
+  container = 'body',
+  destroyOnClose = true,
+  toolbar = {
     maximize: true,
     minimize: true,
-  }),
-  onOk: undefined,
-  onCancel: undefined,
-  beforeClose: undefined,
-  afterClose: undefined,
-  afterDestroy: undefined,
-})
+  },
+  onOk,
+  onCancel,
+  beforeClose,
+  afterClose,
+  afterDestroy,
+} = defineProps<ModalProps>()
 
-const open = defineModel<boolean>('open', { default: false })
+const slots = defineSlots<ModalSlots>()
 
 const hasOpened = ref(open.value)
 const cancelLoading = ref(false)
@@ -55,11 +55,11 @@ let afterLeavePromise: Promise<void>
 
 const handleAction = async (isOk: boolean, waitForAnimation = true) => {
   const loading = isOk ? submitLoading : cancelLoading
-  const action = isOk ? props.onOk : props.onCancel
+  const action = isOk ? onOk : onCancel
 
   loading.value = true
   try {
-    if (!((await action?.()) ?? true) || !((await props.beforeClose?.(isOk)) ?? true)) {
+    if (!((await action?.()) ?? true) || !((await beforeClose?.(isOk)) ?? true)) {
       return
     }
   } finally {
@@ -75,10 +75,10 @@ const handleAction = async (isOk: boolean, waitForAnimation = true) => {
     await afterLeavePromise
   }
 
-  props.afterClose?.(isOk)
+  afterClose?.(isOk)
 
-  if (props.destroyOnClose) {
-    props.afterDestroy?.()
+  if (destroyOnClose) {
+    afterDestroy?.()
     removeMinimizedModal()
   }
 }
@@ -90,15 +90,15 @@ const onAfterLeave = () => {
 const handleSubmit = () => handleAction(true)
 const handleCancel = () => handleAction(false)
 
-const onMaskClick = () => props.maskClosable && handleCancel()
+const onMaskClick = () => maskClosable && handleCancel()
 
 const contentStyle = computed(() => ({
-  maxHeight: `${props.maxHeight}%`,
-  maxWidth: `${props.maxWidth}%`,
-  minWidth: isMaximize.value ? '100%' : props.minWidth ? `${props.minWidth}%` : '0',
-  minHeight: isMaximize.value ? '100%' : props.minHeight ? `${props.minHeight}%` : '0',
-  width: `${props.width}%`,
-  height: `${props.height}%`,
+  maxHeight: `${maxHeight}%`,
+  maxWidth: `${maxWidth}%`,
+  minWidth: isMaximize.value ? '100%' : minWidth ? `${minWidth}%` : '0',
+  minHeight: isMaximize.value ? '100%' : minHeight ? `${minHeight}%` : '0',
+  width: `${width}%`,
+  height: `${height}%`,
 }))
 
 const shouldRender = computed(() => open.value || isMinimize.value || hasOpened.value)
@@ -114,7 +114,7 @@ const closeFn = () => {
     toggleMaximize()
     return
   }
-  if (props.maskClosable) {
+  if (maskClosable) {
     handleCancel()
     return
   }
@@ -132,7 +132,7 @@ const closeFn = () => {
 
 const minimizeModal = markRaw({
   id: sampleID(),
-  title: () => props.title,
+  title: () => title,
   openFn: () => {
     modalZindex.value = ++modalZIndexCounter.value
     open.value = true
@@ -169,7 +169,7 @@ watch(open, (v) => {
     modalZindex.value = ++modalZIndexCounter.value
     modalStack.push(closeFn)
   } else {
-    if (!props.destroyOnClose) {
+    if (!destroyOnClose) {
       handleMinimize()
     }
     closeMessage?.()
@@ -200,7 +200,7 @@ defineExpose({ handleCancel })
       >
         <div
           :style="contentStyle"
-          :class="props.class"
+          :class="className"
           class="gui-modal-modal transition duration-200 flex flex-col rounded-8 shadow"
           style="--wails-draggable: false"
         >
@@ -230,7 +230,7 @@ defineExpose({ handleCancel })
               </Button>
             </div>
           </div>
-          <ScrollView :pt="props.py" :pr="props.px" :pb="props.py" :pl="props.px">
+          <ScrollView :pt="py" :pr="px" :pb="py" :pl="px">
             <slot></slot>
           </ScrollView>
           <div

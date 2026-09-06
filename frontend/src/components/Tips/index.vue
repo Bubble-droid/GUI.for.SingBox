@@ -6,12 +6,9 @@ interface Props {
   position: { x: number; y: number }
   message?: string
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  message: '',
-})
-
 const model = defineModel<boolean>({ required: true })
+
+const { position, message = '' } = defineProps<Props>()
 
 const domRef = useTemplateRef('domRef')
 const fixedPosition = ref({ x: 0, y: 0 })
@@ -19,7 +16,7 @@ const fixedPosition = ref({ x: 0, y: 0 })
 const { t } = useI18n()
 
 watch(
-  () => props.position,
+  () => position,
   async ({ x, y }) => {
     if (!fixedPosition.value.x && !fixedPosition.value.y) {
       fixedPosition.value = { x, y }

@@ -6,13 +6,13 @@ import type { IconName } from './icons'
 
 interface Props {
   icon: IconName
-  size?: number | undefined
-  color?: string | undefined
+  size?: number
+  color?: string
 }
 
-const props = withDefaults(defineProps<Props>(), { size: 16, color: 'var(--color)' })
+const { size = 16, color = 'var(--color)' } = defineProps<Props>()
 
-const sizeWithUnit = computed(() => `${props.size}px`)
+const sizeWithUnit = computed(() => `${size}px`)
 </script>
 
 <template>

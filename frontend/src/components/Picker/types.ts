@@ -4,10 +4,10 @@ export interface PickerItem<T> {
   description?: string
   background?: string
   onSelect?: (args: {
-    value: PickerItem<T>['value']
+    value: T
     option: PickerItem<T>
     options: PickerItem<T>[]
-    selected: PickerItem<T>['value'][]
+    selected: T[]
   }) => void
 }
 

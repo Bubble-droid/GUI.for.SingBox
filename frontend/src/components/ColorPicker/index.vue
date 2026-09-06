@@ -5,11 +5,9 @@ interface Props {
   disabled?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  disabled: false,
-})
-
 const model = defineModel<string>({ default: '#000000' })
+
+const { disabled } = defineProps<Props>()
 
 const emit = defineEmits<{
   change: [value: string]
@@ -23,7 +21,7 @@ const onChange = (v: Event) => {
 }
 
 const pick = () => {
-  !props.disabled && inputRef.value?.click()
+  !disabled && inputRef.value?.click()
 }
 </script>
 

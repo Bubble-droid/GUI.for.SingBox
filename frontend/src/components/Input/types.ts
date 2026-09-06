@@ -3,11 +3,6 @@ export type InputType = 'number' | 'text' | 'code'
 export type InputModelValue<T extends InputType = 'text'> = T extends 'number' ? number : string
 
 export interface InputProps<T extends InputType = 'text'> {
-  modelValue?: InputModelValue<T>
-  modelModifiers?: {
-    lazy?: boolean
-    trim?: boolean
-  }
   autoSize?: boolean
   placeholder?: string
   type?: T

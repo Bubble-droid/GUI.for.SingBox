@@ -29,8 +29,8 @@ interface Props {
   dnsServerOptions: OptionItem[]
 }
 
-defineProps<Props>()
 const model = defineModel<EndpointItem[]>({ required: true })
+defineProps<Props>()
 const { t } = useI18n()
 const [showEditModal] = useBool(false)
 
@@ -42,8 +42,6 @@ const handleAdd = () => {
   fields.value = createEndpoint(EndpointType.WireGuard)
   showEditModal.value = true
 }
-
-defineExpose({ handleAdd })
 
 const handleEdit = (index: number) => {
   editIndex = index
@@ -71,6 +69,8 @@ const onTypeChange = (newType: EndpointType) => {
     message.error(error)
   }
 }
+
+defineExpose({ handleAdd })
 </script>
 
 <template>

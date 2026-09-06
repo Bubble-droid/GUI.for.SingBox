@@ -7,7 +7,6 @@ import { sampleID } from '@/utils/others'
 import Input from '@/components/Input/index.vue'
 
 interface Props {
-  modelValue?: string[]
   placeholder?: string
   autofocus?: boolean
 }
@@ -17,18 +16,15 @@ interface Item {
   id: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: () => [],
-  placeholder: '',
-  autofocus: false,
-})
+const model = defineModel<string[]>({ default: () => [] })
+
+const { placeholder = '' } = defineProps<Props>()
 
 const emit = defineEmits<{
   change: [list: string[]]
-  'update:modelValue': [list: string[]]
 }>()
 
-const innerList = ref<Item[]>(props.modelValue.map((v, i) => ({ value: v, id: i.toString() })))
+const innerList = ref<Item[]>(model.value.map((v, i) => ({ value: v, id: i.toString() })))
 
 const editItem = ref<Item>()
 const inputVal = ref('')
@@ -67,7 +63,7 @@ const handleDel = (item: Item) => {
 let internalUpdate = false
 
 watch(
-  () => props.modelValue,
+  model,
   (val) => {
     if (!internalUpdate) {
       innerList.value.splice(0)
@@ -83,7 +79,7 @@ watch(
 const emitUpdate = () => {
   internalUpdate = true
   const list = innerList.value.map((v) => v.value)
-  emit('update:modelValue', list)
+  model.value = list
   emit('change', list)
 }
 </script>

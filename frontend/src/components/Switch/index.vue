@@ -10,21 +10,16 @@ interface Props {
   disabled?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  size: 'default',
-  border: 'default',
-  label: '',
-  disabled: false,
-})
-
 const model = defineModel<boolean>({ default: false })
+
+const { size = 'default', border = 'default', label = '', disabled } = defineProps<Props>()
 
 const emits = defineEmits<(e: 'change', val: boolean) => void>()
 
 const { t } = i18n.global
 
 const toggle = async () => {
-  if (props.disabled) {
+  if (disabled) {
     return
   }
   model.value = !model.value

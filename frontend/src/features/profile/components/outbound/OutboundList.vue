@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { OutboundType } from '@profile/constant/kernel.ts'
-import { createOutbound } from '@profile/defaults/outbound.ts'
-import type { OutboundItem } from '@profile/types/profiles/outbound.ts'
+import { OutboundType } from '@profile/constant/kernel'
+import { createOutbound } from '@profile/defaults/outbound'
+import type { OutboundItem } from '@profile/types/profiles/outbound'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -19,9 +19,10 @@ const model = defineModel<OutboundItem[]>({ required: true })
 const { t } = useI18n()
 const subscribesStore = useSubscribesStore()
 
-const handleAdd = () => openOutboundModal(createOutbound(), -1)
+const isGroupType = (type: string): boolean =>
+  type === OutboundType.Selector || type === OutboundType.UrlTest
 
-defineExpose({ handleAdd })
+const handleAdd = () => openOutboundModal(createOutbound(), -1)
 
 const handleDeleteGroup = (index: number) => {
   model.value.splice(index, 1)
@@ -55,82 +56,84 @@ const openOutboundModal = (outbound: OutboundItem, index: number) => {
 
       model.value[index] = draft.value
       const { id, tag } = draft.value
+
       model.value
-        .filter((item) => [OutboundType.Selector, OutboundType.UrlTest].includes(item.type as any))
+        .filter((item) => isGroupType(item.type))
         .forEach(({ outbounds }) => {
           const reference = outbounds.find((item) => item.id === id)
-          reference && (reference.tag = tag)
+          if (reference) {
+            reference.tag = tag
+          }
         })
     },
   })
-  m.setContent(OutboundForm, { outbound: draft.value, outbounds: model.value }).open()
+
+  m.setContent(OutboundForm, { modelValue: draft.value, outbounds: model.value }).open()
 }
 
 const handleEditGroup = (index: number) => openOutboundModal(model.value[index]!, index)
 
-const hasLost = (outbound: OutboundItem) => {
-  if ([OutboundType.Selector, OutboundType.UrlTest].includes(outbound.type as any)) {
-    return outbound.outbounds.some(({ id, type }) => {
-      if (type === 'Built-in') {
-        if (BuiltInOutbound.includes(id as any)) {
-          return false
-        }
-        return model.value.every((v) => v.id !== id)
-      } else if (type === 'Subscription') {
-        const sub = subscribesStore.getSubscribeById(id)
-        if (!sub) {
-          return true
-        }
+const hasLost = (outbound: OutboundItem): boolean => {
+  if (!isGroupType(outbound.type)) {
+    return false
+  }
+
+  return outbound.outbounds.some(({ id, type }) => {
+    if (type === 'Built-in') {
+      if ((BuiltInOutbound as string[]).includes(id)) {
         return false
       }
-      const sub = subscribesStore.getSubscribeById(type)
-      if (!sub) {
-        return true
-      }
-      return sub.proxies.every((v) => v.id !== id)
-    })
-  }
-  return false
+      return model.value.every((v) => v.id !== id)
+    } else if (type === 'Subscription') {
+      return !subscribesStore.getSubscribeById(id)
+    }
+    const sub = subscribesStore.getSubscribeById(type)
+    if (!sub) {
+      return true
+    }
+    return sub.proxies.every((v) => v.id !== id)
+  })
 }
 
 const handleSortGroup = (index: number) => {
-  const outbound = ref(deepClone(model.value[index]!))
+  const draft = ref(deepClone(model.value[index]!))
   const m = modal({
     title: 'kernel.outbounds.sort',
     maxWidth: '80',
     maxHeight: '80',
     maskClosable: true,
     onOk: () => {
-      model.value[index] = outbound.value
+      model.value[index] = draft.value
     },
   })
-  m.setContent(OutboundSort, { outbound: outbound.value }).open()
+  m.setContent(OutboundSort, { modelValue: draft.value }).open()
 }
 
-const clacSubscriptionsCount = (outbound: OutboundItem) => {
-  if ([OutboundType.Selector, OutboundType.UrlTest].includes(outbound.type as any)) {
-    return outbound.outbounds.filter((v) => v.type === 'Subscription').length
+const calcSubscriptionsCount = (outbound: OutboundItem): number => {
+  if (!isGroupType(outbound.type)) {
+    return 0
   }
-  return 0
+  return outbound.outbounds.filter((v) => v.type === 'Subscription').length
 }
 
-const clacOutboundsCount = (outbound: OutboundItem) => {
-  if ([OutboundType.Selector, OutboundType.UrlTest].includes(outbound.type as any)) {
-    return outbound.outbounds.filter((v) => v.type !== 'Subscription').length
+const calcOutboundsCount = (outbound: OutboundItem): number => {
+  if (!isGroupType(outbound.type)) {
+    return 0
   }
-  return 0
+  return outbound.outbounds.filter((v) => v.type !== 'Subscription').length
 }
 
-const needToAdd = (outbound: OutboundItem) => {
-  if ([OutboundType.Selector, OutboundType.UrlTest].includes(outbound.type as any)) {
+const needToAdd = (outbound: OutboundItem): boolean => {
+  if (isGroupType(outbound.type)) {
     return outbound.outbounds.length === 0
   }
   return false
 }
 
 const showLost = () => message.warn('kernel.outbounds.notFound')
-
 const showNeedToAdd = () => message.error('kernel.outbounds.needToAdd')
+
+defineExpose({ handleAdd })
 </script>
 
 <template>
@@ -165,13 +168,15 @@ const showNeedToAdd = () => message.error('kernel.outbounds.needToAdd')
           </span>
           {{ outbound.tag }}
         </div>
+
         <Button type="link" size="small" @click="handleSortGroup(index)">
           (
-          {{ t('kernel.outbounds.refsOutbound') }}:{{ clacOutboundsCount(outbound) }}
+          {{ t('kernel.outbounds.refsOutbound') }}:{{ calcOutboundsCount(outbound) }}
           /
-          {{ t('kernel.outbounds.refsSubscription') }}:{{ clacSubscriptionsCount(outbound) }}
+          {{ t('kernel.outbounds.refsSubscription') }}:{{ calcSubscriptionsCount(outbound) }}
           )
         </Button>
+
         <div class="ml-auto">
           <Button v-if="hasLost(outbound)" type="text" @click="handleClearGroup(outbound)">
             {{ t('common.clear') }}

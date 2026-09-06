@@ -11,17 +11,13 @@ interface Props {
   delay?: number
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  trigger: () => ['hover'],
-  placement: 'bottom',
-  delay: 0,
-})
+const { trigger = ['hover'], placement = 'bottom', delay = 0 } = defineProps<Props>()
 
 const domRef = useTemplateRef('domRef')
 const overlayRef = useTemplateRef('overlayRef')
 const overlayStyle = ref({ top: 'auto', left: '0px', bottom: 'auto', maxHeight: 'none' })
 const show = ref(false)
-const transformOrigin = ref(props.placement === 'top' ? 'bottom' : 'top')
+const transformOrigin = ref(placement === 'top' ? 'bottom' : 'top')
 
 const updatePosition = () => {
   if (!domRef.value || !overlayRef.value || !show.value) {
@@ -46,7 +42,7 @@ const updatePosition = () => {
   const canPlaceBottom = totalSpaceBelow >= overlayHeight
   const canPlaceTop = totalSpaceAbove >= overlayHeight
 
-  if (props.placement === 'bottom') {
+  if (placement === 'bottom') {
     if (canPlaceBottom) {
       finalPlacement = 'bottom'
     } else if (canPlaceTop) {
@@ -104,9 +100,9 @@ watch(show, async (isVisible) => {
 const open = () => (show.value = true)
 const close = () => (show.value = false)
 const toggle = () => (show.value = !show.value)
-const hasTrigger = (t: TriggerType) => props.trigger.includes(t)
+const hasTrigger = (t: TriggerType) => trigger.includes(t)
 
-const debounceOpen = debounce(open, props.delay)
+const debounceOpen = debounce(open, delay)
 
 const onMouseEnter = () => {
   if (hasTrigger('hover')) {

@@ -22,19 +22,14 @@ interface Props {
   menu?: App.Menu[]
   columns: Column[]
   dataSource: Record<string, any>[]
-  sort?: string | undefined
+  sort?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  menu: () => [],
-  sort: undefined,
-})
+const { menu = [], columns, dataSource, sort = undefined } = defineProps<Props>()
 
-const sortField = ref(props.sort)
+const sortField = ref(sort)
 const sortReverse = ref(true)
-const sortFunc = computed(
-  () => props.columns.find((column) => column.key === sortField.value)?.sort,
-)
+const sortFunc = computed(() => columns.find((column) => column.key === sortField.value)?.sort)
 
 const { t } = useI18n.global
 
@@ -54,16 +49,16 @@ const handleChangeSortField = (field: string) => {
 
 const tableData = computed(() => {
   if (!sortField.value || !sortFunc.value) {
-    return props.dataSource
+    return dataSource
   }
-  const sorted = [...props.dataSource].toSorted(sortFunc.value)
+  const sorted = [...dataSource].toSorted(sortFunc.value)
   if (sortReverse.value) {
     sorted.reverse()
   }
   return sorted
 })
 
-const tableColumns = computed(() => props.columns.filter((column) => !column.hidden))
+const tableColumns = computed(() => columns.filter((column) => !column.hidden))
 
 const renderCell = (column: Column, record: Recordable) => {
   const value = getValue(record, column.key)

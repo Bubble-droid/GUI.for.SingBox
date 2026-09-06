@@ -11,14 +11,14 @@ interface Props {
   id: string
 }
 
-const props = defineProps<Props>()
+const { id } = defineProps<Props>()
 
 const code = ref('')
 
 const pluginsStore = usePluginsStore()
 
 const fetchAndUpdatePluginCode = async () => {
-  const p = pluginsStore.getPluginById(props.id)
+  const p = pluginsStore.getPluginById(id)
   if (p) {
     const _code = pluginsStore.getPluginCodefromCache(p.id)
     if (_code) {

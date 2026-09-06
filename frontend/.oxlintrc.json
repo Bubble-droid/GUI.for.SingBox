@@ -52,7 +52,6 @@
     "promise/avoid-new": "off",
     "promise/prefer-await-to-callbacks": "off",
     "promise/prefer-await-to-then": "off",
-    "vue/define-props-destructuring": "off",
     "no-unused-expressions": [
       "error",
       {

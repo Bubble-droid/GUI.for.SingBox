@@ -17,7 +17,7 @@ interface Props {
   id: string
 }
 
-const props = defineProps<Props>()
+const { id } = defineProps<Props>()
 
 const loading = ref(false)
 const ruleset = ref<AppRuleSet>()
@@ -50,7 +50,7 @@ const handleSave = async () => {
 }
 
 const initContent = async () => {
-  const r = rulesetsStore.getRulesetById(props.id)
+  const r = rulesetsStore.getRulesetById(id)
   if (r) {
     ruleset.value = deepClone(r)
     const content = (await ignoredError(ReadFile, r.path)) || ''

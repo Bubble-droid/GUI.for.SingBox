@@ -13,7 +13,7 @@ interface Props {
   isAlpha: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {})
+const { isAlpha } = defineProps<Props>()
 
 const emit = defineEmits<{
   config: []
@@ -44,7 +44,7 @@ const {
   grantCorePermission,
   openReleasePage,
   openFileLocation,
-} = useCoreBranch(props.isAlpha)
+} = useCoreBranch(isAlpha)
 
 const handleClearCoreCache = async () => {
   try {

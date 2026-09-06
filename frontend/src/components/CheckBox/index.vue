@@ -1,63 +1,39 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { OptionItem } from '@/types/component'
 
 interface Props {
-  modelValue?: string[]
   options?: OptionItem[]
   size?: 'default' | 'small'
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: () => [],
-  options: () => [],
-  size: 'default',
-})
+const model = defineModel<string[]>({ required: true })
+
+const { options = [], size = 'default' } = defineProps<Props>()
 
 const emit = defineEmits<{
   change: [value: string[]]
-  'update:modelValue': [value: string[]]
 }>()
 
-const model = ref<string[]>([...props.modelValue])
 const { t } = useI18n()
-
-let internalUpdate = false
-
-watch(
-  () => props.modelValue,
-  (newVal) => {
-    if (!internalUpdate) {
-      model.value = [...newVal]
-    }
-    internalUpdate = false
-  },
-  {
-    deep: true,
-  },
-)
 
 const isActive = (val: string) => model.value.includes(val)
 
 const handleSelect = (val: string) => {
-  const idx = model.value.indexOf(val)
-  if (idx === -1) {
-    model.value.push(val)
-  } else {
-    model.value.splice(idx, 1)
-  }
-  internalUpdate = true
-  emit('update:modelValue', [...model.value])
-  emit('change', [...model.value])
+  const next = model.value.includes(val)
+    ? model.value.filter((item) => item !== val)
+    : [...model.value, val]
+
+  model.value = next
+  emit('change', next)
 }
 </script>
 
 <template>
   <div :class="[size]" class="gui-checkbox inline-flex rounded-8 overflow-hidden text-12">
     <div
-      v-for="o in props.options"
+      v-for="o in options"
       :key="o.value"
       :class="{ active: isActive(o.value) }"
       class="gui-checkbox-button cursor-pointer px-12 py-6 transition duration-200 line-clamp-1 break-all"

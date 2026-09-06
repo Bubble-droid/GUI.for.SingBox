@@ -23,8 +23,8 @@ interface Props {
   dnsServerOptions: OptionItem[]
 }
 
-defineProps<Props>()
 const model = defineModel<CertProviderItem[]>({ required: true })
+defineProps<Props>()
 const { t } = useI18n()
 const [showEditModal] = useBool(false)
 
@@ -36,8 +36,6 @@ const handleAdd = () => {
   fields.value = createCertProvider(CertProviderType.Acme)
   showEditModal.value = true
 }
-
-defineExpose({ handleAdd })
 
 const handleEdit = (index: number) => {
   editIndex = index
@@ -65,6 +63,8 @@ const onTypeChange = (newType: CertProviderType) => {
     message.error(error)
   }
 }
+
+defineExpose({ handleAdd })
 </script>
 
 <template>

@@ -18,9 +18,9 @@ interface Props {
   outboundOptions: OptionItem[]
 }
 
-defineProps<Props>()
-
 const model = defineModel<RuleSetItem[]>({ required: true })
+
+defineProps<Props>()
 
 let rulesetId = 0
 const fields = ref<RuleSetItem>(createRouteRuleset())
@@ -34,8 +34,6 @@ const handleAdd = () => {
   fields.value = createRouteRuleset()
   showEditModal.value = true
 }
-
-defineExpose({ handleAdd })
 
 const handleAddEnd = () => {
   if (rulesetId === -1) {
@@ -69,6 +67,8 @@ const handleUse = (ruleset: any) => {
   fields.value.tag = ruleset.name
   fields.value.format = ruleset.format
 }
+
+defineExpose({ handleAdd })
 </script>
 
 <template>

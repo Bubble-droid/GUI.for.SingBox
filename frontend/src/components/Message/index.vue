@@ -10,9 +10,7 @@ interface Props {
   content: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  icon: 'info',
-})
+const { icon = 'info' } = defineProps<Props>()
 
 defineEmits<{
   close: []
@@ -27,13 +25,13 @@ const iconMap = {
   warn: 'messageWarn',
 }
 
-const icon = computed(() => iconMap[props.icon] as any)
+const iconName = computed(() => iconMap[icon] as any)
 </script>
 
 <template>
   <Transition name="slide-down" appear>
     <div class="gui-message flex items-center p-8 pl-16 rounded-8 my-4 shadow">
-      <Icon class="shrink-0" :icon="icon" />
+      <Icon class="shrink-0" :icon="iconName" />
       <div class="text-14 pl-12 break-all">{{ t(content) }}</div>
       <Button
         icon="close"

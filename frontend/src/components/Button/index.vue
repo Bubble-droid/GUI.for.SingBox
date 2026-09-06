@@ -4,22 +4,20 @@ import type { IconName } from '@/components/Icon/icons'
 interface Props {
   type?: 'primary' | 'normal' | 'link' | 'text'
   size?: 'default' | 'small' | 'large'
-  iconSize?: number | undefined
-  iconColor?: string | undefined
-  icon?: IconName | undefined
-  loading?: boolean | undefined
-  disabled?: boolean | undefined
+  iconSize?: number
+  iconColor?: string
+  icon?: IconName
+  loading?: boolean
+  disabled?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
-  type: 'normal',
-  size: 'default',
-  iconSize: undefined,
-  iconColor: undefined,
-  icon: undefined,
-  loading: false,
-  disabled: false,
-})
+const {
+  type = 'normal',
+  size = 'default',
+  iconSize = undefined,
+  iconColor = undefined,
+  icon = undefined,
+} = defineProps<Props>()
 </script>
 
 <template>

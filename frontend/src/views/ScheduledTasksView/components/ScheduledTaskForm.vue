@@ -23,7 +23,7 @@ interface Props {
   id?: string
 }
 
-const props = defineProps<Props>()
+const { id = '' } = defineProps<Props>()
 
 const loading = ref(false)
 
@@ -59,18 +59,22 @@ const handleSave = async () => {
 
   switch (task.value.type) {
     case ScheduledTasksType.UpdateSubscription: {
-      task.value.subscriptions = task.value.subscriptions.filter((id) =>
-        subscribesStore.getSubscribeById(id),
+      task.value.subscriptions = task.value.subscriptions.filter((subId) =>
+        subscribesStore.getSubscribeById(subId),
       )
       break
     }
     case ScheduledTasksType.UpdateRuleset: {
-      task.value.rulesets = task.value.rulesets.filter((id) => rulesetsStore.getRulesetById(id))
+      task.value.rulesets = task.value.rulesets.filter((ruleSetId) =>
+        rulesetsStore.getRulesetById(ruleSetId),
+      )
       break
     }
     case ScheduledTasksType.UpdatePlugin:
     case ScheduledTasksType.RunPlugin: {
-      task.value.plugins = task.value.plugins.filter((id) => pluginsStore.getPluginById(id))
+      task.value.plugins = task.value.plugins.filter((pluginId) =>
+        pluginsStore.getPluginById(pluginId),
+      )
       break
     }
   }
@@ -78,8 +82,8 @@ const handleSave = async () => {
   loading.value = true
 
   try {
-    if (props.id) {
-      await scheduledTasksStore.editScheduledTask(props.id, task.value)
+    if (id) {
+      await scheduledTasksStore.editScheduledTask(id, task.value)
     } else {
       await scheduledTasksStore.addScheduledTask(task.value)
     }
@@ -92,12 +96,12 @@ const handleSave = async () => {
   loading.value = false
 }
 
-const handleUse = (list: string[], id: string) => {
-  const idx = list.indexOf(id)
+const handleUse = (list: string[], targetId: string) => {
+  const idx = list.indexOf(targetId)
   if (idx !== -1) {
     list.splice(idx, 1)
   } else {
-    list.push(id)
+    list.push(targetId)
   }
 }
 
@@ -137,8 +141,8 @@ const onNotificationChange = async (v: boolean) => {
   }
 }
 
-if (props.id) {
-  const s = scheduledTasksStore.getScheduledTaskById(props.id)
+if (id) {
+  const s = scheduledTasksStore.getScheduledTaskById(id)
   if (s) {
     task.value = deepClone(s)
   }

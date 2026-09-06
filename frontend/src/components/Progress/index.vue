@@ -8,27 +8,24 @@ interface Props {
   radius?: number
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  status: 'primary',
-  type: 'line',
-  radius: 100,
-})
+const { percent, status = 'primary', type = 'line', radius = 100 } = defineProps<Props>()
 
 const innerStyle = computed(() => ({
-  width: `${props.percent > 100 ? 100 : props.percent || 0}%`,
+  width: `${percent > 100 ? 100 : percent || 0}%`,
 }))
 
 const circleStyle = computed(() => {
   const color = { warning: '#FFC107', danger: '#F44336', primary: 'var(--progress-inner-bg)' }[
-    props.status
+    status
   ]
-  const radius = `${props.radius * 2}px`
-  const percent = Math.min(props.percent || 0, 100)
-  const mask = `radial-gradient(transparent ${props.radius * 0.6}px, #fff 0px)`
-  const bg = `conic-gradient(${color} 0%, ${color} ${percent}%, var(--progress-bg) ${percent}%, var(--progress-bg) 100%)`
+  const size = `${radius * 2}px`
+  const p = Math.min(percent || 0, 100)
+  const mask = `radial-gradient(transparent ${radius * 0.6}px, #fff 0px)`
+  const bg = `conic-gradient(${color} 0%, ${color} ${p}%, var(--progress-bg) ${p}%, var(--progress-bg) 100%)`
+
   return {
-    width: radius,
-    height: radius,
+    width: size,
+    height: size,
     background: bg,
     mask,
     '-webkit-mask': mask,
@@ -38,11 +35,7 @@ const circleStyle = computed(() => {
 
 <template>
   <div v-if="type === 'line'" class="gui-progress-line h-10 rounded-8 overflow-hidden">
-    <div
-      :style="innerStyle"
-      :class="props.status"
-      class="inner h-full rounded-8 duration-200"
-    ></div>
+    <div :style="innerStyle" :class="status" class="inner h-full rounded-8 duration-200"></div>
   </div>
   <div
     v-if="type === 'circle'"

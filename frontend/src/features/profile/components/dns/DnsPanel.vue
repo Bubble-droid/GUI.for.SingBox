@@ -16,9 +16,9 @@ interface Props {
   ruleSet: RuleSetItem[]
 }
 
-defineProps<Props>()
-
 const model = defineModel<DnsSection>({ required: true })
+
+defineProps<Props>()
 
 const serversOptions = computed(() =>
   model.value.servers.map((v) => ({ label: v.tag, value: v.id })),
@@ -82,7 +82,7 @@ defineExpose({ handleAdd })
         ref="serversConfigRef"
         v-model="model.servers"
         :outbound-options="outboundOptions"
-        :servers-options="serversOptions"
+        :dns-servers-options="serversOptions"
       />
     </template>
     <template #rules>
@@ -90,8 +90,7 @@ defineExpose({ handleAdd })
         ref="rulesConfigRef"
         v-model="model.rules"
         :inbound-options="inboundOptions"
-        :outbound-options="outboundOptions"
-        :servers-options="serversOptions"
+        :dns-server-options="serversOptions"
         :rule-set="ruleSet"
       />
     </template>

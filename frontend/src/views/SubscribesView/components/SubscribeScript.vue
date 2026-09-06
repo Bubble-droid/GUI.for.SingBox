@@ -13,7 +13,7 @@ interface Props {
   id: string
 }
 
-const props = defineProps<Props>()
+const { id } = defineProps<Props>()
 
 const loading = ref(false)
 const subscribe = ref<App.Subscription>()
@@ -32,7 +32,7 @@ const handleSave = async () => {
   loading.value = true
   try {
     subscribe.value.script = code.value
-    await subscribeStore.editSubscribe(props.id, subscribe.value)
+    await subscribeStore.editSubscribe(id, subscribe.value)
     handleSubmit()
   } catch (error: any) {
     message.error(error)
@@ -41,7 +41,7 @@ const handleSave = async () => {
   loading.value = false
 }
 
-const s = subscribeStore.getSubscribeById(props.id)
+const s = subscribeStore.getSubscribeById(id)
 if (s) {
   subscribe.value = s
   code.value = s.script

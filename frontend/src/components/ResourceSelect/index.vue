@@ -22,16 +22,17 @@ interface ResourceConfig<K extends ResourceType> {
 
 type ResourceConfigMap = { [K in ResourceType]: ResourceConfig<K> }
 
-const props = withDefaults(defineProps<ResourceSelectProps<T>>(), {
-  title: undefined,
-  cols: 3,
-  min: 0,
-  max: Number.MAX_SAFE_INTEGER,
-  renderSlot: true,
-  openImmediate: false,
-})
-
 const model = defineModel<string[]>({ default: () => [] })
+
+const {
+  type,
+  title,
+  cols = 3,
+  max = Number.MAX_SAFE_INTEGER,
+  min = 0,
+  renderSlot = true,
+  openImmediate,
+} = defineProps<ResourceSelectProps<T>>()
 
 const emit = defineEmits<{
   change: [val: string[], items: ResourceItemMap<T>[]]
@@ -84,10 +85,10 @@ const resourceConfig = computed<ResourceConfig<T>>(() => {
     },
   }
 
-  return configs[props.type]
+  return configs[type]
 })
 
-const modalTitle = computed(() => props.title || resourceConfig.value.title)
+const modalTitle = computed(() => title || resourceConfig.value.title)
 
 let defaultSlot: Slot | undefined
 let actionSlot: Slot | undefined
@@ -118,7 +119,7 @@ const open = () => {
   m.open()
 }
 
-const isBelowMinSelection = computed(() => model.value.length < props.min)
+const isBelowMinSelection = computed(() => model.value.length < min)
 
 const getItems = (val = model.value) =>
   val.flatMap((id) => {
@@ -135,7 +136,7 @@ const handleSelect = (item: ResourceItemMap<T>) => {
     nextValue.push(...model.value.filter((v) => v !== id))
   } else {
     nextValue.push(...model.value, id)
-    if (nextValue.length > props.max) {
+    if (nextValue.length > max) {
       message.warn('common.maxSelectionExceeded')
       return
     }
@@ -147,7 +148,7 @@ const handleSelect = (item: ResourceItemMap<T>) => {
 }
 
 onMounted(async () => {
-  if (props.openImmediate) {
+  if (openImmediate) {
     await nextTick()
     open()
   }
@@ -164,7 +165,7 @@ onMounted(async () => {
       <Button class="mr-auto" type="text" size="small">
         {{
           isBelowMinSelection
-            ? t('common.selectAtLeast', [props.min])
+            ? t('common.selectAtLeast', [min])
             : t('common.selectedCount', [model.length])
         }}
       </Button>
