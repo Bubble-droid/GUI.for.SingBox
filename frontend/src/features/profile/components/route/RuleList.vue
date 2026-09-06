@@ -29,13 +29,13 @@ import type { OptionItem } from '@/types/component'
 interface Props {
   inboundOptions: OptionItem[]
   outboundOptions: OptionItem[]
-  serverOptions: OptionItem[]
+  dnsServerOptions: OptionItem[]
   ruleSet: RuleSetItem[]
 }
 
-const props = defineProps<Props>()
-
 const model = defineModel<RouteRuleItem[]>({ required: true })
+
+const { inboundOptions, outboundOptions, ruleSet } = defineProps<Props>()
 
 let ruleId = 0
 const fields = ref<RouteRuleItem>(createRouteRule())
@@ -48,8 +48,6 @@ const handleAdd = () => {
   fields.value = createRouteRule()
   showEditModal.value = true
 }
-
-defineExpose({ handleAdd })
 
 const handleAddInsertionPoint = () => {
   model.value.unshift({
@@ -97,7 +95,7 @@ const handleUse = (ruleset: any) => {
 }
 
 const handleClearRuleset = (ruleset: any) => {
-  const ids = fields.value.payload.split(',').filter((id) => props.ruleSet.find((v) => v.id === id))
+  const ids = fields.value.payload.split(',').filter((id) => ruleSet.find((v) => v.id === id))
   ruleset.payload = ids.join(',')
 }
 
@@ -115,11 +113,9 @@ const isInsertionPointMissing = computed(
 
 const hasLost = (rule: RouteRuleItem) => {
   const rulesValidationFlags: boolean[] = []
-  const hasMissingInbound = !props.inboundOptions.some((v) => v.value === rule.payload)
-  const hasMissingOutbound = !props.outboundOptions.some((v) => v.value === rule.outbound)
-  const hasMissingRuleset = rule.payload
-    .split(',')
-    .some((id) => !props.ruleSet.some((v) => v.id === id))
+  const hasMissingInbound = !inboundOptions.some((v) => v.value === rule.payload)
+  const hasMissingOutbound = !outboundOptions.some((v) => v.value === rule.outbound)
+  const hasMissingRuleset = rule.payload.split(',').some((id) => !ruleSet.some((v) => v.id === id))
   if (rule.action === RouteActionKind.Route) {
     rulesValidationFlags.push(hasMissingOutbound)
   } else if (rule.action === RouteActionKind.RouteOptions) {
@@ -148,21 +144,23 @@ const renderRule = (rule: RouteRuleItem) => {
   if (type === RouteRuleType.RuleSet) {
     _payload = rule.payload
       .split(',')
-      .map((id) => props.ruleSet.find((v) => v.id === id)?.tag || id)
+      .map((id) => ruleSet.find((v) => v.id === id)?.tag || id)
       .join(',')
   } else if (type === RouteRuleType.Inbound) {
-    _payload = props.inboundOptions.find((v) => v.value === rule.payload)?.label || rule.payload
+    _payload = inboundOptions.find((v) => v.value === rule.payload)?.label || rule.payload
   }
   if (invert) {
     _payload += ` (invert) `
   }
   children.push(_payload, action)
   if (outbound) {
-    const proxy = props.outboundOptions.find((v) => v.value === outbound)?.label || outbound
+    const proxy = outboundOptions.find((v) => v.value === outbound)?.label || outbound
     children.push(proxy)
   }
   return children.join(',')
 }
+
+defineExpose({ handleAdd })
 </script>
 
 <template>
@@ -316,7 +314,7 @@ const renderRule = (rule: RouteRuleItem) => {
           {{ t('kernel.route.rules.server') }}
           <Select
             v-model="fields.server"
-            :options="[{ label: 'kernel.strategy.byDnsRules', value: '' }, ...serverOptions]"
+            :options="[{ label: 'kernel.strategy.byDnsRules', value: '' }, ...dnsServerOptions]"
           />
         </div>
       </template>

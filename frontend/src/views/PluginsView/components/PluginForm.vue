@@ -17,7 +17,7 @@ interface Props {
   id?: string
 }
 
-const props = defineProps<Props>()
+const { id = '' } = defineProps<Props>()
 
 const official = computed(() => pluginsStore.findPluginInHubById(plugin.value.id))
 const loading = ref(false)
@@ -79,8 +79,8 @@ const handleRestore = () => {
 const handleSave = async () => {
   loading.value = true
   try {
-    if (props.id) {
-      await pluginsStore.editPlugin(props.id, plugin.value)
+    if (id) {
+      await pluginsStore.editPlugin(id, plugin.value)
     } else {
       await pluginsStore.addPlugin(plugin.value)
     }
@@ -156,8 +156,8 @@ const getOptions = (val: string[]) => {
   })
 }
 
-if (props.id) {
-  const p = pluginsStore.getPluginById(props.id)
+if (id) {
+  const p = pluginsStore.getPluginById(id)
   p && (plugin.value = deepClone(p))
 }
 

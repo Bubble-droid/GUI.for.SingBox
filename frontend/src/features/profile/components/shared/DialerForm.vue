@@ -15,8 +15,8 @@ interface Props {
   dnsServerOptions: OptionItem[]
 }
 
-defineProps<Props>()
 const model = defineModel<DialerFormData>({ required: true })
+defineProps<Props>()
 const { t } = useI18n()
 
 const [showDialer, toggleShow] = useBool(false)

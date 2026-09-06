@@ -31,12 +31,20 @@ export default withVueTs(
       '@typescript-eslint/prefer-promise-reject-errors': 'off',
       '@typescript-eslint/prefer-nullish-coalescing': 'off',
       '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-explicit-any': ['off'],
       'vue/no-v-html': ['off'],
       'vue/multi-word-component-names': [
         'error',
         {
           ignores: ['index'],
+        },
+      ],
+      'vue/define-macros-order': [
+        'error',
+        {
+          order: ['defineOptions', 'defineModel', 'defineProps', 'defineEmits', 'defineSlots'],
+          defineExposeLast: true,
         },
       ],
       '@typescript-eslint/consistent-type-imports': 'error',

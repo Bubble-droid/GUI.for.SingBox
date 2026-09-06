@@ -1,20 +1,14 @@
 <script lang="ts" setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    pt?: number
-    pr?: number
-    pb?: number
-    pl?: number
-  }>(),
-  {
-    pt: 0,
-    pr: 0,
-    pb: 0,
-    pl: 0,
-  },
-)
+interface Props {
+  pt?: number
+  pr?: number
+  pb?: number
+  pl?: number
+}
+
+const { pt = 0, pr = 0, pb = 0, pl = 0 } = defineProps<Props>()
 
 const scrollRef = ref<HTMLElement | null>(null)
 const hasOverflow = ref(false)
@@ -30,13 +24,13 @@ const updateOverflow = () => {
 }
 
 const spacing = computed(() => {
-  const pr = hasOverflow.value ? props.pr - 8 - 6 : props.pr
+  const paddingRight = hasOverflow.value ? pr - 8 - 6 : pr
   return {
-    paddingLeft: `${props.pl}px`,
+    paddingLeft: `${pl}px`,
     marginRight: hasOverflow.value ? '8px' : undefined,
-    paddingRight: pr > 0 ? `${pr}px` : undefined,
-    paddingTop: `${props.pt}px`,
-    paddingBottom: `${props.pb}px`,
+    paddingRight: paddingRight > 0 ? `${paddingRight}px` : undefined,
+    paddingTop: `${pt}px`,
+    paddingBottom: `${pb}px`,
   }
 })
 
@@ -64,6 +58,6 @@ onBeforeUnmount(() => {
 
 <style lang="less">
 .gui-scroll-view::-webkit-scrollbar-track {
-  margin-block: v-bind('props.pb+"px"');
+  margin-block: v-bind('pb+"px"');
 }
 </style>

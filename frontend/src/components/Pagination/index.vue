@@ -8,21 +8,22 @@ interface Props {
 }
 
 const model = defineModel<number>('current', { default: 1 })
-const props = withDefaults(defineProps<Props>(), { size: 'default', pageSize: 9 })
 
-const pageNum = computed(() => Math.ceil(props.total / props.pageSize))
+const { total, size = 'default', pageSize = 9 } = defineProps<Props>()
+
+const pageNum = computed(() => Math.ceil(total / pageSize))
 const pages = computed(() => {
-  const total = pageNum.value
+  const pageTotal = pageNum.value
   const current = model.value
-  if (total <= 8) {
-    return range(1, total)
+  if (pageTotal <= 8) {
+    return range(1, pageTotal)
   }
   if (current <= 4) {
-    return [...range(1, 7), 'next', total] as const
-  } else if (current >= total - 3) {
-    return [1, 'prev', ...range(total - 6, total)] as const
+    return [...range(1, 7), 'next', pageTotal] as const
+  } else if (current >= pageTotal - 3) {
+    return [1, 'prev', ...range(pageTotal - 6, pageTotal)] as const
   }
-  return [1, 'prev', ...range(current - 2, current + 2), 'next', total] as const
+  return [1, 'prev', ...range(current - 2, current + 2), 'next', pageTotal] as const
 })
 
 const range = (start: number, end: number) =>

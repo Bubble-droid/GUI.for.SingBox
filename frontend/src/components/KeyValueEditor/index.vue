@@ -3,22 +3,17 @@ import { ref, watch } from 'vue'
 
 import type { Recordable } from '@/types/typescript'
 
-interface Props {
-  modelValue?: Recordable
+const model = defineModel<Recordable<string>>({ required: true })
+
+const { placeholder = ['key', 'value'] } = defineProps<{
   placeholder?: [string, string]
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: () => ({}),
-  placeholder: () => ['key', 'value'],
-})
-
-const emit = defineEmits<{
-  change: [obj: Recordable]
-  'update:modelValue': [obj: Recordable]
 }>()
 
-const entries = ref(Object.entries(props.modelValue))
+const emit = defineEmits<{
+  change: [obj: Recordable<string>]
+}>()
+
+const entries = ref<[string, string][]>(Object.entries(model.value))
 
 const handleDel = (i: number) => {
   entries.value.splice(i, 1)
@@ -33,23 +28,22 @@ const handleAdd = () => {
 let internalUpdate = false
 
 watch(
-  () => props.modelValue,
+  model,
   (val) => {
-    if (!internalUpdate) {
-      entries.value = Object.entries(val)
+    if (internalUpdate) {
+      internalUpdate = false
+      return
     }
-    internalUpdate = false
+    entries.value = Object.entries(val ?? {})
   },
   { deep: true },
 )
 
 const emitUpdate = () => {
   const obj = Object.fromEntries(entries.value)
-  if (!internalUpdate) {
-    emit('update:modelValue', obj)
-  }
-  emit('change', obj)
   internalUpdate = true
+  model.value = obj
+  emit('change', obj)
 }
 </script>
 

@@ -16,11 +16,11 @@ interface Props {
   sub: App.Subscription
 }
 
-const props = defineProps<Props>()
+const { sub } = defineProps<Props>()
 
 const loading = ref(false)
 const proxiesText = ref('')
-const sub = ref(deepClone(props.sub))
+const subRef = ref(deepClone(sub))
 
 const { t } = useI18n()
 const subscribeStore = useSubscribesStore()
@@ -31,15 +31,15 @@ const handleSubmit = inject('submit') as any
 const handleSave = async () => {
   loading.value = true
   try {
-    const { path, proxies, id } = sub.value
+    const { path, proxies, id } = subRef.value
     const proxiesWithId: Record<string, any>[] = JSON.parse(proxiesText.value)
-    sub.value.proxies = proxiesWithId.map((v) => ({
+    subRef.value.proxies = proxiesWithId.map((v) => ({
       id: proxies.find((proxy) => proxy.id === v['__id_in_gui'])?.id || sampleID(),
       tag: v['tag'],
       type: v['type'],
     }))
     await WriteFile(path, JSON.stringify(omitArray(proxiesWithId, ['__id_in_gui']), null, 2))
-    await subscribeStore.editSubscribe(id, sub.value)
+    await subscribeStore.editSubscribe(id, subRef.value)
     handleSubmit()
   } catch (error: any) {
     console.log(error)
@@ -50,11 +50,11 @@ const handleSave = async () => {
 }
 
 const initProxiesText = async () => {
-  const content = (await ignoredError(ReadFile, sub.value.path)) || '[]'
+  const content = (await ignoredError(ReadFile, subRef.value.path)) || '[]'
   const proxies: App.Subscription['proxies'] = JSON.parse(content)
   const proxiesWithId = proxies.map((proxy) => {
     return {
-      __id_in_gui: sub.value.proxies.find((v) => v.tag === proxy.tag)?.id || sampleID(),
+      __id_in_gui: subRef.value.proxies.find((v) => v.tag === proxy.tag)?.id || sampleID(),
       ...proxy,
     }
   })

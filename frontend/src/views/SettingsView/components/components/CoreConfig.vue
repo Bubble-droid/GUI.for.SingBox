@@ -15,7 +15,7 @@ interface Props {
   isAlpha: boolean
 }
 
-const props = defineProps<Props>()
+const { isAlpha } = defineProps<Props>()
 
 const tabs = [
   { tab: 'settings.kernel.config.env', key: 'env' },
@@ -29,7 +29,7 @@ const handleSubmit = inject('submit') as any
 const { t } = useI18n()
 const appSettings = useAppSettingsStore()
 
-const source = props.isAlpha ? appSettings.app.kernel.alpha : appSettings.app.kernel.main
+const source = isAlpha ? appSettings.app.kernel.alpha : appSettings.app.kernel.main
 
 const model = ref(deepClone(source))
 

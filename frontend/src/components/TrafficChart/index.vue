@@ -10,14 +10,11 @@ interface Props {
   series: number[][]
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  height: 214,
-  padding: 50,
-  legend: () => ['upload', 'download'],
-})
+const { height = 214, padding = 50, legend = ['upload', 'download'], series } = defineProps<Props>()
 
 const MAX_HISTORY = 60
-const svgRef = useTemplateRef<SVGAElement>('svgRef')
+
+const svgRef = useTemplateRef('svgRef')
 const width = ref(200)
 const points = ref<string[]>([])
 const showLines = ref([true, true])
@@ -30,8 +27,8 @@ const strokeColors = computed(() => {
 })
 
 const maxValue = computed(() => {
-  const maxUpload = Math.max(...props.series[0]!, props.height)
-  const maxDownload = Math.max(...props.series[1]!, props.height)
+  const maxUpload = Math.max(...(series[0] ?? []), height)
+  const maxDownload = Math.max(...(series[1] ?? []), height)
   if (showLines.value[0] && showLines.value[1]) {
     return Math.max(maxUpload, maxDownload)
   }
@@ -41,7 +38,7 @@ const maxValue = computed(() => {
   if (showLines.value[1]) {
     return maxDownload
   }
-  return props.height
+  return height
 })
 
 const updateSvgWidth = () => {
@@ -52,11 +49,10 @@ const updateSvgWidth = () => {
 }
 
 const updateChart = () => {
-  const { padding } = props
-  let { height } = props
   const paddingY = height / 8
-  height -= paddingY
-  points.value = props.series.map((s, index) => {
+  const chartHeight = height - paddingY
+
+  points.value = series.map((s, index) => {
     if (!showLines.value[index]) {
       return ''
     }
@@ -67,11 +63,12 @@ const updateChart = () => {
     const spacing = (width.value - padding) / newS.length
     const point = newS.reduce((p, c, i) => {
       const x = Math.floor(i * spacing) + padding
-      const y = Math.floor(height - (c / maxValue.value) * height) + paddingY - 6
+      const y = Math.floor(chartHeight - (c / maxValue.value) * chartHeight) + paddingY - 6
       return i === 0 ? `${x},${y}` : `${p},${x},${y}`
     }, '')
-    const startPos = `${padding},${props.height - 6}`
-    const endPos = `${Math.floor((MAX_HISTORY - 1) * spacing + padding)},${props.height - 6}`
+
+    const startPos = `${padding},${height - 6}`
+    const endPos = `${Math.floor((MAX_HISTORY - 1) * spacing + padding)},${height - 6}`
     return `${startPos},${point},${endPos}`
   })
 }
@@ -97,7 +94,7 @@ onUnmounted(() => {
 
 onActivated(updateSvgWidth)
 
-watch(() => props.series, updateChart, { deep: true })
+watch(() => series, updateChart, { deep: true })
 </script>
 
 <template>

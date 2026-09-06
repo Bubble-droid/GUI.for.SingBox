@@ -6,31 +6,28 @@ import useI18n from '@/lang'
 
 import type { PickerItem, PickerProps } from './types'
 
-const props = withDefaults(defineProps<PickerProps<ValueType, PickerType>>(), {
-  options: () => [],
-  initialValue: () => [],
-})
+type PickerValue = PickerType extends 'single' ? ValueType : ValueType[]
+
+const { type, options = [], initialValue = [] } = defineProps<PickerProps<ValueType, PickerType>>()
 
 const emit = defineEmits<{
-  confirm: [val: PickerType extends 'single' ? ValueType : ValueType[]]
+  confirm: [val: PickerValue]
   cancel: []
   finish: []
 }>()
 
 const selected = ref(
-  new Set(
-    props.initialValue.filter((v) => props.options.find((o) => o.value === v)).map((v) => toRaw(v)),
-  ),
+  new Set(initialValue.filter((v) => options.find((o) => o.value === v)).map((v) => toRaw(v))),
 ) as Ref<Set<ValueType>>
 
 const { t } = useI18n.global
 
 const handleConfirm = () => {
-  const res: any = [...selected.value].map((v) => toRaw(v))
-  if (props.type === 'single') {
-    emit('confirm', res[0])
+  const res = [...selected.value].map((v) => toRaw(v))
+  if (type === 'single') {
+    emit('confirm', res[0] as PickerValue)
   } else {
-    emit('confirm', res)
+    emit('confirm', res as PickerValue)
   }
   emit('finish')
 }
@@ -46,22 +43,22 @@ const handleSelect = (option: PickerItem<ValueType>) => {
   if (isSelected(option.value)) {
     selected.value.delete(option.value)
   } else {
-    if (props.type === 'single') {
+    if (type === 'single') {
       selected.value.clear()
     }
     selected.value.add(option.value)
     option.onSelect?.({
       value: option.value,
       option,
-      options: props.options,
+      options,
       selected: [...selected.value].map((v) => toRaw(v)),
     })
   }
 }
 
 const handleSelectAll = () => {
-  if (props.options.some((v) => !selected.value.has(v.value))) {
-    props.options.forEach((v) => selected.value.add(v.value))
+  if (options.some((v) => !selected.value.has(v.value))) {
+    options.forEach((v) => selected.value.add(v.value))
   } else {
     selected.value.clear()
   }

@@ -4,13 +4,12 @@ import type { Component, VNodeChild } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 interface TabItemType<K extends string = string> {
-  key: K
-  tab: string
-  component?: Component
+  readonly key: K
+  readonly tab: string
+  readonly component?: Component
 }
 
 interface Props<K extends string = string> {
-  activeKey: K
   items: readonly TabItemType<K>[]
   tabPosition?: 'left' | 'top'
   tabWidth?: string
@@ -21,29 +20,31 @@ type Slots<K extends string = string> = {
   extra?: () => VNodeChild
 } & Partial<Record<K, () => VNodeChild>>
 
-const props = withDefaults(defineProps<Props<K>>(), {
-  tabPosition: 'left',
-  tabWidth: '20%',
-  contentWidth: '80%',
-})
+const activeKey = defineModel<K>('activeKey', { required: true })
 
-const emits = defineEmits<(e: 'update:activeKey', key: K) => void>()
+const {
+  items,
+  tabPosition = 'left',
+  tabWidth = '20%',
+  contentWidth = '80%',
+} = defineProps<Props<K>>()
 
-const { t } = useI18n()
 const slots = defineSlots<Slots<K>>()
+const { t } = useI18n()
+const isTop = computed(() => tabPosition === 'top')
 
-const isTop = computed(() => props.tabPosition === 'top')
+const handleChange = (key: K) => {
+  activeKey.value = key
+}
 
-const handleChange = (key: K) => emits('update:activeKey', key)
-
-const isActive = (tab: TabItemType<K>) => tab.key === props.activeKey
+const isActive = (tab: TabItemType<K>) => tab.key === activeKey.value
 
 // NOTE:
 // - component tabs are cached via KeepAlive
 // - slot tabs are rendered as functional components and NOT cached
 const currentComponent = computed(() => {
-  const comp = props.items.find((i) => i.key === props.activeKey)?.component
-  return comp ?? slots[props.activeKey]
+  const comp = items.find((i) => i.key === activeKey.value)?.component
+  return comp ?? slots[activeKey.value]
 })
 </script>
 

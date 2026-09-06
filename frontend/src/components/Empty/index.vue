@@ -7,11 +7,7 @@ interface Props {
   description?: string
 }
 
-withDefaults(defineProps<Props>(), {
-  icon: 'empty',
-  iconSize: 64,
-  description: 'common.empty',
-})
+const { icon = 'empty', iconSize = 64, description = 'common.empty' } = defineProps<Props>()
 </script>
 
 <template>

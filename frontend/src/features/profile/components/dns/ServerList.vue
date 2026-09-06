@@ -18,12 +18,12 @@ import type { OptionItem } from '@/types/component'
 
 interface Props {
   outboundOptions: OptionItem[]
-  serversOptions: OptionItem[]
+  dnsServersOptions: OptionItem[]
 }
 
-const props = defineProps<Props>()
-
 const model = defineModel<DnsServerItem[]>({ required: true })
+
+const { outboundOptions } = defineProps<Props>()
 
 let serverId = 0
 const fields = ref<DnsServerItem>(createDnsServer())
@@ -65,8 +65,6 @@ const handleAdd = () => {
   showEditModal.value = true
 }
 
-defineExpose({ handleAdd })
-
 const handleAddEnd = () => {
   if (serverId === -1) {
     model.value.unshift(fields.value)
@@ -92,12 +90,15 @@ const renderServer = (server: DnsServerItem) => {
     h(Tag, () => generateDnsServerURL(server)),
   ]
   if (detour) {
-    const detourLabel = props.outboundOptions.find((v) => v.value === detour)?.label || detour
+    const detourLabel = outboundOptions.find((v) => v.value === detour)?.label || detour
     children.push(h(Tag, { color: 'default' }, () => detourLabel))
   }
   return h('div', { class: 'font-bold' }, children)
 }
+
+defineExpose({ handleAdd })
 </script>
+
 <template>
   <Empty v-if="model.length === 0">
     <template #description>
@@ -138,7 +139,7 @@ const renderServer = (server: DnsServerItem) => {
       <template v-if="isSupportDetourAndDomainResolver">
         <div class="form-item">
           {{ t('kernel.dns.domain_resolver') }}
-          <Select v-model="fields.domain_resolver" :options="serversOptions" clearable />
+          <Select v-model="fields.domain_resolver" :options="dnsServersOptions" clearable />
         </div>
         <div class="form-item">
           {{ t('kernel.dns.detour') }}

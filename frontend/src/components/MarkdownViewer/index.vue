@@ -19,7 +19,7 @@ export interface Props {
   content: string
 }
 
-const props = defineProps<Props>()
+const { content } = defineProps<Props>()
 
 const markdownParser = new Marked({ async: false })
 const nodes = shallowRef<VNodeChild[]>([])
@@ -231,9 +231,9 @@ const renderTable = (token: Tokens.Table, key: string) => {
   return h(Table, { key, columns, dataSource })
 }
 
-const renderMarkdown = (content: string) => {
+const renderMarkdown = (text: string) => {
   try {
-    return renderBlockTokens('markdown', markdownParser.lexer(content))
+    return renderBlockTokens('markdown', markdownParser.lexer(text))
   } catch (error: any) {
     console.error(error)
     return [h('pre', { class: 'select-text whitespace-pre-wrap' }, error?.message || String(error))]
@@ -246,7 +246,7 @@ const scheduleRenderContent = () => {
   }
   renderFrame = requestAnimationFrame(() => {
     renderFrame = 0
-    nodes.value = renderMarkdown(props.content)
+    nodes.value = renderMarkdown(content)
   })
 }
 
@@ -264,7 +264,7 @@ onBeforeUnmount(() => {
   }
 })
 
-watch(() => props.content, scheduleRenderContent, { flush: 'post' })
+watch(() => content, scheduleRenderContent, { flush: 'post' })
 </script>
 
 <template>

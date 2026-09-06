@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends InputType = 'text'">
-import { ref, unref } from 'vue'
+import { ref, computed } from 'vue'
 
 import useI18n from '@/lang'
 
@@ -7,33 +7,34 @@ import type { InputType } from '@/components/Input/types'
 
 import type { PromptProps } from './types'
 
-const props = withDefaults(defineProps<PromptProps<T>>(), {
-  placeholder: '',
-  initialValue: '',
-})
+const { initialValue = '', props: inputProps } = defineProps<PromptProps<T>>()
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   confirm: [value: string | number]
   cancel: []
   finish: []
 }>()
 
-const type = typeof props.initialValue === 'string' ? 'text' : 'number'
-const value = ref(props.initialValue)
+const value = ref(initialValue)
+
+const inputType = computed(() => {
+  return inputProps.type || (typeof initialValue === 'string' ? 'text' : 'number')
+})
 
 const { t } = useI18n.global
 
-const handleSubmit = (e: Event) => {
-  if (e.type === 'keydown' && props.props.type === 'code') {
+const handleSubmit = (e?: Event) => {
+  if (e?.type === 'keydown' && inputProps.type === 'code') {
     return
   }
-  emits('confirm', unref(value))
-  emits('finish')
+
+  emit('confirm', value.value)
+  emit('finish')
 }
 
 const handleCancel = () => {
-  emits('cancel')
-  emits('finish')
+  emit('cancel')
+  emit('finish')
 }
 </script>
 
@@ -43,8 +44,8 @@ const handleCancel = () => {
       <div class="font-bold break-all px-4 py-8">{{ t(title) }}</div>
       <Input
         v-model="value"
-        v-bind="props.props"
-        :type="props.props.type || type"
+        v-bind="inputProps"
+        :type="inputType"
         autofocus
         clearable
         size="small"
@@ -52,7 +53,9 @@ const handleCancel = () => {
         @keydown.enter="handleSubmit"
       />
       <div class="form-action gap-4">
-        <Button size="small" @click="handleCancel">{{ t('common.cancel') }}</Button>
+        <Button size="small" @click="handleCancel">
+          {{ t('common.cancel') }}
+        </Button>
         <Button size="small" type="primary" @click="handleSubmit">
           {{ t('common.confirm') }}
         </Button>

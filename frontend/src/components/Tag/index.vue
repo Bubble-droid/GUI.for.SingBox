@@ -8,12 +8,7 @@ interface Props {
   bordered?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
-  color: 'default',
-  closable: false,
-  size: 'default',
-  bordered: true,
-})
+const { color = 'default', size = 'default', bordered = true } = defineProps<Props>()
 
 const emit = defineEmits<{
   close: []

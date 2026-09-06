@@ -17,10 +17,10 @@ interface Props {
   title?: string
 }
 
-withDefaults(defineProps<Props>(), {
-  title: 'kernel.shared.domain_resolver.title',
-})
 const model = defineModel<DomainResolverFormData>({ required: true })
+
+const { title = 'kernel.shared.domain_resolver.title' } = defineProps<Props>()
+
 const { t } = useI18n()
 
 const [showResolver, toggleShow] = useBool(false)

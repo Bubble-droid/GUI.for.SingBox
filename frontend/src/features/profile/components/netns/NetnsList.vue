@@ -26,8 +26,6 @@ const handleAdd = () => {
   showEditModal.value = true
 }
 
-defineExpose({ handleAdd })
-
 const handleEdit = (index: number) => {
   editIndex = index
   fields.value = deepClone(model.value[index]!)
@@ -50,6 +48,8 @@ const onTypeChange = (newType: NetnsType) => {
   const base = { id: fields.value.id, enable: fields.value.enable }
   fields.value = { ...createNetns(newType), ...base }
 }
+
+defineExpose({ handleAdd })
 </script>
 
 <template>

@@ -4,6 +4,7 @@ import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { OptionItem } from '@/types/component.ts'
+import type { UnpackArray } from '@/types/utils.ts'
 
 import RuleList from './RuleList.vue'
 import RuleSetList from './RuleSetList.vue'
@@ -11,31 +12,32 @@ import RuleSetList from './RuleSetList.vue'
 interface Props {
   inboundOptions: OptionItem[]
   outboundOptions: OptionItem[]
-  serverOptions: OptionItem[]
+  dnsServerOptions: OptionItem[]
 }
-
-defineProps<Props>()
 
 const model = defineModel<RouteSection>({ required: true })
 
-const activeKey = ref('common')
-const rulesConfigRef = useTemplateRef('rulesConfigRef')
-const rulesetConfigRef = useTemplateRef('rulesetConfigRef')
+defineProps<Props>()
+
 const tabs = [
   { key: 'common', tab: 'kernel.route.tab.common' },
-  { key: 'rule_set', tab: 'kernel.route.tab.rule_set' },
+  { key: 'ruleSet', tab: 'kernel.route.tab.rule_set' },
   { key: 'rules', tab: 'kernel.route.tab.rules' },
-]
+] as const
+
+type TabKey = UnpackArray<typeof tabs>['key']
+
+const activeKey = ref<TabKey>('common')
+const rulesConfigRef = useTemplateRef('rulesConfigRef')
+const rulesetConfigRef = useTemplateRef('rulesetConfigRef')
 
 const { t } = useI18n()
 
 const handleAdd = () => {
-  const handlerMap: Record<string, (() => void) | undefined> = {
-    common: () => {
-      /* empty */
-    },
-    rules: rulesConfigRef.value?.handleAdd,
-    rule_set: rulesetConfigRef.value?.handleAdd,
+  const handlerMap: Record<TabKey, (() => void) | undefined> = {
+    common: () => {},
+    rules: () => rulesConfigRef.value?.handleAdd?.(),
+    ruleSet: () => rulesetConfigRef.value?.handleAdd?.(),
   }
   handlerMap[activeKey.value]?.()
 }
@@ -60,7 +62,11 @@ defineExpose({ handleAdd })
       </div>
       <div class="form-item">
         {{ t('kernel.route.default_domain_resolver.server') }}
-        <Select v-model="model.default_domain_resolver.server" :options="serverOptions" clearable />
+        <Select
+          v-model="model.default_domain_resolver.server"
+          :options="dnsServerOptions"
+          clearable
+        />
       </div>
       <!-- <div class="form-item">
         {{ t('kernel.route.default_domain_resolver.client_subnet') }}
@@ -71,7 +77,7 @@ defineExpose({ handleAdd })
         <Select v-model="model.final" :options="outboundOptions" clearable />
       </div>
     </template>
-    <template #rule_set>
+    <template #ruleSet>
       <RuleSetList
         ref="rulesetConfigRef"
         v-model="model.rule_set"
@@ -84,7 +90,7 @@ defineExpose({ handleAdd })
         v-model="model.rules"
         :inbound-options="inboundOptions"
         :outbound-options="outboundOptions"
-        :server-options="serverOptions"
+        :dns-server-options="dnsServerOptions"
         :rule-set="model.rule_set"
       />
     </template>

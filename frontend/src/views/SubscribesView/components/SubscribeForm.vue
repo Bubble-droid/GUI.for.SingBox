@@ -26,7 +26,7 @@ interface Props {
   id?: string
 }
 
-const props = defineProps<Props>()
+const { id = '' } = defineProps<Props>()
 
 const { t } = useI18n()
 const [showMore, toggleShowMore] = useBool(false)
@@ -57,8 +57,8 @@ const handleSave = async () => {
   loading.value = true
 
   try {
-    if (props.id) {
-      await subscribeStore.editSubscribe(props.id, sub.value)
+    if (id) {
+      await subscribeStore.editSubscribe(id, sub.value)
     } else {
       await subscribeStore.addSubscribe(sub.value)
     }
@@ -92,8 +92,8 @@ const handleTestProxy = async () => {
   }
 }
 
-if (props.id) {
-  const s = subscribeStore.getSubscribeById(props.id)
+if (id) {
+  const s = subscribeStore.getSubscribeById(id)
   if (s) {
     sub.value = deepClone(s)
   }

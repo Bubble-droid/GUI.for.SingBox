@@ -10,7 +10,7 @@ import { debounce } from '@/utils/others'
 
 import Input from '@/components/Input/index.vue'
 
-const props = defineProps<{
+const { close } = defineProps<{
   close: () => void
 }>()
 
@@ -44,7 +44,7 @@ const handleExecCommand = async (index: number) => {
   try {
     await hitCommand.value[index]?.handler?.()
     userInput.value = ''
-    props.close()
+    close()
   } catch (error: any) {
     message.error(error.message || error)
   }

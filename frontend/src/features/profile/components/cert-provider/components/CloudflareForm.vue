@@ -12,8 +12,8 @@ interface Props {
   httpClientOptions: OptionItem[]
 }
 
-defineProps<Props>()
 const model = defineModel<CloudflareCertProvider['config']>({ required: true })
+defineProps<Props>()
 const { t } = useI18n()
 </script>
 

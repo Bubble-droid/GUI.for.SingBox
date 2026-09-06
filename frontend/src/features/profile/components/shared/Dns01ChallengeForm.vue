@@ -13,8 +13,8 @@ interface Props {
   dnsServerOptions: OptionItem[]
 }
 
-defineProps<Props>()
 const model = defineModel<Dns01ChallengeFormData>({ required: true })
+defineProps<Props>()
 const { t } = useI18n()
 
 const [showDns01, toggleDns01] = useBool(false)

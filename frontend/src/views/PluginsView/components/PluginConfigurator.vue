@@ -18,7 +18,7 @@ interface Props {
   plugin: AppPlugin
 }
 
-const props = defineProps<Props>()
+const { plugin } = defineProps<Props>()
 
 const { t } = useI18n()
 const pluginsStore = usePluginsStore()
@@ -26,9 +26,9 @@ const appSettingsStore = useAppSettingsStore()
 const pluginConfigRef = useTemplateRef('pluginConfigRef')
 
 const loading = ref(false)
-const settings = ref(appSettingsStore.app.pluginSettings[props.plugin.id] ?? {})
+const settings = ref(appSettingsStore.app.pluginSettings[plugin.id] ?? {})
 const oldSettings = settings.value
-const originalSettings = props.plugin.configuration.reduce((p, { key, value }) => {
+const originalSettings = plugin.configuration.reduce((p, { key, value }) => {
   p[key] = value
   return p
 }, {} as Recordable)
@@ -40,14 +40,14 @@ const handleSave = async () => {
   loading.value = true
   try {
     await pluginsStore.manualTrigger(
-      props.plugin.id,
+      plugin.id,
       PluginTriggerEvent.OnConfigure,
       { ...originalSettings, ...settings.value },
       { ...originalSettings, ...oldSettings },
     )
   } catch (error: any) {
     const errors = [
-      `${props.plugin.id} Not Found`,
+      `${plugin.id} Not Found`,
       'is Missing source code',
       'Disabled',
       `Can't find variable: ${PluginTriggerEvent.OnConfigure}`,
@@ -62,9 +62,9 @@ const handleSave = async () => {
   }
 
   if (JSON.stringify(settings.value) === '{}') {
-    delete appSettingsStore.app.pluginSettings[props.plugin.id]
+    delete appSettingsStore.app.pluginSettings[plugin.id]
   } else {
-    appSettingsStore.app.pluginSettings[props.plugin.id] = settings.value
+    appSettingsStore.app.pluginSettings[plugin.id] = settings.value
   }
 
   await handleSubmit()
@@ -107,5 +107,5 @@ defineExpose({ modalSlots })
 </script>
 
 <template>
-  <PluginConfigItem ref="pluginConfigRef" v-model="settings" :plugin="props.plugin" />
+  <PluginConfigItem ref="pluginConfigRef" v-model="settings" :plugin="plugin" />
 </template>

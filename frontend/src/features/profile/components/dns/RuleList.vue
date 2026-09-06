@@ -30,14 +30,13 @@ import type { OptionItem } from '@/types/component'
 
 interface Props {
   inboundOptions: OptionItem[]
-  outboundOptions: OptionItem[]
-  serversOptions: OptionItem[]
+  dnsServerOptions: OptionItem[]
   ruleSet: RuleSetItem[]
 }
 
-const props = defineProps<Props>()
-
 const model = defineModel<DnsRuleItem[]>({ required: true })
+
+const { inboundOptions, dnsServerOptions, ruleSet } = defineProps<Props>()
 
 let ruleId = 0
 const fields = ref<DnsRuleItem>(createDnsRule())
@@ -54,8 +53,6 @@ const handleAdd = () => {
   fields.value = createDnsRule()
   showEditModal.value = true
 }
-
-defineExpose({ handleAdd })
 
 const handleAddEnd = () => {
   if (ruleId === -1) {
@@ -107,7 +104,7 @@ const handleUse = (ruleset: any) => {
 }
 
 const handleClearRuleset = (ruleset: any) => {
-  const ids = fields.value.payload.split(',').filter((id) => props.ruleSet.find((v) => v.id === id))
+  const ids = fields.value.payload.split(',').filter((id) => ruleSet.find((v) => v.id === id))
   ruleset.payload = ids.join(',')
 }
 
@@ -116,7 +113,7 @@ const showLost = () => message.warn('kernel.route.rules.invalid')
 const hasLost = (rule: DnsRuleItem) => {
   const checkServer = () => {
     if (rule.action === DnsActionKind.Route) {
-      if (!props.serversOptions.some((v) => v.value === rule.server)) {
+      if (!dnsServerOptions.some((v) => v.value === rule.server)) {
         return true
       }
       return false
@@ -132,12 +129,12 @@ const hasLost = (rule: DnsRuleItem) => {
 
   const checkPayload = () => {
     if (rule.type === DnsRuleType.Inbound) {
-      return !props.inboundOptions.some((v) => v.value === rule.payload)
+      return !inboundOptions.some((v) => v.value === rule.payload)
     }
     if (rule.type === DnsRuleType.RuleSet) {
       const hasMissingRuleset = rule.payload
         .split(',')
-        .some((id) => !props.ruleSet.some((v) => v.id === id))
+        .some((id) => !ruleSet.some((v) => v.id === id))
       return hasMissingRuleset
     }
     if (rule.type === DnsRuleType.Inline) {
@@ -156,7 +153,7 @@ const renderRule = (rule: DnsRuleItem) => {
   if (type === DnsRuleType.RuleSet) {
     _payload = rule.payload
       .split(',')
-      .map((id) => props.ruleSet.find((v) => v.id === id)?.tag || id)
+      .map((id) => ruleSet.find((v) => v.id === id)?.tag || id)
       .join(',')
   } else if (type === DnsRuleType.Inline && payload.includes('__is_fake_ip')) {
     _payload = 'FakeIP'
@@ -166,11 +163,13 @@ const renderRule = (rule: DnsRuleItem) => {
   }
   children.push(_payload, action)
   if (server) {
-    const proxy = props.serversOptions.find((v) => v.value === server)?.label || server
+    const proxy = dnsServerOptions.find((v) => v.value === server)?.label || server
     children.push(proxy)
   }
   return children.join(',')
 }
+
+defineExpose({ handleAdd })
 </script>
 <template>
   <Empty v-if="model.length === 0 || (model.length === 1 && !isInsertionPointMissing)">
@@ -278,7 +277,7 @@ const renderRule = (rule: DnsRuleItem) => {
       <template v-if="fields.action === DnsActionKind.Route">
         <div class="form-item">
           {{ t('kernel.dns.rules.server') }}
-          <Select v-model="fields.server" :options="serversOptions" />
+          <Select v-model="fields.server" :options="dnsServerOptions" />
         </div>
         <div class="form-item">
           {{ t('kernel.route.rules.strategy') }}

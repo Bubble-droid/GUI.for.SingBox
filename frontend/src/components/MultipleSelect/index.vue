@@ -3,23 +3,21 @@ import Select from '@/components/Select/index.vue'
 
 import type { SelectModelValue, SelectProps } from '@/components/Select/types'
 
-withDefaults(defineProps<Omit<SelectProps<T, true>, 'modelValue' | 'multiple'>>(), {
-  options: () => [],
-  border: true,
-  size: 'default',
-  placeholder: '',
-  autoSize: false,
-  clearable: false,
-})
-
 const model = defineModel<T[]>({ required: true })
 
-const emits = defineEmits<{
+const {
+  options = [],
+  border = true,
+  size = 'default',
+  placeholder = '',
+} = defineProps<Omit<SelectProps<T, true>, 'multiple'>>()
+
+const emit = defineEmits<{
   changed: [value: T[]]
 }>()
 
 const onChange = (val: T[]) => {
-  emits('changed', val)
+  emit('changed', val)
 }
 </script>
 

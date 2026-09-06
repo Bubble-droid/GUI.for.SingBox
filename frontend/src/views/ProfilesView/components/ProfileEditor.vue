@@ -14,7 +14,7 @@ interface Props {
   profile: Profile
 }
 
-const props = defineProps<Props>()
+const { profile } = defineProps<Props>()
 
 const loading = ref(false)
 const profileText = ref('')
@@ -28,7 +28,7 @@ const handleSubmit = inject('submit') as any
 const handleSave = async () => {
   loading.value = true
   try {
-    const subscriptions = props.profile.outbounds.reduce((p, c) => {
+    const subscriptions = profile.outbounds.reduce((p, c) => {
       c.outbounds.forEach((outbound) => {
         if (outbound.type !== 'Built-in') {
           const id = outbound.type === 'Subscription' ? outbound.id : outbound.type
@@ -37,14 +37,14 @@ const handleSave = async () => {
       })
       return p
     }, new Set<string>())
-    const newProfile = restoreProfile(JSON.parse(profileText.value), props.profile.name, {
-      profile: props.profile,
+    const newProfile = restoreProfile(JSON.parse(profileText.value), profile.name, {
+      profile,
       subscriptionIds: [...subscriptions],
     })
-    newProfile.id = props.profile.id
-    newProfile.mixin = props.profile.mixin
-    newProfile.script = props.profile.script
-    await profilesStore.editProfile(props.profile.id, newProfile)
+    newProfile.id = profile.id
+    newProfile.mixin = profile.mixin
+    newProfile.script = profile.script
+    await profilesStore.editProfile(profile.id, newProfile)
     await handleSubmit()
   } catch (error: any) {
     console.log(error)
@@ -54,7 +54,7 @@ const handleSave = async () => {
 }
 
 onMounted(async () => {
-  const config = await generateConfig(props.profile, {
+  const config = await generateConfig(profile, {
     enableStableConfigCompat: false,
     enablePluginProcessing: false,
     enableMixinProcessing: false,

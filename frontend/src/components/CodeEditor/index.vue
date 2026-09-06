@@ -25,7 +25,6 @@ import { debounce } from '@/utils/others'
 import { IS_IN_MODAL } from '@/components/Modal/state'
 
 interface Props {
-  modelValue?: string
   editable?: boolean
   lang?: 'json' | 'javascript' | 'yaml'
   mode?: 'editor' | 'diff'
@@ -33,38 +32,37 @@ interface Props {
   plugin?: Record<string, any> | undefined
 }
 
+const model = defineModel<string>({ required: true })
+
+const {
+  editable,
+  lang = 'json',
+  mode = 'editor',
+  placeholder = '',
+  plugin = undefined,
+} = defineProps<Props>()
+
 const emit = defineEmits<{
   change: [content: string]
-  'update:modelValue': [content: string]
 }>()
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: '',
-  lang: 'json',
-  mode: 'editor',
-  placeholder: '',
-  plugin: undefined,
-})
 
 const { promise: editorReady, resolve: markEditorReady } = Promise.withResolvers()
 let internalUpdate = true
 
-watch(
-  () => props.modelValue,
-  async (val) => {
-    await editorReady
-    const view = editorView || mergeView?.b
-    if (view && val != view.state.doc.toString()) {
-      internalUpdate = false
-      view.dispatch({
-        changes: {
-          from: 0,
-          to: view.state.doc.length,
-          insert: val,
-        },
-      })
-    }
-  },
-)
+watch(model, async (val) => {
+  await editorReady
+  const view = editorView || mergeView?.b
+  if (view && val != view.state.doc.toString()) {
+    internalUpdate = false
+    view.dispatch({
+      changes: {
+        from: 0,
+        to: view.state.doc.length,
+        insert: val,
+      },
+    })
+  }
+})
 
 let editorView: EditorView
 let mergeView: MergeView
@@ -74,7 +72,7 @@ const appSettings = useAppSettingsStore()
 
 const onChange = debounce((content: string) => {
   if (internalUpdate) {
-    emit('update:modelValue', content)
+    model.value = content
     emit('change', content)
   }
   internalUpdate = true
@@ -84,12 +82,12 @@ const formatDoc = async (view: EditorView) => {
   const content = view.state.doc.toString()
   const cursor = view.state.selection.ranges[0]?.from || 0
   try {
-    const parser = { javascript: 'babel', yaml: 'yaml', json: 'json' }[props.lang]
+    const parser = { javascript: 'babel', yaml: 'yaml', json: 'json' }[lang]
     const plugins = {
       javascript: [parserBabel, estreePlugin],
       yaml: [parserYaml],
       json: [parserBabel, estreePlugin],
-    }[props.lang]
+    }[lang]
     const { formatted, cursorOffset } = await prettier.formatWithCursor(content, {
       cursorOffset: cursor,
       parser,
@@ -153,41 +151,37 @@ const initEditor = () => {
     // Code wrap
     EditorView.lineWrapping,
     // Placeholder
-    Placeholder(props.placeholder),
+    Placeholder(placeholder),
     // Theme
     themeCompartment.of(
       appSettings.themeMode === Theme.Dark ? [EditorView.theme({}, { dark: true }), oneDark] : [],
     ),
-    ...(props.lang === 'javascript'
-      ? [autocompletion({ override: getCompletions(props.plugin) })]
-      : []),
+    ...(lang === 'javascript' ? [autocompletion({ override: getCompletions(plugin) })] : []),
     // Lint
-    ...(props.lang === 'json' ? [linter(jsonParseLinter())] : []),
+    ...(lang === 'json' ? [linter(jsonParseLinter())] : []),
     // Lang
-    ...(['javascript', 'json', 'yaml'].includes(props.lang)
-      ? [{ javascript, json, yaml }[props.lang]()]
-      : []),
+    ...(['javascript', 'json', 'yaml'].includes(lang) ? [{ javascript, json, yaml }[lang]()] : []),
     EditorView.updateListener.of((update) => {
       update.docChanged && onChange(update.state.doc.toString())
     }),
   ]
 
-  if (props.mode === 'editor') {
+  if (mode === 'editor') {
     editorView = new EditorView({
-      doc: props.modelValue,
+      doc: model.value,
       parent: domRef.value!,
-      extensions: [...extensions, EditorView.editable.of(props.editable)],
+      extensions: [...extensions, EditorView.editable.of(editable)],
     })
   } else {
     mergeView = new MergeView({
       parent: domRef.value!,
       a: {
-        doc: props.modelValue,
+        doc: model.value,
         extensions: [...extensions, EditorView.editable.of(false)],
       },
       b: {
-        doc: props.modelValue,
-        extensions: [...extensions, EditorView.editable.of(props.editable)],
+        doc: model.value,
+        extensions: [...extensions, EditorView.editable.of(editable)],
       },
     })
   }

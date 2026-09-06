@@ -1,32 +1,29 @@
 <script lang="ts" setup generic="M extends boolean = false">
+import type { SelectProps, SelectValueType } from '@components/Select/types'
 import { onMounted, ref } from 'vue'
 
 import { GetInterfaces } from '@/bridge/app'
 
 import type { OptionItem } from '@/types/component'
 
-interface Props {
-  border?: boolean
-  multiple?: M
-}
-
 type ModelType = M extends true ? string[] : string
 
 const model = defineModel<ModelType>({ required: true })
 
-withDefaults(defineProps<Props>(), {
-  border: true,
-  multiple: false as any,
-})
+const {
+  border = true,
+  multiple,
+  ...restProps
+} = defineProps<Omit<SelectProps<string, M>, 'options'>>()
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   changed: [value: ModelType]
 }>()
 
 const options = ref<OptionItem[]>([])
 
 const onChange = (val: ModelType) => {
-  emits('changed', val)
+  emit('changed', val)
 }
 
 onMounted(async () => {
@@ -37,11 +34,11 @@ onMounted(async () => {
 
 <template>
   <Select
-    v-model="model"
-    v-bind="$attrs"
+    v-model="model as SelectValueType<string, M>"
+    v-bind="restProps"
     :options="options"
     :border="border"
     :multiple="multiple"
-    @changed="onChange"
+    @changed="onChange($event as ModelType)"
   />
 </template>

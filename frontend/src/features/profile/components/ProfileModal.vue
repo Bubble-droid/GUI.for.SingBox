@@ -36,11 +36,7 @@ interface Props {
   step?: number
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  id: '',
-  isUpdate: false,
-  step: ProfileStep.Name,
-})
+const { id = '', step = ProfileStep.Name } = defineProps<Props>()
 
 const { t } = useI18n()
 const certProviderRef = useTemplateRef('certProviderRef')
@@ -54,7 +50,7 @@ const dnsRef = useTemplateRef('dnsRef')
 const profilesStore = useProfilesStore()
 
 const loading = ref(false)
-const currentStep = ref(props.step)
+const currentStep = ref(step)
 
 const profile = ref<Profile>(profilesStore.getProfileTemplate())
 
@@ -123,8 +119,8 @@ const handleNextStep = () => currentStep.value++
 const handleSave = async () => {
   loading.value = true
   try {
-    if (props.id) {
-      await profilesStore.editProfile(props.id, profile.value)
+    if (id) {
+      await profilesStore.editProfile(id, profile.value)
     } else {
       await profilesStore.addProfile(profile.value)
     }
@@ -171,8 +167,8 @@ const handlePreview = async () => {
   }
 }
 
-if (props.id) {
-  const p = profilesStore.getProfileById(props.id)
+if (id) {
+  const p = profilesStore.getProfileById(id)
   if (p) {
     profile.value = deepClone(p)
   }
@@ -198,7 +194,7 @@ const modalSlots = {
             {
               class: 'p-4 flex flex-col',
             },
-            ProfileStepItems.map((step, index) =>
+            ProfileStepItems.map((item, index) =>
               h(
                 Button,
                 {
@@ -206,7 +202,7 @@ const modalSlots = {
                   disabled: !profile.value.name && currentStep.value !== index,
                   onClick: () => (currentStep.value = index),
                 },
-                () => t(step.title),
+                () => t(item.title),
               ),
             ),
           ),
@@ -354,7 +350,7 @@ defineExpose({ modalSlots })
         v-model="profile.route"
         :inbound-options="inboundOptions"
         :outbound-options="outboundOptions"
-        :server-options="dnsServerOptions"
+        :dns-server-options="dnsServerOptions"
       />
     </div>
     <div v-if="currentStep === ProfileStep.Dns">

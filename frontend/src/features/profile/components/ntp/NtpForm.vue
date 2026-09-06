@@ -13,9 +13,9 @@ interface Props {
   dnsServerOptions: OptionItem[]
 }
 
-defineProps<Props>()
-
 const model = defineModel<NtpSection>({ required: true })
+
+defineProps<Props>()
 
 const { t } = useI18n()
 

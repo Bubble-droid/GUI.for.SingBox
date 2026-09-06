@@ -22,9 +22,10 @@ interface Props {
   dnsServerOptions: OptionItem[]
 }
 
+const model = defineModel<InboundTlsFormData>({ required: true })
+
 defineProps<Props>()
 
-const model = defineModel<InboundTlsFormData>({ required: true })
 const { t } = useI18n()
 
 const [showTls, toggleShow] = useBool(false)

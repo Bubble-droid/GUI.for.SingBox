@@ -21,8 +21,8 @@ interface Props {
   dnsServerOptions: OptionItem[]
 }
 
-defineProps<Props>()
 const model = defineModel<HttpClientItem[]>({ required: true })
+defineProps<Props>()
 const { t } = useI18n()
 const [showEditModal] = useBool(false)
 
@@ -34,8 +34,6 @@ const handleAdd = () => {
   fields.value = createHttpClient()
   showEditModal.value = true
 }
-
-defineExpose({ handleAdd })
 
 const handleEdit = (index: number) => {
   editIndex = index
@@ -54,6 +52,8 @@ const handleAddEnd = () => {
     model.value[editIndex] = fields.value
   }
 }
+
+defineExpose({ handleAdd })
 </script>
 
 <template>

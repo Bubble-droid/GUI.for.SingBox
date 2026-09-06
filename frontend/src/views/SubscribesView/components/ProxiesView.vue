@@ -21,16 +21,16 @@ interface Props {
   sub: App.Subscription
 }
 
-const props = defineProps<Props>()
+const { sub } = defineProps<Props>()
 
 const loading = ref(false)
 const keywords = ref('')
 const proxyType = ref('')
 const allFieldsProxies = ref<any[]>([])
-const sub = ref(deepClone(props.sub))
+const subRef = ref(deepClone(sub))
 
 const filteredProxyTypeOptions = computed(() => {
-  const proxyProtocols = sub.value.proxies.reduce((p, c) => {
+  const proxyProtocols = subRef.value.proxies.reduce((p, c) => {
     p[c.type] = (p[c.type] || 0) + 1
     return p
   }, {} as Recordable)
@@ -44,7 +44,7 @@ const filteredProxyTypeOptions = computed(() => {
 })
 
 const filteredProxies = computed(() => {
-  return sub.value.proxies.filter((v) => {
+  return subRef.value.proxies.filter((v) => {
     const hitType = proxyType.value ? proxyType.value === v.type : true
     const hitName = buildSmartRegExp(keywords.value, 'i').test(v.tag)
     return hitName && hitType
@@ -120,9 +120,9 @@ const menus: App.Menu[] = [
   {
     label: 'common.delete',
     handler: (record: Record<string, any>) => {
-      const idx = sub.value.proxies.findIndex((v) => v.tag === record['tag'])
+      const idx = subRef.value.proxies.findIndex((v) => v.tag === record['tag'])
       if (idx !== -1) {
-        sub.value.proxies.splice(idx, 1)
+        subRef.value.proxies.splice(idx, 1)
       }
     },
   },
@@ -137,14 +137,14 @@ const handleSubmit = inject('submit') as any
 const handleSave = async () => {
   loading.value = true
   try {
-    const { path, proxies, id } = sub.value
+    const { path, proxies, id } = subRef.value
     await initAllFieldsProxies()
     const matched = allFieldsProxies.value.filter((v: any) =>
       proxies.some((vv) => vv.tag === v.tag),
     )
     const sortedArray = proxies.map((v) => matched.find((vv) => vv.tag === v.tag))
     await WriteFile(path, JSON.stringify(sortedArray, null, 2))
-    await subscribeStore.editSubscribe(id, sub.value)
+    await subscribeStore.editSubscribe(id, subRef.value)
     handleSubmit()
   } catch (error: any) {
     console.log(error)
@@ -191,17 +191,17 @@ const onEditEnd = async (id: string, text: string): Promise<boolean | void> => {
   await initAllFieldsProxies()
 
   const allFieldsProxiesIdx = allFieldsProxies.value.findIndex((v: any) => v.tag === id)
-  const subProxiesIdx = sub.value.proxies.findIndex((v) => v.tag === id)
+  const subProxiesIdx = subRef.value.proxies.findIndex((v) => v.tag === id)
 
   if (allFieldsProxiesIdx !== -1 && subProxiesIdx !== -1) {
     allFieldsProxies.value.splice(allFieldsProxiesIdx, 1, proxy)
-    sub.value.proxies.splice(subProxiesIdx, 1, {
-      ...sub.value.proxies[subProxiesIdx]!,
+    subRef.value.proxies.splice(subProxiesIdx, 1, {
+      ...subRef.value.proxies[subProxiesIdx]!,
       tag: proxy.tag,
     })
   } else {
     allFieldsProxies.value.push(proxy)
-    sub.value.proxies.push({
+    subRef.value.proxies.push({
       id: sampleID(),
       tag: proxy.tag,
       type: proxy.type,
@@ -213,7 +213,7 @@ const initAllFieldsProxies = async () => {
   if (allFieldsProxies.value.length) {
     return
   }
-  const content = (await ignoredError(ReadFile, sub.value!.path)) || '[]'
+  const content = (await ignoredError(ReadFile, subRef.value!.path)) || '[]'
   allFieldsProxies.value = JSON.parse(content)
 }
 

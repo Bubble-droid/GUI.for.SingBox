@@ -6,53 +6,56 @@ import { ClipboardGetText } from '@wails/runtime/runtime'
 import useI18n from '@/lang'
 import { debounce } from '@/utils/others'
 
-import type { InputProps, InputType, InputModelValue } from './types'
+import type { InputModelValue, InputProps, InputType } from './types'
 
 type ValueType = InputModelValue<T>
 
-const props = withDefaults(defineProps<InputProps<T>>(), {
-  modelValue: '' as any,
-  modelModifiers: () => ({}),
-  autoSize: false,
-  placeholder: undefined,
-  type: 'text' as any,
-  lang: 'javascript',
-  size: 'default',
-  editable: false,
-  autofocus: false,
-  allowPaste: false,
-  min: undefined,
-  max: undefined,
-  maxWidth: true,
-  clearable: false,
-  disabled: false,
-  border: true,
-  delay: 0,
+const [modelValue, modifiers] = defineModel<ValueType, 'lazy' | 'trim'>({
+  required: true,
+  set(val) {
+    if (typeof val === 'string' && modifiers.trim) {
+      return val.trim()
+    }
+    return val
+  },
 })
 
-const emits = defineEmits<{
-  'update:modelValue': [value: ValueType]
-  change: [value: ValueType]
+const {
+  type = 'text',
+  lang = 'javascript',
+  size = 'default',
+  editable,
+  autofocus,
+  allowPaste,
+  min,
+  max,
+  maxWidth = true,
+  clearable,
+  disabled,
+  border = true,
+  delay = 0,
+} = defineProps<InputProps<T>>()
+
+const emit = defineEmits<{
+  changed: [value: ValueType]
   confirm: [value: ValueType]
 }>()
 
 const showEdit = ref(false)
 const isComposing = ref(false)
 const inputRef = useTemplateRef('inputRef')
-const innerClearable = computed(
-  () => props.clearable && props.type !== 'code' && props.modelValue && !props.disabled,
-)
-const innerAllowPaste = computed(() => props.allowPaste && props.type !== 'code' && !props.disabled)
+
+const innerClearable = computed(() => clearable && type !== 'code' && modelValue.value && !disabled)
+const innerAllowPaste = computed(() => allowPaste && type !== 'code' && !disabled)
 
 const { t } = useI18n.global
 
 const validate = (val: string | number): ValueType => {
-  if (props.type === 'number') {
+  if (type === 'number') {
     let num = Number(val)
     if (Number.isNaN(num)) {
       throw new TypeError('Please enter a valid number')
     }
-    const { min, max } = props
     if (min !== undefined) {
       num = num < min ? min : num
     }
@@ -64,21 +67,26 @@ const validate = (val: string | number): ValueType => {
   return String(val) as ValueType
 }
 
-const emitInput = debounce((e: any) => {
-  let val = validate(e.target.value)
-  if (typeof val === 'string' && props.modelModifiers?.trim) {
-    val = val.trim() as ValueType
-  }
-  e.target.value = val
-  emits('update:modelValue', val)
-  emits('change', val)
-}, props.delay)
+type InputPayload =
+  | InputEvent
+  | {
+      target: { value: string | number }
+    }
 
-const onInput = (e: any) => {
-  if (isComposing.value || e.isComposing) {
+const emitInput = debounce((e: InputPayload) => {
+  if (!e.target || !('value' in e.target)) {
     return
   }
-  if (props.modelModifiers?.lazy) {
+  modelValue.value = validate(e.target.value)
+  e.target.value = modelValue.value
+  emit('changed', modelValue.value)
+}, delay)
+
+const onInput = (e: InputPayload) => {
+  if (isComposing.value || ('isComposing' in e && e.isComposing)) {
+    return
+  }
+  if (modifiers.lazy) {
     return
   }
   emitInput(e)
@@ -103,10 +111,10 @@ const onKeydownEnter = async (e: KeyboardEvent) => {
 }
 
 const handleClear = async () => {
-  const val = (props.type === 'number' ? Math.min(props.min || 0, 0) : '') as ValueType
-  emits('update:modelValue', val)
-  emits('change', val)
-  if (!props.editable) {
+  const val = (type === 'number' ? Math.min(min || 0, 0) : '') as ValueType
+  modelValue.value = val
+  emit('changed', modelValue.value)
+  if (!editable) {
     await nextTick()
     inputRef.value?.focus()
   }
@@ -114,13 +122,12 @@ const handleClear = async () => {
 
 const handlePaste = async () => {
   const text = await ClipboardGetText()
-  const val = validate(text)
-  emits('update:modelValue', val)
-  emits('change', val)
+  modelValue.value = validate(text)
+  emit('changed', modelValue.value)
 }
 
 const showInput = async () => {
-  if (props.disabled) {
+  if (disabled) {
     return
   }
   showEdit.value = true
@@ -128,21 +135,28 @@ const showInput = async () => {
   inputRef.value?.focus()
 }
 
-const onSubmit = (e: any) => {
-  let val = validate(e.target.value)
-  if (typeof val === 'string' && props.modelModifiers?.trim) {
-    val = val.trim() as ValueType
-    e.target.value = val
+const onSubmit = (e: FocusEvent) => {
+  emitInput.cancel()
+
+  const target = e.target as HTMLInputElement
+  const val = validate(target.value)
+
+  const hasChanged = modelValue.value !== val
+  modelValue.value = val
+
+  if (hasChanged || modifiers.lazy) {
+    emit('changed', modelValue.value)
   }
-  if (props.modelModifiers?.lazy) {
-    emits('update:modelValue', val)
-    emits('change', val)
+
+  target.value = String(modelValue.value ?? '')
+
+  emit('confirm', modelValue.value)
+  if (editable) {
+    showEdit.value = false
   }
-  emits('confirm', val)
-  props.editable && (showEdit.value = false)
 }
 
-onMounted(() => props.autofocus && !props.editable && inputRef.value?.focus())
+onMounted(() => autofocus && !editable && inputRef.value?.focus())
 
 defineExpose({
   focus: () => inputRef.value?.focus(),

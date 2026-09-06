@@ -10,7 +10,8 @@ interface Props {
 }
 
 const model = defineModel<boolean>({ default: false })
-const props = defineProps<Props>()
+
+const { position } = defineProps<Props>()
 
 const secondaryMenu = ref<App.Menu[] | undefined>()
 
@@ -46,7 +47,7 @@ const fixMenuPos = (x: number, y: number) => {
 }
 
 const fixSecondaryMenuPos = () => {
-  const { x, y } = props.position
+  const { x, y } = position
   const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.value!
 
   let left = menuWidth
@@ -66,7 +67,7 @@ const fixSecondaryMenuPos = () => {
 }
 
 watch(
-  () => props.position,
+  () => position,
   async ({ x, y }) => {
     await nextTick()
     fixMenuPos(x, y)
@@ -74,7 +75,7 @@ watch(
   },
 )
 
-watch([() => secondaryMenu.value, () => props.position], async () => {
+watch([() => secondaryMenu.value, () => position], async () => {
   await nextTick()
   fixSecondaryMenuPos()
 })
