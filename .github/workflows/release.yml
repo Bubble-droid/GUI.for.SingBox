@@ -240,7 +240,6 @@ jobs:
     runs-on: ${{ matrix.runner }}
     permissions: *read_perms
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PACKAGER: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
       ARCH: ${{ matrix.arch }}
       APP_VERSION: ${{ needs.calculate_version.outputs.version }}

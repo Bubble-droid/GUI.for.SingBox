@@ -36,13 +36,11 @@ CORES_DIR := package/cores
 TMP_DIR := package/tmp
 PKGS_DIR := package/dist
 
-_STABLE_VER_RAW = $(shell gh release list --repo SagerNet/sing-box --exclude-pre-releases --json tagName,isLatest --jq '.[] | select(.isLatest == true) | .tagName' 2>/dev/null | head -n 1 | sed 's/^v//')
-STABLE_VER = $(eval STABLE_VER := $(or $(_STABLE_VER_RAW),1.13.0))$(STABLE_VER)
 
-_ALPHA_VER_RAW = $(shell gh release list --repo SagerNet/sing-box --json tagName,isPrerelease --jq '.[] | select(.isPrerelease == true) | .tagName' 2>/dev/null | head -n 1 | sed 's/^v//')
-ALPHA_VER = $(eval ALPHA_VER := $(or $(_ALPHA_VER_RAW),1.14.0-beta.1))$(ALPHA_VER)
+STABLE_VER := 1.14.0
+ALPHA_VER := 1.15.0-alpha.1
 
-BUNDLE_SUFFIX = _with_sing-box_v$(STABLE_VER)_alpha_v$(ALPHA_VER)
+BUNDLE_SUFFIX := _with_sing-box_v$(STABLE_VER)_alpha_v$(ALPHA_VER)
 
 ARCHIVE_VERSION = $(patsubst v%,%,$(APP_VERSION))
 PKG_VERSION = $(subst -,~,$(ARCHIVE_VERSION))
