@@ -21,7 +21,12 @@ import { Branch, OS } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { useEnvStore } from '@/stores/env'
 import { useKernelApiStore } from '@/stores/kernelApi'
-import { getKernelFileName, getKernelAssetFileName, GrantTUNPermission } from '@/utils/helper'
+import {
+  getKernelFileName,
+  getKernelAssetFileName,
+  GrantTUNPermission,
+  PreserveCorePermissions,
+} from '@/utils/helper'
 import { confirm, message } from '@/utils/interaction'
 import { getGitHubApiAuthorization, ignoredError, debounce } from '@/utils/others'
 
@@ -149,6 +154,7 @@ export const useCoreBranch = (isAlpha = false) => {
 
       if (!CoreFilePath.endsWith('.exe')) {
         await ignoredError(Exec, 'chmod', ['+x', await AbsolutePath(CoreFilePath)])
+        await PreserveCorePermissions(CoreBakFilePath, CoreFilePath)
       }
 
       void refreshLocalVersion()
