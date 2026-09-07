@@ -17,17 +17,17 @@ GUI.for.SingBox — a desktop GUI client for [sing-box](https://sing-box.sagerne
   - `frontend/src/views/` — top-level pages (`HomeView`, `ProfilesView`, `SettingsView`, …).
   - `frontend/src/features/views/` — config sub-views (`DnsConfig.vue`, `OutboundsConfig.vue`, …), aliased as `@views/*`.
   - `frontend/src/features/transformers/` — `generator` (config → sing-box JSON) and `restorer` (config → UI).
-- `Makefile` — the real entrypoint for dev/build/packaging; `wails.json` and `wails build` alone are not enough.
+- `task.sh`, `constants.sh` — the real entrypoint script and string constants configuration for dev/build/packaging; `wails.json` and `wails build` alone are not enough.
 
 ## Commands
 
 Run everything from the repo root.
 
 ```bash
-make dev          # dev mode, non-XDG paths (uses -tags non_xdg, VITE_APP_VERSION=dev)
-make dev-xdg      # dev mode with XDG data dirs and real version
-make build-frontend  # pnpm install + vite build into frontend/dist
-make build-linux     # needs frontend/dist first; cross builds use build-frontend upstream
+./task.sh dev             # dev mode, non-XDG paths (uses -tags non_xdg, VITE_APP_VERSION=dev)
+./task.sh dev-xdg         # dev mode with XDG data dirs and real version
+./task.sh build-frontend  # pnpm install + vite build into frontend/dist
+./task.sh build-linux     # needs frontend/dist first; cross builds use build-frontend upstream
 ```
 
 Frontend-only checks (all in `frontend/`):
@@ -39,20 +39,20 @@ pnpm --dir frontend lint            # oxlint + eslint, both auto-fix
 pnpm --dir frontend format          # oxfmt
 ```
 
-There are no test suites (no Go `_test.go`, no vitest). Verification is `type-check` + `lint` for frontend, `go build ./...` / `make build-<os>` for Go.
+There are no test suites (no Go `_test.go`, no vitest). Verification is `type-check` + `lint` for frontend, `go build ./...` / `./task.sh build-<os>` for Go.
 
 ## Gotchas
 
 - **Order matters**: `main.go` embeds `frontend/dist`, and `frontend/dist` is gitignored — the frontend must be built before any `wails build`. CI builds frontend as a separate job and downloads the artifact.
-- **Generated bindings**: `frontend/src/bridge/wailsjs/` is committed and must not be hand-edited (oxlint ignores it). `wails build` runs with `-skipbindings`, so if you add/change Go methods on `App`, regenerate with `wails dev` or `wails generate module`. `wails.json` sets `wailsjsdir: frontend/src/bridge`.
-- **Version injection**: `bridge.AppVersion`, `bridge.SingBoxVersion`, `bridge.SingBoxAlphaVersion` are vars set via `-ldflags "-X 'guiforcores/bridge.AppVersion=...'"`. `AppVersion == "dev"` flips the app into dev mode. Running the frontend alone won't reflect these.
+- **Generated bindings**: `frontend/src/bridge/wailsjs/` is committed and must not be hand-edited (oxlint ignores it). `wails build` runs with `-skipbindings`, so if you add/change Go methods on `App`, regenerate with `./task.sh dev` or `wails generate module`. `wails.json` sets `wailsjsdir: frontend/src/bridge`.
+- **Version injection**: `bridge.AppVersion`, `bridge.SingBoxVersion`, `bridge.SingBoxAlphaVersion` are vars set via `-ldflags "-X 'guiforcores/config.appVersion=...'"` (and corresponding config flags). `AppVersion == "dev"` flips the app into dev mode. Running the frontend alone won't reflect these.
 - **TS path aliases** (from `tsconfig.app.json`): `@/`, `@profile/*`, `@features/*`, `@wails/*` (→ `src/bridge/wailsjs/*`). Vite uses `tsconfigPaths: true` so they work at build time too.
 - **Strict TS**: `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, and `noPropertyAccessFromIndexSignature` are on — expect `.at()`/optional chaining and explicit property access.
 - **No barrel files**: oxlint enforces `oxc/no-barrel-file` (threshold 1) and `import/no-cycle`; recent refactors removed index re-export files. Import directly from the defining module.
 - **Formatting is oxfmt**, not Prettier (though prettier is a dep for eslint-config-prettier). `.editorconfig` + `oxfmt` define style; lint-staged runs oxlint + eslint + oxfmt on commit.
-- **Linux**: builds/tests need `libgtk-3-dev libwebkit2gtk-4.1-dev` and the `webkit2_41` build tag (handled by `make`).
-- **macOS**: `make` runs `patch-macos` first (go mod vendor + sed-patches Wails' `AppDelegate.m` to set `ActivationPolicyAccessory`) and builds with `-mod=vendor`.
-- **sing-box cores are not in this repo**: `package/cores/` is gitignored. `make fetch-cores` downloads `sing-box`/`sing-box-alpha` from SagerNet/sing-box releases for the "full" packages; vanilla packages expect a system-installed core. `bridge.SingBoxVersion` is baked in at build time.
+- **Linux**: builds/tests need `libgtk-3-dev libwebkit2gtk-4.1-dev` and the `webkit2_41` build tag (handled by `task.sh`).
+- **macOS**: `task.sh` runs `patch-macos` first (go mod vendor + sed-patches Wails' `AppDelegate.m` to set `ActivationPolicyAccessory`) and builds with `-mod=vendor`.
+- **sing-box cores are not in this repo**: `package/cores/` is gitignored. `./task.sh fetch-cores` downloads `sing-box`/`sing-box-alpha` from SagerNet/sing-box releases for the "full" packages; vanilla packages expect a system-installed core. `bridge.SingBoxVersion` is baked in at build time.
 - **Packaging uses a nfpm fork**: install via `go install` from `https://github.com/Bubble-droid/nfpm` (`feat/arch` branch) for pacman support.
 - A `replace` directive in `go.mod` swaps `github.com/energye/systray` for the GUI-for-Cores fork.
 

@@ -162,7 +162,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
       - name: Build Frontend Dist
-        run: make build-frontend
+        run: ./task.sh build-frontend
       - name: Upload Frontend Dist
         uses: &action_upload actions/upload-artifact@v7
         with:
@@ -201,7 +201,7 @@ jobs:
           path: frontend/dist
 
       - name: Build Windows Binary
-        run: make build-windows
+        run: ./task.sh build-windows
 
       - name: Upload Windows Binary
         uses: *action_upload
@@ -225,7 +225,7 @@ jobs:
       - *download_frontend_dist
 
       - name: Build MacOS Binary
-        run: make build-macos
+        run: ./task.sh build-macos
 
       - name: Upload MacOS Binary
         uses: *action_upload
@@ -263,16 +263,16 @@ jobs:
           go install ./cmd/nfpm
 
       - name: Build Linux Binary
-        run: make build-linux
+        run: ./task.sh build-linux
 
       - name: Package DEB
-        run: make package-deb-all
+        run: ./task.sh package-deb-all
 
       - name: Package RPM
-        run: make package-rpm-all
+        run: ./task.sh package-rpm-all
 
       - name: Package Pacman
-        run: make package-pacman-all
+        run: ./task.sh package-pacman-all
 
       - name: Prepare Artifacts
         run: |
