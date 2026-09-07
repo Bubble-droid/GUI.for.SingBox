@@ -1,0 +1,65 @@
+name: Auto Alpha Release Trigger
+
+on:
+  schedule:
+    - cron: '23 18 * * 5'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  check_and_tag:
+    name: Check Dev & Auto Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout dev branch
+        uses: actions/checkout@v7
+        with:
+          ref: dev
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Check Commits & Bump Alpha Tag
+        run: |
+          set -e
+          git fetch --tags --prune
+
+          LATEST_TAG=$(git -c 'versionsort.suffix=-' tag --merged origin/dev --sort=-v:refname | head -n 1)
+          echo "Current highest tag on dev is: $LATEST_TAG"
+
+          if [[ ! "$LATEST_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-alpha\.([0-9]+)$ ]]; then
+            echo "Latest tag ($LATEST_TAG) is not an active alpha tag. Skipping auto release."
+            exit 0
+          fi
+
+          CURRENT_ALPHA_NUM="${BASH_REMATCH[1]}"
+          TAG_PREFIX="${LATEST_TAG%-alpha.*}"
+
+          NEW_COMMITS=$(git rev-list "${LATEST_TAG}..origin/dev" --count)
+          echo "Found $NEW_COMMITS new commit(s) on dev since $LATEST_TAG"
+
+          if [[ "$NEW_COMMITS" -eq 0 ]]; then
+            echo "No new commits found. Nothing to release."
+            exit 0
+          fi
+
+          NEXT_ALPHA_NUM=$((CURRENT_ALPHA_NUM + 1))
+          NEXT_TAG="${TAG_PREFIX}-alpha.${NEXT_ALPHA_NUM}"
+          echo "Auto-bumping: $LATEST_TAG -> $NEXT_TAG"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "$NEXT_TAG" origin/dev -m "chore(release): auto bump $NEXT_TAG"
+
+          git push origin "$NEXT_TAG"
+          echo "Successfully pushed tag $NEXT_TAG! Build workflow will be triggered."
