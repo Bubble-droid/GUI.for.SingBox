@@ -1,3 +1,4 @@
+// oxlint-disable no-sequences
 import {
   ProfileSchemaVersion,
   createCert,

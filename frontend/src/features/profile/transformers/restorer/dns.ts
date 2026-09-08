@@ -1,3 +1,4 @@
+// oxlint-disable no-sequences
 import { DnsActionKind, DnsRuleType, DnsServerType } from '@profile/constant/kernel'
 import { createDnsServer, createDnsRule } from '@profile/defaults/dns'
 import type { DnsRuleItem, DnsServerItem } from '@profile/types/profiles/dns'

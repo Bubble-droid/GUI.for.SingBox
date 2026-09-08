@@ -185,7 +185,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
       await saveRulesets()
     }
 
-    eventBus.emit('rulesetsChange', undefined)
+    eventBus.emit('rulesetsChange', null)
 
     return result.flatMap((v) => (v.ok && v.value) || [])
   }

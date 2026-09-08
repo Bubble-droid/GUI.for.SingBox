@@ -23,7 +23,7 @@ export class Request {
   public responseType: string
   public beforeRequest: () => void
 
-  constructor(options: RequestOptions = {}) {
+  public constructor(options: RequestOptions = {}) {
     this.base = options.base ?? ''
     this.bearer = options.bearer ?? ''
     this.timeout = options.timeout ?? 10_000

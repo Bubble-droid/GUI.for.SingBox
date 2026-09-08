@@ -238,12 +238,12 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     },
     systemProxyBypass() {
       if (envStore.systemProxy) {
-        envStore.setSystemProxy().catch((err) => message.error(err))
+        envStore.setSystemProxy().catch((err: unknown) => message.error(err))
       }
     },
     systemDNS() {
       if (app.value.autoSetSystemDNS) {
-        envStore.setSystemDNS(envStore.systemDNSSet).catch((err) => message.error(err))
+        envStore.setSystemDNS(envStore.systemDNSSet).catch((err: unknown) => message.error(err))
       }
     },
   }

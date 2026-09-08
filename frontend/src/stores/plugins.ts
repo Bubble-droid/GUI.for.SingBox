@@ -242,7 +242,7 @@ export const usePluginsStore = defineStore('plugins', () => {
       return cache.module.modulePromise
     }
     if (cache.code === undefined) {
-      cache.code = await ReadFile(cache.plugin.path).catch((error) => {
+      cache.code = await ReadFile(cache.plugin.path).catch((error: unknown) => {
         if (cache.plugin.type === 'File') {
           return ''
         }
@@ -296,7 +296,7 @@ export const usePluginsStore = defineStore('plugins', () => {
         delete globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__?.[id]
         return module
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         delete globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__?.[id]
         resetPluginModuleCache(id)
         throw error
@@ -511,9 +511,7 @@ export const usePluginsStore = defineStore('plugins', () => {
     releasePluginRuntimeCache(id)
 
     if (plugin.path.startsWith('data')) {
-      await RemoveFile(plugin.path).catch((_) => {
-        /* empty */
-      })
+      await RemoveFile(plugin.path).catch(() => {})
     }
     if (appSettingsStore.app.pluginSettings[plugin.id]) {
       if (await confirm('Tips', 'plugins.removeConfiguration').catch(() => 0)) {

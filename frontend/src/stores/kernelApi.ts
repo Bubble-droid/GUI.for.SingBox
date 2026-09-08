@@ -355,10 +355,10 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     await Promise.all([refreshConfig(), refreshProviderProxies()])
 
     if (appSettingsStore.app.autoSetSystemProxy) {
-      await envStore.setSystemProxy().catch((error) => message.error(error))
+      await envStore.setSystemProxy().catch((error: unknown) => message.error(error))
     }
     if (appSettingsStore.app.autoSetSystemDNS) {
-      await envStore.setSystemDNS(true).catch((error) => message.error(error))
+      await envStore.setSystemDNS(true).catch((error: unknown) => message.error(error))
     }
     await envStore.updateSystemProxyStatus()
 
@@ -381,7 +381,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       await envStore.clearSystemProxy()
     }
     if (appSettingsStore.app.autoSetSystemDNS || envStore.systemDNSSet) {
-      await envStore.setSystemDNS(false).catch((error) => message.error(error))
+      await envStore.setSystemDNS(false).catch((error: unknown) => message.error(error))
     }
 
     resetConfig()

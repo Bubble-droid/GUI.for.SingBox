@@ -1,3 +1,4 @@
+// oxlint-disable no-sequences
 import { RouteActionKind, RouteRuleType, RuleSetType } from '@profile/constant/kernel'
 import { createRouteRuleset, createRouteRule } from '@profile/defaults/route'
 import type { RouteRuleItem, RuleSetItem } from '@profile/types/profiles/route'

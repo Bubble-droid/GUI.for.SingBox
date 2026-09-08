@@ -15,7 +15,7 @@ export class WebSockets {
   public bearer: string
   public beforeConnect: () => void
 
-  constructor(options: WebSocketsOptions) {
+  public constructor(options: WebSocketsOptions) {
     this.base = options.base ?? ''
     this.bearer = options.bearer ?? ''
     this.beforeConnect = options.beforeConnect ?? (() => 0)

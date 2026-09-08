@@ -32,6 +32,7 @@ export default withVueTs(
       '@typescript-eslint/prefer-nullish-coalescing': 'off',
       '@typescript-eslint/no-misused-promises': 'off',
       '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': ['off'],
       'vue/no-v-html': ['off'],
       'vue/multi-word-component-names': [
@@ -47,6 +48,8 @@ export default withVueTs(
           defineExposeLast: true,
         },
       ],
+      'vue/component-api-style': ['error', ['script-setup', 'composition']],
+      'vue/no-duplicate-class-names': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-import-type-side-effects': 'error',
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],

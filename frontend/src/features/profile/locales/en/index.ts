@@ -1,4 +1,5 @@
-import type { MessageSchema } from '../types'
+import type { MessageSchema } from '@profile/locales/types'
+
 import certificate_providers from './cert-provider'
 import certificate from './certificate'
 import dns from './dns'

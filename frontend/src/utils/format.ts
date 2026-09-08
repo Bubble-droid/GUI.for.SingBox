@@ -9,7 +9,7 @@ export const formatBytes = (bytes: number, decimals = 1): string => {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
   const i = Math.max(0, Math.floor(Math.log(bytes) / Math.log(k)))
-  const formattedValue = parseFloat((bytes / k ** i).toFixed(decimals))
+  const formattedValue = Number.parseFloat((bytes / k ** i).toFixed(decimals))
 
   return `${formattedValue} ${sizes[i]}`
 }

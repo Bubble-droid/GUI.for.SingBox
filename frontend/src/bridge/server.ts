@@ -67,47 +67,45 @@ export const StartServer = async (
     throw new Error(data)
   }
 
-  EventsOn(id, (...args) => {
-    void (async () => {
-      const [requestId, method, url, headers, body] = args as [
-        Request['id'],
-        Request['method'],
-        Request['url'],
-        Recordable<string[]>,
-        Request['body'],
-      ]
-      try {
-        await handler(
-          {
-            id: requestId,
-            method,
-            url,
-            headers: Object.fromEntries(Object.entries(headers).map(([k, v]) => [k, v[0] ?? ''])),
-            body,
+  EventsOn(id, async (...args) => {
+    const [requestId, method, url, headers, body] = args as [
+      Request['id'],
+      Request['method'],
+      Request['url'],
+      Recordable<string[]>,
+      Request['body'],
+    ]
+    try {
+      await handler(
+        {
+          id: requestId,
+          method,
+          url,
+          headers: Object.fromEntries(Object.entries(headers).map(([k, v]) => [k, v[0] ?? ''])),
+          body,
+        },
+        {
+          end: (status, resHeaders, resBody, resOptions) => {
+            EventsEmit(
+              requestId,
+              status,
+              JSON.stringify(resHeaders),
+              resBody,
+              JSON.stringify(resOptions),
+            )
           },
-          {
-            end: (status, resHeaders, resBody, resOptions) => {
-              EventsEmit(
-                requestId,
-                status,
-                JSON.stringify(resHeaders),
-                resBody,
-                JSON.stringify(resOptions),
-              )
-            },
-          },
-        )
-      } catch (error: any) {
-        console.log('Server handler err:', error, requestId)
-        EventsEmit(
-          requestId,
-          500,
-          JSON.stringify({ 'Content-Type': 'text/plain; charset=utf-8' }),
-          normalizeErrorMessage(error),
-          JSON.stringify({ Mode: 'Text' }),
-        )
-      }
-    })()
+        },
+      )
+    } catch (error: any) {
+      console.log('Server handler err:', error, requestId)
+      EventsEmit(
+        requestId,
+        500,
+        JSON.stringify({ 'Content-Type': 'text/plain; charset=utf-8' }),
+        normalizeErrorMessage(error),
+        JSON.stringify({ Mode: 'Text' }),
+      )
+    }
   })
   return { close: () => StopServer(id) }
 }

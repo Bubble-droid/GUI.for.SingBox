@@ -1,4 +1,4 @@
-import type { MessageSchema } from '../types'
+import type { MessageSchema } from '@profile/locales/types'
 
 export default {
   clash_api: {

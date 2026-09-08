@@ -1,6 +1,6 @@
 import kernel from '@profile/locales/en'
 
-import type { MessageSchema } from '../i18n'
+import type { MessageSchema } from '@/lang/i18n'
 
 export default {
   common: {

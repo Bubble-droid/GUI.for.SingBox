@@ -8,6 +8,8 @@
 
     "lib": ["ESNext", "DOM"],
 
+    "types": ["vite/client"],
+
     "paths": {
       "@profile/*": ["./src/features/profile/*"],
       "@features/*": ["./src/features/*"],

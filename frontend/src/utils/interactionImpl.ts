@@ -50,7 +50,7 @@ class MessageImpl implements Message {
   public container: HTMLElement
   public instances: Record<string, MessageEntry>
 
-  constructor() {
+  public constructor() {
     const ID = `${APP_TITLE}-toast`
     this.container = document.querySelector(`#${ID}`) ?? document.createElement('div')
     this.container.id = ID

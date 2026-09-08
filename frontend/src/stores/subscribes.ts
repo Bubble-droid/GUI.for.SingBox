@@ -142,7 +142,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       if (h['Subscription-Userinfo']) {
         ;(h['Subscription-Userinfo'] as string).split(/\s*;\s*/).forEach((part) => {
           const [key, value] = part.split('=') as [string, string]
-          userInfo[key] = parseInt(value) || 0
+          userInfo[key] = Number.parseInt(value) || 0
         })
       }
       body = b as string
@@ -276,7 +276,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       await saveSubscribes()
     }
 
-    eventBus.emit('subscriptionsChange', undefined)
+    eventBus.emit('subscriptionsChange', null)
 
     return result.flatMap((v) => (v.ok && v.value) || [])
   }

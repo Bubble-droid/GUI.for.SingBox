@@ -86,7 +86,8 @@ export const PreserveCorePermissions = async (source: string, target: string) =>
   }
   // macOS can reject port reuse while root-owned sockets are in TIME_WAIT if the
   // replacement core loses setuid and starts as the current user instead.
-  if (owner === '0' && (parseInt(mode, 8) & 0o4000) !== 0) {
+  // oxlint-disable-next-line no-bitwise
+  if (owner === '0' && (Number.parseInt(mode, 8) & 0o4000) !== 0) {
     await GrantTUNPermission(target).catch(() => {})
   }
 }

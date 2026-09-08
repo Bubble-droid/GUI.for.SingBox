@@ -6,7 +6,7 @@ import type * as App from '@/types/app'
 
 import { APP_ID, APP_TITLE, APP_VERSION } from './env'
 import { isValidIPv4, isValidIPv6 } from './is'
-import { normalizeBase64 } from './normalize'
+import { normalizeBase64, normalizeErrorMessage } from './normalize'
 
 export const deepClone = <T>(json: T): T => JSON.parse(JSON.stringify(json))
 
@@ -160,7 +160,10 @@ const runPool = async <T, K>(
     const promise = Promise.resolve()
       .then(() => iteratorFn(item, array))
       .then<{ ok: true; value: K }>((value) => ({ ok: true, value }))
-      .catch<{ ok: false; error: Error }>((error) => ({ ok: false, error }))
+      .catch<{ ok: false; error: Error }>((error: unknown) => ({
+        ok: false,
+        error: error instanceof Error ? error : new Error(normalizeErrorMessage(error)),
+      }))
 
     results.push(promise)
 

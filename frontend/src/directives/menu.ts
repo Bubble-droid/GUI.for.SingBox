@@ -10,19 +10,17 @@ const menuHandlers = new WeakMap<HTMLElement, (e: MouseEvent) => void>()
 const updateMenus = (el: HTMLElement, binding: DirectiveBinding<App.Menu[]>) => {
   const appStore = useAppStore()
 
-  const onContextMenu = (e: MouseEvent) => {
+  const onContextMenu = async (e: MouseEvent) => {
     e.preventDefault()
-    void (async () => {
-      if (binding.value.length > 0) {
-        appStore.menuPosition = { x: e.clientX, y: e.clientY }
-        appStore.menuList = binding.value
-        if (appStore.menuShow) {
-          appStore.menuShow = false
-          await sleep(200)
-        }
-        appStore.menuShow = true
+    if (binding.value.length > 0) {
+      appStore.menuPosition = { x: e.clientX, y: e.clientY }
+      appStore.menuList = binding.value
+      if (appStore.menuShow) {
+        appStore.menuShow = false
+        await sleep(200)
       }
-    })()
+      appStore.menuShow = true
+    }
   }
 
   const previous = menuHandlers.get(el)

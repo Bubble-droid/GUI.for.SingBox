@@ -8,12 +8,13 @@ import { OS } from '@/enums/app'
 import i18n from '@/lang'
 import { StoreDep, useStoreDeps } from '@/stores/deps'
 
-import type { Lang } from '@/enums/app'
+import type { Lang, PluginTriggerEvent } from '@/enums/app'
 import type * as App from '@/types/app'
 import type { Recordable } from '@/types/typescript'
 
 import { APP_TITLE, APP_VERSION } from './env'
 import { handleUseProxy, handleChangeMode, exitApp } from './helper'
+import { normalizeErrorMessage } from './normalize'
 import { debounce } from './others'
 
 const getTrayIcons = () => {
@@ -160,8 +161,8 @@ const getTrayMenus = () => {
             type: 'item',
             text,
             event: () => {
-              pluginsStore.manualTrigger(id, event as any).catch((err: any) => {
-                void Notify('Error', err.message || err)
+              pluginsStore.manualTrigger(id, event as PluginTriggerEvent).catch((err: unknown) => {
+                void Notify('Error', normalizeErrorMessage(err))
               })
             },
           }

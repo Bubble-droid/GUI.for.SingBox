@@ -1,9 +1,9 @@
 interface EventMap {
   profileChange: { id: string }
   subscriptionChange: { id: string }
-  subscriptionsChange: void
+  subscriptionsChange: null
   rulesetChange: { id: string }
-  rulesetsChange: void
+  rulesetsChange: null
 }
 
 class TypedEventBus<Events extends Record<string, any>> {
@@ -11,13 +11,13 @@ class TypedEventBus<Events extends Record<string, any>> {
     [K in keyof Events]?: ((data: Events[K]) => void)[]
   } = {}
 
-  on<K extends keyof Events>(event: K, handler: (data: Events[K]) => void) {
+  public on<K extends keyof Events>(event: K, handler: (data: Events[K]) => void) {
     const list = this.handlers[event] || []
     list.push(handler)
     this.handlers[event] = list
   }
 
-  off<K extends keyof Events>(event: K, handler: (data: Events[K]) => void) {
+  public off<K extends keyof Events>(event: K, handler: (data: Events[K]) => void) {
     const list = this.handlers[event]
     if (!list) {
       return
@@ -25,7 +25,7 @@ class TypedEventBus<Events extends Record<string, any>> {
     this.handlers[event] = list.filter((h) => h !== handler)
   }
 
-  emit<K extends keyof Events>(event: K, data: Events[K]) {
+  public emit<K extends keyof Events>(event: K, data: Events[K]) {
     const list = this.handlers[event]
     if (!list) {
       return
