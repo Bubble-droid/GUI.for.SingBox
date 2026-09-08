@@ -130,7 +130,6 @@ const unregisterMemoryHandler = kernelApiStore.onMemory((data) => {
   if (appSettings.app.kernel.realMemoryUsage) {
     getCoreMemoryUsage(statistics.value.memUsage || data.inuse).then((usage) => {
       statistics.value.memUsage = usage
-      return
     })
   }
 })

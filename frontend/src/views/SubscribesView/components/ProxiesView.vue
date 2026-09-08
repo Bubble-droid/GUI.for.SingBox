@@ -210,7 +210,7 @@ const onEditEnd = async (id: string, text: string): Promise<boolean | void> => {
 }
 
 const initAllFieldsProxies = async () => {
-  if (allFieldsProxies.value.length) {
+  if (allFieldsProxies.value.length > 0) {
     return
   }
   const content = (await ignoredError(ReadFile, subRef.value!.path)) || '[]'

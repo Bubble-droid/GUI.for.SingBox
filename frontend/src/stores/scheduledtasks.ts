@@ -36,7 +36,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
   const runScheduledTask = async (id: string) => {
     const task = getScheduledTaskById(id)
     if (!task) {
-      return undefined
+      return
     }
 
     const logsStore = useStoreDeps(StoreDep.LogsStore)
@@ -80,7 +80,7 @@ export const useScheduledTasksStore = defineStore('scheduledtasks', () => {
             output.push({ ok: true, result })
           }
         } catch (error: any) {
-          output.push({ ok: false, result: error.message || error })
+          output.push({ ok: false, result: error.message ?? error })
         }
       }
       return output

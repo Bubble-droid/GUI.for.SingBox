@@ -93,10 +93,10 @@ const generateMenus = (subscription: App.Subscription) => {
   }))
 
   const contextMenus = pluginsStore.plugins.filter(
-    (plugin) => Object.keys(plugin.context.subscriptions).length !== 0,
+    (plugin) => Object.keys(plugin.context.subscriptions).length > 0,
   )
 
-  if (contextMenus.length !== 0) {
+  if (contextMenus.length > 0) {
     builtInMenus.push(
       {
         label: '',

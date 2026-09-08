@@ -17,7 +17,7 @@ const testing = ref(false)
 const isCustomProxy = computed(() => appSettings.app.requestProxyMode === RequestProxyMode.Custom)
 const showProxyTest = computed(() => appSettings.app.requestProxyMode !== RequestProxyMode.None)
 
-const getCurrentProxy = async () => {
+const getCurrentProxy = () => {
   if (isCustomProxy.value) {
     return normalizeRequestProxy(appSettings.app.customProxy)
   }

@@ -222,8 +222,8 @@ export const getCommands = () => {
       label: 'tray.plugins',
       cmd: 'Plugins',
       children: pluginsStore.plugins.flatMap((plugin) => {
-        const hasTrigger = !!plugin.triggers.find((trigger) => trigger === PluginTrigger.OnManual)
-        const hasMenus = !!Object.keys(plugin.menus).length
+        const hasTrigger = plugin.triggers.some((trigger) => trigger === PluginTrigger.OnManual)
+        const hasMenus = Object.keys(plugin.menus).length > 0
         if (!hasTrigger && !hasMenus) {
           return []
         }
@@ -253,7 +253,7 @@ export const getCommands = () => {
                   plugin.running = true
                   await pluginsStore.manualTrigger(plugin.id, fnName as any)
                 } catch (error: any) {
-                  message.error(error.message || error)
+                  message.error(error.message ?? error)
                 } finally {
                   plugin.running = false
                 }

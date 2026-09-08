@@ -157,7 +157,7 @@ const handleOnRun = async (p: AppPlugin) => {
 const generateMenus = (p: AppPlugin) => {
   const builtInMenus: Menu[] = menuList.map((v) => ({ ...v, handler: () => v.handler?.(p.id) }))
 
-  if (p.configuration.length) {
+  if (p.configuration.length > 0) {
     builtInMenus.push({
       label: 'plugins.configuration',
       handler: () => {
@@ -167,7 +167,7 @@ const generateMenus = (p: AppPlugin) => {
     })
   }
 
-  if (Object.keys(p.menus).length !== 0) {
+  if (Object.keys(p.menus).length > 0) {
     builtInMenus.push({
       label: '',
       separator: true,

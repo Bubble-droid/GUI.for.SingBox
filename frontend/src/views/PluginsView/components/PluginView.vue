@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, inject, h } from 'vue'
+import { ref, inject, h, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { WriteFile, ReadFile } from '@/bridge/io'
@@ -90,12 +90,14 @@ const initPluginCode = async (p: AppPlugin) => {
   code.value = content
 }
 
-const p = pluginsStore.getPluginById(id)
-if (p) {
-  plugin.value = deepClone(p)
-  metadata.value = pluginsStore.getPluginMetadata(id)
-  initPluginCode(p)
-}
+onMounted(async () => {
+  const p = pluginsStore.getPluginById(id)
+  if (p) {
+    plugin.value = deepClone(p)
+    metadata.value = pluginsStore.getPluginMetadata(id)
+    await initPluginCode(p)
+  }
+})
 
 const modalSlots = {
   action: () => {

@@ -1,9 +1,10 @@
+// oxlint-disable typescript/no-unsafe-function-type
+// oxlint-disable typescript/no-unnecessary-type-parameters
+
 import * as Vue from 'vue'
 
 import { Plugins } from '@/assets/pluginApis'
 
-/* eslint-disable @typescript-eslint/no-unsafe-function-type */
-// oxlint-disable typescript/no-unnecessary-type-parameters
 interface AsyncFunctionConstructor {
   new <TArgs extends any[] = any[], TReturn = any>(
     ...args: string[]
@@ -39,6 +40,4 @@ globalThis.Plugins = Plugins
 
 globalThis.Vue = Vue
 
-globalThis.AsyncFunction = Object.getPrototypeOf(async () => {
-  /* Empty */
-}).constructor
+globalThis.AsyncFunction = Object.getPrototypeOf(async () => {}).constructor

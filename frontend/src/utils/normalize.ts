@@ -27,7 +27,7 @@ export const normalizeErrorMessage = (error: unknown) => {
 }
 
 export const normalizeBase64 = (str: string): string => {
-  const normalized = str.trim().replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/')
+  const normalized = str.trim().replaceAll(/\s+/g, '').replaceAll('-', '+').replaceAll('_', '/')
 
   const padding = (4 - (normalized.length % 4)) % 4
   return normalized + '='.repeat(padding)

@@ -241,14 +241,12 @@ export const usePluginsStore = defineStore('plugins', () => {
     if (cache.module) {
       return cache.module.modulePromise
     }
-    if (cache.code === undefined) {
-      cache.code = await ReadFile(cache.plugin.path).catch((error: unknown) => {
-        if (cache.plugin.type === 'File') {
-          return ''
-        }
-        throw error
-      })
-    }
+    cache.code ??= await ReadFile(cache.plugin.path).catch((error: unknown) => {
+      if (cache.plugin.type === 'File') {
+        return ''
+      }
+      throw error
+    })
 
     const events = new Set<PluginTriggerEvent>([
       PluginTriggerEvent.OnEnabled,
@@ -275,13 +273,16 @@ export const usePluginsStore = defineStore('plugins', () => {
     })
 
     const eventsStr = [...events].join('|')
-    globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__ ||= {}
+    globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__ ??= {}
     globalThis.__GUI_FOR_CORES_PLUGIN_CONTEXT__[id] = getPluginMetadata(id)
 
     const code = cache.code
-      .replace(new RegExp(`^const\\s+(${eventsStr})`, 'gm'), 'export const $1')
-      .replace(new RegExp(`^function\\s+(${eventsStr})`, 'gm'), 'export function $1')
-      .replace(new RegExp(`^async\\s+function\\s+(${eventsStr})`, 'gm'), 'export async function $1')
+      .replaceAll(new RegExp(`^const\\s+(${eventsStr})`, 'gm'), 'export const $1')
+      .replaceAll(new RegExp(`^function\\s+(${eventsStr})`, 'gm'), 'export function $1')
+      .replaceAll(
+        new RegExp(`^async\\s+function\\s+(${eventsStr})`, 'gm'),
+        'export async function $1',
+      )
 
     const sourceMapComment = createPluginSourceMapComment(cache.plugin, code, 1, 0)
     const source = [
@@ -337,10 +338,10 @@ export const usePluginsStore = defineStore('plugins', () => {
           `[${cache.plugin.name}] ${event} is defined in both default export and named export. Using default export.`,
         )
       }
-      const handler = defaultHandler || moduleHandler
+      const handler = defaultHandler ?? moduleHandler
       if (typeof handler !== 'function') {
         if (options?.allowUndefined) {
-          return undefined
+          return
         }
         throw new Error(`${event} is not defined`)
       }
@@ -385,7 +386,7 @@ export const usePluginsStore = defineStore('plugins', () => {
         return lastPlugin.data
       }
       const cache = PluginsCache[id]
-      const plugin = cache?.plugin || plugins.value.find((item) => item.id === id)
+      const plugin = cache?.plugin ?? plugins.value.find((item) => item.id === id)
       if (!plugin) {
         throw new Error(`Failed to getting plugin cache: ${id}`)
       }
@@ -528,7 +529,7 @@ export const usePluginsStore = defineStore('plugins', () => {
       return
     }
     const plugin = plugins.value[idx]!
-    const oldPlugin = deepClone(PluginsCache[id]?.plugin || plugin)
+    const oldPlugin = deepClone(PluginsCache[id]?.plugin ?? plugin)
     const shouldResetModule = shouldResetPluginModule(oldPlugin, newPlugin)
     const shouldEnable = oldPlugin.disabled && !newPlugin.disabled
     const shouldDisable = !oldPlugin.disabled && newPlugin.disabled
@@ -671,7 +672,7 @@ export const usePluginsStore = defineStore('plugins', () => {
         result.result = `Plugin [${plugin.name}] updated successfully.`
       } catch (error: any) {
         result.ok = false
-        result.result = `Failed to update plugin [${plugin.name}]. Reason: ${error.message || error}`
+        result.result = `Failed to update plugin [${plugin.name}]. Reason: ${error.message ?? error}`
       } finally {
         plugin.updating = false
       }
@@ -788,7 +789,7 @@ export const usePluginsStore = defineStore('plugins', () => {
           await updatePluginState(cache.plugin.id, cache.plugin)
         }
       } catch (error: any) {
-        const msg = error.message || error
+        const msg = error.message ?? error
         if (interruptOnError) {
           throw msg
         }

@@ -9,7 +9,7 @@ export const formatBytes = (bytes: number, decimals = 1): string => {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
   const i = Math.max(0, Math.floor(Math.log(bytes) / Math.log(k)))
-  const formattedValue = Number.parseFloat((bytes / k ** i).toFixed(decimals))
+  const formattedValue = Number((bytes / k ** i).toFixed(decimals))
 
   return `${formattedValue} ${sizes[i]}`
 }
@@ -61,7 +61,7 @@ export const formatDate = (timestamp: number | string, format: string) => {
     ss: String(date.getSeconds()).padStart(2, '0'),
   }
 
-  return format.replace(/YYYY|MM|DD|HH|mm|ss/g, (matched) => map[matched])
+  return format.replaceAll(/YYYY|MM|DD|HH|mm|ss/g, (matched) => map[matched])
 }
 
 export const formatProxyHost = (host: string) => {

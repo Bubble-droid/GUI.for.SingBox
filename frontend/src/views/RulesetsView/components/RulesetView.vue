@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, inject, h } from 'vue'
+import { ref, inject, h, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { WriteFile, ReadFile } from '@/bridge/io'
@@ -58,7 +58,9 @@ const initContent = async () => {
   }
 }
 
-initContent()
+onMounted(async () => {
+  await initContent()
+})
 
 const modalSlots = {
   cancel: () =>
@@ -80,7 +82,7 @@ const modalSlots = {
       },
       () => t('common.save'),
     ),
-}
+} as const
 
 defineExpose({ modalSlots })
 </script>

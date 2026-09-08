@@ -53,7 +53,7 @@ const groups = computed(() => {
       const all = (group.all || [])
         .filter((proxy) => {
           const history = proxies[proxy]?.history || []
-          const alive = (history[history.length - 1]?.delay ?? 0) > 0
+          const alive = (history.at(-1)?.delay ?? 0) > 0
           const condition1 =
             appSettings.app.kernel.unAvailable ||
             ['direct', 'block'].includes(proxy) ||
@@ -65,7 +65,7 @@ const groups = computed(() => {
         })
         .map((proxy) => {
           const history = proxies[proxy]?.history || []
-          const delay = history[history.length - 1]?.delay || 0
+          const delay = history.at(-1)?.delay || 0
           return { ...proxies[proxy]!, delay }
         })
         .toSorted((a, b) => {

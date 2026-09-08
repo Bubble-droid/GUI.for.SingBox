@@ -1,4 +1,6 @@
+<!-- eslint-disable vue/require-default-prop -->
 <script setup lang="ts">
+// oxlint-disable vue/require-default-prop
 import type { IconName } from '@/components/Icon/icons'
 
 interface Props {
@@ -11,13 +13,7 @@ interface Props {
   disabled?: boolean
 }
 
-const {
-  type = 'normal',
-  size = 'default',
-  iconSize = undefined,
-  iconColor = undefined,
-  icon = undefined,
-} = defineProps<Props>()
+const { type = 'normal', size = 'default' } = defineProps<Props>()
 </script>
 
 <template>

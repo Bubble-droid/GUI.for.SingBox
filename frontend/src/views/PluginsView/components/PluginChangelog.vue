@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import { ReadFile } from '@/bridge/io'
 import { HttpGet } from '@/bridge/net'
@@ -32,7 +32,9 @@ const fetchAndUpdatePluginCode = async () => {
   }
 }
 
-fetchAndUpdatePluginCode()
+onMounted(async () => {
+  await fetchAndUpdatePluginCode()
+})
 </script>
 
 <template>

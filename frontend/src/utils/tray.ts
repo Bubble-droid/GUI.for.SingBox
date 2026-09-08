@@ -46,7 +46,7 @@ const generateUniqueEventsForMenu = (menus: App.MenuItem[]) => {
 
   let index = 0
   const processMenu = (menu: App.MenuItem) => {
-    const _menu = { ...menu, text: t(menu.text || ''), tooltip: t(menu.tooltip || '') }
+    const _menu = { ...menu, text: t(menu.text ?? ''), tooltip: t(menu.tooltip ?? '') }
     const { event, children } = menu
 
     if (event) {
@@ -85,7 +85,7 @@ const getTrayMenus = () => {
       return []
     }
     const hiddenList = new Set(
-      (profilesStore.currentProfile?.outbounds || []).flatMap((v) => (v.hidden ? v.tag : [])),
+      (profilesStore.currentProfile?.outbounds ?? []).flatMap((v) => (v.hidden ? v.tag : [])),
     )
     groupMenus = Object.values(proxies)
       .filter(
@@ -94,22 +94,22 @@ const getTrayMenus = () => {
           v.name !== 'GLOBAL' &&
           !hiddenList.has(v.name),
       )
-      .concat(proxies['GLOBAL'] || [])
+      .concat(proxies['GLOBAL'] ?? [])
       .map((group) => {
         const all = (group.all || [])
           .filter((proxy) => {
-            const history = proxies[proxy]?.history || []
-            const alive = (history[history.length - 1]?.delay || 0) > 0
+            const history = proxies[proxy]?.history ?? []
+            const alive = (history.at(-1)?.delay ?? 0) > 0
             return (
-              appSettings.app.kernel.unAvailable ||
-              ['direct', 'block'].includes(proxy) ||
-              proxies[proxy]?.all ||
+              (appSettings.app.kernel.unAvailable ||
+                ['direct', 'block'].includes(proxy) ||
+                proxies[proxy]?.all) ??
               alive
             )
           })
           .map((proxy) => {
-            const history = proxies[proxy]?.history || []
-            const delay = history[history.length - 1]?.delay || 0
+            const history = proxies[proxy]?.history ?? []
+            const delay = history.at(-1)?.delay ?? 0
             return { ...proxies[proxy], delay }
           })
           .toSorted((a, b) => {
@@ -149,7 +149,7 @@ const getTrayMenus = () => {
 
   if (!pluginMenusHidden) {
     const filtered = pluginsStore.plugins.filter(
-      (plugin) => Object.keys(plugin.menus).length && !plugin.disabled,
+      (plugin) => Object.keys(plugin.menus).length > 0 && !plugin.disabled,
     )
     pluginMenusHidden = filtered.length === 0
     pluginMenus = filtered.map(({ id, name, menus }) => {

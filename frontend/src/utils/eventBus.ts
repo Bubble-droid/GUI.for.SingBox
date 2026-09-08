@@ -30,7 +30,9 @@ class TypedEventBus<Events extends Record<string, any>> {
     if (!list) {
       return
     }
-    list.forEach((h) => h(data))
+    list.forEach((h) => {
+      h(data)
+    })
   }
 }
 

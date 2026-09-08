@@ -19,7 +19,7 @@ export const useAppLifecycle = () => {
   let commandModal: ReturnType<typeof modal> | undefined
 
   const offLaunchApp = EventsOn('onLaunchApp', async (...args: string[]) => {
-    if (!args.length) {
+    if (args.length === 0) {
       return
     }
 

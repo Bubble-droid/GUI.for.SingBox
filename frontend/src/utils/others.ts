@@ -32,6 +32,7 @@ export const omitArray = <T, K extends keyof T>(arr: T[], fields: K[]): Omit<T, 
     return item as Omit<T, K>
   })
 }
+
 export const debounce = (fn: (...args: any) => any, wait: number) => {
   let timer: null | number = null
   const _debuonce = (...args: any) => {
@@ -80,19 +81,20 @@ export const throttle = <T extends (...args: any[]) => void>(
     }
 
     trailingArgs = args
-    if (!timer) {
-      timer = setTimeout(() => {
-        timer = null
-        if (trailingArgs) {
-          invoke(trailingArgs)
-          trailingArgs = null
-        }
-      }, remaining)
-    }
+    timer ??= setTimeout(() => {
+      timer = null
+      if (trailingArgs) {
+        invoke(trailingArgs)
+        trailingArgs = null
+      }
+    }, remaining)
   }
 }
 
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+export const sleep = (ms: number) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
 
 export const ignoredError = async <F extends (...args: any[]) => Promise<any>>(
   fn: F,
@@ -116,10 +118,10 @@ export const generateSecureKey = (bits = 256) => {
 
 export const getValue = (obj: unknown, expr: string): unknown => {
   return expr.split('.').reduce<unknown>((value, key) => {
-    if (value && typeof value === 'object') {
-      return (value as Record<string, unknown>)[key]
+    if (!value || typeof value !== 'object') {
+      return
     }
-    return undefined
+    return (value as Record<string, unknown>)[key]
   }, obj)
 }
 
@@ -178,7 +180,7 @@ const runPool = async <T, K>(
     }
   }
 
-  return await Promise.all(results)
+  return Promise.all(results)
 }
 
 export const asyncPool = <T, K = any>(
@@ -216,7 +218,9 @@ export const createAsyncPool = <T, K>(
 
   const shouldPause = async () => {
     if (paused) {
-      await new Promise<void>((resolve) => (resumeResolve = resolve))
+      await new Promise<void>((resolve) => {
+        resumeResolve = resolve
+      })
     }
   }
 
@@ -427,13 +431,13 @@ export const readonly = <T>(obj: T): T => {
 }
 
 export const base64UrlEncode = (str: string): string => {
-  return base64Encode(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+  return base64Encode(str).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '')
 }
 
 export const base64Encode = (str: string): string => {
   const bytes = new TextEncoder().encode(str)
   const len = bytes.length
-  const chars = Array(len)
+  const chars = Array.from({ length: len })
 
   for (let i = 0; i < len; i++) {
     chars[i] = String.fromCharCode(bytes[i]!)
@@ -490,7 +494,7 @@ export const buildSmartRegExp = (pattern: string, flags = '') => {
   try {
     r = new RegExp(pattern, flags)
   } catch {
-    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
+    const escaped = pattern.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
     r = new RegExp(escaped, flags)
   }
 

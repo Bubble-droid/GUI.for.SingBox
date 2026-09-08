@@ -101,11 +101,11 @@ const defineOptions = <
   return Object.values(source).map((v) => {
     const item: Record<string, unknown> = {
       value: v,
-      label: labelPattern.replaceAll(/\{\{val\}\}/g, String(v)),
+      label: labelPattern.replaceAll('{{val}}', String(v)),
     }
 
     if (descPattern !== undefined) {
-      item['desc'] = descPattern.replaceAll(/\{\{val\}\}/g, String(v))
+      item['desc'] = descPattern.replaceAll('{{val}}', String(v))
     }
 
     return item

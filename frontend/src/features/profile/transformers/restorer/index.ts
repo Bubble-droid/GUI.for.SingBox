@@ -213,6 +213,7 @@ export const restoreProfile = (
     dns: {
       disable_cache: config.dns?.disable_cache ?? template.dns.disable_cache,
       disable_expire: config.dns?.disable_expire ?? template.dns.disable_expire,
+      // oxlint-disable-next-line typescript/no-deprecated
       independent_cache: config.dns?.independent_cache ?? template.dns.independent_cache,
       final: DnsServersIds[config.dns?.final ?? ''] ?? template.dns.final,
       strategy: config.dns?.strategy ?? template.dns.strategy,

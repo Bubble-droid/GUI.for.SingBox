@@ -63,7 +63,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       validUrl.pathname === '//install-config/' ||
       validUrl.hostname === 'import-remote-profile'
     ) {
-      subName = validUrl.searchParams.get('name') || sampleID()
+      subName = validUrl.searchParams.get('name') ?? sampleID()
     } else if (validUrl.pathname.startsWith('//import-remote-profile')) {
       subName = decodeURIComponent(validUrl.hash).slice(1) || sampleID()
     }
@@ -196,7 +196,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
     s.updateTime = Date.now()
     s.proxies = proxies.map(({ tag, type }) => {
       // Keep the original ID value of the proxy unchanged
-      const id = s.proxies.find((v) => v.tag === tag)?.id || sampleID()
+      const id = s.proxies.find((v) => v.tag === tag)?.id ?? sampleID()
       return { id, tag, type }
     })
 
@@ -214,7 +214,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
     Object.assign(s, subscription)
     s.proxies = _proxies.map(({ tag, type }) => {
       // Keep the original ID value of the proxy unchanged
-      const id = s.proxies.find((v) => v.tag === tag)?.id || sampleID()
+      const id = s.proxies.find((v) => v.tag === tag)?.id ?? sampleID()
       return { id, tag, type }
     })
 
@@ -237,7 +237,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       await _doUpdateSub(s, options)
       await saveSubscribes()
     } catch (error: any) {
-      throw `Failed to update subscription [${s.name}]. Reason: ${error.message || error}`
+      throw `Failed to update subscription [${s.name}]. Reason: ${error.message ?? error}`
     } finally {
       s.updating = false
     }
@@ -259,7 +259,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
         result.result = `Subscription [${s.name}] updated successfully.`
       } catch (error: any) {
         result.ok = false
-        result.result = `Failed to update subscription [${s.name}]. Reason: ${error.message || error}`
+        result.result = `Failed to update subscription [${s.name}]. Reason: ${error.message ?? error}`
       } finally {
         s.updating = false
       }
@@ -294,7 +294,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       expire: 0,
       updateTime: 0,
       type: 'Http',
-      url: options.url || '',
+      url: options.url ?? '',
       website: '',
       path: `data/subscribes/${id}.json`,
       include: '',

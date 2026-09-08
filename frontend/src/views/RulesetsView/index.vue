@@ -116,7 +116,7 @@ const handleClearRuleset = async (id: string) => {
   if (!r) {
     return
   }
-  if (r.format != RuleSetFormat.Source) {
+  if (r.format !== RuleSetFormat.Source) {
     return
   }
 

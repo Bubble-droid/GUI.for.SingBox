@@ -168,7 +168,7 @@ export const useRulesetsStore = defineStore('rulesets', () => {
         result.result = `Rule-Set [${r.name}] updated successfully.`
       } catch (error: any) {
         result.ok = false
-        result.result = `Failed to update rule-set [${r.name}]. Reason: ${error.message || error}`
+        result.result = `Failed to update rule-set [${r.name}]. Reason: ${error.message ?? error}`
       } finally {
         r.updating = false
       }

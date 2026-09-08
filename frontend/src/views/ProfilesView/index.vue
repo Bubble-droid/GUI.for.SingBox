@@ -137,10 +137,10 @@ const generateMenus = (profile: Profile) => {
   ]
 
   const contextMenus = pluginsStore.plugins.filter(
-    (plugin) => Object.keys(plugin.context.profiles).length !== 0,
+    (plugin) => Object.keys(plugin.context.profiles).length > 0,
   )
 
-  if (contextMenus.length !== 0) {
+  if (contextMenus.length > 0) {
     moreMenus.push(
       {
         label: '',

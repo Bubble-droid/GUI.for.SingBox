@@ -1,4 +1,6 @@
+<!-- eslint-disable vue/require-default-prop -->
 <script setup lang="ts">
+// oxlint-disable vue/require-default-prop
 import { autocompletion } from '@codemirror/autocomplete'
 import { indentWithTab } from '@codemirror/commands'
 import { javascript } from '@codemirror/lang-javascript'
@@ -34,13 +36,7 @@ interface Props {
 
 const model = defineModel<string>({ required: true })
 
-const {
-  editable,
-  lang = 'json',
-  mode = 'editor',
-  placeholder = '',
-  plugin = undefined,
-} = defineProps<Props>()
+const { editable, lang = 'json', mode = 'editor', placeholder = '', plugin } = defineProps<Props>()
 
 const emit = defineEmits<{
   change: [content: string]
@@ -52,7 +48,7 @@ let internalUpdate = true
 watch(model, async (val) => {
   await editorReady
   const view = editorView || mergeView?.b
-  if (view && val != view.state.doc.toString()) {
+  if (view && val !== view.state.doc.toString()) {
     internalUpdate = false
     view.dispatch({
       changes: {

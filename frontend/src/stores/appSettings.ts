@@ -137,7 +137,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
       settings.kernel.alpha = DefaultCoreConfig()
     }
     if (!settings.proxyBypassList) {
-      settings.proxyBypassList = (await ignoredError(GetSystemProxyBypass)) || ''
+      settings.proxyBypassList = (await ignoredError(GetSystemProxyBypass)) ?? ''
     }
     if ('darwinSystemProxyServices' in settings) {
       settings.systemProxyServices = settings.darwinSystemProxyServices as string[]
@@ -154,38 +154,24 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     ) {
       settings.systemProxyServices = defaultSystemProxyServices
     }
-    if (settings.autoSetSystemDNS === undefined) {
-      settings.autoSetSystemDNS = false
-    }
-    if (settings.systemProxyDNS === undefined) {
-      settings.systemProxyDNS = ''
-    }
-    if (settings.systemDefaultDNS === undefined) {
-      settings.systemDefaultDNS = ''
-    }
+    settings.autoSetSystemDNS ??= false
+    settings.systemProxyDNS ??= ''
+    settings.systemDefaultDNS ??= ''
     if (!settings.requestProxyMode) {
       settings.requestProxyMode = RequestProxyMode.System
     }
-    if (settings.customProxy === undefined) {
-      settings.customProxy = ''
-    }
-    if (settings.githubDownloadAcceleration === undefined) {
-      settings.githubDownloadAcceleration = false
-    }
-    if (settings.githubDownloadMirror === undefined) {
-      settings.githubDownloadMirror = ''
-    }
+    settings.customProxy ??= ''
+    settings.githubDownloadAcceleration ??= false
+    settings.githubDownloadMirror ??= ''
     if (!settings.plugins) {
       settings.plugins = {
         sources: DefaultPluginHubSources(),
       }
     }
-    if (settings.debugUsePointer === undefined) {
-      settings.debugUsePointer = false
-    }
+    settings.debugUsePointer ??= false
 
     if ('rollingRelease' in settings) {
-      delete settings.rollingRelease
+      settings.rollingRelease = false
     }
 
     settings.systemTitleBar ??= false
@@ -265,7 +251,6 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     if (latestUserSettings !== lastModifiedSettings) {
       void saveAppSettings(lastModifiedSettings).then(() => {
         latestUserSettings = lastModifiedSettings
-        return
       })
     } else {
       saveAppSettings.cancel()

@@ -251,7 +251,7 @@ export const getCompletions = (pluginScope?: any) => {
         return null
       }
 
-      const codeCompletion = localCompletionSource(context) || { options: [] }
+      const codeCompletion = localCompletionSource(context) ?? { options: [] }
 
       return {
         from: word.from,
