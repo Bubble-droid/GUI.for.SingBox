@@ -122,13 +122,6 @@
           "lowercase": true
         }
       }
-    ],
-    "oxc/no-barrel-file": [
-      "error",
-      {
-        "threshold": 1
-      }
-    ],
-    "import/no-cycle": "error"
+    ]
   }
 }

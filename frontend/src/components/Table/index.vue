@@ -1,6 +1,4 @@
-<!-- eslint-disable vue/require-default-prop -->
 <script lang="ts" setup>
-// oxlint-disable vue/require-default-prop
 import { ref, computed, isVNode, h } from 'vue'
 
 import vMenu from '@/directives/menu'

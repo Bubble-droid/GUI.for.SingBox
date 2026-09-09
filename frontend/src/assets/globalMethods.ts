@@ -1,6 +1,3 @@
-// oxlint-disable typescript/no-unsafe-function-type
-// oxlint-disable typescript/no-unnecessary-type-parameters
-
 import * as Vue from 'vue'
 
 import { Plugins } from '@/assets/pluginApis'

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+// oxlint-disable typescript/no-explicit-any
 import { DnsServerType } from '@profile/constant/kernel'
 import { DnsServerTypeOptions } from '@profile/constant/options'
 import { createDnsServer } from '@profile/defaults/dns'
@@ -90,7 +91,7 @@ const renderServer = (server: DnsServerItem) => {
     h(Tag, () => generateDnsServerURL(server)),
   ]
   if (detour) {
-    const detourLabel = outboundOptions.find((v) => v.value === detour)?.label || detour
+    const detourLabel = outboundOptions.find((v) => v.value === detour)?.label ?? detour
     children.push(h(Tag, { color: 'default' }, () => detourLabel))
   }
   return h('div', { class: 'font-bold' }, children)

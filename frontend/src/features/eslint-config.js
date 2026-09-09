@@ -17,6 +17,9 @@ export const featuresStrictConfig = {
     'vue/component-api-style': ['error', ['script-setup', 'composition']],
     'vue/no-duplicate-class-names': 'error',
 
+    'no-empty-function': 'off',
+
+    '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/member-ordering': 'error',
   },
 }

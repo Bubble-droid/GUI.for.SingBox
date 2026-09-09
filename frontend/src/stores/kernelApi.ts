@@ -326,7 +326,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
       },
     )
 
-    // oxlint-disable-next-line no-unmodified-loop-condition
     while (!stopped) {
       const ok = await probeApiAvailability().catch(() => false)
       if (ok) {

@@ -1,4 +1,3 @@
-// oxlint-disable promise/param-names func-names
 // Polyfill for Promise.withResolvers()
 if (typeof Promise.withResolvers !== 'function') {
   Promise.withResolvers = function <T>() {

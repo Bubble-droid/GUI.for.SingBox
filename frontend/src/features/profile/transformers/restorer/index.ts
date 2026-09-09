@@ -1,4 +1,3 @@
-// oxlint-disable no-sequences
 import {
   ProfileSchemaVersion,
   createCert,
@@ -26,7 +25,7 @@ import type {
   Ntp,
   SingBoxConfig,
 } from '@profile/types/sing-box/config'
-import type { DnsServer } from '@profile/types/sing-box/dns'
+import type { DomainResolverOptions } from '@profile/types/sing-box/shared'
 import { normalizeArray } from '@profile/utils/helper'
 
 import { sampleID } from '@/utils/others'
@@ -53,7 +52,10 @@ const legacyBuildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable
   if (!arr) {
     return {}
   }
-  return arr.reduce((p, c, i) => ((p[c['tag']] = prefix + i), p), {})
+  return arr.reduce((p, c, i) => {
+    p[c['tag']] = `${prefix}${i}`
+    return p
+  }, {})
 }
 
 const buildTagIdMapping = (prefix: string, arr: { tag?: string }[] = []): Map<string, string> =>
@@ -203,26 +205,24 @@ export const restoreProfile = (
       final: OutboundsIds[config.route?.final ?? ''] ?? template.route.final,
       default_domain_resolver: {
         server:
-          DnsServersIds[(config.route?.default_domain_resolver as any)?.server] ??
-          template.route.default_domain_resolver.server,
+          DnsServersIds[
+            (config.route?.default_domain_resolver as DomainResolverOptions | undefined)?.server ??
+              ''
+          ] ?? template.route.default_domain_resolver.server,
         client_subnet:
-          (config.route?.default_domain_resolver as any)?.client_subnet ??
-          template.route.default_domain_resolver.client_subnet,
+          (config.route?.default_domain_resolver as DomainResolverOptions | undefined)
+            ?.client_subnet ?? template.route.default_domain_resolver.client_subnet,
       },
     },
     dns: {
       disable_cache: config.dns?.disable_cache ?? template.dns.disable_cache,
       disable_expire: config.dns?.disable_expire ?? template.dns.disable_expire,
-      // oxlint-disable-next-line typescript/no-deprecated
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       independent_cache: config.dns?.independent_cache ?? template.dns.independent_cache,
       final: DnsServersIds[config.dns?.final ?? ''] ?? template.dns.final,
       strategy: config.dns?.strategy ?? template.dns.strategy,
       client_subnet: config.dns?.client_subnet ?? template.dns.client_subnet,
-      servers: restoreDnsServers(
-        (config.dns?.servers as DnsServer[]) ?? [],
-        DnsServersIds,
-        OutboundsIds,
-      ),
+      servers: restoreDnsServers(config.dns?.servers ?? [], DnsServersIds, OutboundsIds),
       rules: restoreDnsRules(config.dns?.rules ?? [], InboundsIds, RouteRuleSetIds, DnsServersIds),
     },
     mixin: profile?.mixin ?? createMixin(),

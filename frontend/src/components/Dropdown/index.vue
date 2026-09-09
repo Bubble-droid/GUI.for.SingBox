@@ -60,7 +60,6 @@ const updatePosition = () => {
 
   transformOrigin.value = finalPlacement === 'top' ? 'bottom' : 'top'
 
-  // oxlint-disable-next-line oxc/branches-sharing-code
   if (finalPlacement === 'bottom') {
     overlayStyle.value.top = `${triggerRect.bottom}px`
     overlayStyle.value.bottom = 'auto'

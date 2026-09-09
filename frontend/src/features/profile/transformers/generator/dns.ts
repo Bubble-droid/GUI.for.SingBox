@@ -48,7 +48,7 @@ export const generateDns = (
   const getOutbound = (id: string) => outbounds.find((v) => v.id === id)
   const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
   const dnsExtra: Recordable = {}
-  if (dns.strategy) {
+  if (dns.strategy as string) {
     dnsExtra['strategy'] = dns.strategy
   }
   if (dns.client_subnet) {

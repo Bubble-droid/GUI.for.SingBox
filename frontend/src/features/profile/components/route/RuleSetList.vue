@@ -12,6 +12,7 @@ import { useRulesetsStore } from '@/stores/rulesets'
 import { message } from '@/utils/interaction'
 import { deepClone } from '@/utils/others'
 
+import type { AppRuleSet } from '@/types/app'
 import type { OptionItem } from '@/types/component'
 
 interface Props {
@@ -62,7 +63,7 @@ const hasLost = (ruleset: RuleSetItem) => {
   return !rulesetsStore.getRulesetById(ruleset.path)
 }
 
-const handleUse = (ruleset: any) => {
+const handleUse = (ruleset: AppRuleSet) => {
   fields.value.path = ruleset.id
   fields.value.tag = ruleset.name
   fields.value.format = ruleset.format

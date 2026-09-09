@@ -169,7 +169,7 @@ const restoreOpenConnect = (
       tls: {
         ...template.config.tls,
         ...tls,
-        peer_fingerprint: normalizeArray(tls?.peer_fingerprint),
+        peer_fingerprint: normalizeArray(tls.peer_fingerprint),
         certificate_authority:
           'certificate_authority' in tls ? normalizeArray(tls.certificate_authority) : [],
         client_certificate:
@@ -203,7 +203,7 @@ const restoreOpenVpnClient = (
   const servers = createOpenVpnServerRemoteItem()
   const pullFilter = createOpenVpnPullFilter()
 
-  const tls = final.tls ?? {}
+  const tls = final.tls
 
   return {
     ...template,
@@ -292,7 +292,7 @@ const restoreOpenVpnServer = (
         remote_certificate_ku: normalizeArray(tls.remote_certificate_ku),
         control_wrap: {
           ...template.config.tls.control_wrap,
-          ...tls?.control_wrap,
+          ...tls.control_wrap,
           key:
             tls.control_wrap && 'key' in tls.control_wrap
               ? normalizeArray(tls.control_wrap.key)

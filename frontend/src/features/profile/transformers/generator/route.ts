@@ -47,7 +47,7 @@ export const generateRoute = (
           extra['sniffer'] = rule.sniffer
         }
       } else if (rule.action === RouteActionKind.Resolve) {
-        if (rule.strategy) {
+        if (rule.strategy as string) {
           extra['strategy'] = rule.strategy
         }
         extra['server'] = getDnsServer(rule.server)
@@ -65,7 +65,7 @@ export const generateRoute = (
         const localRuleset = ctx.getRuleSet(ruleset.path)
         extra.path = localRuleset?.path.replace(/^data\//v, `${ctx.appEnv.appDataPath}/`) ?? ''
         extra.format = ruleset.format
-      } else if (ruleset.type === RuleSetType.Remote) {
+      } else {
         extra.url = ruleset.url
         extra.format = ruleset.format
         extra.download_detour = getOutbound(ruleset.download_detour)!

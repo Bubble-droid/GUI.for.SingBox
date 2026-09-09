@@ -1,4 +1,3 @@
-// oxlint-disable no-sequences
 import { DnsActionKind, DnsRuleType, DnsServerType } from '@profile/constant/kernel'
 import { createDnsServer, createDnsRule } from '@profile/defaults/dns'
 import type { DnsRuleItem, DnsServerItem } from '@profile/types/profiles/dns'
@@ -14,9 +13,6 @@ export const restoreDnsServers = (
   OutboundsIds: Recordable<string>,
 ): DnsServerItem[] =>
   servers.flatMap((raw) => {
-    if (!raw.type) {
-      return []
-    }
     const server = createDnsServer()
     server.id = DnsServersIds[raw.tag]!
     server.tag = raw.tag
@@ -107,7 +103,7 @@ export const restoreDnsRules = (
 
     const hits = supportedRuleTypes.filter((key) => key in raw)
     if (hits.length === 1) {
-      rule.type = hits[0] as any
+      rule.type = hits[0] as DnsRuleType
     } else {
       rule.type = DnsRuleType.Inline
     }
@@ -158,7 +154,10 @@ export const restoreDnsRules = (
           client_subnet: undefined,
           strategy: undefined,
           server: undefined,
-          ...supportedRuleTypes.reduce<Recordable>((p, c) => ((p[c] = undefined), p), {}),
+          ...supportedRuleTypes.reduce<Recordable>((p, c) => {
+            p[c] = undefined
+            return p
+          }, {}),
         },
         null,
         2,

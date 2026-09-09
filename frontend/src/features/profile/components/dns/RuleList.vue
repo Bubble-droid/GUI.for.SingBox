@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+// oxlint-disable typescript/no-explicit-any
 import type { DomainStrategy } from '@profile/constant/kernel'
 import {
   DnsRuleType,
@@ -92,7 +93,7 @@ const handleDeleteRule = (index: number) => {
   model.value.splice(index, 1)
 }
 
-const handleUse = (ruleset: any) => {
+const handleUse = (ruleset: RuleSetItem) => {
   const ids = fields.value.payload.split(',').filter(Boolean)
   const idx = ids.indexOf(ruleset.id)
   if (idx === -1) {
@@ -103,9 +104,9 @@ const handleUse = (ruleset: any) => {
   fields.value.payload = ids.join(',')
 }
 
-const handleClearRuleset = (ruleset: any) => {
+const handleClearRuleset = (rule: DnsRuleItem) => {
   const ids = fields.value.payload.split(',').filter((id) => ruleSet.find((v) => v.id === id))
-  ruleset.payload = ids.join(',')
+  rule.payload = ids.join(',')
 }
 
 const showLost = () => message.warn('kernel.route.rules.invalid')
@@ -153,7 +154,7 @@ const renderRule = (rule: DnsRuleItem) => {
   if (type === DnsRuleType.RuleSet) {
     _payload = rule.payload
       .split(',')
-      .map((id) => ruleSet.find((v) => v.id === id)?.tag || id)
+      .map((id) => ruleSet.find((v) => v.id === id)?.tag ?? id)
       .join(',')
   } else if (type === DnsRuleType.Inline && payload.includes('__is_fake_ip')) {
     _payload = 'FakeIP'
@@ -163,7 +164,7 @@ const renderRule = (rule: DnsRuleItem) => {
   }
   children.push(_payload, action)
   if (server) {
-    const proxy = dnsServerOptions.find((v) => v.value === server)?.label || server
+    const proxy = dnsServerOptions.find((v) => v.value === server)?.label ?? server
     children.push(proxy)
   }
   return children.join(',')

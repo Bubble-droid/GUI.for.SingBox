@@ -17,25 +17,22 @@ export const generateInbounds = (inbounds: InboundItem[]) =>
         ...inbound[inbound.type]!.listen,
         users: users.length > 0 ? users : undefined,
       }
-    }
-    if (inbound.type === InboundType.Direct) {
+    } else if (inbound.type === InboundType.Direct) {
       return {
         type: inbound.type,
         tag: inbound.tag,
         ...inbound[inbound.type]!.listen,
-        network: inbound.direct!.network || undefined,
+        network: inbound.direct?.network ?? undefined,
       }
     }
-    if (inbound.type === InboundType.Tun) {
-      return {
-        type: inbound.type,
-        tag: inbound.tag,
-        ...inbound.tun!,
-        route_address: inbound.tun!.route_address?.length ? inbound.tun!.route_address : undefined,
-        route_exclude_address: inbound.tun!.route_exclude_address?.length
+    return {
+      type: inbound.type,
+      tag: inbound.tag,
+      ...inbound.tun!,
+      route_address: inbound.tun!.route_address.length > 0 ? inbound.tun!.route_address : undefined,
+      route_exclude_address:
+        inbound.tun!.route_exclude_address.length > 0
           ? inbound.tun!.route_exclude_address
           : undefined,
-      }
     }
-    return []
   })

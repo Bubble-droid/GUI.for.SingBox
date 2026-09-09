@@ -126,7 +126,7 @@ const handleSave = async () => {
       await profilesStore.addProfile(profile.value)
     }
     await submit()
-  } catch (error: any) {
+  } catch (error) {
     console.error('handleSave:', error)
     message.error(error)
   }

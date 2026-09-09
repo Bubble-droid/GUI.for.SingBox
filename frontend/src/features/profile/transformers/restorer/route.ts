@@ -1,4 +1,3 @@
-// oxlint-disable no-sequences
 import { RouteActionKind, RouteRuleType, RuleSetType } from '@profile/constant/kernel'
 import { createRouteRuleset, createRouteRule } from '@profile/defaults/route'
 import type { RouteRuleItem, RuleSetItem } from '@profile/types/profiles/route'
@@ -68,7 +67,7 @@ export const restoreRouteRules = (
 
     const hits = supportedRuleTypes.filter((key) => key in raw)
     if (hits.length === 1) {
-      rule.type = hits[0] as any
+      rule.type = hits[0] as RouteRuleType
     } else {
       rule.type = RouteRuleType.Inline
     }
@@ -110,7 +109,10 @@ export const restoreRouteRules = (
           ...raw,
           action: undefined,
           invert: undefined,
-          ...supportedRuleTypes.reduce<Recordable>((p, c) => ((p[c] = undefined), p), {}),
+          ...supportedRuleTypes.reduce<Recordable>((p, c) => {
+            p[c] = undefined
+            return p
+          }, {}),
         },
         null,
         2,

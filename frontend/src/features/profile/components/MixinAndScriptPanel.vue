@@ -42,11 +42,11 @@ const onFormatChange = (val: 'json' | 'yaml' | Event, old?: 'json' | 'yaml') => 
         model.value.mixin.config = stringify(config)
       }
     }
-  } catch (error: any) {
+  } catch (error) {
     if (old) {
       model.value.mixin.format = old
     }
-    message.error(error.message || error)
+    message.error(error)
   }
 }
 </script>

@@ -88,7 +88,9 @@ const inbounds = [
 
 const handleAdd = async () => {
   const fns = await picker.multi('common.add', inbounds)
-  fns.forEach((fn) => fn())
+  fns.forEach((fn) => {
+    fn()
+  })
 }
 
 defineExpose({ handleAdd })

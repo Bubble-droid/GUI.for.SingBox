@@ -1,4 +1,3 @@
-// oxlint-disable unicorn/consistent-function-scoping
 import type { Profile } from '@profile/types/profiles'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'

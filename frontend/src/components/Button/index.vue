@@ -1,6 +1,4 @@
-<!-- eslint-disable vue/require-default-prop -->
 <script setup lang="ts">
-// oxlint-disable vue/require-default-prop
 import type { IconName } from '@/components/Icon/icons'
 
 interface Props {

@@ -31,7 +31,7 @@ const outboundGroups = computed(() => [
     name: 'kernel.outbounds.builtIn',
     proxies: [
       ...BuiltInOutbound.map((v) => ({ id: v, tag: v, type: 'Built-In' })),
-      ...outbounds.map(({ id, tag, type }) => ({ id, tag, type: String(type) })),
+      ...outbounds.map(({ id, tag, type }) => ({ id, tag, type })),
     ],
   },
   {

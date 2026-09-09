@@ -1,3 +1,4 @@
+// oxlint-disable max-depth
 import { OutboundType } from '@profile/constant/kernel'
 import type { OutboundItem } from '@profile/types/profiles/outbound'
 import type { Outbound, OutboundOf } from '@profile/types/sing-box/config'

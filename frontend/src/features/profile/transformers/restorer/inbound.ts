@@ -68,6 +68,7 @@ export const restoreInbounds = (inbounds: Recordable[], InboundsIds: Recordable)
           udp_fragment: raw['udp_fragment'] ?? template.listen.udp_fragment,
         },
         users:
+          // oxlint-disable-next-line typescript/no-explicit-any
           raw['users']?.map((user: any) => `${user.username}:${user.password}`) ?? template.users,
       }
     }

@@ -52,6 +52,7 @@ export const restoreOutbounds = (
     let newOutbounds: OutboundChild[] = []
 
     raw['outbounds']?.forEach((tag: string) => {
+      // oxlint-disable-next-line typescript/no-explicit-any
       const isBuiltIn = [OutboundType.Direct, OutboundType.Block].includes(tag as any)
       if (isBuiltIn) {
         newOutbounds.push({ id: tag, type: 'Built-in', tag })

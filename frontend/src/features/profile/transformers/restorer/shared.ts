@@ -138,7 +138,6 @@ export const restoreInboundTls = (maps: IdMaps, raw?: InboundTlsOptions): Inboun
   return {
     ...template,
     ...raw,
-    enabled: raw.enabled ?? true,
     alpn: normalizeArray(raw.alpn),
     cipher_suites: normalizeArray(raw.cipher_suites),
     curve_preferences: normalizeArray(raw.curve_preferences),
@@ -175,7 +174,6 @@ export const restoreOutboundTls = (raw?: OutboundTlsOptions): OutboundTlsFormDat
   return {
     ...template,
     ...raw,
-    enabled: raw.enabled ?? true,
     alpn: normalizeArray(raw.alpn),
     cipher_suites: normalizeArray(raw.cipher_suites),
     curve_preferences: normalizeArray(raw.curve_preferences),

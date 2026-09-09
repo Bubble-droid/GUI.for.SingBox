@@ -1,4 +1,3 @@
-// oxlint-disable unicorn/consistent-function-scoping
 import { createProfile } from '@profile/defaults'
 import { restoreProfile } from '@profile/transformers/restorer'
 import type { Profile } from '@profile/types/profiles'

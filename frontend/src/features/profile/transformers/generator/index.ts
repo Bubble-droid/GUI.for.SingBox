@@ -180,7 +180,7 @@ export const generateConfig = async (originalProfile: Profile, options: Generate
     const { priority, config: mixin } = originalProfile.mixin
     if (priority === 'mixin') {
       deepAssign(config, parse(mixin))
-    } else if (priority === 'gui') {
+    } else {
       deepAssign(config, deepAssign(parse(mixin), config))
     }
   }

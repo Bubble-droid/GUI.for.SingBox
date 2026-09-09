@@ -22,7 +22,9 @@ const subscribesStore = useSubscribesStore()
 const isGroupType = (type: string): boolean =>
   type === OutboundType.Selector || type === OutboundType.UrlTest
 
-const handleAdd = () => openOutboundModal(createOutbound(), -1)
+const handleAdd = () => {
+  openOutboundModal(createOutbound(), -1)
+}
 
 const handleDeleteGroup = (index: number) => {
   model.value.splice(index, 1)
@@ -71,7 +73,9 @@ const openOutboundModal = (outbound: OutboundItem, index: number) => {
   m.setContent(OutboundForm, { modelValue: draft.value, outbounds: model.value }).open()
 }
 
-const handleEditGroup = (index: number) => openOutboundModal(model.value[index]!, index)
+const handleEditGroup = (index: number) => {
+  openOutboundModal(model.value[index]!, index)
+}
 
 const hasLost = (outbound: OutboundItem): boolean => {
   if (!isGroupType(outbound.type)) {

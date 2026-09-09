@@ -1,4 +1,3 @@
-// oxlint-disable unicorn/consistent-function-scoping
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { parse } from 'yaml'

@@ -1,4 +1,3 @@
-// oxlint-disable no-eq-null
 import type { Recordable } from '@/types/typescript'
 
 const isPlainObject = (val: unknown): val is Record<PropertyKey, unknown> => {
@@ -46,7 +45,7 @@ const cleanValue = (val: unknown, deep: boolean): unknown => {
 }
 
 export const cleanObject = <T extends object>(target: T, deep = false): Partial<T> => {
-  if (!target || typeof target !== 'object') {
+  if (typeof target !== 'object') {
     return target
   }
 
@@ -72,6 +71,7 @@ export const cleanObject = <T extends object>(target: T, deep = false): Partial<
 type Many<T> = T | readonly T[]
 
 export const normalizeArray = <T>(value: Many<T> | null | undefined): T[] => {
+  // oxlint-disable-next-line eqeqeq no-eq-null
   if (value == null) {
     return []
   }
