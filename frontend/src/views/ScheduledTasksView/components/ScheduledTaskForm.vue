@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, inject, h } from 'vue'
+import { useModalContext } from '@components/Modal'
+import { ref, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { IsNotificationAvailable, RequestNotificationAuthorization } from '@wails/runtime/runtime'
@@ -25,6 +26,8 @@ interface Props {
 
 const { id = '' } = defineProps<Props>()
 
+const { cancel, submit } = useModalContext()
+
 const loading = ref(false)
 
 const task = ref<App.ScheduledTask>({
@@ -46,9 +49,6 @@ const scheduledTasksStore = useScheduledTasksStore()
 const subscribesStore = useSubscribesStore()
 const rulesetsStore = useRulesetsStore()
 const pluginsStore = usePluginsStore()
-
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
 
 const handleSave = async () => {
   const { ok, reason } = isValidCron(task.value.cron)
@@ -87,7 +87,7 @@ const handleSave = async () => {
     } else {
       await scheduledTasksStore.addScheduledTask(task.value)
     }
-    await handleSubmit()
+    await submit()
   } catch (error: any) {
     console.error(error)
     message.error(error)
@@ -154,7 +154,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

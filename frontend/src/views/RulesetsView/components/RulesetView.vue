@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, inject, h, onMounted } from 'vue'
+import { useModalContext } from '@components/Modal'
+import { ref, h, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { WriteFile, ReadFile } from '@/bridge/io'
@@ -19,12 +20,11 @@ interface Props {
 
 const { id } = defineProps<Props>()
 
+const { cancel, submit } = useModalContext()
+
 const loading = ref(false)
 const ruleset = ref<AppRuleSet>()
 const rulesetContent = ref<string>('')
-
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
 
 const { t } = useI18n()
 const rulesetsStore = useRulesetsStore()
@@ -40,7 +40,7 @@ const handleSave = async () => {
     }
     await WriteFile(ruleset.value.path, rulesetContent.value)
     await rulesetsStore.updateRuleset(ruleset.value.id)
-    await handleSubmit()
+    await submit()
   } catch (error: any) {
     message.error(error)
     console.log(error)
@@ -68,7 +68,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useModalContext } from '@components/Modal/index.ts'
 import CertProviderList from '@profile/components/cert-provider/CertProviderList.vue'
 import EndpointList from '@profile/components/endpoint/EndpointList.vue'
 import NetnsList from '@profile/components/netns/NetnsList.vue'
@@ -6,7 +7,7 @@ import OutboundList from '@profile/components/outbound/OutboundList.vue'
 import { EndpointType } from '@profile/constant/kernel.ts'
 import { generateConfig } from '@profile/transformers/generator/index.ts'
 import type { Profile } from '@profile/types/profiles/index.ts'
-import { ref, inject, computed, useTemplateRef, h } from 'vue'
+import { ref, computed, useTemplateRef, h } from 'vue'
 import type { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -37,6 +38,8 @@ interface Props {
 }
 
 const { id = '', step = ProfileStep.Name } = defineProps<Props>()
+
+const { cancel, submit } = useModalContext()
 
 const { t } = useI18n()
 const certProviderRef = useTemplateRef('certProviderRef')
@@ -111,8 +114,6 @@ const mixinAndScriptConfig = computed({
   },
 })
 
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
 const handlePrevStep = () => currentStep.value--
 const handleNextStep = () => currentStep.value++
 
@@ -124,7 +125,7 @@ const handleSave = async () => {
     } else {
       await profilesStore.addProfile(profile.value)
     }
-    await handleSubmit()
+    await submit()
   } catch (error: any) {
     console.error('handleSave:', error)
     message.error(error)
@@ -259,7 +260,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

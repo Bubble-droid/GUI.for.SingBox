@@ -5,7 +5,14 @@ import { useBool } from '@/hooks/useBool'
 import { message } from '@/utils/interaction'
 import { sampleID } from '@/utils/others'
 
-import { IS_IN_MODAL, modalStack, modalZIndexCounter, modalMinimized } from './state'
+import {
+  IS_IN_MODAL,
+  MODAL_CANCEL,
+  MODAL_SUBMIT,
+  modalStack,
+  modalZIndexCounter,
+  modalMinimized,
+} from './state'
 import type { ModalProps, ModalSlots } from './types.ts'
 
 const open = defineModel<boolean>('open', { default: false })
@@ -180,8 +187,8 @@ watch(open, (v) => {
   }
 })
 
-provide('cancel', handleCancel)
-provide('submit', handleSubmit)
+provide(MODAL_CANCEL, handleCancel)
+provide(MODAL_SUBMIT, handleSubmit)
 provide(IS_IN_MODAL, true)
 
 defineExpose({ handleCancel })

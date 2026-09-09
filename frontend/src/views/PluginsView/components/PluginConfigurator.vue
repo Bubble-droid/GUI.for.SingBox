@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, inject, h, useTemplateRef } from 'vue'
+import { useModalContext } from '@components/Modal/index.ts'
+import { ref, h, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { PluginTriggerEvent } from '@/enums/app.ts'
@@ -20,6 +21,8 @@ interface Props {
 
 const { plugin } = defineProps<Props>()
 
+const { cancel, submit } = useModalContext()
+
 const { t } = useI18n()
 const pluginsStore = usePluginsStore()
 const appSettingsStore = useAppSettingsStore()
@@ -32,9 +35,6 @@ const originalSettings = plugin.configuration.reduce((p, { key, value }) => {
   p[key] = value
   return p
 }, {} as Recordable)
-
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
 
 const handleSave = async () => {
   loading.value = true
@@ -67,7 +67,7 @@ const handleSave = async () => {
     appSettingsStore.app.pluginSettings[plugin.id] = settings.value
   }
 
-  await handleSubmit()
+  await submit()
   message.success('common.success')
 }
 
@@ -87,7 +87,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

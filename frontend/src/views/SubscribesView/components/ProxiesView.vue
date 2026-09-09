@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, inject, h, defineComponent } from 'vue'
+import { useModalContext } from '@components/Modal'
+import { ref, computed, h, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { WriteFile, ReadFile } from '@/bridge/io'
@@ -22,6 +23,8 @@ interface Props {
 }
 
 const { sub } = defineProps<Props>()
+
+const { cancel, submit } = useModalContext()
 
 const loading = ref(false)
 const keywords = ref('')
@@ -131,9 +134,6 @@ const menus: App.Menu[] = [
 const { t } = useI18n()
 const subscribeStore = useSubscribesStore()
 
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
-
 const handleSave = async () => {
   loading.value = true
   try {
@@ -145,7 +145,7 @@ const handleSave = async () => {
     const sortedArray = proxies.map((v) => matched.find((vv) => vv.tag === v.tag))
     await WriteFile(path, JSON.stringify(sortedArray, null, 2))
     await subscribeStore.editSubscribe(id, subRef.value)
-    handleSubmit()
+    await submit()
   } catch (error: any) {
     console.log(error)
     message.error(error)
@@ -232,7 +232,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

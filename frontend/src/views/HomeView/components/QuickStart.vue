@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { h, inject, ref } from 'vue'
+import { useModalContext } from '@components/Modal'
+import { h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useAppSettingsStore } from '@/stores/appSettings'
@@ -10,6 +11,8 @@ import { sampleID } from '@/utils/others'
 
 import Button from '@/components/Button/index.vue'
 
+const { cancel, submit } = useModalContext()
+
 const { t } = useI18n()
 const subscribeStore = useSubscribesStore()
 const profilesStore = useProfilesStore()
@@ -18,9 +21,6 @@ const appSettingsStore = useAppSettingsStore()
 const url = ref('')
 const name = ref('')
 const loading = ref(false)
-
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
 
 const handleSave = async () => {
   if (!name.value) {
@@ -57,7 +57,7 @@ const handleSave = async () => {
 
   loading.value = false
 
-  handleSubmit()
+  submit()
 }
 
 const modalSlots = {
@@ -66,7 +66,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

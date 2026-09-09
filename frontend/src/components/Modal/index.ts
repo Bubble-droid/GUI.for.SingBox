@@ -1,7 +1,8 @@
-import { ref, defineComponent, h, computed } from 'vue'
+import { ref, defineComponent, h, computed, inject } from 'vue'
 import type { VNode, ComponentPublicInstance } from 'vue'
 
 import Modal from './index.vue'
+import { MODAL_CANCEL, MODAL_SUBMIT, IS_IN_MODAL } from './state.ts'
 import type { ModalProps, ModalSlots } from './types'
 
 export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}) => {
@@ -90,4 +91,11 @@ export const useModal = (options: Partial<ModalProps>, contents: ModalSlots = {}
   }
 
   return [modal, api] as const
+}
+
+export const useModalContext = () => {
+  const cancel = inject(MODAL_CANCEL, async () => {})
+  const submit = inject(MODAL_SUBMIT, async () => {})
+  const isInModal = inject(IS_IN_MODAL, false)
+  return { cancel, submit, isInModal }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, inject, h } from 'vue'
+import { useModalContext } from '@components/Modal'
+import { ref, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useSubscribesStore } from '@/stores/subscribes'
@@ -15,15 +16,14 @@ interface Props {
 
 const { id } = defineProps<Props>()
 
+const { cancel, submit } = useModalContext()
+
 const loading = ref(false)
 const subscribe = ref<App.Subscription>()
 const code = ref('')
 
 const { t } = useI18n()
 const subscribeStore = useSubscribesStore()
-
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
 
 const handleSave = async () => {
   if (!subscribe.value) {
@@ -33,7 +33,7 @@ const handleSave = async () => {
   try {
     subscribe.value.script = code.value
     await subscribeStore.editSubscribe(id, subscribe.value)
-    handleSubmit()
+    await submit()
   } catch (error: any) {
     message.error(error)
     console.log(error)
@@ -53,7 +53,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

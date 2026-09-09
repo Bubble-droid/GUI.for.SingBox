@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, inject, computed, h } from 'vue'
+import { useModalContext } from '@components/Modal'
+import { ref, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { PluginsTriggerOptions, DraggableOptions } from '@/constant/app'
@@ -18,6 +19,8 @@ interface Props {
 }
 
 const { id = '' } = defineProps<Props>()
+
+const { cancel, submit } = useModalContext()
 
 const official = computed(() => pluginsStore.findPluginInHubById(plugin.value.id))
 const loading = ref(false)
@@ -66,9 +69,6 @@ const { t } = useI18n()
 const [showMore, toggleShowMore] = useBool(false)
 const pluginsStore = usePluginsStore()
 
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
-
 const handleRestore = () => {
   if (official.value) {
     plugin.value = deepClone(official.value)
@@ -84,7 +84,7 @@ const handleSave = async () => {
     } else {
       await pluginsStore.addPlugin(plugin.value)
     }
-    await handleSubmit()
+    await submit()
   } catch (error: any) {
     console.error(error)
     message.error(error)
@@ -173,7 +173,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

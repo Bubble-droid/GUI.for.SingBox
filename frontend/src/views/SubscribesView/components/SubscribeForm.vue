@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, inject, computed, h } from 'vue'
+import { useModalContext } from '@components/Modal'
+import { ref, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { HttpGet } from '@/bridge/net'
@@ -28,6 +29,8 @@ interface Props {
 
 const { id = '' } = defineProps<Props>()
 
+const { cancel, submit } = useModalContext()
+
 const { t } = useI18n()
 const [showMore, toggleShowMore] = useBool(false)
 const subscribeStore = useSubscribesStore()
@@ -50,9 +53,6 @@ const showProxyTest = computed(() => {
   return true
 })
 
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
-
 const handleSave = async () => {
   loading.value = true
 
@@ -62,7 +62,7 @@ const handleSave = async () => {
     } else {
       await subscribeStore.addSubscribe(sub.value)
     }
-    await handleSubmit()
+    await submit()
   } catch (error: any) {
     console.error(error)
     message.error(error)
@@ -105,7 +105,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

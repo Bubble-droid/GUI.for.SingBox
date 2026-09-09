@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { useModalContext } from '@components/Modal'
 import { RuleSetFormat, RouteRuleType, RuleSetType } from '@profile/constant/kernel'
 import { createRouteRuleset, createRouteRule } from '@profile/defaults/route'
-import { computed, h, inject, ref, watch } from 'vue'
+import { computed, h, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { HttpGet } from '@/bridge/net'
@@ -17,6 +18,8 @@ import Pagination from '@/components/Pagination/index.vue'
 
 import type * as App from '@/types/app'
 
+const { cancel } = useModalContext()
+
 const pageSize = 27
 const rulesetFormats = [RuleSetFormat.Source, RuleSetFormat.Binary]
 const currentPage = ref(1)
@@ -26,7 +29,6 @@ const rulesetsStore = useRulesetsStore()
 const profilesStore = useProfilesStore()
 
 const keywords = ref('')
-const handleCancel = inject('cancel') as any
 
 watch(keywords, () => (currentPage.value = 1))
 
@@ -212,7 +214,7 @@ const modalSlots = {
       Button,
       {
         type: 'text',
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.close'),
     ),

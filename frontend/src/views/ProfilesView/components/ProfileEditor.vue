@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { useModalContext } from '@components/Modal'
 import { generateConfig } from '@profile/transformers/generator'
 import { restoreProfile } from '@profile/transformers/restorer'
 import type { Profile } from '@profile/types/profiles'
-import { ref, inject, h, onMounted } from 'vue'
+import { ref, h, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useProfilesStore } from '@/stores/profiles'
@@ -16,14 +17,13 @@ interface Props {
 
 const { profile } = defineProps<Props>()
 
+const { cancel, submit } = useModalContext()
+
 const loading = ref(false)
 const profileText = ref('')
 
 const { t } = useI18n()
 const profilesStore = useProfilesStore()
-
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
 
 const handleSave = async () => {
   loading.value = true
@@ -45,7 +45,7 @@ const handleSave = async () => {
     newProfile.mixin = profile.mixin
     newProfile.script = profile.script
     await profilesStore.editProfile(profile.id, newProfile)
-    await handleSubmit()
+    await submit()
   } catch (error: any) {
     console.log(error)
     message.error(error.message || error)
@@ -69,7 +69,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

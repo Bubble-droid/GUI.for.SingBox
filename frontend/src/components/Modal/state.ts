@@ -1,6 +1,9 @@
 import { ref } from 'vue'
+import type { InjectionKey } from 'vue'
 
-export const IS_IN_MODAL = 'IS_IN_MODAL'
+export const IS_IN_MODAL: InjectionKey<boolean> = Symbol('IS_IN_MODAL')
+export const MODAL_CANCEL: InjectionKey<() => Promise<void>> = Symbol('MODAL_CANCEL')
+export const MODAL_SUBMIT: InjectionKey<() => Promise<void>> = Symbol('MODAL_SUBMIT')
 
 export interface MinimizedModal {
   id: string

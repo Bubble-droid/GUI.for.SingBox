@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { useModalContext } from '@components/Modal'
 import { RuleSetFormat } from '@profile/constant/kernel'
 import { RuleSetFormatOptions } from '@profile/constant/options'
-import { ref, inject, watch, computed, h } from 'vue'
+import { ref, watch, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useRulesetsStore } from '@/stores/rulesets'
@@ -18,6 +19,8 @@ interface Props {
 }
 
 const { id = '', isUpdate } = defineProps<Props>()
+
+const { cancel } = useModalContext()
 
 const loading = ref(false)
 
@@ -36,15 +39,13 @@ const ruleset = ref<AppRuleSet>({
 const { t } = useI18n()
 const rulesetsStore = useRulesetsStore()
 
-const handleCancel = inject('cancel') as any
-
 const handleSubmit = async () => {
   loading.value = true
 
   if (isUpdate) {
     try {
       await rulesetsStore.editRuleset(id, ruleset.value)
-      handleCancel()
+      await cancel()
     } catch (error: any) {
       console.error('editRuleset:', error)
       message.error(error)
@@ -57,7 +58,7 @@ const handleSubmit = async () => {
 
   try {
     await rulesetsStore.addRuleset(ruleset.value)
-    handleCancel()
+    await cancel()
   } catch (error: any) {
     console.error('addRuleset:', error)
     message.error(error)
@@ -111,7 +112,7 @@ const modalSlots = {
       Button,
       {
         disabled: loading.value,
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

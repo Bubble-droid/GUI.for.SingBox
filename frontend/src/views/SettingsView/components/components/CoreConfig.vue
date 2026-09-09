@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { h, inject, ref } from 'vue'
+import { useModalContext } from '@components/Modal'
+import { h, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { DraggableOptions } from '@/constant/app'
@@ -17,14 +18,14 @@ interface Props {
 
 const { isAlpha } = defineProps<Props>()
 
+const { cancel, submit } = useModalContext()
+
 const tabs = [
   { tab: 'settings.kernel.config.env', key: 'env' },
   { tab: 'settings.kernel.config.args', key: 'args' },
 ]
 
 const activeKey = ref('env')
-const handleCancel = inject('cancel') as any
-const handleSubmit = inject('submit') as any
 
 const { t } = useI18n()
 const appSettings = useAppSettingsStore()
@@ -33,9 +34,9 @@ const source = isAlpha ? appSettings.app.kernel.alpha : appSettings.app.kernel.m
 
 const model = ref(deepClone(source))
 
-const handleSave = () => {
+const handleSave = async () => {
   Object.assign(source, model.value)
-  handleSubmit()
+  await submit()
 }
 
 const modalSlots = {
@@ -58,7 +59,7 @@ const modalSlots = {
     h(
       Button,
       {
-        onClick: handleCancel,
+        onClick: cancel,
       },
       () => t('common.cancel'),
     ),

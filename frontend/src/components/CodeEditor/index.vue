@@ -1,6 +1,4 @@
-<!-- eslint-disable vue/require-default-prop -->
 <script setup lang="ts">
-// oxlint-disable vue/require-default-prop
 import { autocompletion } from '@codemirror/autocomplete'
 import { indentWithTab } from '@codemirror/commands'
 import { javascript } from '@codemirror/lang-javascript'
@@ -11,20 +9,19 @@ import { MergeView } from '@codemirror/merge'
 import { Compartment } from '@codemirror/state'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { keymap, placeholder as Placeholder } from '@codemirror/view'
+import { useModalContext } from '@components/Modal'
 import { EditorView, basicSetup } from 'codemirror'
 import * as parserBabel from 'prettier/parser-babel'
 import * as parserYaml from 'prettier/parser-yaml'
 import estreePlugin from 'prettier/plugins/estree'
 import * as prettier from 'prettier/standalone'
-import { watch, onUnmounted, onMounted, useTemplateRef, inject } from 'vue'
+import { watch, onUnmounted, onMounted, useTemplateRef } from 'vue'
 
 import { Theme } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores/appSettings'
 import { getCompletions } from '@/utils/completion'
 import { message } from '@/utils/interaction'
 import { debounce } from '@/utils/others'
-
-import { IS_IN_MODAL } from '@/components/Modal/state'
 
 interface Props {
   editable?: boolean
@@ -41,6 +38,8 @@ const { editable, lang = 'json', mode = 'editor', placeholder = '', plugin } = d
 const emit = defineEmits<{
   change: [content: string]
 }>()
+
+const { isInModal } = useModalContext()
 
 const { promise: editorReady, resolve: markEditorReady } = Promise.withResolvers()
 let internalUpdate = true
@@ -121,7 +120,7 @@ watch(
 )
 
 let timer: number
-onMounted(() => (timer = setTimeout(() => initEditor(), inject(IS_IN_MODAL, false) ? 100 : 0)))
+onMounted(() => (timer = setTimeout(() => initEditor(), isInModal ? 100 : 0)))
 onUnmounted(() => {
   clearTimeout(timer)
   const view = editorView || mergeView
