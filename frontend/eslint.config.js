@@ -1,8 +1,9 @@
 import { withVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import skipFormatting from 'eslint-config-prettier/flat'
+import prettierConfig from 'eslint-config-prettier'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import pluginVue from 'eslint-plugin-vue'
-import { globalIgnores } from 'eslint/config'
+
+import { featuresStrictConfig } from './src/features/eslint-config.js'
 
 export default withVueTs(
   {
@@ -11,29 +12,14 @@ export default withVueTs(
   },
 
   {
-    name: 'app/files-to-lint',
-    files: ['**/*.{ts,vue}'],
+    ignores: ['**/dist/**', '**/wailsjs/**'],
   },
 
-  globalIgnores(['**/dist/**', '**/wailsjs/**']),
-
-  pluginVue.configs['flat/recommended'],
-  vueTsConfigs.recommendedTypeChecked,
-  vueTsConfigs.stylisticTypeChecked,
-
-  skipFormatting,
-
-  pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
-
   {
+    name: 'app/base-rules',
+    files: ['**/*.{ts,vue}'],
+    extends: [pluginVue.configs['flat/recommended'], vueTsConfigs.recommended],
     rules: {
-      '@typescript-eslint/only-throw-error': 'off',
-      '@typescript-eslint/prefer-promise-reject-errors': 'off',
-      '@typescript-eslint/prefer-nullish-coalescing': 'off',
-      '@typescript-eslint/no-unsafe-function-type': 'off',
-      '@typescript-eslint/no-misused-promises': 'off',
-      '@typescript-eslint/no-empty-function': 'off',
-      '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': ['off'],
       'vue/no-v-html': ['off'],
       'vue/multi-word-component-names': [
@@ -42,18 +28,7 @@ export default withVueTs(
           ignores: ['index'],
         },
       ],
-      'vue/define-macros-order': [
-        'error',
-        {
-          order: ['defineOptions', 'defineModel', 'defineProps', 'defineEmits', 'defineSlots'],
-          defineExposeLast: true,
-        },
-      ],
-      'vue/component-api-style': ['error', ['script-setup', 'composition']],
-      'vue/no-duplicate-class-names': 'error',
-      '@typescript-eslint/consistent-type-imports': 'error',
-      '@typescript-eslint/no-import-type-side-effects': 'error',
-      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -68,4 +43,11 @@ export default withVueTs(
       ],
     },
   },
+
+  featuresStrictConfig,
+
+  ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
+  ...pluginOxlint.buildFromOxlintConfigFile('./src/features/.oxlintrc.json'),
+
+  prettierConfig,
 )

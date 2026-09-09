@@ -22,34 +22,8 @@
       "@/*": ["./src/*"]
     },
 
-    // Style Options
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "noImplicitOverride": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": true,
-
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-
     // `vue-tsc --build` produces a .tsbuildinfo file for incremental type-checking.
     // Specified here to keep it out of the root directory.
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo"
-  },
-  "vueCompilerOptions": {
-    "strictTemplates": true,
-    "strictCssModules": true,
-    "inferComponentDollarEl": true,
-    "inferComponentDollarRefs": true,
-    "inferTemplateDollarAttrs": true,
-    "inferTemplateDollarEl": true,
-    "inferTemplateDollarRefs": true,
-    "inferTemplateDollarSlots": true,
-    "fallthroughAttributes": true,
-    "resolveStyleImports": true,
-    "resolveStyleClassNames": true
   }
 }
