@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   disabled: 'Disable Log',
@@ -14,4 +14,4 @@ export default {
     fatal: 'fatal',
     panic: 'panic',
   },
-} satisfies MessageSchema['log']
+} satisfies MessageSchema['log'];

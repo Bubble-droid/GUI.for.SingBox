@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   title: 'Endpoints',
@@ -401,4 +401,4 @@ export default {
       },
     },
   },
-} satisfies MessageSchema['endpoints']
+} satisfies MessageSchema['endpoints'];

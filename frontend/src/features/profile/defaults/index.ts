@@ -1,5 +1,5 @@
-import type { CertStore, HttpEngine } from '@profile/constant/kernel'
-import { ClashMode, HttpVersion, LogLevel } from '@profile/constant/kernel'
+import type { CertStore, HttpEngine } from '@profile/constant/kernel';
+import { ClashMode, HttpVersion, LogLevel } from '@profile/constant/kernel';
 import type {
   CertSection,
   ExperimentalSection,
@@ -9,14 +9,14 @@ import type {
   NtpSection,
   Profile,
   Script,
-} from '@profile/types/profiles'
+} from '@profile/types/profiles';
 
-import { generateSecureKey, sampleID } from '@/utils/others'
+import { generateSecureKey, sampleID } from '@/utils/others';
 
-import { createDns } from './dns'
-import { createInbounds } from './inbound'
-import { createOutbounds } from './outbound'
-import { createRoute } from './route'
+import { createDns } from './dns';
+import { createInbounds } from './inbound';
+import { createOutbounds } from './outbound';
+import { createRoute } from './route';
 import {
   createDialer,
   createHttp2Options,
@@ -24,22 +24,26 @@ import {
   createQuicOptions,
   createSwitchable,
   DefaultOutboundIds,
-} from './shared'
+} from './shared';
 
-export const ProfileSchemaVersion = 'v0.8.0'
+export const ProfileSchemaVersion = 'v0.8.0';
 
-export const createMixin = (): Mixin => ({ priority: 'mixin', format: 'json', config: '{}' })
+export const createMixin = (): Mixin => ({
+  priority: 'mixin',
+  format: 'json',
+  config: '{}',
+});
 
 export const createScript = (): Script => ({
   code: `const onGenerate = async (config) => {\n  return config\n}`,
-})
+});
 
 export const createLog = (): LogSection => ({
   disabled: false,
   level: LogLevel.Info,
   output: '',
   timestamp: false,
-})
+});
 
 export const createNtp = (): NtpSection => ({
   enabled: false,
@@ -47,14 +51,14 @@ export const createNtp = (): NtpSection => ({
   server_port: 123,
   interval: '',
   dialer: createDialer(),
-})
+});
 
 export const createCert = (): CertSection => ({
   store: '' as CertStore,
   certificate: [],
   certificate_path: [],
   certificate_directory_path: [],
-})
+});
 
 export const createHttpClient = (): HttpClientItem => ({
   ...createSwitchable(),
@@ -69,7 +73,7 @@ export const createHttpClient = (): HttpClientItem => ({
     tls: createOutboundTls(),
     dialer: createDialer(),
   },
-})
+});
 
 export const createExperimental = (): ExperimentalSection => ({
   clash_api: {
@@ -89,7 +93,7 @@ export const createExperimental = (): ExperimentalSection => ({
     store_fakeip: false,
     store_dns: false,
   },
-})
+});
 
 export const createProfile = (name = ''): Profile => ({
   id: sampleID(),
@@ -109,4 +113,4 @@ export const createProfile = (name = ''): Profile => ({
   dns: createDns(),
   mixin: createMixin(),
   script: createScript(),
-})
+});

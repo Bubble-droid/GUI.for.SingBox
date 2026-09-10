@@ -14,4 +14,4 @@ export default {
   },
   server_port: 'NTP 服务器端口',
   interval: '同步间隔',
-}
+};

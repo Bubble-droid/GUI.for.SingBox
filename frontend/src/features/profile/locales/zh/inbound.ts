@@ -30,4 +30,4 @@ export default {
   mixedPort: '混合代理端口',
   httpPort: 'HTTP(s)代理端口',
   socksPort: 'SOCKS5代理端口',
-}
+};

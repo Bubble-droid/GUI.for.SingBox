@@ -1,4 +1,4 @@
-import { vueTsConfigs } from '@vue/eslint-config-typescript'
+import { vueTsConfigs } from '@vue/eslint-config-typescript';
 
 /** @type {Parameters<typeof import('@vue/eslint-config-typescript')['withVueTs']>[1]} */
 export const featuresStrictConfig = {
@@ -10,7 +10,13 @@ export const featuresStrictConfig = {
     'vue/define-macros-order': [
       'error',
       {
-        order: ['defineOptions', 'defineModel', 'defineProps', 'defineEmits', 'defineSlots'],
+        order: [
+          'defineOptions',
+          'defineModel',
+          'defineProps',
+          'defineEmits',
+          'defineSlots',
+        ],
         defineExposeLast: true,
       },
     ],
@@ -22,4 +28,4 @@ export const featuresStrictConfig = {
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/member-ordering': 'error',
   },
-}
+};

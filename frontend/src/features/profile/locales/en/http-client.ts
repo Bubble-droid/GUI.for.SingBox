@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   title: 'HTTP Clients',
@@ -13,4 +13,4 @@ export default {
   },
   disable_version_fallback: 'Disable Version Fallback',
   headers: 'Custom Headers',
-} satisfies MessageSchema['http_clients']
+} satisfies MessageSchema['http_clients'];

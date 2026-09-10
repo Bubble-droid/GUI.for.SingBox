@@ -18,4 +18,4 @@ export default {
     store_fakeip: '存储 FakeIP',
     store_dns: '存储 DNS',
   },
-}
+};

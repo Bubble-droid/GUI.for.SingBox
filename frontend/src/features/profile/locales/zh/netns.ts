@@ -12,4 +12,4 @@ export default {
   unshare: {
     pid_file: 'PID 文件路径',
   },
-}
+};

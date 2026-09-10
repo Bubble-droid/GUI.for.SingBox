@@ -1,21 +1,24 @@
 <script setup lang="ts">
-import type { OutboundChild, OutboundItem } from '@profile/types/profiles/outbound'
-import { useI18n } from 'vue-i18n'
+import type {
+  OutboundChild,
+  OutboundItem,
+} from '@profile/types/profiles/outbound';
+import { useI18n } from 'vue-i18n';
 
-import { DraggableOptions } from '@/constant/app'
-import { useSubscribesStore } from '@/stores/subscribes'
+import { DraggableOptions } from '@/constant/app';
+import { useSubscribesStore } from '@/stores/subscribes';
 
-const outbound = defineModel<OutboundItem>({ required: true })
+const outbound = defineModel<OutboundItem>({ required: true });
 
-const { t } = useI18n()
-const subscribesStore = useSubscribesStore()
+const { t } = useI18n();
+const subscribesStore = useSubscribesStore();
 
 const getOutboundName = (item: OutboundChild) => {
   if (item.type === 'Subscription') {
-    return subscribesStore.getSubscribeById(item.id)?.name ?? item.tag
+    return subscribesStore.getSubscribeById(item.id)?.name ?? item.tag;
   }
-  return item.tag
-}
+  return item.tag;
+};
 </script>
 
 <template>

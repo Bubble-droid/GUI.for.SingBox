@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { DefaultNetns } from '@profile/types/profiles/netns'
-import { useI18n } from 'vue-i18n'
+import type { DefaultNetns } from '@profile/types/profiles/netns';
+import { useI18n } from 'vue-i18n';
 
-const model = defineModel<DefaultNetns['config']>({ required: true })
-const { t } = useI18n()
+const model = defineModel<DefaultNetns['config']>({ required: true });
+const { t } = useI18n();
 </script>
 
 <template>

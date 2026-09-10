@@ -1,29 +1,29 @@
 <script lang="ts" setup>
-import { DomainStrategyOptions } from '@profile/constant/options.ts'
+import { DomainStrategyOptions } from '@profile/constant/options.ts';
 import type {
   DnsRouteOptionsFormData,
   DomainResolverFormData,
-} from '@profile/types/profiles/shared.ts'
-import { useI18n } from 'vue-i18n'
+} from '@profile/types/profiles/shared.ts';
+import { useI18n } from 'vue-i18n';
 
-import { useBool } from '@/hooks/useBool.ts'
+import { useBool } from '@/hooks/useBool.ts';
 
-import type { OptionItem } from '@/types/component.ts'
+import type { OptionItem } from '@/types/component.ts';
 
-import DnsRouteOptionsForm from './DnsRouteOptionsForm.vue'
+import DnsRouteOptionsForm from './DnsRouteOptionsForm.vue';
 
 interface Props {
-  dnsServerOptions: OptionItem[]
-  title?: string
+  dnsServerOptions: OptionItem[];
+  title?: string;
 }
 
-const model = defineModel<DomainResolverFormData>({ required: true })
+const model = defineModel<DomainResolverFormData>({ required: true });
 
-const { title = 'kernel.shared.domain_resolver.title' } = defineProps<Props>()
+const { title = 'kernel.shared.domain_resolver.title' } = defineProps<Props>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const [showResolver, toggleShow] = useBool(false)
+const [showResolver, toggleShow] = useBool(false);
 </script>
 
 <template>

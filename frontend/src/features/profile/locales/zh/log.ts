@@ -12,4 +12,4 @@ export default {
     fatal: '致命',
     panic: '恐慌',
   },
-}
+};

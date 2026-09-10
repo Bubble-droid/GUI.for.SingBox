@@ -1,4 +1,4 @@
-import { RouteRuleType, DnsRuleType } from '@profile/constant/kernel'
+import { RouteRuleType, DnsRuleType } from '@profile/constant/kernel';
 import {
   createDomainResolver,
   createDialer,
@@ -9,7 +9,7 @@ import {
   createHttp2Options,
   createQuicOptions,
   createDns01Challenge,
-} from '@profile/defaults/shared'
+} from '@profile/defaults/shared';
 import type {
   DialerFormData,
   Dns01ChallengeFormData,
@@ -21,7 +21,7 @@ import type {
   OutboundUtls,
   QuicFormData,
   UdpNatFormData,
-} from '@profile/types/profiles/shared'
+} from '@profile/types/profiles/shared';
 import type {
   DialerOptions,
   Dns01ChallengeOptions,
@@ -32,10 +32,10 @@ import type {
   OutboundTlsOptions,
   QuicOptions,
   UdpNatOptions,
-} from '@profile/types/sing-box/shared'
-import { normalizeArray, splitProps } from '@profile/utils/helper'
+} from '@profile/types/sing-box/shared';
+import { normalizeArray, splitProps } from '@profile/utils/helper';
 
-import type { IdMaps } from './types'
+import type { IdMaps } from './types';
 
 export const supportedRuleTypes = [
   RouteRuleType.Inbound,
@@ -58,34 +58,34 @@ export const supportedRuleTypes = [
   RouteRuleType.IpIsPrivate,
   RouteRuleType.ClashMode,
   DnsRuleType.IpAcceptAny,
-]
+];
 
 export const restoreDomainResolver = (
   maps: IdMaps,
   raw?: DomainResolverOptions | string,
 ): DomainResolverFormData => {
-  const template = createDomainResolver()
+  const template = createDomainResolver();
   const normalizedResolver = raw
     ? typeof raw === 'string'
       ? { ...template, server: raw }
       : splitProps(raw, template).target
-    : template
+    : template;
   const resolver: DomainResolverFormData = {
     ...template,
     ...normalizedResolver,
     server: maps.dnsServers.get(normalizedResolver.server) ?? '',
-  }
-  return resolver
-}
+  };
+  return resolver;
+};
 
 export const restoreDialer = <T extends object>(
   raw: T,
   maps: IdMaps,
 ): { dialer: DialerFormData; rest: Omit<T, keyof DialerFormData> } => {
-  const template = createDialer()
-  const result = splitProps(raw, template)
-  const target = result.target as DialerOptions
-  const resolver = restoreDomainResolver(maps, target.domain_resolver)
+  const template = createDialer();
+  const result = splitProps(raw, template);
+  const target = result.target as DialerOptions;
+  const resolver = restoreDomainResolver(maps, target.domain_resolver);
   const dialer: DialerFormData = {
     ...template,
     ...target,
@@ -94,46 +94,52 @@ export const restoreDialer = <T extends object>(
     netns: maps.netns.get(target.netns ?? '') ?? '',
     detour: maps.outbounds.get(target.detour ?? '') ?? '',
     domain_resolver: resolver,
-  }
-  return { dialer, rest: result.rest }
-}
+  };
+  return { dialer, rest: result.rest };
+};
 
 export const restoreUdpNat = <T extends object>(
   raw: T,
 ): { udpNat: UdpNatFormData; rest: Omit<T, keyof UdpNatFormData> } => {
-  const template = createUdpNat()
-  const result = splitProps(raw, template)
-  const target = result.target as UdpNatOptions
+  const template = createUdpNat();
+  const result = splitProps(raw, template);
+  const target = result.target as UdpNatOptions;
   const udpNat = {
     ...template,
     ...target,
-  }
-  return { udpNat, rest: result.rest }
-}
+  };
+  return { udpNat, rest: result.rest };
+};
 
 export const restoreListen = <T extends object>(
   raw: T,
   maps: IdMaps,
 ): { listen: ListenFormData; rest: Omit<T, keyof ListenFormData> } => {
-  const template = createListen()
-  const result = splitProps(raw, template)
-  const target = result.target as unknown as ListenOptions
+  const template = createListen();
+  const result = splitProps(raw, template);
+  const target = result.target as unknown as ListenOptions;
   const listen: ListenFormData = {
     ...template,
     ...target,
     netns: maps.netns.get(target.netns ?? '') ?? '',
     detour: maps.inbounds.get(target.detour ?? '') ?? '',
-  }
-  return { listen, rest: result.rest }
-}
+  };
+  return { listen, rest: result.rest };
+};
 
-export const restoreInboundTls = (maps: IdMaps, raw?: InboundTlsOptions): InboundTlsFormData => {
-  const template = createInboundTls()
+export const restoreInboundTls = (
+  maps: IdMaps,
+  raw?: InboundTlsOptions,
+): InboundTlsFormData => {
+  const template = createInboundTls();
   if (!raw) {
-    return template
+    return template;
   }
 
-  const { dialer, rest: handshakeRest } = restoreDialer(raw.reality?.handshake ?? {}, maps)
+  const { dialer, rest: handshakeRest } = restoreDialer(
+    raw.reality?.handshake ?? {},
+    maps,
+  );
 
   return {
     ...template,
@@ -144,9 +150,12 @@ export const restoreInboundTls = (maps: IdMaps, raw?: InboundTlsOptions): Inboun
     certificate: normalizeArray(raw.certificate),
     client_certificate: normalizeArray(raw.client_certificate),
     client_certificate_path: normalizeArray(raw.client_certificate_path),
-    client_certificate_public_key_sha256: normalizeArray(raw.client_certificate_public_key_sha256),
+    client_certificate_public_key_sha256: normalizeArray(
+      raw.client_certificate_public_key_sha256,
+    ),
     key: normalizeArray(raw.key),
-    certificate_provider: maps.certProviders.get(raw.certificate_provider as string) ?? '',
+    certificate_provider:
+      maps.certProviders.get(raw.certificate_provider as string) ?? '',
     ech: {
       ...template.ech,
       ...raw.ech,
@@ -162,13 +171,15 @@ export const restoreInboundTls = (maps: IdMaps, raw?: InboundTlsOptions): Inboun
       },
       short_id: normalizeArray(raw.reality?.short_id),
     },
-  }
-}
+  };
+};
 
-export const restoreOutboundTls = (raw?: OutboundTlsOptions): OutboundTlsFormData => {
-  const template = createOutboundTls()
+export const restoreOutboundTls = (
+  raw?: OutboundTlsOptions,
+): OutboundTlsFormData => {
+  const template = createOutboundTls();
   if (!raw) {
-    return template
+    return template;
   }
 
   return {
@@ -178,7 +189,9 @@ export const restoreOutboundTls = (raw?: OutboundTlsOptions): OutboundTlsFormDat
     cipher_suites: normalizeArray(raw.cipher_suites),
     curve_preferences: normalizeArray(raw.curve_preferences),
     certificate: normalizeArray(raw.certificate),
-    certificate_public_key_sha256: normalizeArray(raw.certificate_public_key_sha256),
+    certificate_public_key_sha256: normalizeArray(
+      raw.certificate_public_key_sha256,
+    ),
     client_certificate: normalizeArray(raw.client_certificate),
     client_key: normalizeArray(raw.client_key),
     ech: {
@@ -195,42 +208,42 @@ export const restoreOutboundTls = (raw?: OutboundTlsOptions): OutboundTlsFormDat
       ...raw.reality,
       short_id: normalizeArray(raw.reality?.short_id),
     },
-  }
-}
+  };
+};
 
 export const restoreHttp2Options = <T extends Record<string, unknown>>(
   raw: T,
 ): { http2: Http2FormData; rest: Omit<T, keyof Http2FormData> } => {
-  const template = createHttp2Options()
-  const result = splitProps(raw, template)
-  const target = result.target as Http2Options
+  const template = createHttp2Options();
+  const result = splitProps(raw, template);
+  const target = result.target as Http2Options;
   const http2: Http2FormData = {
     ...template,
     ...target,
-  }
-  return { http2, rest: result.rest }
-}
+  };
+  return { http2, rest: result.rest };
+};
 
 export const restoreQuicOptions = <T extends Record<string, unknown>>(
   raw: T,
 ): { quic: QuicFormData; rest: Omit<T, keyof QuicFormData> } => {
-  const template = createQuicOptions()
-  const result = splitProps(raw, template)
-  const target = result.target as QuicOptions
+  const template = createQuicOptions();
+  const result = splitProps(raw, template);
+  const target = result.target as QuicOptions;
   const quic: QuicFormData = {
     ...template,
     ...target,
-  }
-  return { quic, rest: result.rest }
-}
+  };
+  return { quic, rest: result.rest };
+};
 
 export const restoreDns01Challenge = (
   maps: IdMaps,
   raw?: Dns01ChallengeOptions,
 ): Dns01ChallengeFormData => {
-  const template = createDns01Challenge(raw?.provider)
+  const template = createDns01Challenge(raw?.provider);
   if (!raw) {
-    return template
+    return template;
   }
 
   return {
@@ -239,5 +252,5 @@ export const restoreDns01Challenge = (
     resolvers: normalizeArray(raw.resolvers)
       .map((v) => maps.dnsServers.get(v))
       .filter(Boolean) as string[],
-  } as Dns01ChallengeFormData
-}
+  } as Dns01ChallengeFormData;
+};

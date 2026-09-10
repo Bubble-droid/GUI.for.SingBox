@@ -1,54 +1,57 @@
 <script setup lang="ts">
-import type { Mixin, Script } from '@profile/types/profiles'
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { parse, stringify } from 'yaml'
+import type { Mixin, Script } from '@profile/types/profiles';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { parse, stringify } from 'yaml';
 
-import { message } from '@/utils/interaction'
+import { message } from '@/utils/interaction';
 
 const model = defineModel<{ mixin: Mixin; script: Script }>({
   required: true,
-})
+});
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const activeTab = ref('mixin')
+const activeTab = ref('mixin');
 
 const tabItems = [
   { key: 'mixin', tab: 'profile.mixinSettings.name' },
   { key: 'script', tab: 'profile.scriptSettings.name' },
-]
+];
 
 const MixinPriorityOptions = [
   { label: 'profile.mixinSettings.mixin', value: 'mixin' },
   { label: 'profile.mixinSettings.gui', value: 'gui' },
-] as const
+] as const;
 
 const MixinFormatOptions = [
   { label: 'JSON', value: 'json' },
   { label: 'YAML', value: 'yaml' },
-] as const
+] as const;
 
-const onFormatChange = (val: 'json' | 'yaml' | Event, old?: 'json' | 'yaml') => {
+const onFormatChange = (
+  val: 'json' | 'yaml' | Event,
+  old?: 'json' | 'yaml',
+) => {
   if (typeof val !== 'string') {
-    return
+    return;
   }
   try {
-    const config = parse(model.value.mixin.config)
+    const config = parse(model.value.mixin.config);
     if (config) {
       if (val === 'json') {
-        model.value.mixin.config = JSON.stringify(config, null, 2)
+        model.value.mixin.config = JSON.stringify(config, null, 2);
       } else {
-        model.value.mixin.config = stringify(config)
+        model.value.mixin.config = stringify(config);
       }
     }
   } catch (error) {
     if (old) {
-      model.value.mixin.format = old
+      model.value.mixin.format = old;
     }
-    message.error(error)
+    message.error(error);
   }
-}
+};
 </script>
 
 <template>
@@ -66,7 +69,11 @@ const onFormatChange = (val: 'json' | 'yaml' | Event, old?: 'json' | 'yaml') => 
           @change="onFormatChange"
         />
       </div>
-      <CodeEditor v-model="model.mixin.config" :lang="model.mixin.format" editable />
+      <CodeEditor
+        v-model="model.mixin.config"
+        :lang="model.mixin.format"
+        editable
+      />
     </template>
     <template #script>
       <CodeEditor v-model="model.script.code" lang="javascript" editable />

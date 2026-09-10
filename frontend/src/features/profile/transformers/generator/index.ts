@@ -1,12 +1,12 @@
-import { NetnsType } from '@profile/constant/kernel'
+import { NetnsType } from '@profile/constant/kernel';
 import type {
   ExperimentalSection,
   HttpClientItem,
   NtpSection,
   Profile,
-} from '@profile/types/profiles'
-import type { NetnsItem } from '@profile/types/profiles/netns'
-import type { TagItem } from '@profile/types/profiles/shared'
+} from '@profile/types/profiles';
+import type { NetnsItem } from '@profile/types/profiles/netns';
+import type { TagItem } from '@profile/types/profiles/shared';
 import type {
   Dns,
   Experimental,
@@ -17,59 +17,66 @@ import type {
   Outbound,
   Route,
   SingBoxConfig,
-} from '@profile/types/sing-box/config'
-import { cleanObject } from '@profile/utils/helper'
-import { parse } from 'yaml'
+} from '@profile/types/sing-box/config';
+import { cleanObject } from '@profile/utils/helper';
+import { parse } from 'yaml';
 
-import { WriteFile } from '@/bridge/io'
+import { WriteFile } from '@/bridge/io';
 
-import { CoreConfigFilePath } from '@/constant/kernel'
-import { Branch } from '@/enums/app'
-import { APP_TITLE } from '@/utils/env'
-import { normalizeErrorMessage } from '@/utils/normalize'
-import { deepClone, deepAssign } from '@/utils/others'
+import { CoreConfigFilePath } from '@/constant/kernel';
+import { Branch } from '@/enums/app';
+import { APP_TITLE } from '@/utils/env';
+import { normalizeErrorMessage } from '@/utils/normalize';
+import { deepClone, deepAssign } from '@/utils/others';
 
-import type { Recordable } from '@/types/typescript'
+import type { Recordable } from '@/types/typescript';
 
-import { _adaptToStableBranch } from './adapter'
-import { generateCertProviders } from './cert-provider'
-import { getGenerateContext } from './context'
-import { generateDns } from './dns'
-import { generateEndpoints } from './endpoint'
-import { generateInbounds } from './inbound'
-import { generateOutbounds } from './outbound'
-import { generateRoute } from './route'
+import { _adaptToStableBranch } from './adapter';
+import { generateCertProviders } from './cert-provider';
+import { getGenerateContext } from './context';
+import { generateDns } from './dns';
+import { generateEndpoints } from './endpoint';
+import { generateInbounds } from './inbound';
+import { generateOutbounds } from './outbound';
+import { generateRoute } from './route';
 import {
   generateQuicOptions,
   generateHttp2Options,
   generateDialer,
   generateOutboundTls,
-} from './shared'
-import type { GenerateOptions, TagMaps } from './types'
+} from './shared';
+import type { GenerateOptions, TagMaps } from './types';
 
 const buildIdTagMapping = (items: TagItem[]): Map<string, string> =>
-  new Map(items.map((v) => [v.id, v.tag]))
+  new Map(items.map((v) => [v.id, v.tag]));
 
 const generateNtp = (ntp: NtpSection, maps: TagMaps): Ntp => {
   if (!ntp.enabled) {
-    return {} as Ntp
+    return {} as Ntp;
   }
-  const { dialer, ...rest } = ntp
+  const { dialer, ...rest } = ntp;
   return {
     ...(rest as Ntp),
     ...generateDialer(dialer, maps),
-  }
-}
+  };
+};
 
-const generateHttpClients = (httpClients: HttpClientItem[], maps: TagMaps): HttpClient[] =>
+const generateHttpClients = (
+  httpClients: HttpClientItem[],
+  maps: TagMaps,
+): HttpClient[] =>
   httpClients
     .filter((hc) => hc.enable)
     .map((hc): HttpClient => {
-      const { tag, config } = hc
-      const { http2, quic, tls, dialer, version, ...rest } = config
+      const { tag, config } = hc;
+      const { http2, quic, tls, dialer, version, ...rest } = config;
 
       const http2OrQuicProps =
-        version === 3 ? generateQuicOptions(quic) : version === 2 ? generateHttp2Options(http2) : {}
+        version === 3
+          ? generateQuicOptions(quic)
+          : version === 2
+            ? generateHttp2Options(http2)
+            : {};
 
       return {
         ...rest,
@@ -78,52 +85,60 @@ const generateHttpClients = (httpClients: HttpClientItem[], maps: TagMaps): Http
         tag,
         version,
         tls: generateOutboundTls(tls),
-      }
-    })
+      };
+    });
 
 const generateNetns = (netns: NetnsItem[]) =>
   netns
     .filter((ns) => ns.enable)
     .map((ns): NetworkNamespace => {
-      const { type, tag, config } = ns
+      const { type, tag, config } = ns;
       switch (type) {
         case NetnsType.Default:
         case NetnsType.Unshare: {
-          return { type, tag, ...config } as NetworkNamespace
+          return { type, tag, ...config } as NetworkNamespace;
         }
         default: {
-          throw new Error(`Unexpected netns type: ${type as string}`)
+          throw new Error(`Unexpected netns type: ${type as string}`);
         }
       }
-    })
+    });
 
-const generateExperimental = (experimental: ExperimentalSection, maps: TagMaps): Experimental => {
-  const { clash_api, cache_file } = experimental
+const generateExperimental = (
+  experimental: ExperimentalSection,
+  maps: TagMaps,
+): Experimental => {
+  const { clash_api, cache_file } = experimental;
   return {
     clash_api: {
       ...clash_api,
-      external_ui_download_detour: maps.outbounds.get(clash_api.external_ui_download_detour),
+      external_ui_download_detour: maps.outbounds.get(
+        clash_api.external_ui_download_detour,
+      ),
     },
     cache_file: cache_file.enabled ? { ...cache_file } : undefined,
-  } as Experimental
-}
+  } as Experimental;
+};
 
-export const generateConfig = async (originalProfile: Profile, options: GenerateOptions = {}) => {
+export const generateConfig = async (
+  originalProfile: Profile,
+  options: GenerateOptions = {},
+) => {
   if (typeof options === 'boolean') {
-    options = { enableStableConfigCompat: options }
+    options = { enableStableConfigCompat: options };
   }
 
-  const ctx = getGenerateContext()
-  const isMainBranch = ctx.appSettings.kernel.branch === Branch.Main
+  const ctx = getGenerateContext();
+  const isMainBranch = ctx.appSettings.kernel.branch === Branch.Main;
 
   const {
     enableStableConfigCompat = isMainBranch,
     enablePluginProcessing = true,
     enableMixinProcessing = true,
     enableScriptProcessing = true,
-  } = options
+  } = options;
 
-  const profile = deepClone(originalProfile)
+  const profile = deepClone(originalProfile);
 
   const tagMaps: TagMaps = {
     certProviders: buildIdTagMapping(profile.certProviders),
@@ -133,7 +148,7 @@ export const generateConfig = async (originalProfile: Profile, options: Generate
     inbounds: buildIdTagMapping([...profile.endpoints, ...profile.inbounds]),
     outbounds: buildIdTagMapping([...profile.endpoints, ...profile.outbounds]),
     dnsServers: buildIdTagMapping(profile.dns.servers),
-  }
+  };
 
   // step 1
   let config = cleanObject(
@@ -142,12 +157,18 @@ export const generateConfig = async (originalProfile: Profile, options: Generate
       ntp: generateNtp(profile.ntp, tagMaps),
       experimental: generateExperimental(profile.experimental, tagMaps),
       certificate: { ...profile.cert },
-      certificate_providers: generateCertProviders(profile.certProviders, tagMaps),
+      certificate_providers: generateCertProviders(
+        profile.certProviders,
+        tagMaps,
+      ),
       http_clients: generateHttpClients(profile.httpClients, tagMaps),
       network_namespaces: generateNetns(profile.netns),
       endpoints: generateEndpoints(profile.endpoints, tagMaps),
       inbounds: generateInbounds(profile.inbounds) as Inbound[],
-      outbounds: (await generateOutbounds(profile.outbounds, ctx)) as Outbound[],
+      outbounds: (await generateOutbounds(
+        profile.outbounds,
+        ctx,
+      )) as Outbound[],
       route: generateRoute(
         profile.route,
         profile.inbounds,
@@ -163,25 +184,25 @@ export const generateConfig = async (originalProfile: Profile, options: Generate
       ) as Dns,
     } satisfies SingBoxConfig,
     true,
-  )
+  );
 
   // adapt to stable branch
   if (enableStableConfigCompat) {
-    _adaptToStableBranch(config)
+    _adaptToStableBranch(config);
   }
 
   // step 2
   if (enablePluginProcessing) {
-    config = await ctx.onGenerate(config, originalProfile)
+    config = await ctx.onGenerate(config, originalProfile);
   }
 
   // step 3
   if (enableMixinProcessing) {
-    const { priority, config: mixin } = originalProfile.mixin
+    const { priority, config: mixin } = originalProfile.mixin;
     if (priority === 'mixin') {
-      deepAssign(config, parse(mixin))
+      deepAssign(config, parse(mixin));
     } else {
-      deepAssign(config, deepAssign(parse(mixin), config))
+      deepAssign(config, deepAssign(parse(mixin), config));
     }
   }
 
@@ -190,29 +211,32 @@ export const generateConfig = async (originalProfile: Profile, options: Generate
     const fn = new globalThis.AsyncFunction(
       'config',
       `${originalProfile.script.code}; return await onGenerate(config)`,
-    )
+    );
     try {
-      config = await fn(config)
+      config = await fn(config);
     } catch (error) {
-      throw new Error(normalizeErrorMessage(error), { cause: error })
+      throw new Error(normalizeErrorMessage(error), { cause: error });
     }
 
     if (typeof config !== 'object') {
-      throw new TypeError('Wrong result')
+      throw new TypeError('Wrong result');
     }
   }
 
-  return config
-}
+  return config;
+};
 
 export const generateConfigFile = async (
   profile: Profile,
   beforeWrite: (config: Recordable) => Promise<Recordable>,
 ) => {
-  const header = `DO NOT EDIT - Auto Generated by ${APP_TITLE}`
+  const header = `DO NOT EDIT - Auto Generated by ${APP_TITLE}`;
 
-  const config = await generateConfig(profile)
-  const finalConfig = await beforeWrite(config)
+  const config = await generateConfig(profile);
+  const finalConfig = await beforeWrite(config);
 
-  await WriteFile(CoreConfigFilePath, JSON.stringify({ $schema: header, ...finalConfig }, null, 2))
-}
+  await WriteFile(
+    CoreConfigFilePath,
+    JSON.stringify({ $schema: header, ...finalConfig }, null, 2),
+  );
+};

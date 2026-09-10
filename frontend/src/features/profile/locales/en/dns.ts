@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   tab: {
@@ -43,4 +43,4 @@ export default {
     action: 'Action',
     server: 'Server',
   },
-} satisfies MessageSchema['dns']
+} satisfies MessageSchema['dns'];

@@ -1,19 +1,19 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
-import certificate_providers from './cert-provider'
-import certificate from './certificate'
-import dns from './dns'
-import endpoints from './endpoint'
-import experimental from './experimental'
-import http_clients from './http-client'
-import inbounds from './inbound'
-import log from './log'
-import netns from './netns'
-import ntp from './ntp'
-import outbounds from './outbound'
-import route from './route'
-import rules from './rules'
-import shared from './shared'
+import certificate_providers from './cert-provider';
+import certificate from './certificate';
+import dns from './dns';
+import endpoints from './endpoint';
+import experimental from './experimental';
+import http_clients from './http-client';
+import inbounds from './inbound';
+import log from './log';
+import netns from './netns';
+import ntp from './ntp';
+import outbounds from './outbound';
+import route from './route';
+import rules from './rules';
+import shared from './shared';
 
 export default {
   rule: 'Rule',
@@ -53,4 +53,4 @@ export default {
   addInsertionPoint: 'Add insertion point',
   missingInsertionPoint: 'Please add an insertion point first',
   startupFailed: 'Startup failed, please Check logs for details',
-} satisfies MessageSchema
+} satisfies MessageSchema;

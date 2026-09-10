@@ -1,13 +1,16 @@
-import { OutboundType } from '@profile/constant/kernel'
-import { createOutbound } from '@profile/defaults/outbound'
-import type { OutboundChild, OutboundItem } from '@profile/types/profiles/outbound'
+import { OutboundType } from '@profile/constant/kernel';
+import { createOutbound } from '@profile/defaults/outbound';
+import type {
+  OutboundChild,
+  OutboundItem,
+} from '@profile/types/profiles/outbound';
 
-import { createTextMatcher } from '@/utils/others'
+import { createTextMatcher } from '@/utils/others';
 
-import type { Subscription } from '@/types/app'
-import type { Recordable } from '@/types/typescript'
+import type { Subscription } from '@/types/app';
+import type { Recordable } from '@/types/typescript';
 
-import type { RestoreContext } from './types'
+import type { RestoreContext } from './types';
 
 export const restoreOutbounds = (
   outbounds: Recordable[],
@@ -16,109 +19,124 @@ export const restoreOutbounds = (
   subscriptionIds: string[],
   ctx: RestoreContext,
 ): OutboundItem[] => {
-  const subscriptionCache = new Map<string, Subscription>()
-  const proxyToSubMap = new Map<string, { sub: string; id: string }>()
-  const originalOutboundMap = new Map<string, OutboundItem>()
+  const subscriptionCache = new Map<string, Subscription>();
+  const proxyToSubMap = new Map<string, { sub: string; id: string }>();
+  const originalOutboundMap = new Map<string, OutboundItem>();
 
   const groupTags = new Set(
     outbounds
-      .filter((o: Recordable) => [OutboundType.Selector, OutboundType.UrlTest].includes(o['type']))
+      .filter((o: Recordable) =>
+        [OutboundType.Selector, OutboundType.UrlTest].includes(o['type']),
+      )
       .map((o: Recordable) => o['tag']),
-  )
+  );
 
   subscriptionIds.forEach((id) => {
-    const sub = ctx.getSubscribe(id)
+    const sub = ctx.getSubscribe(id);
     if (sub) {
-      subscriptionCache.set(id, sub)
+      subscriptionCache.set(id, sub);
       sub.proxies.forEach((proxy) => {
-        proxyToSubMap.set(proxy.tag, { sub: id, id: proxy.id })
-      })
+        proxyToSubMap.set(proxy.tag, { sub: id, id: proxy.id });
+      });
     }
-  })
+  });
 
   originalOutbounds.forEach((outbound) => {
-    originalOutboundMap.set(outbound.tag, outbound)
-  })
+    originalOutboundMap.set(outbound.tag, outbound);
+  });
 
   return outbounds.flatMap((raw) => {
     if (![OutboundType.Selector, OutboundType.UrlTest].includes(raw['type'])) {
-      return []
+      return [];
     }
-    const outbound = createOutbound()
-    outbound.id = OutboundsIds[raw['tag']]
-    outbound.tag = raw['tag']
-    outbound.type = raw['type']
+    const outbound = createOutbound();
+    outbound.id = OutboundsIds[raw['tag']];
+    outbound.tag = raw['tag'];
+    outbound.type = raw['type'];
 
-    let newOutbounds: OutboundChild[] = []
+    let newOutbounds: OutboundChild[] = [];
 
     raw['outbounds']?.forEach((tag: string) => {
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const isBuiltIn = [OutboundType.Direct, OutboundType.Block].includes(tag as any)
+      const isBuiltIn = [OutboundType.Direct, OutboundType.Block].includes(
+        // oxlint-disable-next-line typescript/no-explicit-any
+        tag as any,
+      );
       if (isBuiltIn) {
-        newOutbounds.push({ id: tag, type: 'Built-in', tag })
+        newOutbounds.push({ id: tag, type: 'Built-in', tag });
       } else if (groupTags.has(tag)) {
-        const id = OutboundsIds[tag]
+        const id = OutboundsIds[tag];
         if (id) {
-          newOutbounds.push({ id, type: 'Built-in', tag })
+          newOutbounds.push({ id, type: 'Built-in', tag });
         }
       } else {
-        const proxy = proxyToSubMap.get(tag)
+        const proxy = proxyToSubMap.get(tag);
         if (proxy) {
-          newOutbounds.push({ id: proxy.id, type: proxy.sub, tag })
+          newOutbounds.push({ id: proxy.id, type: proxy.sub, tag });
         }
       }
-    })
+    });
 
-    const originalGroup = originalOutboundMap.get(outbound.tag)
+    const originalGroup = originalOutboundMap.get(outbound.tag);
     if (originalGroup) {
-      outbound.icon = originalGroup.icon
-      outbound.hidden = originalGroup.hidden
-      outbound.include = originalGroup.include
-      outbound.exclude = originalGroup.exclude
+      outbound.icon = originalGroup.icon;
+      outbound.hidden = originalGroup.hidden;
+      outbound.include = originalGroup.include;
+      outbound.exclude = originalGroup.exclude;
 
       const currentNonBuiltInIds = new Set(
         newOutbounds.filter((v) => v.type !== 'Built-in').map((v) => v.id),
-      )
+      );
 
       subscriptionIds.forEach((id) => {
-        const sub = subscriptionCache.get(id)
+        const sub = subscriptionCache.get(id);
         if (sub) {
-          const isTagMatching = createTextMatcher(originalGroup.include, originalGroup.exclude)
-          const matchedProxies = sub.proxies.filter((proxy) => isTagMatching(proxy.tag))
+          const isTagMatching = createTextMatcher(
+            originalGroup.include,
+            originalGroup.exclude,
+          );
+          const matchedProxies = sub.proxies.filter((proxy) =>
+            isTagMatching(proxy.tag),
+          );
 
           const isAllMatched =
             matchedProxies.length > 0 &&
-            matchedProxies.every((proxy) => currentNonBuiltInIds.has(proxy.id))
+            matchedProxies.every((proxy) => currentNonBuiltInIds.has(proxy.id));
 
           if (isAllMatched) {
-            const matchedIds = new Set(matchedProxies.map((p) => p.id))
+            const matchedIds = new Set(matchedProxies.map((p) => p.id));
             newOutbounds = newOutbounds.filter(
               (v) => v.type === 'Built-in' || !matchedIds.has(v.id),
-            )
-            newOutbounds.push({ id: sub.id, type: 'Subscription', tag: sub.name })
+            );
+            newOutbounds.push({
+              id: sub.id,
+              type: 'Subscription',
+              tag: sub.name,
+            });
 
-            matchedIds.forEach((matchedId) => currentNonBuiltInIds.delete(matchedId))
+            matchedIds.forEach((matchedId) =>
+              currentNonBuiltInIds.delete(matchedId),
+            );
           }
         }
-      })
+      });
     }
 
-    outbound.outbounds = newOutbounds
+    outbound.outbounds = newOutbounds;
 
     if ('interrupt_exist_connections' in raw) {
-      outbound.interrupt_exist_connections = raw['interrupt_exist_connections']
+      outbound.interrupt_exist_connections = raw['interrupt_exist_connections'];
     }
     if (OutboundType.UrlTest === raw['type']) {
       if ('url' in raw) {
-        outbound.url = raw['url']
+        outbound.url = raw['url'];
       }
       if ('interval' in raw) {
-        outbound.interval = raw['interval']
+        outbound.interval = raw['interval'];
       }
       if ('tolerance' in raw) {
-        outbound.tolerance = raw['tolerance']
+        outbound.tolerance = raw['tolerance'];
       }
     }
-    return outbound
-  })
-}
+    return outbound;
+  });
+};

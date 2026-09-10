@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   dns01: {
@@ -214,4 +214,4 @@ export default {
       address_and_port_dependent: 'Address and Port Dependent',
     },
   },
-} satisfies MessageSchema['shared']
+} satisfies MessageSchema['shared'];

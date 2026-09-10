@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import PortInput from '@profile/components/shared/PortInput.vue'
-import type { TailscaleEndpoint } from '@profile/types/profiles/endpoint'
-import { useI18n } from 'vue-i18n'
+import PortInput from '@profile/components/shared/PortInput.vue';
+import type { TailscaleEndpoint } from '@profile/types/profiles/endpoint';
+import { useI18n } from 'vue-i18n';
 
-const model = defineModel<TailscaleEndpoint['config']>({ required: true })
-const { t } = useI18n()
+const model = defineModel<TailscaleEndpoint['config']>({ required: true });
+const { t } = useI18n();
 </script>
 
 <template>
@@ -85,7 +85,12 @@ const { t } = useI18n()
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.tailscale.system_interface_mtu') }}
-    <Input v-model="model.system_interface_mtu" type="number" editable clearable />
+    <Input
+      v-model="model.system_interface_mtu"
+      type="number"
+      editable
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.tailscale.udp_timeout') }}

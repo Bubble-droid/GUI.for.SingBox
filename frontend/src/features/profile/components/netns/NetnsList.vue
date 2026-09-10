@@ -1,55 +1,55 @@
 <script lang="ts" setup>
-import { NetnsType } from '@profile/constant/kernel.ts'
-import { NetnsTypeOptions } from '@profile/constant/options.ts'
-import { createNetns } from '@profile/defaults/netns.ts'
-import type { NetnsItem } from '@profile/types/profiles/netns.ts'
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { NetnsType } from '@profile/constant/kernel.ts';
+import { NetnsTypeOptions } from '@profile/constant/options.ts';
+import { createNetns } from '@profile/defaults/netns.ts';
+import type { NetnsItem } from '@profile/types/profiles/netns.ts';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import { DraggableOptions } from '@/constant/app'
-import { useBool } from '@/hooks/useBool.ts'
-import { deepClone } from '@/utils/others.ts'
+import { DraggableOptions } from '@/constant/app';
+import { useBool } from '@/hooks/useBool.ts';
+import { deepClone } from '@/utils/others.ts';
 
-import DefaultForm from './components/DefaultForm.vue'
-import UnshareForm from './components/UnshareForm.vue'
+import DefaultForm from './components/DefaultForm.vue';
+import UnshareForm from './components/UnshareForm.vue';
 
-const model = defineModel<NetnsItem[]>({ required: true })
-const { t } = useI18n()
-const [showEditModal] = useBool(false)
+const model = defineModel<NetnsItem[]>({ required: true });
+const { t } = useI18n();
+const [showEditModal] = useBool(false);
 
-let editIndex = -1
-const fields = ref<NetnsItem>(createNetns(NetnsType.Default))
+let editIndex = -1;
+const fields = ref<NetnsItem>(createNetns(NetnsType.Default));
 
 const handleAdd = () => {
-  editIndex = -1
-  fields.value = createNetns(NetnsType.Default)
-  showEditModal.value = true
-}
+  editIndex = -1;
+  fields.value = createNetns(NetnsType.Default);
+  showEditModal.value = true;
+};
 
 const handleEdit = (index: number) => {
-  editIndex = index
-  fields.value = deepClone(model.value[index]!)
-  showEditModal.value = true
-}
+  editIndex = index;
+  fields.value = deepClone(model.value[index]!);
+  showEditModal.value = true;
+};
 
 const handleDelete = (index: number) => {
-  model.value.splice(index, 1)
-}
+  model.value.splice(index, 1);
+};
 
 const handleAddEnd = () => {
   if (editIndex === -1) {
-    model.value.unshift(fields.value)
+    model.value.unshift(fields.value);
   } else {
-    model.value[editIndex] = fields.value
+    model.value[editIndex] = fields.value;
   }
-}
+};
 
 const onTypeChange = (newType: NetnsType) => {
-  const base = { id: fields.value.id, enable: fields.value.enable }
-  fields.value = { ...createNetns(newType), ...base }
-}
+  const base = { id: fields.value.id, enable: fields.value.enable };
+  fields.value = { ...createNetns(newType), ...base };
+};
 
-defineExpose({ handleAdd })
+defineExpose({ handleAdd });
 </script>
 
 <template>
@@ -70,8 +70,18 @@ defineExpose({ handleAdd })
           <Tag>{{ netns.type }}</Tag>
         </div>
         <div class="ml-auto">
-          <Button icon="edit" type="text" size="small" @click="handleEdit(index)" />
-          <Button icon="delete" type="text" size="small" @click="handleDelete(index)" />
+          <Button
+            icon="edit"
+            type="text"
+            size="small"
+            @click="handleEdit(index)"
+          />
+          <Button
+            icon="delete"
+            type="text"
+            size="small"
+            @click="handleDelete(index)"
+          />
         </div>
       </div>
     </Card>
@@ -97,7 +107,13 @@ defineExpose({ handleAdd })
       <Input v-model="fields.tag" autofocus clearable />
     </div>
 
-    <DefaultForm v-if="fields.type === NetnsType.Default" :model-value="fields.config" />
-    <UnshareForm v-else-if="fields.type === NetnsType.Unshare" :model-value="fields.config" />
+    <DefaultForm
+      v-if="fields.type === NetnsType.Default"
+      :model-value="fields.config"
+    />
+    <UnshareForm
+      v-else-if="fields.type === NetnsType.Unshare"
+      :model-value="fields.config"
+    />
   </Modal>
 </template>

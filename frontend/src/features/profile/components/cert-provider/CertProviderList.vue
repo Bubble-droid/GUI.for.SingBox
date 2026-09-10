@@ -1,70 +1,70 @@
 <script lang="ts" setup>
-import { CertProviderType } from '@profile/constant/kernel.ts'
-import { CertificateProviderTypeOptions } from '@profile/constant/options.ts'
-import { createCertProvider } from '@profile/defaults/cert-provider.ts'
-import type { CertProviderItem } from '@profile/types/profiles/cert-provider.ts'
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { CertProviderType } from '@profile/constant/kernel.ts';
+import { CertificateProviderTypeOptions } from '@profile/constant/options.ts';
+import { createCertProvider } from '@profile/defaults/cert-provider.ts';
+import type { CertProviderItem } from '@profile/types/profiles/cert-provider.ts';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import { DraggableOptions } from '@/constant/app.ts'
-import { useBool } from '@/hooks/useBool'
-import { message } from '@/utils/interaction.ts'
-import { deepClone } from '@/utils/others.ts'
+import { DraggableOptions } from '@/constant/app.ts';
+import { useBool } from '@/hooks/useBool';
+import { message } from '@/utils/interaction.ts';
+import { deepClone } from '@/utils/others.ts';
 
-import type { OptionItem } from '@/types/component.ts'
+import type { OptionItem } from '@/types/component.ts';
 
-import AcmeForm from './components/AcmeForm.vue'
-import CloudflareForm from './components/CloudflareForm.vue'
-import TailscaleForm from './components/TailscaleForm.vue'
+import AcmeForm from './components/AcmeForm.vue';
+import CloudflareForm from './components/CloudflareForm.vue';
+import TailscaleForm from './components/TailscaleForm.vue';
 
 interface Props {
-  httpClientOptions: OptionItem[]
-  tailscaleOptions: OptionItem[]
-  dnsServerOptions: OptionItem[]
+  httpClientOptions: OptionItem[];
+  tailscaleOptions: OptionItem[];
+  dnsServerOptions: OptionItem[];
 }
 
-const model = defineModel<CertProviderItem[]>({ required: true })
-defineProps<Props>()
-const { t } = useI18n()
-const [showEditModal] = useBool(false)
+const model = defineModel<CertProviderItem[]>({ required: true });
+defineProps<Props>();
+const { t } = useI18n();
+const [showEditModal] = useBool(false);
 
-let editIndex = -1
-const fields = ref<CertProviderItem>(createCertProvider(CertProviderType.Acme))
+let editIndex = -1;
+const fields = ref<CertProviderItem>(createCertProvider(CertProviderType.Acme));
 
 const handleAdd = () => {
-  editIndex = -1
-  fields.value = createCertProvider(CertProviderType.Acme)
-  showEditModal.value = true
-}
+  editIndex = -1;
+  fields.value = createCertProvider(CertProviderType.Acme);
+  showEditModal.value = true;
+};
 
 const handleEdit = (index: number) => {
-  editIndex = index
-  fields.value = deepClone(model.value[index]!)
-  showEditModal.value = true
-}
+  editIndex = index;
+  fields.value = deepClone(model.value[index]!);
+  showEditModal.value = true;
+};
 
 const handleDelete = (index: number) => {
-  model.value.splice(index, 1)
-}
+  model.value.splice(index, 1);
+};
 
 const handleAddEnd = () => {
   if (editIndex === -1) {
-    model.value.unshift(fields.value)
+    model.value.unshift(fields.value);
   } else {
-    model.value[editIndex] = fields.value
+    model.value[editIndex] = fields.value;
   }
-}
+};
 
 const onTypeChange = (newType: CertProviderType) => {
-  const base = { id: fields.value.id, enable: fields.value.enable }
+  const base = { id: fields.value.id, enable: fields.value.enable };
   try {
-    fields.value = { ...createCertProvider(newType), ...base }
+    fields.value = { ...createCertProvider(newType), ...base };
   } catch (error) {
-    message.error(error)
+    message.error(error);
   }
-}
+};
 
-defineExpose({ handleAdd })
+defineExpose({ handleAdd });
 </script>
 
 <template>
@@ -85,8 +85,18 @@ defineExpose({ handleAdd })
           <Tag>{{ provider.type }}</Tag>
         </div>
         <div class="ml-auto">
-          <Button icon="edit" type="text" size="small" @click="handleEdit(index)" />
-          <Button icon="delete" type="text" size="small" @click="handleDelete(index)" />
+          <Button
+            icon="edit"
+            type="text"
+            size="small"
+            @click="handleEdit(index)"
+          />
+          <Button
+            icon="delete"
+            type="text"
+            size="small"
+            @click="handleDelete(index)"
+          />
         </div>
       </div>
     </Card>

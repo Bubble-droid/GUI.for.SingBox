@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   title: 'Certificate',
@@ -12,4 +12,4 @@ export default {
   certificate: 'Trusted Certificates (PEM)',
   certificate_path: 'Trusted Certificate File Paths',
   certificate_directory_path: 'Trusted Certificate Directory Paths',
-} satisfies MessageSchema['certificate']
+} satisfies MessageSchema['certificate'];

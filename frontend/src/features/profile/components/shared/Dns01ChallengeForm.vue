@@ -1,23 +1,23 @@
 <script lang="ts" setup>
-import { Dns01Provider } from '@profile/constant/kernel'
-import { Dns01ProviderOptions } from '@profile/constant/options'
-import { createDns01Challenge } from '@profile/defaults/shared'
-import type { Dns01ChallengeFormData } from '@profile/types/profiles/shared'
-import { useI18n } from 'vue-i18n'
+import { Dns01Provider } from '@profile/constant/kernel';
+import { Dns01ProviderOptions } from '@profile/constant/options';
+import { createDns01Challenge } from '@profile/defaults/shared';
+import type { Dns01ChallengeFormData } from '@profile/types/profiles/shared';
+import { useI18n } from 'vue-i18n';
 
-import { useBool } from '@/hooks/useBool'
+import { useBool } from '@/hooks/useBool';
 
-import type { OptionItem } from '@/types/component'
+import type { OptionItem } from '@/types/component';
 
 interface Props {
-  dnsServerOptions: OptionItem[]
+  dnsServerOptions: OptionItem[];
 }
 
-const model = defineModel<Dns01ChallengeFormData>({ required: true })
-defineProps<Props>()
-const { t } = useI18n()
+const model = defineModel<Dns01ChallengeFormData>({ required: true });
+defineProps<Props>();
+const { t } = useI18n();
 
-const [showDns01, toggleDns01] = useBool(false)
+const [showDns01, toggleDns01] = useBool(false);
 
 const onProviderChange = (newProvider: Dns01Provider) => {
   const base = {
@@ -26,13 +26,13 @@ const onProviderChange = (newProvider: Dns01Provider) => {
     propagation_timeout: model.value.propagation_timeout,
     resolvers: model.value.resolvers,
     override_domain: model.value.override_domain,
-  }
-  const fresh = createDns01Challenge(newProvider)
+  };
+  const fresh = createDns01Challenge(newProvider);
   model.value = {
     ...fresh,
     ...base,
-  }
-}
+  };
+};
 </script>
 
 <template>

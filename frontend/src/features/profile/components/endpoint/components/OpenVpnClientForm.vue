@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import PortInput from '@profile/components/shared/PortInput.vue'
+import PortInput from '@profile/components/shared/PortInput.vue';
 import {
   OpenVpnModeOptions,
   OpenVpnTopologyOptions,
@@ -18,29 +18,32 @@ import {
   TlsVersionOptions,
   TlsCipherSuiteOptions,
   NetworkOptions,
-} from '@profile/constant/options'
-import { createOpenVpnServerRemoteItem, createOpenVpnPullFilter } from '@profile/defaults/endpoint'
-import type { OpenVpnClientEndpoint } from '@profile/types/profiles/endpoint'
-import { useI18n } from 'vue-i18n'
+} from '@profile/constant/options';
+import {
+  createOpenVpnServerRemoteItem,
+  createOpenVpnPullFilter,
+} from '@profile/defaults/endpoint';
+import type { OpenVpnClientEndpoint } from '@profile/types/profiles/endpoint';
+import { useI18n } from 'vue-i18n';
 
-const model = defineModel<OpenVpnClientEndpoint['config']>({ required: true })
-const { t } = useI18n()
+const model = defineModel<OpenVpnClientEndpoint['config']>({ required: true });
+const { t } = useI18n();
 
 const addRemoteServer = () => {
-  model.value.servers.push(createOpenVpnServerRemoteItem())
-}
+  model.value.servers.push(createOpenVpnServerRemoteItem());
+};
 
 const deleteRemoteServer = (index: number) => {
-  model.value.servers.splice(index, 1)
-}
+  model.value.servers.splice(index, 1);
+};
 
 const addPullFilter = () => {
-  model.value.pull_filters.push(createOpenVpnPullFilter())
-}
+  model.value.pull_filters.push(createOpenVpnPullFilter());
+};
 
 const deletePullFilter = (index: number) => {
-  model.value.pull_filters.splice(index, 1)
-}
+  model.value.pull_filters.splice(index, 1);
+};
 </script>
 
 <template>
@@ -71,12 +74,23 @@ const deletePullFilter = (index: number) => {
 
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.servers.title') }}
-    <Button icon="add" type="primary" @click="addRemoteServer">{{ t('common.add') }}</Button>
+    <Button icon="add" type="primary" @click="addRemoteServer">{{
+      t('common.add')
+    }}</Button>
   </div>
   <div v-if="model.servers.length" class="flex flex-col gap-8 mt-8">
-    <Card v-for="(item, index) in model.servers" :key="index" :title="`${index + 1}`">
+    <Card
+      v-for="(item, index) in model.servers"
+      :key="index"
+      :title="`${index + 1}`"
+    >
       <template #extra>
-        <Button icon="delete" type="text" size="small" @click="deleteRemoteServer(index)" />
+        <Button
+          icon="delete"
+          type="text"
+          size="small"
+          @click="deleteRemoteServer(index)"
+        />
       </template>
       <div class="form-item">
         {{ t('kernel.endpoints.openvpn.servers.server') }}
@@ -115,7 +129,11 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.topology.title') }}
-    <Select v-model="model.topology" :options="OpenVpnTopologyOptions" clearable />
+    <Select
+      v-model="model.topology"
+      :options="OpenVpnTopologyOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.username') }}
@@ -127,7 +145,11 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.auth_retry.title') }}
-    <Select v-model="model.auth_retry" :options="OpenVpnAuthRetryOptions" clearable />
+    <Select
+      v-model="model.auth_retry"
+      :options="OpenVpnAuthRetryOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.static_challenge') }}
@@ -147,7 +169,11 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.key_direction.title') }}
-    <Select v-model="model.key_direction" :options="OpenVpnKeyDirectionOptions" clearable />
+    <Select
+      v-model="model.key_direction"
+      :options="OpenVpnKeyDirectionOptions"
+      clearable
+    />
   </div>
 
   <Divider>{{ t('kernel.endpoints.openvpn.tls.title') }}</Divider>
@@ -157,9 +183,16 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.cert_name_type.title') }}
-    <Select v-model="model.tls.server_name_type" :options="OpenVpnCertNameTypeOptions" clearable />
+    <Select
+      v-model="model.tls.server_name_type"
+      :options="OpenVpnCertNameTypeOptions"
+      clearable
+    />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.certificate.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.certificate.length }"
+  >
     {{ t('kernel.endpoints.openvpn.tls.certificate') }}
     <InputList v-model="model.tls.certificate" />
   </div>
@@ -167,7 +200,10 @@ const deletePullFilter = (index: number) => {
     {{ t('kernel.endpoints.openvpn.tls.certificate_path') }}
     <Input v-model="model.tls.certificate_path" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.client_certificate.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.client_certificate.length }"
+  >
     {{ t('kernel.endpoints.openvpn.tls.client_certificate') }}
     <InputList v-model="model.tls.client_certificate" />
   </div>
@@ -175,7 +211,10 @@ const deletePullFilter = (index: number) => {
     {{ t('kernel.endpoints.openvpn.tls.client_certificate_path') }}
     <Input v-model="model.tls.client_certificate_path" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.client_key.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.client_key.length }"
+  >
     {{ t('kernel.endpoints.openvpn.tls.client_key') }}
     <InputList v-model="model.tls.client_key" />
   </div>
@@ -183,7 +222,10 @@ const deletePullFilter = (index: number) => {
     {{ t('kernel.endpoints.openvpn.tls.client_key_path') }}
     <Input v-model="model.tls.client_key_path" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.peer_fingerprint.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.peer_fingerprint.length }"
+  >
     {{ t('kernel.endpoints.openvpn.tls.peer_fingerprint') }}
     <InputList v-model="model.tls.peer_fingerprint" />
   </div>
@@ -191,7 +233,10 @@ const deletePullFilter = (index: number) => {
     {{ t('kernel.endpoints.openvpn.tls.crl_path') }}
     <Input v-model="model.tls.crl_path" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.remote_certificate_ku.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.remote_certificate_ku.length }"
+  >
     {{ t('kernel.endpoints.openvpn.tls.remote_certificate_ku') }}
     <InputList v-model="model.tls.remote_certificate_ku" />
   </div>
@@ -217,19 +262,35 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.ns_cert_type.title') }}
-    <Select v-model="model.tls.ns_certificate_type" :options="OpenVpnNsCertTypeOptions" clearable />
+    <Select
+      v-model="model.tls.ns_certificate_type"
+      :options="OpenVpnNsCertTypeOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.version_min') }}
-    <Select v-model="model.tls.version_min" :options="TlsVersionOptions" clearable />
+    <Select
+      v-model="model.tls.version_min"
+      :options="TlsVersionOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.version_max') }}
-    <Select v-model="model.tls.version_max" :options="TlsVersionOptions" clearable />
+    <Select
+      v-model="model.tls.version_max"
+      :options="TlsVersionOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.cipher') }}
-    <Select v-model="model.tls.cipher" :options="TlsCipherSuiteOptions" clearable />
+    <Select
+      v-model="model.tls.cipher"
+      :options="TlsCipherSuiteOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.groups') }}
@@ -245,7 +306,10 @@ const deletePullFilter = (index: number) => {
       clearable
     />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.control_wrap.key.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.control_wrap.key.length }"
+  >
     {{ t('kernel.endpoints.openvpn.static_key') }}
     <InputList v-model="model.tls.control_wrap.key" />
   </div>
@@ -267,7 +331,10 @@ const deletePullFilter = (index: number) => {
     {{ t('kernel.endpoints.openvpn.cipher') }}
     <Input v-model="model.cipher" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.data_ciphers.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.data_ciphers.length }"
+  >
     {{ t('kernel.endpoints.openvpn.data_ciphers') }}
     <InputList v-model="model.data_ciphers" />
   </div>
@@ -289,7 +356,11 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.mss_fix_mode.title') }}
-    <Select v-model="model.mss_fix_mode" :options="OpenVpnMssFixModeOptions" clearable />
+    <Select
+      v-model="model.mss_fix_mode"
+      :options="OpenVpnMssFixModeOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.fragment') }}
@@ -305,15 +376,27 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.compression.title') }}
-    <Select v-model="model.compression" :options="OpenVpnCompressionOptions" clearable />
+    <Select
+      v-model="model.compression"
+      :options="OpenVpnCompressionOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.compression_lzo.title') }}
-    <Select v-model="model.compression_lzo" :options="OpenVpnCompressionLzoOptions" clearable />
+    <Select
+      v-model="model.compression_lzo"
+      :options="OpenVpnCompressionLzoOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.allow_compression.title') }}
-    <Select v-model="model.allow_compression" :options="OpenVpnAllowCompressionOptions" clearable />
+    <Select
+      v-model="model.allow_compression"
+      :options="OpenVpnAllowCompressionOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.route_no_pull') }}
@@ -322,16 +405,31 @@ const deletePullFilter = (index: number) => {
 
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.pull_filters.title') }}
-    <Button icon="add" type="primary" @click="addPullFilter">{{ t('common.add') }}</Button>
+    <Button icon="add" type="primary" @click="addPullFilter">{{
+      t('common.add')
+    }}</Button>
   </div>
   <div v-if="model.pull_filters.length" class="flex flex-col gap-8 mt-8">
-    <Card v-for="(filter, index) in model.pull_filters" :key="index" :title="`${index + 1}`">
+    <Card
+      v-for="(filter, index) in model.pull_filters"
+      :key="index"
+      :title="`${index + 1}`"
+    >
       <template #extra>
-        <Button icon="delete" type="text" size="small" @click="deletePullFilter(index)" />
+        <Button
+          icon="delete"
+          type="text"
+          size="small"
+          @click="deletePullFilter(index)"
+        />
       </template>
       <div class="form-item">
         {{ t('kernel.endpoints.openvpn.pull_filters.action.title') }}
-        <Select v-model="filter.action" :options="OpenVpnPullFilterActionOptions" clearable />
+        <Select
+          v-model="filter.action"
+          :options="OpenVpnPullFilterActionOptions"
+          clearable
+        />
       </div>
       <div class="form-item">
         {{ t('kernel.endpoints.openvpn.pull_filters.text') }}
@@ -357,7 +455,10 @@ const deletePullFilter = (index: number) => {
     {{ t('kernel.endpoints.openvpn.redirect_gateway') }}
     <Switch v-model="model.redirect_gateway" />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.redirect_gateway_flags.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.redirect_gateway_flags.length }"
+  >
     {{ t('kernel.endpoints.openvpn.redirect_gateway_flags') }}
     <InputList v-model="model.redirect_gateway_flags" />
   </div>
@@ -395,7 +496,12 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.renegotiate_packets') }}
-    <Input v-model="model.renegotiate_packets" type="number" editable clearable />
+    <Input
+      v-model="model.renegotiate_packets"
+      type="number"
+      editable
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls_timeout') }}
@@ -407,6 +513,11 @@ const deletePullFilter = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.explicit_exit_notify') }}
-    <Input v-model="model.explicit_exit_notify" type="number" editable clearable />
+    <Input
+      v-model="model.explicit_exit_notify"
+      type="number"
+      editable
+      clearable
+    />
   </div>
 </template>

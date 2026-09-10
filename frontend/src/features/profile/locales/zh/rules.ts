@@ -46,4 +46,4 @@ export default {
       no_drop: '不丢弃',
     },
   },
-}
+};

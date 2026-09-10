@@ -1,11 +1,15 @@
-import { RouteActionKind, RouteRuleType, RuleSetType } from '@profile/constant/kernel'
-import { createRouteRuleset, createRouteRule } from '@profile/defaults/route'
-import type { RouteRuleItem, RuleSetItem } from '@profile/types/profiles/route'
+import {
+  RouteActionKind,
+  RouteRuleType,
+  RuleSetType,
+} from '@profile/constant/kernel';
+import { createRouteRuleset, createRouteRule } from '@profile/defaults/route';
+import type { RouteRuleItem, RuleSetItem } from '@profile/types/profiles/route';
 
-import type { Recordable } from '@/types/typescript'
+import type { Recordable } from '@/types/typescript';
 
-import { supportedRuleTypes } from './shared'
-import type { RestoreContext } from './types'
+import { supportedRuleTypes } from './shared';
+import type { RestoreContext } from './types';
 
 export const restoreRuleSet = (
   rulesets: Recordable[],
@@ -14,43 +18,45 @@ export const restoreRuleSet = (
   ctx: RestoreContext,
 ): RuleSetItem[] =>
   rulesets.flatMap((raw) => {
-    const ruleset = createRouteRuleset()
-    ruleset.id = RouteRuleSetIds[raw['tag']]
-    ruleset.type = raw['type']
-    ruleset.tag = raw['tag']
+    const ruleset = createRouteRuleset();
+    ruleset.id = RouteRuleSetIds[raw['tag']];
+    ruleset.type = raw['type'];
+    ruleset.tag = raw['tag'];
 
     if (raw['type'] === RuleSetType.Inline) {
       if ('rules' in raw) {
-        ruleset.rules = JSON.stringify(raw['rules'], null, 2)
+        ruleset.rules = JSON.stringify(raw['rules'], null, 2);
       }
     } else if (raw['type'] === RuleSetType.Local) {
       if ('path' in raw) {
-        const r = ctx.getRuleSetByPath(raw['path']?.replace(`${ctx.appEnv.appDataPath}/`, 'data/'))
+        const r = ctx.getRuleSetByPath(
+          raw['path']?.replace(`${ctx.appEnv.appDataPath}/`, 'data/'),
+        );
         if (r) {
-          ruleset.path = r.id
+          ruleset.path = r.id;
         } else {
-          ruleset.path = raw['path']
+          ruleset.path = raw['path'];
         }
       }
       if ('format' in raw) {
-        ruleset.format = raw['format']
+        ruleset.format = raw['format'];
       }
     } else if (raw['type'] === RuleSetType.Remote) {
       if ('format' in raw) {
-        ruleset.format = raw['format']
+        ruleset.format = raw['format'];
       }
       if ('url' in raw) {
-        ruleset.url = raw['url']
+        ruleset.url = raw['url'];
       }
       if ('download_detour' in raw) {
-        ruleset.download_detour = OutboundsIds[raw['download_detour']]
+        ruleset.download_detour = OutboundsIds[raw['download_detour']];
       }
       if ('update_interval' in raw) {
-        ruleset.update_interval = raw['update_interval']
+        ruleset.update_interval = raw['update_interval'];
       }
     }
-    return ruleset
-  })
+    return ruleset;
+  });
 
 export const restoreRouteRules = (
   rules: Recordable[],
@@ -60,16 +66,16 @@ export const restoreRouteRules = (
   DnsServersIds: Recordable,
 ): RouteRuleItem[] =>
   rules.flatMap((raw, i) => {
-    const rule = createRouteRule()
+    const rule = createRouteRule();
 
-    rule.id = `rule-${i}`
-    rule.action = raw['action'] ?? RouteActionKind.Route
+    rule.id = `rule-${i}`;
+    rule.action = raw['action'] ?? RouteActionKind.Route;
 
-    const hits = supportedRuleTypes.filter((key) => key in raw)
+    const hits = supportedRuleTypes.filter((key) => key in raw);
     if (hits.length === 1) {
-      rule.type = hits[0] as RouteRuleType
+      rule.type = hits[0] as RouteRuleType;
     } else {
-      rule.type = RouteRuleType.Inline
+      rule.type = RouteRuleType.Inline;
     }
 
     if (rule.type === RouteRuleType.Inline) {
@@ -85,23 +91,25 @@ export const restoreRouteRules = (
         },
         null,
         2,
-      )
+      );
     } else if (rule.type === RouteRuleType.Inbound) {
-      rule.payload = InboundsIds[raw[rule.type]]
+      rule.payload = InboundsIds[raw[rule.type]];
     } else if (rule.type === RouteRuleType.RuleSet) {
-      const rs = Array.isArray(raw[rule.type]) ? raw[rule.type] : [raw[rule.type]]
-      rule.payload = rs.map((tag: string) => RouteRuleSetIds[tag]).join(',')
+      const rs = Array.isArray(raw[rule.type])
+        ? raw[rule.type]
+        : [raw[rule.type]];
+      rule.payload = rs.map((tag: string) => RouteRuleSetIds[tag]).join(',');
     } else {
       rule.payload = Array.isArray(raw[rule.type])
         ? raw[rule.type].join(',')
-        : String(raw[rule.type])
+        : String(raw[rule.type]);
     }
 
     if (RouteActionKind.Route === raw['action']) {
-      rule.outbound = OutboundsIds[raw['outbound']]
+      rule.outbound = OutboundsIds[raw['outbound']];
     } else if (RouteActionKind.Reject === raw['action']) {
       if ('method' in raw) {
-        rule.outbound = raw['method']
+        rule.outbound = raw['method'];
       }
     } else if (RouteActionKind.RouteOptions === raw['action']) {
       rule.outbound = JSON.stringify(
@@ -110,27 +118,29 @@ export const restoreRouteRules = (
           action: undefined,
           invert: undefined,
           ...supportedRuleTypes.reduce<Recordable>((p, c) => {
-            p[c] = undefined
-            return p
+            p[c] = undefined;
+            return p;
           }, {}),
         },
         null,
         2,
-      )
+      );
     } else if (RouteActionKind.Sniff === raw['action']) {
       if ('sniffer' in raw) {
-        rule.sniffer = Array.isArray(raw['sniffer']) ? raw['sniffer'] : [raw['sniffer']]
+        rule.sniffer = Array.isArray(raw['sniffer'])
+          ? raw['sniffer']
+          : [raw['sniffer']];
       }
     } else if (RouteActionKind.Resolve === raw['action']) {
       if ('strategy' in raw) {
-        rule.strategy = raw['strategy']
+        rule.strategy = raw['strategy'];
       }
       if ('server' in raw) {
-        rule.server = DnsServersIds[raw['server']]
+        rule.server = DnsServersIds[raw['server']];
       }
     }
     if ('invert' in raw) {
-      rule.invert = raw['invert']
+      rule.invert = raw['invert'];
     }
-    return rule
-  })
+    return rule;
+  });

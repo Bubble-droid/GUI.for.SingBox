@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import PortInput from '@profile/components/shared/PortInput.vue'
-import { createWireGuardPeer } from '@profile/defaults/endpoint'
-import type { WireGuardEndpoint } from '@profile/types/profiles/endpoint'
-import { useI18n } from 'vue-i18n'
+import PortInput from '@profile/components/shared/PortInput.vue';
+import { createWireGuardPeer } from '@profile/defaults/endpoint';
+import type { WireGuardEndpoint } from '@profile/types/profiles/endpoint';
+import { useI18n } from 'vue-i18n';
 
-const model = defineModel<WireGuardEndpoint['config']>({ required: true })
-const { t } = useI18n()
+const model = defineModel<WireGuardEndpoint['config']>({ required: true });
+const { t } = useI18n();
 
 const addPeer = () => {
-  model.value.peers.push(createWireGuardPeer())
-}
+  model.value.peers.push(createWireGuardPeer());
+};
 
 const deletePeer = (index: number) => {
-  model.value.peers.splice(index, 1)
-}
+  model.value.peers.splice(index, 1);
+};
 </script>
 
 <template>
@@ -58,9 +58,18 @@ const deletePeer = (index: number) => {
   </div>
   <Empty v-if="!model.peers.length" />
   <div class="flex flex-col gap-8 mt-8">
-    <Card v-for="(peer, index) in model.peers" :key="index" :title="`${index + 1}`">
+    <Card
+      v-for="(peer, index) in model.peers"
+      :key="index"
+      :title="`${index + 1}`"
+    >
       <template #extra>
-        <Button icon="delete" type="text" size="small" @click="deletePeer(index)" />
+        <Button
+          icon="delete"
+          type="text"
+          size="small"
+          @click="deletePeer(index)"
+        />
       </template>
       <div class="form-item">
         {{ t('kernel.endpoints.wireguard.peers.address') }}
@@ -88,8 +97,15 @@ const deletePeer = (index: number) => {
         <InputList v-model="peer.allowed_ips" />
       </div>
       <div class="form-item">
-        {{ t('kernel.endpoints.wireguard.peers.persistent_keepalive_interval') }}
-        <Input v-model="peer.persistent_keepalive_interval" type="number" editable clearable />
+        {{
+          t('kernel.endpoints.wireguard.peers.persistent_keepalive_interval')
+        }}
+        <Input
+          v-model="peer.persistent_keepalive_interval"
+          type="number"
+          editable
+          clearable
+        />
       </div>
       <div
         :class="{

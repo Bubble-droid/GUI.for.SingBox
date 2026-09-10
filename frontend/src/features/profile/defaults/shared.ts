@@ -1,4 +1,4 @@
-import { Dns01Provider } from '@profile/constant/kernel'
+import { Dns01Provider } from '@profile/constant/kernel';
 import type {
   DomainStrategy,
   NetworkStrategy,
@@ -8,7 +8,7 @@ import type {
   TlsVersion,
   UdpNatBehavior,
   UtlsFingerprint,
-} from '@profile/constant/kernel'
+} from '@profile/constant/kernel';
 import type {
   TagItem,
   ProfileBase,
@@ -24,9 +24,9 @@ import type {
   QuicFormData,
   Dns01ChallengeFormData,
   DnsRouteOptionsFormData,
-} from '@profile/types/profiles/shared'
+} from '@profile/types/profiles/shared';
 
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/others';
 
 export const DefaultOutboundIds = {
   Select: 'outbound-select',
@@ -35,12 +35,12 @@ export const DefaultOutboundIds = {
   Block: 'outbound-block',
   Fallback: 'outbound-fallback',
   Global: 'outbound-global',
-} as const
+} as const;
 
 export const DefaultInboundIds = {
   MixedIn: 'mixed-in',
   Tun: 'tun-in',
-} as const
+} as const;
 
 export const DefaultRulesetIds = {
   CATEGORY_ADS: 'Category-Ads',
@@ -49,7 +49,7 @@ export const DefaultRulesetIds = {
   GEOLOCATION_NOT_CN: 'GeoLocation-!CN',
   GEOSITE_PRIVATE: 'GeoSite-Private',
   GEOIP_PRIVATE: 'GeoIP-Private',
-} as const
+} as const;
 
 export const DefaultDnsServersIds = {
   LocalDns: 'Local-DNS',
@@ -57,22 +57,22 @@ export const DefaultDnsServersIds = {
   FakeIP: 'Fake-IP',
   LocalDnsResolver: 'Local-DNS-Resolver',
   RemoteDnsResolver: 'Remote-DNS-Resolver',
-} as const
+} as const;
 
 export const createTagItem = (): TagItem => ({
   id: sampleID(),
   tag: '',
-})
+});
 
 export const createProfileBase = (): ProfileBase => ({
   ...createTagItem(),
   fields: '{}',
-})
+});
 
 export const createSwitchable = (): Switchable => ({
   ...createProfileBase(),
   enable: true,
-})
+});
 
 export const createDnsRouteOptions = (): DnsRouteOptionsFormData => ({
   disable_cache: false,
@@ -80,13 +80,13 @@ export const createDnsRouteOptions = (): DnsRouteOptionsFormData => ({
   rewrite_ttl: 0,
   timeout: '',
   client_subnet: '',
-})
+});
 
 export const createDomainResolver = (): DomainResolverFormData => ({
   ...createDnsRouteOptions(),
   server: '',
   strategy: '' as DomainStrategy,
-})
+});
 
 export const createDialer = (): DialerFormData => ({
   detour: '',
@@ -111,14 +111,14 @@ export const createDialer = (): DialerFormData => ({
   fallback_network_type: [],
   fallback_delay: '',
   network_fallback_delay: '',
-})
+});
 
 export const createUdpNat = (): UdpNatFormData => ({
   udp_timeout: '',
   udp_mapping: '' as UdpNatBehavior,
   udp_filtering: '' as UdpNatBehavior,
   udp_nat_max: 0,
-})
+});
 
 export const createListen = (): ListenFormData => ({
   listen: '',
@@ -135,7 +135,7 @@ export const createListen = (): ListenFormData => ({
   udp_fragment: false,
   udp_timeout: '',
   detour: '',
-})
+});
 
 export const createInboundTls = (): InboundTlsFormData => ({
   enabled: false,
@@ -173,7 +173,7 @@ export const createInboundTls = (): InboundTlsFormData => ({
     short_id: [],
     max_time_difference: '',
   },
-})
+});
 
 export const createOutboundTls = (): OutboundTlsFormData => ({
   enabled: false,
@@ -216,7 +216,7 @@ export const createOutboundTls = (): OutboundTlsFormData => ({
     public_key: '',
     short_id: [],
   },
-})
+});
 
 export const createHttp2Options = (): Http2FormData => ({
   idle_timeout: '',
@@ -224,27 +224,29 @@ export const createHttp2Options = (): Http2FormData => ({
   stream_receive_window: '',
   connection_receive_window: '',
   max_concurrent_streams: 0,
-})
+});
 
 export const createQuicOptions = (): QuicFormData => ({
   ...createHttp2Options(),
   initial_packet_size: 0,
   disable_path_mtu_discovery: false,
-})
+});
 
-export const createDns01Challenge = (provider?: Dns01Provider): Dns01ChallengeFormData => {
+export const createDns01Challenge = (
+  provider?: Dns01Provider,
+): Dns01ChallengeFormData => {
   const base: Dns01ChallengeBase = {
     ttl: '',
     propagation_delay: '',
     propagation_timeout: '',
     resolvers: [],
     override_domain: '',
-  }
+  };
   if (!provider) {
     return {
       ...base,
       provider: '' as Dns01Provider,
-    } as Dns01ChallengeFormData
+    } as Dns01ChallengeFormData;
   }
   switch (provider) {
     case Dns01Provider.AliDns: {
@@ -255,7 +257,7 @@ export const createDns01Challenge = (provider?: Dns01Provider): Dns01ChallengeFo
         access_key_secret: '',
         region_id: '',
         security_token: '',
-      }
+      };
     }
     case Dns01Provider.Cloudflare: {
       return {
@@ -263,7 +265,7 @@ export const createDns01Challenge = (provider?: Dns01Provider): Dns01ChallengeFo
         provider: Dns01Provider.Cloudflare,
         api_token: '',
         zone_token: '',
-      }
+      };
     }
     case Dns01Provider.AcmeDns: {
       return {
@@ -273,10 +275,10 @@ export const createDns01Challenge = (provider?: Dns01Provider): Dns01ChallengeFo
         password: '',
         subdomain: '',
         server_url: '',
-      }
+      };
     }
     default: {
-      throw new Error(`Unexpected DNS provider: ${provider as string}`)
+      throw new Error(`Unexpected DNS provider: ${provider as string}`);
     }
   }
-}
+};

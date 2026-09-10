@@ -3,21 +3,24 @@ import type {
   AcmeProvider,
   CloudflareRequestType,
   CloudflareValidity,
-} from '@profile/constant/kernel'
-import { CertProviderType } from '@profile/constant/kernel'
+} from '@profile/constant/kernel';
+import { CertProviderType } from '@profile/constant/kernel';
 import type {
   AcmeCertProvider,
   CertProviderItem,
   CloudflareCertProvider,
   TailscaleCertProvider,
-} from '@profile/types/profiles/cert-provider'
+} from '@profile/types/profiles/cert-provider';
 
-import { createDns01Challenge, createSwitchable } from './shared'
+import { createDns01Challenge, createSwitchable } from './shared';
 
-type Result<T extends CertProviderType> = Extract<CertProviderItem, { type: T }>
+type Result<T extends CertProviderType> = Extract<
+  CertProviderItem,
+  { type: T }
+>;
 
 const createAcme = (): AcmeCertProvider => {
-  const type = CertProviderType.Acme
+  const type = CertProviderType.Acme;
   return {
     ...createSwitchable(),
     type,
@@ -42,11 +45,11 @@ const createAcme = (): AcmeCertProvider => {
       profile: '',
       http_client: '',
     },
-  }
-}
+  };
+};
 
 const createTailscale = (): TailscaleCertProvider => {
-  const type = CertProviderType.Tailscale
+  const type = CertProviderType.Tailscale;
   return {
     ...createSwitchable(),
     type,
@@ -54,11 +57,11 @@ const createTailscale = (): TailscaleCertProvider => {
     config: {
       endpoint: '',
     },
-  }
-}
+  };
+};
 
 const createCloudflare = (): CloudflareCertProvider => {
-  const type = CertProviderType.Cloudflare
+  const type = CertProviderType.Cloudflare;
   return {
     ...createSwitchable(),
     type,
@@ -72,22 +75,24 @@ const createCloudflare = (): CloudflareCertProvider => {
       requested_validity: 0 as CloudflareValidity,
       http_client: '',
     },
-  }
-}
+  };
+};
 
-export const createCertProvider = <T extends CertProviderType>(type: T): Result<T> => {
+export const createCertProvider = <T extends CertProviderType>(
+  type: T,
+): Result<T> => {
   switch (type) {
     case CertProviderType.Acme: {
-      return createAcme() as Result<T>
+      return createAcme() as Result<T>;
     }
     case CertProviderType.Tailscale: {
-      return createTailscale() as Result<T>
+      return createTailscale() as Result<T>;
     }
     case CertProviderType.Cloudflare: {
-      return createCloudflare() as Result<T>
+      return createCloudflare() as Result<T>;
     }
     default: {
-      throw new Error(`Unexpected certificate provider type: ${type}`)
+      throw new Error(`Unexpected certificate provider type: ${type}`);
     }
   }
-}
+};

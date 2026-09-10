@@ -1,21 +1,21 @@
 <script lang="ts" setup>
-import { PredefinedClashModeOptions } from '@profile/constant/options'
-import type { ExperimentalSection } from '@profile/types/profiles'
-import { useI18n } from 'vue-i18n'
+import { PredefinedClashModeOptions } from '@profile/constant/options';
+import type { ExperimentalSection } from '@profile/types/profiles';
+import { useI18n } from 'vue-i18n';
 
-import { generateSecureKey, sampleID } from '@/utils/others'
+import { generateSecureKey, sampleID } from '@/utils/others';
 
-import type { OptionItem } from '@/types/component'
+import type { OptionItem } from '@/types/component';
 
 interface Props {
-  outboundOptions: OptionItem[]
+  outboundOptions: OptionItem[];
 }
 
-const model = defineModel<ExperimentalSection>({ required: true })
+const model = defineModel<ExperimentalSection>({ required: true });
 
-defineProps<Props>()
+defineProps<Props>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 </script>
 
 <template>
@@ -58,10 +58,15 @@ const { t } = useI18n()
     </div>
     <div class="form-item">
       {{ t('kernel.experimental.clash_api.default_mode') }}
-      <Select v-model="model.clash_api.default_mode as any" :options="PredefinedClashModeOptions" />
+      <Select
+        v-model="model.clash_api.default_mode as any"
+        :options="PredefinedClashModeOptions"
+      />
     </div>
     <div class="form-item">
-      {{ t('kernel.experimental.clash_api.access_control_allow_private_network') }}
+      {{
+        t('kernel.experimental.clash_api.access_control_allow_private_network')
+      }}
       <Switch v-model="model.clash_api.access_control_allow_private_network" />
     </div>
     <div

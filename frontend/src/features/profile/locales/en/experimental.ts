@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   clash_api: {
@@ -20,4 +20,4 @@ export default {
     store_fakeip: 'Store FakeIP',
     store_dns: 'Store DNS',
   },
-} satisfies MessageSchema['experimental']
+} satisfies MessageSchema['experimental'];

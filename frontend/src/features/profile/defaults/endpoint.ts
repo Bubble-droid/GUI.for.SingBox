@@ -23,8 +23,8 @@ import type {
   TlsVersion,
   TlsCipherSuite,
   Network,
-} from '@profile/constant/kernel'
-import { EndpointType } from '@profile/constant/kernel'
+} from '@profile/constant/kernel';
+import { EndpointType } from '@profile/constant/kernel';
 import type {
   WireGuardPeer,
   OpenConnectTnccCertificate,
@@ -39,11 +39,16 @@ import type {
   OpenConnectEndpoint,
   OpenVpnClientEndpoint,
   OpenVpnServerEndpoint,
-} from '@profile/types/profiles/endpoint'
+} from '@profile/types/profiles/endpoint';
 
-import { createSwitchable, createUdpNat, createDialer, createListen } from './shared'
+import {
+  createSwitchable,
+  createUdpNat,
+  createDialer,
+  createListen,
+} from './shared';
 
-type Result<T extends EndpointType> = Extract<EndpointItem, { type: T }>
+type Result<T extends EndpointType> = Extract<EndpointItem, { type: T }>;
 
 export const createWireGuardPeer = (): WireGuardPeer => ({
   address: '127.0.0.1',
@@ -53,10 +58,10 @@ export const createWireGuardPeer = (): WireGuardPeer => ({
   allowed_ips: [],
   persistent_keepalive_interval: 0,
   reserved: [],
-})
+});
 
 const createWireGuard = (): WireGuardEndpoint => {
-  const type = EndpointType.WireGuard
+  const type = EndpointType.WireGuard;
   return {
     ...createSwitchable(),
     type,
@@ -73,11 +78,11 @@ const createWireGuard = (): WireGuardEndpoint => {
       udpNat: createUdpNat(),
       dialer: createDialer(),
     },
-  }
-}
+  };
+};
 
 const createTailscale = (): TailscaleEndpoint => {
-  const type = EndpointType.Tailscale
+  const type = EndpointType.Tailscale;
   return {
     ...createSwitchable(),
     type,
@@ -108,13 +113,13 @@ const createTailscale = (): TailscaleEndpoint => {
       },
       dialer: createDialer(),
     },
-  }
-}
+  };
+};
 
 export const createOpenConnectTnccCert = (): OpenConnectTnccCertificate => ({
   certificate: [],
   certificate_path: '',
-})
+});
 
 export const createOpenConnectFormEntry = (): OpenConnectFormEntry => ({
   form_id: '',
@@ -122,10 +127,10 @@ export const createOpenConnectFormEntry = (): OpenConnectFormEntry => ({
   name: '',
   value: '',
   promote: false,
-})
+});
 
 const createOpenConnect = (): OpenConnectEndpoint => {
-  const type = EndpointType.OpenConnect
+  const type = EndpointType.OpenConnect;
   return {
     ...createSwitchable(),
     type,
@@ -214,22 +219,22 @@ const createOpenConnect = (): OpenConnectEndpoint => {
       udpNat: createUdpNat(),
       dialer: createDialer(),
     },
-  }
-}
+  };
+};
 
 export const createOpenVpnServerRemoteItem = (): OpenVpnServerRemoteItem => ({
   server: '',
   server_port: 1194,
   network: '' as Network,
-})
+});
 
 export const createOpenVpnPullFilter = (): OpenVpnPullFilter => ({
   action: '' as OpenVpnPullFilterAction,
   text: '',
-})
+});
 
 const createOpenVpnClient = (): OpenVpnClientEndpoint => {
-  const type = EndpointType.OpenVpnClient
+  const type = EndpointType.OpenVpnClient;
   return {
     ...createSwitchable(),
     type,
@@ -319,13 +324,13 @@ const createOpenVpnClient = (): OpenVpnClientEndpoint => {
       udpNat: createUdpNat(),
       dialer: createDialer(),
     },
-  }
-}
+  };
+};
 
 export const createOpenVpnUser = (): OpenVpnUser => ({
   username: '',
   password: '',
-})
+});
 
 export const createOpenVpnPushDnsServer = (): OpenVpnPushDnsServer => ({
   priority: 0,
@@ -334,10 +339,10 @@ export const createOpenVpnPushDnsServer = (): OpenVpnPushDnsServer => ({
   dnssec: '' as OpenVpnDnsSec,
   transport: '' as OpenVpnDnsTransport,
   sni: '',
-})
+});
 
 const createOpenVpnServer = (): OpenVpnServerEndpoint => {
-  const type = EndpointType.OpenVpnServer
+  const type = EndpointType.OpenVpnServer;
   return {
     ...createSwitchable(),
     type,
@@ -420,28 +425,28 @@ const createOpenVpnServer = (): OpenVpnServerEndpoint => {
       listen: createListen(),
       udpNat: createUdpNat(),
     },
-  }
-}
+  };
+};
 
 export const createEndpoint = <T extends EndpointType>(type: T): Result<T> => {
   switch (type) {
     case EndpointType.WireGuard: {
-      return createWireGuard() as Result<T>
+      return createWireGuard() as Result<T>;
     }
     case EndpointType.Tailscale: {
-      return createTailscale() as Result<T>
+      return createTailscale() as Result<T>;
     }
     case EndpointType.OpenConnect: {
-      return createOpenConnect() as Result<T>
+      return createOpenConnect() as Result<T>;
     }
     case EndpointType.OpenVpnClient: {
-      return createOpenVpnClient() as Result<T>
+      return createOpenVpnClient() as Result<T>;
     }
     case EndpointType.OpenVpnServer: {
-      return createOpenVpnServer() as Result<T>
+      return createOpenVpnServer() as Result<T>;
     }
     default: {
-      throw new Error(`Unexpected endpoint type: ${type}`)
+      throw new Error(`Unexpected endpoint type: ${type}`);
     }
   }
-}
+};

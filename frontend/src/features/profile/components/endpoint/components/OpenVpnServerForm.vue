@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import PortInput from '@profile/components/shared/PortInput.vue'
+import PortInput from '@profile/components/shared/PortInput.vue';
 import {
   OpenVpnModeOptions,
   OpenVpnTopologyOptions,
@@ -16,29 +16,32 @@ import {
   TlsVersionOptions,
   TlsCipherSuiteOptions,
   NetworkOptions,
-} from '@profile/constant/options'
-import { createOpenVpnUser, createOpenVpnPushDnsServer } from '@profile/defaults/endpoint'
-import type { OpenVpnServerEndpoint } from '@profile/types/profiles/endpoint'
-import { useI18n } from 'vue-i18n'
+} from '@profile/constant/options';
+import {
+  createOpenVpnUser,
+  createOpenVpnPushDnsServer,
+} from '@profile/defaults/endpoint';
+import type { OpenVpnServerEndpoint } from '@profile/types/profiles/endpoint';
+import { useI18n } from 'vue-i18n';
 
-const model = defineModel<OpenVpnServerEndpoint['config']>({ required: true })
-const { t } = useI18n()
+const model = defineModel<OpenVpnServerEndpoint['config']>({ required: true });
+const { t } = useI18n();
 
 const addUser = () => {
-  model.value.users.push(createOpenVpnUser())
-}
+  model.value.users.push(createOpenVpnUser());
+};
 
 const deleteUser = (index: number) => {
-  model.value.users.splice(index, 1)
-}
+  model.value.users.splice(index, 1);
+};
 
 const addPushDnsServer = () => {
-  model.value.push.dns_servers.push(createOpenVpnPushDnsServer())
-}
+  model.value.push.dns_servers.push(createOpenVpnPushDnsServer());
+};
 
 const deletePushDnsServer = (index: number) => {
-  model.value.push.dns_servers.splice(index, 1)
-}
+  model.value.push.dns_servers.splice(index, 1);
+};
 </script>
 
 <template>
@@ -88,7 +91,11 @@ const deletePushDnsServer = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.topology.title') }}
-    <Select v-model="model.topology" :options="OpenVpnTopologyOptions" clearable />
+    <Select
+      v-model="model.topology"
+      :options="OpenVpnTopologyOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.duplicate_cn') }}
@@ -97,12 +104,23 @@ const deletePushDnsServer = (index: number) => {
 
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.users.title') }}
-    <Button icon="add" type="primary" @click="addUser">{{ t('common.add') }}</Button>
+    <Button icon="add" type="primary" @click="addUser">{{
+      t('common.add')
+    }}</Button>
   </div>
   <div v-if="model.users.length" class="flex flex-col gap-8 mt-8">
-    <Card v-for="(user, index) in model.users" :key="index" :title="`${index + 1}`">
+    <Card
+      v-for="(user, index) in model.users"
+      :key="index"
+      :title="`${index + 1}`"
+    >
       <template #extra>
-        <Button icon="delete" type="text" size="small" @click="deleteUser(index)" />
+        <Button
+          icon="delete"
+          type="text"
+          size="small"
+          @click="deleteUser(index)"
+        />
       </template>
       <div class="form-item">
         {{ t('kernel.endpoints.openvpn.users.username') }}
@@ -126,11 +144,18 @@ const deletePushDnsServer = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.key_direction.title') }}
-    <Select v-model="model.key_direction" :options="OpenVpnKeyDirectionOptions" clearable />
+    <Select
+      v-model="model.key_direction"
+      :options="OpenVpnKeyDirectionOptions"
+      clearable
+    />
   </div>
 
   <Divider>{{ t('kernel.endpoints.openvpn.tls.title') }}</Divider>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.certificate.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.certificate.length }"
+  >
     {{ t('kernel.endpoints.openvpn.tls.certificate') }}
     <InputList v-model="model.tls.certificate" />
   </div>
@@ -146,7 +171,10 @@ const deletePushDnsServer = (index: number) => {
     {{ t('kernel.endpoints.openvpn.tls.key_path') }}
     <Input v-model="model.tls.key_path" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.client_certificate.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.client_certificate.length }"
+  >
     {{ t('kernel.endpoints.openvpn.tls.client_certificate') }}
     <InputList v-model="model.tls.client_certificate" />
   </div>
@@ -168,9 +196,16 @@ const deletePushDnsServer = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.cert_name_type.title') }}
-    <Select v-model="model.tls.client_name_type" :options="OpenVpnCertNameTypeOptions" clearable />
+    <Select
+      v-model="model.tls.client_name_type"
+      :options="OpenVpnCertNameTypeOptions"
+      clearable
+    />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.peer_fingerprint.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.peer_fingerprint.length }"
+  >
     {{ t('kernel.endpoints.openvpn.tls.peer_fingerprint') }}
     <InputList v-model="model.tls.peer_fingerprint" />
   </div>
@@ -178,7 +213,10 @@ const deletePushDnsServer = (index: number) => {
     {{ t('kernel.endpoints.openvpn.tls.crl_path') }}
     <Input v-model="model.tls.crl_path" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.remote_certificate_ku.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.remote_certificate_ku.length }"
+  >
     {{ t('kernel.endpoints.openvpn.tls.remote_certificate_ku') }}
     <InputList v-model="model.tls.remote_certificate_ku" />
   </div>
@@ -204,19 +242,35 @@ const deletePushDnsServer = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.ns_cert_type.title') }}
-    <Select v-model="model.tls.ns_certificate_type" :options="OpenVpnNsCertTypeOptions" clearable />
+    <Select
+      v-model="model.tls.ns_certificate_type"
+      :options="OpenVpnNsCertTypeOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.version_min') }}
-    <Select v-model="model.tls.version_min" :options="TlsVersionOptions" clearable />
+    <Select
+      v-model="model.tls.version_min"
+      :options="TlsVersionOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.version_max') }}
-    <Select v-model="model.tls.version_max" :options="TlsVersionOptions" clearable />
+    <Select
+      v-model="model.tls.version_max"
+      :options="TlsVersionOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.cipher') }}
-    <Select v-model="model.tls.cipher" :options="TlsCipherSuiteOptions" clearable />
+    <Select
+      v-model="model.tls.cipher"
+      :options="TlsCipherSuiteOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.tls.groups') }}
@@ -232,7 +286,10 @@ const deletePushDnsServer = (index: number) => {
       clearable
     />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.control_wrap.key.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.control_wrap.key.length }"
+  >
     {{ t('kernel.endpoints.openvpn.static_key') }}
     <InputList v-model="model.tls.control_wrap.key" />
   </div>
@@ -258,7 +315,10 @@ const deletePushDnsServer = (index: number) => {
     {{ t('kernel.endpoints.openvpn.cipher') }}
     <Input v-model="model.cipher" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.data_ciphers.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.data_ciphers.length }"
+  >
     {{ t('kernel.endpoints.openvpn.data_ciphers') }}
     <InputList v-model="model.data_ciphers" />
   </div>
@@ -280,7 +340,11 @@ const deletePushDnsServer = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.mss_fix_mode.title') }}
-    <Select v-model="model.mss_fix_mode" :options="OpenVpnMssFixModeOptions" clearable />
+    <Select
+      v-model="model.mss_fix_mode"
+      :options="OpenVpnMssFixModeOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.replay_window') }}
@@ -302,32 +366,57 @@ const deletePushDnsServer = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.push.dns_servers.title') }}
-    <Button icon="add" type="primary" @click="addPushDnsServer">{{ t('common.add') }}</Button>
+    <Button icon="add" type="primary" @click="addPushDnsServer">{{
+      t('common.add')
+    }}</Button>
   </div>
   <div v-if="model.push.dns_servers.length" class="flex flex-col gap-8 mt-8">
-    <Card v-for="(dnsServer, index) in model.push.dns_servers" :key="index" :title="`${index + 1}`">
+    <Card
+      v-for="(dnsServer, index) in model.push.dns_servers"
+      :key="index"
+      :title="`${index + 1}`"
+    >
       <template #extra>
-        <Button icon="delete" type="text" size="small" @click="deletePushDnsServer(index)" />
+        <Button
+          icon="delete"
+          type="text"
+          size="small"
+          @click="deletePushDnsServer(index)"
+        />
       </template>
       <div class="form-item">
         {{ t('kernel.endpoints.openvpn.push.dns_servers.priority') }}
         <Input v-model="dnsServer.priority" type="number" editable clearable />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!dnsServer.addresses.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!dnsServer.addresses.length }"
+      >
         {{ t('kernel.endpoints.openvpn.push.dns_servers.addresses') }}
         <InputList v-model="dnsServer.addresses" />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!dnsServer.resolve_domains.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!dnsServer.resolve_domains.length }"
+      >
         {{ t('kernel.endpoints.openvpn.push.dns_servers.resolve_domains') }}
         <InputList v-model="dnsServer.resolve_domains" />
       </div>
       <div class="form-item">
         {{ t('kernel.endpoints.openvpn.push.dns_servers.dnssec.title') }}
-        <Select v-model="dnsServer.dnssec" :options="OpenVpnDnsSecOptions" clearable />
+        <Select
+          v-model="dnsServer.dnssec"
+          :options="OpenVpnDnsSecOptions"
+          clearable
+        />
       </div>
       <div class="form-item">
         {{ t('kernel.endpoints.openvpn.push.dns_servers.transport.title') }}
-        <Select v-model="dnsServer.transport" :options="OpenVpnDnsTransportOptions" clearable />
+        <Select
+          v-model="dnsServer.transport"
+          :options="OpenVpnDnsTransportOptions"
+          clearable
+        />
       </div>
       <div class="form-item">
         {{ t('kernel.endpoints.openvpn.push.dns_servers.sni') }}
@@ -335,11 +424,17 @@ const deletePushDnsServer = (index: number) => {
       </div>
     </Card>
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.push.search_domains.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.push.search_domains.length }"
+  >
     {{ t('kernel.endpoints.openvpn.push.search_domains') }}
     <InputList v-model="model.push.search_domains" />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.push.dhcp_options.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.push.dhcp_options.length }"
+  >
     {{ t('kernel.endpoints.openvpn.push.dhcp_options') }}
     <InputList v-model="model.push.dhcp_options" />
   </div>
@@ -347,7 +442,10 @@ const deletePushDnsServer = (index: number) => {
     {{ t('kernel.endpoints.openvpn.push.redirect_gateway') }}
     <Switch v-model="model.push.redirect_gateway" />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.push.redirect_gateway_flags.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.push.redirect_gateway_flags.length }"
+  >
     {{ t('kernel.endpoints.openvpn.push.redirect_gateway_flags') }}
     <InputList v-model="model.push.redirect_gateway_flags" />
   </div>
@@ -387,7 +485,12 @@ const deletePushDnsServer = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.renegotiate_packets') }}
-    <Input v-model="model.renegotiate_packets" type="number" editable clearable />
+    <Input
+      v-model="model.renegotiate_packets"
+      type="number"
+      editable
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openvpn.handshake_window') }}

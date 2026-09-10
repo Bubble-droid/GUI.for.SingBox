@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   name: 'Outbound',
@@ -27,4 +27,4 @@ export default {
   exclude: 'Exclude',
   icon: 'Icon',
   hidden: 'Hidden',
-} satisfies MessageSchema['outbounds']
+} satisfies MessageSchema['outbounds'];

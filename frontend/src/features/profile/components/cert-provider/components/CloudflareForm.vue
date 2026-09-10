@@ -2,19 +2,19 @@
 import {
   CloudflareOriginCaRequestTypeOptions,
   CloudflareOriginCaValidityOptions,
-} from '@profile/constant/options'
-import type { CloudflareCertProvider } from '@profile/types/profiles/cert-provider'
-import { useI18n } from 'vue-i18n'
+} from '@profile/constant/options';
+import type { CloudflareCertProvider } from '@profile/types/profiles/cert-provider';
+import { useI18n } from 'vue-i18n';
 
-import type { OptionItem } from '@/types/component'
+import type { OptionItem } from '@/types/component';
 
 interface Props {
-  httpClientOptions: OptionItem[]
+  httpClientOptions: OptionItem[];
 }
 
-const model = defineModel<CloudflareCertProvider['config']>({ required: true })
-defineProps<Props>()
-const { t } = useI18n()
+const model = defineModel<CloudflareCertProvider['config']>({ required: true });
+defineProps<Props>();
+const { t } = useI18n();
 </script>
 
 <template>
@@ -35,7 +35,9 @@ const { t } = useI18n()
     <Input v-model="model.origin_ca_key" editable clearable />
   </div>
   <div class="form-item">
-    {{ t('kernel.certificate_providers.cloudflare_origin_ca.request_type.title') }}
+    {{
+      t('kernel.certificate_providers.cloudflare_origin_ca.request_type.title')
+    }}
     <Select
       v-model="model.request_type"
       :options="CloudflareOriginCaRequestTypeOptions"
@@ -43,7 +45,11 @@ const { t } = useI18n()
     />
   </div>
   <div class="form-item">
-    {{ t('kernel.certificate_providers.cloudflare_origin_ca.requested_validity.title') }}
+    {{
+      t(
+        'kernel.certificate_providers.cloudflare_origin_ca.requested_validity.title',
+      )
+    }}
     <Select
       v-model="model.requested_validity"
       :options="CloudflareOriginCaValidityOptions"
@@ -52,6 +58,10 @@ const { t } = useI18n()
   </div>
   <div class="form-item">
     {{ t('kernel.certificate_providers.cloudflare_origin_ca.http_client') }}
-    <Select v-model="model.http_client" :options="httpClientOptions" clearable />
+    <Select
+      v-model="model.http_client"
+      :options="httpClientOptions"
+      clearable
+    />
   </div>
 </template>

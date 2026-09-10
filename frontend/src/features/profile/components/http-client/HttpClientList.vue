@@ -1,59 +1,62 @@
 <script lang="ts" setup>
-import DialerForm from '@profile/components/shared/DialerForm.vue'
-import Http2Form from '@profile/components/shared/Http2Form.vue'
-import OutboundTlsForm from '@profile/components/shared/OutboundTlsForm.vue'
-import QuicForm from '@profile/components/shared/QuicForm.vue'
-import { HttpEngineOptions, HttpVersionOptions } from '@profile/constant/options'
-import { createHttpClient } from '@profile/defaults'
-import type { HttpClientItem } from '@profile/types/profiles'
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import DialerForm from '@profile/components/shared/DialerForm.vue';
+import Http2Form from '@profile/components/shared/Http2Form.vue';
+import OutboundTlsForm from '@profile/components/shared/OutboundTlsForm.vue';
+import QuicForm from '@profile/components/shared/QuicForm.vue';
+import {
+  HttpEngineOptions,
+  HttpVersionOptions,
+} from '@profile/constant/options';
+import { createHttpClient } from '@profile/defaults';
+import type { HttpClientItem } from '@profile/types/profiles';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import { DraggableOptions } from '@/constant/app'
-import { useBool } from '@/hooks/useBool'
-import { deepClone } from '@/utils/others'
+import { DraggableOptions } from '@/constant/app';
+import { useBool } from '@/hooks/useBool';
+import { deepClone } from '@/utils/others';
 
-import type { OptionItem } from '@/types/component'
+import type { OptionItem } from '@/types/component';
 
 interface Props {
-  netnsOptions: OptionItem[]
-  outboundOptions: OptionItem[]
-  dnsServerOptions: OptionItem[]
+  netnsOptions: OptionItem[];
+  outboundOptions: OptionItem[];
+  dnsServerOptions: OptionItem[];
 }
 
-const model = defineModel<HttpClientItem[]>({ required: true })
-defineProps<Props>()
-const { t } = useI18n()
-const [showEditModal] = useBool(false)
+const model = defineModel<HttpClientItem[]>({ required: true });
+defineProps<Props>();
+const { t } = useI18n();
+const [showEditModal] = useBool(false);
 
-let editIndex = -1
-const fields = ref<HttpClientItem>(createHttpClient())
+let editIndex = -1;
+const fields = ref<HttpClientItem>(createHttpClient());
 
 const handleAdd = () => {
-  editIndex = -1
-  fields.value = createHttpClient()
-  showEditModal.value = true
-}
+  editIndex = -1;
+  fields.value = createHttpClient();
+  showEditModal.value = true;
+};
 
 const handleEdit = (index: number) => {
-  editIndex = index
-  fields.value = deepClone(model.value[index]!)
-  showEditModal.value = true
-}
+  editIndex = index;
+  fields.value = deepClone(model.value[index]!);
+  showEditModal.value = true;
+};
 
 const handleDelete = (index: number) => {
-  model.value.splice(index, 1)
-}
+  model.value.splice(index, 1);
+};
 
 const handleAddEnd = () => {
   if (editIndex === -1) {
-    model.value.unshift(fields.value)
+    model.value.unshift(fields.value);
   } else {
-    model.value[editIndex] = fields.value
+    model.value[editIndex] = fields.value;
   }
-}
+};
 
-defineExpose({ handleAdd })
+defineExpose({ handleAdd });
 </script>
 
 <template>
@@ -71,11 +74,23 @@ defineExpose({ handleAdd })
         <Switch v-model="client.enable" size="small" />
         <div class="flex items-center gap-2">
           <Tag color="cyan">{{ client.tag }}</Tag>
-          <Tag v-if="client.config.version">HTTP/{{ client.config.version }}</Tag>
+          <Tag v-if="client.config.version"
+            >HTTP/{{ client.config.version }}</Tag
+          >
         </div>
         <div class="ml-auto">
-          <Button icon="edit" type="text" size="small" @click="handleEdit(index)" />
-          <Button icon="delete" type="text" size="small" @click="handleDelete(index)" />
+          <Button
+            icon="edit"
+            type="text"
+            size="small"
+            @click="handleEdit(index)"
+          />
+          <Button
+            icon="delete"
+            type="text"
+            size="small"
+            @click="handleDelete(index)"
+          />
         </div>
       </div>
     </Card>
@@ -94,7 +109,11 @@ defineExpose({ handleAdd })
     </div>
     <div class="form-item">
       {{ t('kernel.http_clients.engine.title') }}
-      <Select v-model="fields.config.engine" :options="HttpEngineOptions" clearable />
+      <Select
+        v-model="fields.config.engine"
+        :options="HttpEngineOptions"
+        clearable
+      />
     </div>
     <div class="form-item">
       {{ t('kernel.http_clients.version.title') }}
@@ -110,7 +129,10 @@ defineExpose({ handleAdd })
     </div>
 
     <!-- HTTP2 Fields -->
-    <Http2Form v-if="fields.config.version === 2" v-model="fields.config.http2" />
+    <Http2Form
+      v-if="fields.config.version === 2"
+      v-model="fields.config.http2"
+    />
 
     <!-- QUIC Fields -->
     <QuicForm v-if="fields.config.version === 3" v-model="fields.config.quic" />

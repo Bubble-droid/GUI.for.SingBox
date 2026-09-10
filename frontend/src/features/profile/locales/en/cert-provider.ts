@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   title: 'Certificate Providers',
@@ -66,4 +66,4 @@ export default {
     },
     http_client: 'HTTP Client',
   },
-} satisfies MessageSchema['certificate_providers']
+} satisfies MessageSchema['certificate_providers'];

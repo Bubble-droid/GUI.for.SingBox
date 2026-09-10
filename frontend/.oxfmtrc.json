@@ -6,6 +6,15 @@
   "singleQuote": true,
   "printWidth": 100,
   "trailingComma": "all",
+  "overrides": [
+    {
+      "files": ["src/features/**/*"],
+      "options": {
+        "printWidth": 80,
+        "semi": true
+      }
+    }
+  ],
   "sortImports": {
     "ignoreCase": true,
     "internalPattern": ["@/", "@wails/"],

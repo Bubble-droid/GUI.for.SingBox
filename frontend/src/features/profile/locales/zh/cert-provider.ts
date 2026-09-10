@@ -64,4 +64,4 @@ export default {
     },
     http_client: 'HTTP 客户端',
   },
-}
+};

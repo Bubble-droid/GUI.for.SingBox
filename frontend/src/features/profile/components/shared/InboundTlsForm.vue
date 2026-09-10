@@ -4,36 +4,38 @@ import {
   TlsCipherSuiteOptions,
   TlsCurvePreferenceOptions,
   TlsClientAuthenticationOptions,
-} from '@profile/constant/options'
-import type { InboundTlsFormData } from '@profile/types/profiles/shared'
-import { useI18n } from 'vue-i18n'
+} from '@profile/constant/options';
+import type { InboundTlsFormData } from '@profile/types/profiles/shared';
+import { useI18n } from 'vue-i18n';
 
-import { useBool } from '@/hooks/useBool'
+import { useBool } from '@/hooks/useBool';
 
-import type { OptionItem } from '@/types/component'
+import type { OptionItem } from '@/types/component';
 
-import DialerForm from './DialerForm.vue'
-import PortInput from './PortInput.vue'
+import DialerForm from './DialerForm.vue';
+import PortInput from './PortInput.vue';
 
 interface Props {
-  certProviderOptions: OptionItem[]
-  netnsOptions: OptionItem[]
-  outboundOptions: OptionItem[]
-  dnsServerOptions: OptionItem[]
+  certProviderOptions: OptionItem[];
+  netnsOptions: OptionItem[];
+  outboundOptions: OptionItem[];
+  dnsServerOptions: OptionItem[];
 }
 
-const model = defineModel<InboundTlsFormData>({ required: true })
+const model = defineModel<InboundTlsFormData>({ required: true });
 
-defineProps<Props>()
+defineProps<Props>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const [showTls, toggleShow] = useBool(false)
+const [showTls, toggleShow] = useBool(false);
 </script>
 
 <template>
   <Divider>
-    <Button type="text" size="small" @click="toggleShow">{{ t('kernel.shared.tls.title') }}</Button>
+    <Button type="text" size="small" @click="toggleShow">{{
+      t('kernel.shared.tls.title')
+    }}</Button>
   </Divider>
   <div v-show="showTls">
     <div class="form-item">
@@ -52,17 +54,35 @@ const [showTls, toggleShow] = useBool(false)
       </div>
       <div class="form-item">
         {{ t('kernel.shared.tls.min_version.title') }}
-        <Select v-model="model.min_version" :options="TlsVersionOptions" clearable />
+        <Select
+          v-model="model.min_version"
+          :options="TlsVersionOptions"
+          clearable
+        />
       </div>
       <div class="form-item">
         {{ t('kernel.shared.tls.max_version.title') }}
-        <Select v-model="model.max_version" :options="TlsVersionOptions" clearable />
+        <Select
+          v-model="model.max_version"
+          :options="TlsVersionOptions"
+          clearable
+        />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.cipher_suites.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.cipher_suites.length }"
+      >
         {{ t('kernel.shared.tls.cipher_suites') }}
-        <MultipleSelect v-model="model.cipher_suites" :options="TlsCipherSuiteOptions" clearable />
+        <MultipleSelect
+          v-model="model.cipher_suites"
+          :options="TlsCipherSuiteOptions"
+          clearable
+        />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.curve_preferences.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.curve_preferences.length }"
+      >
         {{ t('kernel.shared.tls.curve_preferences') }}
         <MultipleSelect
           v-model="model.curve_preferences"
@@ -70,7 +90,10 @@ const [showTls, toggleShow] = useBool(false)
           clearable
         />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.certificate.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.certificate.length }"
+      >
         {{ t('kernel.shared.tls.certificate') }}
         <InputList v-model="model.certificate" />
       </div>
@@ -86,17 +109,25 @@ const [showTls, toggleShow] = useBool(false)
           clearable
         />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.client_certificate.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.client_certificate.length }"
+      >
         {{ t('kernel.shared.tls.client_certificate') }}
         <InputList v-model="model.client_certificate" />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.client_certificate_path.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.client_certificate_path.length }"
+      >
         {{ t('kernel.shared.tls.client_certificate_path') }}
         <InputList v-model="model.client_certificate_path" />
       </div>
       <div
         class="form-item"
-        :class="{ 'items-start': !!model.client_certificate_public_key_sha256.length }"
+        :class="{
+          'items-start': !!model.client_certificate_public_key_sha256.length,
+        }"
       >
         {{ t('kernel.shared.tls.client_certificate_public_key_sha256') }}
         <InputList v-model="model.client_certificate_public_key_sha256" />
@@ -123,7 +154,11 @@ const [showTls, toggleShow] = useBool(false)
       </div>
       <div class="form-item">
         {{ t('kernel.shared.tls.certificate_provider') }}
-        <Select v-model="model.certificate_provider" :options="certProviderOptions" clearable />
+        <Select
+          v-model="model.certificate_provider"
+          :options="certProviderOptions"
+          clearable
+        />
       </div>
 
       <!-- ECH -->
@@ -133,7 +168,10 @@ const [showTls, toggleShow] = useBool(false)
         <Switch v-model="model.ech.enabled" />
       </div>
       <template v-if="model.ech.enabled">
-        <div class="form-item" :class="{ 'items-start': !!model.ech.key.length }">
+        <div
+          class="form-item"
+          :class="{ 'items-start': !!model.ech.key.length }"
+        >
           {{ t('kernel.shared.tls.ech.key') }}
           <InputList v-model="model.ech.key" />
         </div>
@@ -168,13 +206,20 @@ const [showTls, toggleShow] = useBool(false)
           {{ t('kernel.shared.tls.reality.private_key') }}
           <Input v-model="model.reality.private_key" clearable />
         </div>
-        <div class="form-item" :class="{ 'items-start': !!model.reality.short_id.length }">
+        <div
+          class="form-item"
+          :class="{ 'items-start': !!model.reality.short_id.length }"
+        >
           {{ t('kernel.shared.tls.reality.short_id') }}
           <InputList v-model="model.reality.short_id" />
         </div>
         <div class="form-item">
           {{ t('kernel.shared.tls.reality.max_time_difference') }}
-          <Input v-model="model.reality.max_time_difference" editable clearable />
+          <Input
+            v-model="model.reality.max_time_difference"
+            editable
+            clearable
+          />
         </div>
       </template>
     </template>

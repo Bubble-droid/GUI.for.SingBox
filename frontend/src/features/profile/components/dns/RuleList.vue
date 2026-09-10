@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // oxlint-disable typescript/no-explicit-any
-import type { DomainStrategy } from '@profile/constant/kernel'
+import type { DomainStrategy } from '@profile/constant/kernel';
 import {
   DnsRuleType,
   DnsActionKind,
@@ -8,71 +8,73 @@ import {
   ClashMode,
   RuleSetFormat,
   RuleSetType,
-} from '@profile/constant/kernel'
+} from '@profile/constant/kernel';
 import {
   DnsRejectMethodOptions,
   DnsRuleActionOptions,
   DnsRuleTypeOptions,
   DomainStrategyOptions,
-} from '@profile/constant/options'
-import { createDnsRule } from '@profile/defaults/dns'
-import type { DnsRuleItem } from '@profile/types/profiles/dns'
-import type { RuleSetItem } from '@profile/types/profiles/route'
-import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+} from '@profile/constant/options';
+import { createDnsRule } from '@profile/defaults/dns';
+import type { DnsRuleItem } from '@profile/types/profiles/dns';
+import type { RuleSetItem } from '@profile/types/profiles/route';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import { DraggableOptions } from '@/constant/app'
-import { useBool } from '@/hooks/useBool'
-import { message } from '@/utils/interaction'
-import { isValidJson } from '@/utils/is'
-import { deepClone } from '@/utils/others'
+import { DraggableOptions } from '@/constant/app';
+import { useBool } from '@/hooks/useBool';
+import { message } from '@/utils/interaction';
+import { isValidJson } from '@/utils/is';
+import { deepClone } from '@/utils/others';
 
-import type { OptionItem } from '@/types/component'
+import type { OptionItem } from '@/types/component';
 
 interface Props {
-  inboundOptions: OptionItem[]
-  dnsServerOptions: OptionItem[]
-  ruleSet: RuleSetItem[]
+  inboundOptions: OptionItem[];
+  dnsServerOptions: OptionItem[];
+  ruleSet: RuleSetItem[];
 }
 
-const model = defineModel<DnsRuleItem[]>({ required: true })
+const model = defineModel<DnsRuleItem[]>({ required: true });
 
-const { inboundOptions, dnsServerOptions, ruleSet } = defineProps<Props>()
+const { inboundOptions, dnsServerOptions, ruleSet } = defineProps<Props>();
 
-let ruleId = 0
-const fields = ref<DnsRuleItem>(createDnsRule())
+let ruleId = 0;
+const fields = ref<DnsRuleItem>(createDnsRule());
 
 const isInsertionPointMissing = computed(
   () => !model.value.some((rule) => rule.type === DnsRuleType.InsertionPoint),
-)
+);
 
-const { t } = useI18n()
-const [showEditModal] = useBool(false)
+const { t } = useI18n();
+const [showEditModal] = useBool(false);
 
 const handleAdd = () => {
-  ruleId = -1
-  fields.value = createDnsRule()
-  showEditModal.value = true
-}
+  ruleId = -1;
+  fields.value = createDnsRule();
+  showEditModal.value = true;
+};
 
 const handleAddEnd = () => {
   if (ruleId === -1) {
-    const index = model.value.findIndex((v) => v.type === DnsRuleType.InsertionPoint)
+    const index = model.value.findIndex(
+      (v) => v.type === DnsRuleType.InsertionPoint,
+    );
     if (index === -1) {
-      model.value.unshift(fields.value)
+      model.value.unshift(fields.value);
     } else {
-      model.value.splice(index + 1, 0, fields.value)
+      model.value.splice(index + 1, 0, fields.value);
     }
   } else {
-    model.value[ruleId] = fields.value
+    model.value[ruleId] = fields.value;
   }
-}
+};
 
 const handleEdit = (index: number) => {
-  ruleId = index
-  fields.value = deepClone(model.value[index]!)
-  showEditModal.value = true
-}
+  ruleId = index;
+  fields.value = deepClone(model.value[index]!);
+  showEditModal.value = true;
+};
 
 const handleAddInsertionPoint = () => {
   model.value.unshift({
@@ -86,94 +88,105 @@ const handleAddInsertionPoint = () => {
     strategy: '' as DomainStrategy,
     disable_cache: false,
     client_subnet: '',
-  })
-}
+  });
+};
 
 const handleDeleteRule = (index: number) => {
-  model.value.splice(index, 1)
-}
+  model.value.splice(index, 1);
+};
 
 const handleUse = (ruleset: RuleSetItem) => {
-  const ids = fields.value.payload.split(',').filter(Boolean)
-  const idx = ids.indexOf(ruleset.id)
+  const ids = fields.value.payload.split(',').filter(Boolean);
+  const idx = ids.indexOf(ruleset.id);
   if (idx === -1) {
-    ids.push(ruleset.id)
+    ids.push(ruleset.id);
   } else {
-    ids.splice(idx, 1)
+    ids.splice(idx, 1);
   }
-  fields.value.payload = ids.join(',')
-}
+  fields.value.payload = ids.join(',');
+};
 
 const handleClearRuleset = (rule: DnsRuleItem) => {
-  const ids = fields.value.payload.split(',').filter((id) => ruleSet.find((v) => v.id === id))
-  rule.payload = ids.join(',')
-}
+  const ids = fields.value.payload
+    .split(',')
+    .filter((id) => ruleSet.find((v) => v.id === id));
+  rule.payload = ids.join(',');
+};
 
-const showLost = () => message.warn('kernel.route.rules.invalid')
+const showLost = () => message.warn('kernel.route.rules.invalid');
 
 const hasLost = (rule: DnsRuleItem) => {
   const checkServer = () => {
     if (rule.action === DnsActionKind.Route) {
       if (!dnsServerOptions.some((v) => v.value === rule.server)) {
-        return true
+        return true;
       }
-      return false
+      return false;
     } else if (
-      [DnsActionKind.RouteOptions, DnsActionKind.Predefined].includes(rule.action as any)
+      [DnsActionKind.RouteOptions, DnsActionKind.Predefined].includes(
+        rule.action as any,
+      )
     ) {
-      return !isValidJson(rule.server)
+      return !isValidJson(rule.server);
     } else if (rule.action === DnsActionKind.Reject) {
-      return ![DnsRejectMethod.Default, DnsRejectMethod.Drop].includes(rule.server as any)
+      return ![DnsRejectMethod.Default, DnsRejectMethod.Drop].includes(
+        rule.server as any,
+      );
     }
-    return false
-  }
+    return false;
+  };
 
   const checkPayload = () => {
     if (rule.type === DnsRuleType.Inbound) {
-      return !inboundOptions.some((v) => v.value === rule.payload)
+      return !inboundOptions.some((v) => v.value === rule.payload);
     }
     if (rule.type === DnsRuleType.RuleSet) {
       const hasMissingRuleset = rule.payload
         .split(',')
-        .some((id) => !ruleSet.some((v) => v.id === id))
-      return hasMissingRuleset
+        .some((id) => !ruleSet.some((v) => v.id === id));
+      return hasMissingRuleset;
     }
     if (rule.type === DnsRuleType.Inline) {
-      return !isValidJson(rule.payload)
+      return !isValidJson(rule.payload);
     }
-    return !rule.payload
-  }
+    return !rule.payload;
+  };
 
-  return checkServer() || checkPayload()
-}
+  return checkServer() || checkPayload();
+};
 
 const renderRule = (rule: DnsRuleItem) => {
-  const { type, payload, server, action, invert } = rule
-  const children: string[] = [type]
-  let _payload = payload
+  const { type, payload, server, action, invert } = rule;
+  const children: string[] = [type];
+  let _payload = payload;
   if (type === DnsRuleType.RuleSet) {
     _payload = rule.payload
       .split(',')
       .map((id) => ruleSet.find((v) => v.id === id)?.tag ?? id)
-      .join(',')
+      .join(',');
   } else if (type === DnsRuleType.Inline && payload.includes('__is_fake_ip')) {
-    _payload = 'FakeIP'
+    _payload = 'FakeIP';
   }
   if (invert) {
-    _payload += ` (invert) `
+    _payload += ` (invert) `;
   }
-  children.push(_payload, action)
+  children.push(_payload, action);
   if (server) {
-    const proxy = dnsServerOptions.find((v) => v.value === server)?.label ?? server
-    children.push(proxy)
+    const proxy =
+      dnsServerOptions.find((v) => v.value === server)?.label ?? server;
+    children.push(proxy);
   }
-  return children.join(',')
-}
+  return children.join(',');
+};
 
-defineExpose({ handleAdd })
+defineExpose({ handleAdd });
 </script>
 <template>
-  <Empty v-if="model.length === 0 || (model.length === 1 && !isInsertionPointMissing)">
+  <Empty
+    v-if="
+      model.length === 0 || (model.length === 1 && !isInsertionPointMissing)
+    "
+  >
     <template #description>
       <Button icon="add" type="primary" size="small" @click="handleAdd">
         {{ t('common.add') }}
@@ -189,7 +202,10 @@ defineExpose({ handleAdd })
 
   <div v-draggable="[model, DraggableOptions]">
     <Card v-for="(rule, index) in model" :key="rule.id" class="mb-2">
-      <div v-if="rule.type === DnsRuleType.InsertionPoint" class="text-center font-bold">
+      <div
+        v-if="rule.type === DnsRuleType.InsertionPoint"
+        class="text-center font-bold"
+      >
         <Divider class="cursor-move">
           <Button icon="add" type="text" size="small" @click="handleAdd">
             {{ t('kernel.insertionPoint') }}
@@ -201,20 +217,38 @@ defineExpose({ handleAdd })
           <Switch v-model="rule.enable" border="square" size="small" />
         </div>
         <div class="font-bold flex-1 rule-content">
-          <span v-if="hasLost(rule)" class="warn cursor-pointer" @click="showLost"> [ ! ] </span>
+          <span
+            v-if="hasLost(rule)"
+            class="warn cursor-pointer"
+            @click="showLost"
+          >
+            [ ! ]
+          </span>
           {{ renderRule(rule) }}
         </div>
         <div class="ml-auto shrink-0">
           <Button
-            v-if="rule.type === DnsRuleType.RuleSet && rule.payload && hasLost(rule)"
+            v-if="
+              rule.type === DnsRuleType.RuleSet && rule.payload && hasLost(rule)
+            "
             size="small"
             type="text"
             @click="handleClearRuleset(rule)"
           >
             {{ t('common.clear') }}
           </Button>
-          <Button icon="edit" type="text" size="small" @click="handleEdit(index)" />
-          <Button icon="delete" type="text" size="small" @click="handleDeleteRule(index)" />
+          <Button
+            icon="edit"
+            type="text"
+            size="small"
+            @click="handleEdit(index)"
+          />
+          <Button
+            icon="delete"
+            type="text"
+            size="small"
+            @click="handleDeleteRule(index)"
+          />
         </div>
       </div>
     </Card>
@@ -264,7 +298,11 @@ defineExpose({ handleAdd })
         style="min-width: 320px"
       />
       <Switch
-        v-else-if="[DnsRuleType.IpIsPrivate, DnsRuleType.IpAcceptAny].includes(fields.type as any)"
+        v-else-if="
+          [DnsRuleType.IpIsPrivate, DnsRuleType.IpAcceptAny].includes(
+            fields.type as any,
+          )
+        "
         :model-value="fields.payload === 'true'"
         @change="(val) => (fields.payload = val ? 'true' : 'false')"
       />
@@ -288,7 +326,12 @@ defineExpose({ handleAdd })
       <template v-else-if="fields.action === DnsActionKind.RouteOptions">
         <div class="form-item">
           {{ t('kernel.route.rules.routeOptions') }}
-          <CodeEditor v-model="fields.server" editable lang="json" style="min-width: 320px" />
+          <CodeEditor
+            v-model="fields.server"
+            editable
+            lang="json"
+            style="min-width: 320px"
+          />
         </div>
       </template>
       <template v-else-if="fields.action === DnsActionKind.Reject">
@@ -300,11 +343,20 @@ defineExpose({ handleAdd })
       <template v-else-if="fields.action === DnsActionKind.Predefined">
         <div class="form-item">
           {{ t('kernel.route.rules.action.predefined') }}
-          <CodeEditor v-model="fields.server" editable lang="json" style="min-width: 320px" />
+          <CodeEditor
+            v-model="fields.server"
+            editable
+            lang="json"
+            style="min-width: 320px"
+          />
         </div>
       </template>
       <template
-        v-if="[DnsActionKind.Route, DnsActionKind.RouteOptions].includes(fields.action as any)"
+        v-if="
+          [DnsActionKind.Route, DnsActionKind.RouteOptions].includes(
+            fields.action as any,
+          )
+        "
       >
         <div class="form-item">
           {{ t('kernel.route.rules.disable_cache') }}
@@ -318,7 +370,10 @@ defineExpose({ handleAdd })
     </Card>
     <template v-if="fields.type === DnsRuleType.RuleSet">
       <Divider>{{ t('kernel.route.tab.rule_set') }}</Divider>
-      <Empty v-if="ruleSet.length === 0" :description="t('kernel.route.rule_set.empty')" />
+      <Empty
+        v-if="ruleSet.length === 0"
+        :description="t('kernel.route.rule_set.empty')"
+      />
       <div class="grid grid-cols-3 gap-8">
         <Card
           v-for="ruleset in ruleSet"
@@ -330,7 +385,11 @@ defineExpose({ handleAdd })
           @click="handleUse(ruleset)"
         >
           {{ ruleset.type }}
-          {{ ruleset.type === RuleSetType.Inline ? RuleSetFormat.Source : ruleset.format }}
+          {{
+            ruleset.type === RuleSetType.Inline
+              ? RuleSetFormat.Source
+              : ruleset.format
+          }}
         </Card>
       </div>
     </template>

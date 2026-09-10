@@ -1,8 +1,8 @@
-import type { Network } from '@profile/constant/kernel'
-import { InboundType, TunStack } from '@profile/constant/kernel'
-import type { InboundItem } from '@profile/types/profiles/inbound'
+import type { Network } from '@profile/constant/kernel';
+import { InboundType, TunStack } from '@profile/constant/kernel';
+import type { InboundItem } from '@profile/types/profiles/inbound';
 
-import { DefaultInboundIds } from './shared'
+import { DefaultInboundIds } from './shared';
 
 export const createInboundSocks = (): NonNullable<InboundItem['socks']> => ({
   listen: {
@@ -13,7 +13,7 @@ export const createInboundSocks = (): NonNullable<InboundItem['socks']> => ({
     udp_fragment: false,
   },
   users: [],
-})
+});
 
 export const createInboundHttp = (): NonNullable<InboundItem['http']> => ({
   listen: {
@@ -24,7 +24,7 @@ export const createInboundHttp = (): NonNullable<InboundItem['http']> => ({
     udp_fragment: false,
   },
   users: [],
-})
+});
 
 export const createInboundMixed = (): NonNullable<InboundItem['mixed']> => ({
   listen: {
@@ -35,7 +35,7 @@ export const createInboundMixed = (): NonNullable<InboundItem['mixed']> => ({
     udp_fragment: false,
   },
   users: [],
-})
+});
 
 export const createInboundDirect = (): NonNullable<InboundItem['direct']> => ({
   listen: {
@@ -46,7 +46,7 @@ export const createInboundDirect = (): NonNullable<InboundItem['direct']> => ({
     udp_fragment: false,
   },
   network: '' as Network,
-})
+});
 
 export const createInboundTun = (): NonNullable<InboundItem['tun']> => ({
   interface_name: '',
@@ -58,7 +58,7 @@ export const createInboundTun = (): NonNullable<InboundItem['tun']> => ({
   route_exclude_address: [],
   endpoint_independent_nat: false,
   stack: TunStack.Mixed,
-})
+});
 
 export const createInbounds = (): InboundItem[] => [
   {
@@ -75,4 +75,4 @@ export const createInbounds = (): InboundItem[] => [
     enable: false,
     tun: createInboundTun(),
   },
-]
+];

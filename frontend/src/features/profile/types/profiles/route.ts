@@ -4,49 +4,49 @@ import type {
   RouteRuleType,
   DomainStrategy,
   RouteActionKind,
-} from '@profile/constant/kernel'
+} from '@profile/constant/kernel';
 
-import type { TagItem } from './shared'
+import type { TagItem } from './shared';
 
 export interface RuleSetItem extends TagItem {
-  type: RuleSetType
+  type: RuleSetType;
   // inline
-  rules: string
+  rules: string;
   // local
-  path: string
+  path: string;
   // remote
-  url: string
-  download_detour: string
-  update_interval: string
+  url: string;
+  download_detour: string;
+  update_interval: string;
   // local or remote
-  format: RuleSetFormat
+  format: RuleSetFormat;
 }
 
 export interface RouteRuleItem {
-  id: string
-  type: RouteRuleType
-  enable: boolean
-  payload: string
-  invert: boolean
-  action: RouteActionKind
+  id: string;
+  type: RouteRuleType;
+  enable: boolean;
+  payload: string;
+  invert: boolean;
+  action: RouteActionKind;
   // action = route
-  outbound: string
+  outbound: string;
   // action = sniff
-  sniffer: string[]
+  sniffer: string[];
   // action = resolve
-  strategy: DomainStrategy
-  server: string
+  strategy: DomainStrategy;
+  server: string;
 }
 
 export interface RouteSection {
-  rules: RouteRuleItem[]
-  rule_set: RuleSetItem[]
-  final: string
-  auto_detect_interface: boolean
-  default_interface: string
-  find_process: boolean
+  rules: RouteRuleItem[];
+  rule_set: RuleSetItem[];
+  final: string;
+  auto_detect_interface: boolean;
+  default_interface: string;
+  find_process: boolean;
   default_domain_resolver: {
-    server: string
-    client_subnet: string
-  }
+    server: string;
+    client_subnet: string;
+  };
 }

@@ -1,21 +1,25 @@
-import type { DomainStrategy } from '@profile/constant/kernel'
+import type { DomainStrategy } from '@profile/constant/kernel';
 import {
   RouteRuleType,
   RuleSetType,
   RuleSetFormat,
   ClashMode,
   RouteActionKind,
-} from '@profile/constant/kernel'
-import type { RouteRuleItem, RouteSection, RuleSetItem } from '@profile/types/profiles/route'
+} from '@profile/constant/kernel';
+import type {
+  RouteRuleItem,
+  RouteSection,
+  RuleSetItem,
+} from '@profile/types/profiles/route';
 
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/others';
 
 import {
   DefaultInboundIds,
   DefaultOutboundIds,
   DefaultRulesetIds,
   DefaultDnsServersIds,
-} from './shared'
+} from './shared';
 
 export const createRouteRule = (): RouteRuleItem => ({
   id: sampleID(),
@@ -28,7 +32,7 @@ export const createRouteRule = (): RouteRuleItem => ({
   sniffer: [],
   strategy: '' as DomainStrategy,
   server: '',
-})
+});
 
 export const createRouteRuleset = (): RuleSetItem => ({
   id: sampleID(),
@@ -40,7 +44,7 @@ export const createRouteRuleset = (): RuleSetItem => ({
   update_interval: '',
   rules: '',
   path: '',
-})
+});
 
 export const createRoute = (): RouteSection => ({
   rules: [
@@ -277,4 +281,4 @@ export const createRoute = (): RouteSection => ({
     server: DefaultDnsServersIds.LocalDns,
     client_subnet: '',
   },
-})
+});

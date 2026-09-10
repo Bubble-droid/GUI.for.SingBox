@@ -1,10 +1,23 @@
-import type { DomainStrategy } from '@profile/constant/kernel'
-import { DnsRuleType, ClashMode, DnsServerType, DnsActionKind } from '@profile/constant/kernel'
-import type { DnsRuleItem, DnsSection, DnsServerItem } from '@profile/types/profiles/dns'
+import type { DomainStrategy } from '@profile/constant/kernel';
+import {
+  DnsRuleType,
+  ClashMode,
+  DnsServerType,
+  DnsActionKind,
+} from '@profile/constant/kernel';
+import type {
+  DnsRuleItem,
+  DnsSection,
+  DnsServerItem,
+} from '@profile/types/profiles/dns';
 
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/others';
 
-import { DefaultDnsServersIds, DefaultOutboundIds, DefaultRulesetIds } from './shared'
+import {
+  DefaultDnsServersIds,
+  DefaultOutboundIds,
+  DefaultRulesetIds,
+} from './shared';
 
 export const createDnsServer = (): DnsServerItem => ({
   id: sampleID(),
@@ -20,7 +33,7 @@ export const createDnsServer = (): DnsServerItem => ({
   inet6_range: '',
   hosts_path: [],
   predefined: {},
-})
+});
 
 export const createDnsServers = (): DnsServerItem[] => [
   {
@@ -98,7 +111,7 @@ export const createDnsServers = (): DnsServerItem[] => [
     hosts_path: [],
     predefined: {},
   },
-]
+];
 
 export const createFakeIPDnsRule = () => ({
   __is_fake_ip: true,
@@ -124,7 +137,7 @@ export const createFakeIPDnsRule = () => ({
       query_type: ['A', 'AAAA'],
     },
   ],
-})
+});
 
 export const createDnsRule = (): DnsRuleItem => ({
   id: sampleID(),
@@ -139,7 +152,7 @@ export const createDnsRule = (): DnsRuleItem => ({
   // route/route-options
   disable_cache: false,
   client_subnet: '',
-})
+});
 
 export const createDnsRules = (): DnsRuleItem[] => [
   {
@@ -214,7 +227,7 @@ export const createDnsRules = (): DnsRuleItem[] => [
     disable_cache: false,
     client_subnet: '',
   },
-]
+];
 
 export const createDns = (): DnsSection => ({
   servers: createDnsServers(),
@@ -225,4 +238,4 @@ export const createDns = (): DnsSection => ({
   client_subnet: '',
   final: DefaultDnsServersIds.RemoteDns,
   strategy: '' as DomainStrategy,
-})
+});

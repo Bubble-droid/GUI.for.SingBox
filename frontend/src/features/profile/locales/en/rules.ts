@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   type: {
@@ -48,4 +48,4 @@ export default {
       no_drop: 'Do Not Drop',
     },
   },
-} satisfies MessageSchema['rules']
+} satisfies MessageSchema['rules'];

@@ -1,48 +1,48 @@
 <script lang="ts" setup>
-import type { RouteSection } from '@profile/types/profiles/route.ts'
-import { ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
+import type { RouteSection } from '@profile/types/profiles/route.ts';
+import { ref, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import type { OptionItem } from '@/types/component.ts'
-import type { UnpackArray } from '@/types/utils.ts'
+import type { OptionItem } from '@/types/component.ts';
+import type { UnpackArray } from '@/types/utils.ts';
 
-import RuleList from './RuleList.vue'
-import RuleSetList from './RuleSetList.vue'
+import RuleList from './RuleList.vue';
+import RuleSetList from './RuleSetList.vue';
 
 interface Props {
-  inboundOptions: OptionItem[]
-  outboundOptions: OptionItem[]
-  dnsServerOptions: OptionItem[]
+  inboundOptions: OptionItem[];
+  outboundOptions: OptionItem[];
+  dnsServerOptions: OptionItem[];
 }
 
-const model = defineModel<RouteSection>({ required: true })
+const model = defineModel<RouteSection>({ required: true });
 
-defineProps<Props>()
+defineProps<Props>();
 
 const tabs = [
   { key: 'common', tab: 'kernel.route.tab.common' },
   { key: 'ruleSet', tab: 'kernel.route.tab.rule_set' },
   { key: 'rules', tab: 'kernel.route.tab.rules' },
-] as const
+] as const;
 
-type TabKey = UnpackArray<typeof tabs>['key']
+type TabKey = UnpackArray<typeof tabs>['key'];
 
-const activeKey = ref<TabKey>('common')
-const rulesConfigRef = useTemplateRef('rulesConfigRef')
-const rulesetConfigRef = useTemplateRef('rulesetConfigRef')
+const activeKey = ref<TabKey>('common');
+const rulesConfigRef = useTemplateRef('rulesConfigRef');
+const rulesetConfigRef = useTemplateRef('rulesetConfigRef');
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const handleAdd = () => {
   const handlerMap: Record<TabKey, (() => void) | undefined> = {
     common: () => {},
     rules: () => rulesConfigRef.value?.handleAdd?.(),
     ruleSet: () => rulesetConfigRef.value?.handleAdd?.(),
-  }
-  handlerMap[activeKey.value]?.()
-}
+  };
+  handlerMap[activeKey.value]?.();
+};
 
-defineExpose({ handleAdd })
+defineExpose({ handleAdd });
 </script>
 
 <template>

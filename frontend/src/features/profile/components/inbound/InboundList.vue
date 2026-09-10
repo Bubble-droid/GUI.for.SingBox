@@ -1,27 +1,27 @@
 <script lang="ts" setup>
-import { InboundType } from '@profile/constant/kernel'
-import { NetworkOptions, TunStackOptions } from '@profile/constant/options'
+import { InboundType } from '@profile/constant/kernel';
+import { NetworkOptions, TunStackOptions } from '@profile/constant/options';
 import {
   createInboundDirect,
   createInboundMixed,
   createInboundHttp,
   createInboundSocks,
   createInboundTun,
-} from '@profile/defaults/inbound'
-import type { InboundItem } from '@profile/types/profiles/inbound'
-import { useI18n } from 'vue-i18n'
+} from '@profile/defaults/inbound';
+import type { InboundItem } from '@profile/types/profiles/inbound';
+import { useI18n } from 'vue-i18n';
 
-import { DraggableOptions } from '@/constant/app'
-import { picker } from '@/utils/interaction'
-import { sampleID } from '@/utils/others'
+import { DraggableOptions } from '@/constant/app';
+import { picker } from '@/utils/interaction';
+import { sampleID } from '@/utils/others';
 
-const model = defineModel<InboundItem[]>({ required: true })
+const model = defineModel<InboundItem[]>({ required: true });
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const handleDelete = (index: number) => {
-  model.value.splice(index, 1)
-}
+  model.value.splice(index, 1);
+};
 
 const inbounds = [
   {
@@ -33,7 +33,7 @@ const inbounds = [
         type: InboundType.Direct,
         enable: true,
         direct: createInboundDirect(),
-      })
+      });
     },
   },
   {
@@ -45,7 +45,7 @@ const inbounds = [
         type: InboundType.Mixed,
         enable: true,
         mixed: createInboundMixed(),
-      })
+      });
     },
   },
   {
@@ -57,7 +57,7 @@ const inbounds = [
         type: InboundType.Http,
         enable: true,
         http: createInboundHttp(),
-      })
+      });
     },
   },
   {
@@ -69,7 +69,7 @@ const inbounds = [
         type: InboundType.Socks,
         enable: true,
         socks: createInboundSocks(),
-      })
+      });
     },
   },
   {
@@ -81,38 +81,52 @@ const inbounds = [
         type: InboundType.Tun,
         enable: true,
         tun: createInboundTun(),
-      })
+      });
     },
   },
-]
+];
 
 const handleAdd = async () => {
-  const fns = await picker.multi('common.add', inbounds)
+  const fns = await picker.multi('common.add', inbounds);
   fns.forEach((fn) => {
-    fn()
-  })
-}
+    fn();
+  });
+};
 
-defineExpose({ handleAdd })
+defineExpose({ handleAdd });
 </script>
 
 <template>
   <Empty v-if="model.length === 0">
     <template #description>
       <div class="flex gap-8">
-        <Button v-for="inbound in inbounds" :key="inbound.label" @click="inbound.value">
+        <Button
+          v-for="inbound in inbounds"
+          :key="inbound.label"
+          @click="inbound.value"
+        >
           {{ t('common.add') }} {{ inbound.label }}
         </Button>
       </div>
     </template>
   </Empty>
   <div v-draggable="[model, { ...DraggableOptions, handle: '.drag' }]">
-    <Card v-for="(inbound, index) in model" :key="inbound.id" :title="inbound.tag" class="mb-8">
+    <Card
+      v-for="(inbound, index) in model"
+      :key="inbound.id"
+      :title="inbound.tag"
+      class="mb-8"
+    >
       <template #title-prefix>
         <Icon icon="drag" class="drag cursor-move" />
       </template>
       <template #extra>
-        <Button icon="delete" type="text" size="small" @click="handleDelete(index)" />
+        <Button
+          icon="delete"
+          type="text"
+          size="small"
+          @click="handleDelete(index)"
+        />
       </template>
       <div class="form-item">
         {{ t('kernel.inbounds.enable') }}
@@ -129,7 +143,10 @@ defineExpose({ handleAdd })
         </div>
         <div class="form-item">
           {{ t('kernel.inbounds.listen.listen_port') }}
-          <Input v-model="inbound[inbound.type]!.listen.listen_port" type="number" />
+          <Input
+            v-model="inbound[inbound.type]!.listen.listen_port"
+            type="number"
+          />
         </div>
         <div
           v-if="inbound.type !== InboundType.Direct"
@@ -137,7 +154,10 @@ defineExpose({ handleAdd })
           class="form-item"
         >
           {{ t('kernel.inbounds.users') }}
-          <InputList v-model="inbound[inbound.type]!.users" placeholder="user:password" />
+          <InputList
+            v-model="inbound[inbound.type]!.users"
+            placeholder="user:password"
+          />
         </div>
         <div v-else class="form-item">
           {{ t('kernel.inbounds.direct.network') }}
@@ -186,15 +206,27 @@ defineExpose({ handleAdd })
           {{ t('kernel.inbounds.tun.mtu') }}
           <Input v-model="inbound.tun.mtu" type="number" editable />
         </div>
-        <div :class="{ 'items-start': inbound.tun.address.length }" class="form-item">
+        <div
+          :class="{ 'items-start': inbound.tun.address.length }"
+          class="form-item"
+        >
           {{ t('kernel.inbounds.tun.address') }}
           <InputList v-model="inbound.tun.address" />
         </div>
-        <div :class="{ 'items-start': inbound.tun.route_address.length }" class="form-item">
+        <div
+          :class="{ 'items-start': inbound.tun.route_address.length }"
+          class="form-item"
+        >
           {{ t('kernel.inbounds.tun.route_address') }}
-          <InputList v-model="inbound.tun.route_address" placeholder="0.0.0.0/1 ::1" />
+          <InputList
+            v-model="inbound.tun.route_address"
+            placeholder="0.0.0.0/1 ::1"
+          />
         </div>
-        <div :class="{ 'items-start': inbound.tun.route_exclude_address.length }" class="form-item">
+        <div
+          :class="{ 'items-start': inbound.tun.route_exclude_address.length }"
+          class="form-item"
+        >
           {{ t('kernel.inbounds.tun.route_exclude_address') }}
           <InputList
             v-model="inbound.tun.route_exclude_address"

@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   tab: {
@@ -74,4 +74,4 @@ export default {
     invalid: 'Invalid Parameter',
     invert: 'Invert',
   },
-} satisfies MessageSchema['route']
+} satisfies MessageSchema['route'];

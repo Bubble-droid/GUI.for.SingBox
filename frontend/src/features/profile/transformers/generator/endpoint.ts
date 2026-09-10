@@ -1,4 +1,4 @@
-import { EndpointType } from '@profile/constant/kernel'
+import { EndpointType } from '@profile/constant/kernel';
 import type {
   EndpointItem,
   OpenConnectEndpoint,
@@ -6,18 +6,18 @@ import type {
   OpenVpnServerEndpoint,
   TailscaleEndpoint,
   WireGuardEndpoint,
-} from '@profile/types/profiles/endpoint'
-import type { Endpoint, EndpointOf } from '@profile/types/sing-box/config'
+} from '@profile/types/profiles/endpoint';
+import type { Endpoint, EndpointOf } from '@profile/types/sing-box/config';
 
-import { generateDialer, generateUdpNat, generateListen } from './shared'
-import type { TagMaps } from './types'
+import { generateDialer, generateUdpNat, generateListen } from './shared';
+import type { TagMaps } from './types';
 
 const generateWireGuard = (
   wireguard: WireGuardEndpoint,
   maps: TagMaps,
 ): EndpointOf<'wireguard'> => {
-  const { type, tag, config } = wireguard
-  const { dialer, udpNat, ...rest } = config
+  const { type, tag, config } = wireguard;
+  const { dialer, udpNat, ...rest } = config;
   return {
     ...rest,
     ...generateDialer(dialer, maps),
@@ -25,27 +25,30 @@ const generateWireGuard = (
     type,
     tag,
     peers: rest.peers.map((v) => ({ ...v, reserved: v.reserved.map(Number) })),
-  }
-}
+  };
+};
 
 const generateTailscale = (
   tailscale: TailscaleEndpoint,
   maps: TagMaps,
 ): EndpointOf<'tailscale'> => {
-  const { type, tag, config } = tailscale
-  const { dialer, ...rest } = config
+  const { type, tag, config } = tailscale;
+  const { dialer, ...rest } = config;
   return {
     ...rest,
     ...generateDialer(dialer, maps),
     type,
     tag,
     ssh_server: rest.ssh_server.enabled ? { ...rest.ssh_server } : undefined,
-  } as EndpointOf<'tailscale'>
-}
+  } as EndpointOf<'tailscale'>;
+};
 
-const generateOpenConnect = (openconnect: OpenConnectEndpoint, maps: TagMaps): Endpoint => {
-  const { type, tag, config } = openconnect
-  const { dialer, udpNat, ...rest } = config
+const generateOpenConnect = (
+  openconnect: OpenConnectEndpoint,
+  maps: TagMaps,
+): Endpoint => {
+  const { type, tag, config } = openconnect;
+  const { dialer, udpNat, ...rest } = config;
 
   return {
     ...rest,
@@ -53,15 +56,15 @@ const generateOpenConnect = (openconnect: OpenConnectEndpoint, maps: TagMaps): E
     ...generateUdpNat(udpNat),
     type,
     tag,
-  } as unknown as Endpoint
-}
+  } as unknown as Endpoint;
+};
 
 const generateOpenVpnClient = (
   openvpn: OpenVpnClientEndpoint,
   maps: TagMaps,
 ): EndpointOf<'openvpn-client'> => {
-  const { type, tag, config } = openvpn
-  const { dialer, udpNat, ...rest } = config
+  const { type, tag, config } = openvpn;
+  const { dialer, udpNat, ...rest } = config;
 
   return {
     ...rest,
@@ -69,15 +72,15 @@ const generateOpenVpnClient = (
     ...generateUdpNat(udpNat),
     type,
     tag,
-  } as EndpointOf<'openvpn-client'>
-}
+  } as EndpointOf<'openvpn-client'>;
+};
 
 const generateOpenVpnServer = (
   openvpn: OpenVpnServerEndpoint,
   maps: TagMaps,
 ): EndpointOf<'openvpn-server'> => {
-  const { type, tag, config } = openvpn
-  const { listen, udpNat, ...rest } = config
+  const { type, tag, config } = openvpn;
+  const { listen, udpNat, ...rest } = config;
 
   return {
     ...rest,
@@ -85,32 +88,35 @@ const generateOpenVpnServer = (
     ...generateUdpNat(udpNat),
     type,
     tag,
-  } as unknown as EndpointOf<'openvpn-server'>
-}
+  } as unknown as EndpointOf<'openvpn-server'>;
+};
 
-export const generateEndpoints = (endpoints: EndpointItem[], maps: TagMaps): Endpoint[] =>
+export const generateEndpoints = (
+  endpoints: EndpointItem[],
+  maps: TagMaps,
+): Endpoint[] =>
   endpoints
     .filter((ep) => ep.enable)
     .map((ep): Endpoint => {
-      const { type } = ep
+      const { type } = ep;
       switch (type) {
         case EndpointType.WireGuard: {
-          return generateWireGuard(ep, maps)
+          return generateWireGuard(ep, maps);
         }
         case EndpointType.Tailscale: {
-          return generateTailscale(ep, maps)
+          return generateTailscale(ep, maps);
         }
         case EndpointType.OpenConnect: {
-          return generateOpenConnect(ep, maps)
+          return generateOpenConnect(ep, maps);
         }
         case EndpointType.OpenVpnClient: {
-          return generateOpenVpnClient(ep, maps)
+          return generateOpenVpnClient(ep, maps);
         }
         case EndpointType.OpenVpnServer: {
-          return generateOpenVpnServer(ep, maps)
+          return generateOpenVpnServer(ep, maps);
         }
         default: {
-          throw new Error(`Unexpected endpoint type: ${type as string}`)
+          throw new Error(`Unexpected endpoint type: ${type as string}`);
         }
       }
-    })
+    });

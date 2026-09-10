@@ -1,41 +1,41 @@
 <script lang="ts" setup>
-import DialerForm from '@profile/components/shared/DialerForm.vue'
-import { PredefinedNtpServerOptions } from '@profile/constant/options.ts'
-import type { NtpSection } from '@profile/types/profiles/index.ts'
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import DialerForm from '@profile/components/shared/DialerForm.vue';
+import { PredefinedNtpServerOptions } from '@profile/constant/options.ts';
+import type { NtpSection } from '@profile/types/profiles/index.ts';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import type { OptionItem } from '@/types/component.ts'
+import type { OptionItem } from '@/types/component.ts';
 
 interface Props {
-  netnsOptions: OptionItem[]
-  outboundOptions: OptionItem[]
-  dnsServerOptions: OptionItem[]
+  netnsOptions: OptionItem[];
+  outboundOptions: OptionItem[];
+  dnsServerOptions: OptionItem[];
 }
 
-const model = defineModel<NtpSection>({ required: true })
+const model = defineModel<NtpSection>({ required: true });
 
-defineProps<Props>()
+defineProps<Props>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const serverSelect = computed({
   get() {
     const isPredefined = PredefinedNtpServerOptions.some(
       (opt) => opt.value === model.value.server && opt.value !== 'custom',
-    )
-    return isPredefined ? model.value.server : 'custom'
+    );
+    return isPredefined ? model.value.server : 'custom';
   },
   set(val) {
     if (val === 'custom') {
-      model.value.server = ''
+      model.value.server = '';
     } else {
-      model.value.server = val
+      model.value.server = val;
     }
   },
-})
+});
 
-const isCustomServer = computed(() => serverSelect.value === 'custom')
+const isCustomServer = computed(() => serverSelect.value === 'custom');
 </script>
 
 <template>

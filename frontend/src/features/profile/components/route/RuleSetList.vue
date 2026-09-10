@@ -1,75 +1,78 @@
 <script lang="ts" setup>
-import { RuleSetFormat, RuleSetType } from '@profile/constant/kernel'
-import { RuleSetFormatOptions, RuleSetTypeOptions } from '@profile/constant/options'
-import { createRouteRuleset } from '@profile/defaults/route'
-import type { RuleSetItem } from '@profile/types/profiles/route'
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { RuleSetFormat, RuleSetType } from '@profile/constant/kernel';
+import {
+  RuleSetFormatOptions,
+  RuleSetTypeOptions,
+} from '@profile/constant/options';
+import { createRouteRuleset } from '@profile/defaults/route';
+import type { RuleSetItem } from '@profile/types/profiles/route';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import { DraggableOptions } from '@/constant/app'
-import { useBool } from '@/hooks/useBool'
-import { useRulesetsStore } from '@/stores/rulesets'
-import { message } from '@/utils/interaction'
-import { deepClone } from '@/utils/others'
+import { DraggableOptions } from '@/constant/app';
+import { useBool } from '@/hooks/useBool';
+import { useRulesetsStore } from '@/stores/rulesets';
+import { message } from '@/utils/interaction';
+import { deepClone } from '@/utils/others';
 
-import type { AppRuleSet } from '@/types/app'
-import type { OptionItem } from '@/types/component'
+import type { AppRuleSet } from '@/types/app';
+import type { OptionItem } from '@/types/component';
 
 interface Props {
-  outboundOptions: OptionItem[]
+  outboundOptions: OptionItem[];
 }
 
-const model = defineModel<RuleSetItem[]>({ required: true })
+const model = defineModel<RuleSetItem[]>({ required: true });
 
-defineProps<Props>()
+defineProps<Props>();
 
-let rulesetId = 0
-const fields = ref<RuleSetItem>(createRouteRuleset())
+let rulesetId = 0;
+const fields = ref<RuleSetItem>(createRouteRuleset());
 
-const { t } = useI18n()
-const [showEditModal] = useBool(false)
-const rulesetsStore = useRulesetsStore()
+const { t } = useI18n();
+const [showEditModal] = useBool(false);
+const rulesetsStore = useRulesetsStore();
 
 const handleAdd = () => {
-  rulesetId = -1
-  fields.value = createRouteRuleset()
-  showEditModal.value = true
-}
+  rulesetId = -1;
+  fields.value = createRouteRuleset();
+  showEditModal.value = true;
+};
 
 const handleAddEnd = () => {
   if (rulesetId === -1) {
-    model.value.unshift(fields.value)
+    model.value.unshift(fields.value);
   } else {
-    model.value[rulesetId] = fields.value
+    model.value[rulesetId] = fields.value;
   }
-}
+};
 
 const handleEdit = (index: number) => {
-  rulesetId = index
-  fields.value = deepClone(model.value[index]!)
-  showEditModal.value = true
-}
+  rulesetId = index;
+  fields.value = deepClone(model.value[index]!);
+  showEditModal.value = true;
+};
 
 const handleDelete = (index: number) => {
-  model.value.splice(index, 1)
-}
+  model.value.splice(index, 1);
+};
 
-const showLost = () => message.warn('kernel.route.rule_set.notFound')
+const showLost = () => message.warn('kernel.route.rule_set.notFound');
 
 const hasLost = (ruleset: RuleSetItem) => {
   if (ruleset.type !== RuleSetType.Local) {
-    return false
+    return false;
   }
-  return !rulesetsStore.getRulesetById(ruleset.path)
-}
+  return !rulesetsStore.getRulesetById(ruleset.path);
+};
 
 const handleUse = (ruleset: AppRuleSet) => {
-  fields.value.path = ruleset.id
-  fields.value.tag = ruleset.name
-  fields.value.format = ruleset.format
-}
+  fields.value.path = ruleset.id;
+  fields.value.tag = ruleset.name;
+  fields.value.format = ruleset.format;
+};
 
-defineExpose({ handleAdd })
+defineExpose({ handleAdd });
 </script>
 
 <template>
@@ -99,7 +102,9 @@ defineExpose({ handleAdd })
             {{
               t(
                 'kernel.route.rule_set.format.' +
-                  (ruleset.type === RuleSetType.Inline ? RuleSetFormat.Source : ruleset.format),
+                  (ruleset.type === RuleSetType.Inline
+                    ? RuleSetFormat.Source
+                    : ruleset.format),
               )
             }}
           </Tag>
@@ -108,8 +113,18 @@ defineExpose({ handleAdd })
           </template>
         </div>
         <div class="ml-auto">
-          <Button icon="edit" type="text" size="small" @click="handleEdit(index)" />
-          <Button icon="delete" type="text" size="small" @click="handleDelete(index)" />
+          <Button
+            icon="edit"
+            type="text"
+            size="small"
+            @click="handleEdit(index)"
+          />
+          <Button
+            icon="delete"
+            type="text"
+            size="small"
+            @click="handleDelete(index)"
+          />
         </div>
       </div>
     </Card>
@@ -164,7 +179,11 @@ defineExpose({ handleAdd })
       </div>
       <div class="form-item">
         {{ t('kernel.route.rule_set.download_detour') }}
-        <Select v-model="fields.download_detour" :options="outboundOptions" clearable />
+        <Select
+          v-model="fields.download_detour"
+          :options="outboundOptions"
+          clearable
+        />
       </div>
       <div class="form-item">
         {{ t('kernel.route.rule_set.update_interval') }}

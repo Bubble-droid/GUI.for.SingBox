@@ -1,17 +1,17 @@
-import certificate_providers from './cert-provider'
-import certificate from './certificate'
-import dns from './dns'
-import endpoints from './endpoint'
-import experimental from './experimental'
-import http_clients from './http-cilent'
-import inbounds from './inbound'
-import log from './log'
-import netns from './netns'
-import ntp from './ntp'
-import outbounds from './outbound'
-import route from './route'
-import rules from './rules'
-import shared from './shared'
+import certificate_providers from './cert-provider';
+import certificate from './certificate';
+import dns from './dns';
+import endpoints from './endpoint';
+import experimental from './experimental';
+import http_clients from './http-cilent';
+import inbounds from './inbound';
+import log from './log';
+import netns from './netns';
+import ntp from './ntp';
+import outbounds from './outbound';
+import route from './route';
+import rules from './rules';
+import shared from './shared';
 
 export default {
   rule: '规则',
@@ -51,4 +51,4 @@ export default {
   addInsertionPoint: '添加插入点',
   missingInsertionPoint: '请先添加插入点',
   startupFailed: '启动失败，请查看日志详情',
-}
+};

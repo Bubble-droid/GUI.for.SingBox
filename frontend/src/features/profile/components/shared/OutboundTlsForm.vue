@@ -6,21 +6,23 @@ import {
   TlsCurvePreferenceOptions,
   TlsSpoofMethodOptions,
   UtlsFingerprintOptions,
-} from '@profile/constant/options'
-import type { OutboundTlsFormData } from '@profile/types/profiles/shared'
-import { useI18n } from 'vue-i18n'
+} from '@profile/constant/options';
+import type { OutboundTlsFormData } from '@profile/types/profiles/shared';
+import { useI18n } from 'vue-i18n';
 
-import { useBool } from '@/hooks/useBool'
+import { useBool } from '@/hooks/useBool';
 
-const model = defineModel<OutboundTlsFormData>({ required: true })
-const { t } = useI18n()
+const model = defineModel<OutboundTlsFormData>({ required: true });
+const { t } = useI18n();
 
-const [showTls, toggleShow] = useBool(false)
+const [showTls, toggleShow] = useBool(false);
 </script>
 
 <template>
   <Divider>
-    <Button type="text" size="small" @click="toggleShow">{{ t('kernel.shared.tls.title') }}</Button>
+    <Button type="text" size="small" @click="toggleShow">{{
+      t('kernel.shared.tls.title')
+    }}</Button>
   </Divider>
   <div v-show="showTls">
     <div class="form-item">
@@ -51,17 +53,35 @@ const [showTls, toggleShow] = useBool(false)
       </div>
       <div class="form-item">
         {{ t('kernel.shared.tls.min_version.title') }}
-        <Select v-model="model.min_version" :options="TlsVersionOptions" clearable />
+        <Select
+          v-model="model.min_version"
+          :options="TlsVersionOptions"
+          clearable
+        />
       </div>
       <div class="form-item">
         {{ t('kernel.shared.tls.max_version.title') }}
-        <Select v-model="model.max_version" :options="TlsVersionOptions" clearable />
+        <Select
+          v-model="model.max_version"
+          :options="TlsVersionOptions"
+          clearable
+        />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.cipher_suites.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.cipher_suites.length }"
+      >
         {{ t('kernel.shared.tls.cipher_suites') }}
-        <MultipleSelect v-model="model.cipher_suites" :options="TlsCipherSuiteOptions" clearable />
+        <MultipleSelect
+          v-model="model.cipher_suites"
+          :options="TlsCipherSuiteOptions"
+          clearable
+        />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.curve_preferences.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.curve_preferences.length }"
+      >
         {{ t('kernel.shared.tls.curve_preferences') }}
         <MultipleSelect
           v-model="model.curve_preferences"
@@ -69,7 +89,10 @@ const [showTls, toggleShow] = useBool(false)
           clearable
         />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.certificate.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.certificate.length }"
+      >
         {{ t('kernel.shared.tls.certificate') }}
         <InputList v-model="model.certificate" />
       </div>
@@ -84,7 +107,10 @@ const [showTls, toggleShow] = useBool(false)
         {{ t('kernel.shared.tls.certificate_public_key_sha256') }}
         <InputList v-model="model.certificate_public_key_sha256" />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.client_certificate.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.client_certificate.length }"
+      >
         {{ t('kernel.shared.tls.client_certificate') }}
         <InputList v-model="model.client_certificate" />
       </div>
@@ -92,7 +118,10 @@ const [showTls, toggleShow] = useBool(false)
         {{ t('kernel.shared.tls.client_certificate_path') }}
         <Input v-model="model.client_certificate_path" editable clearable />
       </div>
-      <div class="form-item" :class="{ 'items-start': !!model.client_key.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!model.client_key.length }"
+      >
         {{ t('kernel.shared.tls.client_key') }}
         <InputList v-model="model.client_key" />
       </div>
@@ -118,7 +147,11 @@ const [showTls, toggleShow] = useBool(false)
       </div>
       <div class="form-item">
         {{ t('kernel.shared.tls.spoof_method.title') }}
-        <Select v-model="model.spoof_method" :options="TlsSpoofMethodOptions" clearable />
+        <Select
+          v-model="model.spoof_method"
+          :options="TlsSpoofMethodOptions"
+          clearable
+        />
       </div>
       <div class="form-item">
         {{ t('kernel.shared.tls.kernel_tx') }}
@@ -140,7 +173,10 @@ const [showTls, toggleShow] = useBool(false)
         <Switch v-model="model.ech.enabled" />
       </div>
       <template v-if="model.ech.enabled">
-        <div class="form-item" :class="{ 'items-start': !!model.ech.config.length }">
+        <div
+          class="form-item"
+          :class="{ 'items-start': !!model.ech.config.length }"
+        >
           {{ t('kernel.shared.tls.ech.config') }}
           <InputList v-model="model.ech.config" />
         </div>
@@ -163,7 +199,11 @@ const [showTls, toggleShow] = useBool(false)
       <template v-if="model.utls.enabled">
         <div class="form-item">
           {{ t('kernel.shared.tls.utls.fingerprint') }}
-          <Select v-model="model.utls.fingerprint" :options="UtlsFingerprintOptions" clearable />
+          <Select
+            v-model="model.utls.fingerprint"
+            :options="UtlsFingerprintOptions"
+            clearable
+          />
         </div>
       </template>
 

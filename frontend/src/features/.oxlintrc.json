@@ -1,7 +1,15 @@
 {
   "$schema": "../../node_modules/oxlint/configuration_schema.json",
   "extends": ["../../.oxlintrc.json"],
-  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "promise", "vue"],
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "promise",
+    "vue"
+  ],
   "categories": {
     "correctness": "error",
     "suspicious": "warn",

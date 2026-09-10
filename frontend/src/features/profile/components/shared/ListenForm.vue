@@ -1,23 +1,23 @@
 <script lang="ts" setup>
-import type { ListenFormData } from '@profile/types/profiles/shared.ts'
-import { useI18n } from 'vue-i18n'
+import type { ListenFormData } from '@profile/types/profiles/shared.ts';
+import { useI18n } from 'vue-i18n';
 
-import { useBool } from '@/hooks/useBool'
+import { useBool } from '@/hooks/useBool';
 
-import type { OptionItem } from '@/types/component'
+import type { OptionItem } from '@/types/component';
 
-import PortInput from './PortInput.vue'
+import PortInput from './PortInput.vue';
 
 interface Props {
-  netnsOptions: OptionItem[]
-  inboundOptions: OptionItem[]
+  netnsOptions: OptionItem[];
+  inboundOptions: OptionItem[];
 }
 
-const model = defineModel<ListenFormData>({ required: true })
-defineProps<Props>()
-const { t } = useI18n()
+const model = defineModel<ListenFormData>({ required: true });
+defineProps<Props>();
+const { t } = useI18n();
 
-const [showListen, toggleShow] = useBool(false)
+const [showListen, toggleShow] = useBool(false);
 </script>
 
 <template>

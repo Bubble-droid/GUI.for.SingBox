@@ -1,61 +1,61 @@
 <script setup lang="ts">
-import { useModalContext } from '@components/Modal/index.ts'
-import CertProviderList from '@profile/components/cert-provider/CertProviderList.vue'
-import EndpointList from '@profile/components/endpoint/EndpointList.vue'
-import NetnsList from '@profile/components/netns/NetnsList.vue'
-import OutboundList from '@profile/components/outbound/OutboundList.vue'
-import { EndpointType } from '@profile/constant/kernel.ts'
-import { generateConfig } from '@profile/transformers/generator/index.ts'
-import type { Profile } from '@profile/types/profiles/index.ts'
-import { ref, computed, useTemplateRef, h } from 'vue'
-import type { Ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useModalContext } from '@components/Modal/index.ts';
+import CertProviderList from '@profile/components/cert-provider/CertProviderList.vue';
+import EndpointList from '@profile/components/endpoint/EndpointList.vue';
+import NetnsList from '@profile/components/netns/NetnsList.vue';
+import OutboundList from '@profile/components/outbound/OutboundList.vue';
+import { EndpointType } from '@profile/constant/kernel.ts';
+import { generateConfig } from '@profile/transformers/generator/index.ts';
+import type { Profile } from '@profile/types/profiles/index.ts';
+import { ref, computed, useTemplateRef, h } from 'vue';
+import type { Ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import { ProfileStep, ProfileStepItems } from '@/constant/app'
-import { useProfilesStore } from '@/stores/profiles.ts'
-import { message, modal } from '@/utils/interaction.ts'
-import { deepClone } from '@/utils/others.ts'
+import { ProfileStep, ProfileStepItems } from '@/constant/app';
+import { useProfilesStore } from '@/stores/profiles.ts';
+import { message, modal } from '@/utils/interaction.ts';
+import { deepClone } from '@/utils/others.ts';
 
-import Button from '@/components/Button/index.vue'
-import CodeViewer from '@/components/CodeViewer/index.vue'
-import Dropdown from '@/components/Dropdown/index.vue'
+import Button from '@/components/Button/index.vue';
+import CodeViewer from '@/components/CodeViewer/index.vue';
+import Dropdown from '@/components/Dropdown/index.vue';
 
-import type { OptionItem } from '@/types/component.ts'
+import type { OptionItem } from '@/types/component.ts';
 
-import CertForm from './cert/CertForm.vue'
-import DnsPanel from './dns/DnsPanel.vue'
-import ExperimentalForm from './experimental/ExperimentalForm.vue'
-import HttpClientList from './http-client/HttpClientList.vue'
-import InboundList from './inbound/InboundList.vue'
-import LogForm from './log/LogForm.vue'
-import MixinAndScriptPanel from './MixinAndScriptPanel.vue'
-import NtpForm from './ntp/NtpForm.vue'
-import RoutePanel from './route/RoutePanel.vue'
+import CertForm from './cert/CertForm.vue';
+import DnsPanel from './dns/DnsPanel.vue';
+import ExperimentalForm from './experimental/ExperimentalForm.vue';
+import HttpClientList from './http-client/HttpClientList.vue';
+import InboundList from './inbound/InboundList.vue';
+import LogForm from './log/LogForm.vue';
+import MixinAndScriptPanel from './MixinAndScriptPanel.vue';
+import NtpForm from './ntp/NtpForm.vue';
+import RoutePanel from './route/RoutePanel.vue';
 
 interface Props {
-  id?: string
-  step?: number
+  id?: string;
+  step?: number;
 }
 
-const { id = '', step = ProfileStep.Name } = defineProps<Props>()
+const { id = '', step = ProfileStep.Name } = defineProps<Props>();
 
-const { cancel, submit } = useModalContext()
+const { cancel, submit } = useModalContext();
 
-const { t } = useI18n()
-const certProviderRef = useTemplateRef('certProviderRef')
-const httpClientRef = useTemplateRef('httpClientRef')
-const netnsRef = useTemplateRef('netnsRef')
-const endpointRef = useTemplateRef('endpointRef')
-const inboundRef = useTemplateRef('inboundRef')
-const outboundRef = useTemplateRef('outboundRef')
-const routeRef = useTemplateRef('routeRef')
-const dnsRef = useTemplateRef('dnsRef')
-const profilesStore = useProfilesStore()
+const { t } = useI18n();
+const certProviderRef = useTemplateRef('certProviderRef');
+const httpClientRef = useTemplateRef('httpClientRef');
+const netnsRef = useTemplateRef('netnsRef');
+const endpointRef = useTemplateRef('endpointRef');
+const inboundRef = useTemplateRef('inboundRef');
+const outboundRef = useTemplateRef('outboundRef');
+const routeRef = useTemplateRef('routeRef');
+const dnsRef = useTemplateRef('dnsRef');
+const profilesStore = useProfilesStore();
 
-const loading = ref(false)
-const currentStep = ref(step)
+const loading = ref(false);
+const currentStep = ref(step);
 
-const profile = ref<Profile>(profilesStore.getProfileTemplate())
+const profile = ref<Profile>(profilesStore.getProfileTemplate());
 
 const httpClientOptions = computed<OptionItem[]>(() =>
   profile.value.httpClients
@@ -64,7 +64,7 @@ const httpClientOptions = computed<OptionItem[]>(() =>
       label: v.tag,
       value: v.id,
     })),
-)
+);
 
 const netnsOptions = computed<OptionItem[]>(() =>
   profile.value.netns
@@ -73,7 +73,7 @@ const netnsOptions = computed<OptionItem[]>(() =>
       label: ns.tag,
       value: ns.id,
     })),
-)
+);
 
 const tailscaleOptions = computed<OptionItem[]>(() =>
   profile.value.endpoints
@@ -82,7 +82,7 @@ const tailscaleOptions = computed<OptionItem[]>(() =>
       label: v.tag,
       value: v.id,
     })),
-)
+);
 
 const inboundOptions = computed<OptionItem[]>(() =>
   [...profile.value.endpoints, ...profile.value.inbounds]
@@ -91,47 +91,50 @@ const inboundOptions = computed<OptionItem[]>(() =>
       label: v.tag,
       value: v.id,
     })),
-)
+);
 
 const outboundOptions = computed<OptionItem[]>(() =>
-  [...profile.value.endpoints.filter((v) => v.enable), ...profile.value.outbounds].map((v) => ({
+  [
+    ...profile.value.endpoints.filter((v) => v.enable),
+    ...profile.value.outbounds,
+  ].map((v) => ({
     label: v.tag,
     value: v.id,
   })),
-)
+);
 
 const dnsServerOptions = computed<OptionItem[]>(() =>
   profile.value.dns.servers.map((v) => ({ label: v.tag, value: v.id })),
-)
+);
 
 const mixinAndScriptConfig = computed({
   get() {
-    return { mixin: profile.value.mixin, script: profile.value.script }
+    return { mixin: profile.value.mixin, script: profile.value.script };
   },
   set({ mixin, script }) {
-    profile.value.mixin = mixin
-    profile.value.script = script
+    profile.value.mixin = mixin;
+    profile.value.script = script;
   },
-})
+});
 
-const handlePrevStep = () => currentStep.value--
-const handleNextStep = () => currentStep.value++
+const handlePrevStep = () => currentStep.value--;
+const handleNextStep = () => currentStep.value++;
 
 const handleSave = async () => {
-  loading.value = true
+  loading.value = true;
   try {
     if (id) {
-      await profilesStore.editProfile(id, profile.value)
+      await profilesStore.editProfile(id, profile.value);
     } else {
-      await profilesStore.addProfile(profile.value)
+      await profilesStore.addProfile(profile.value);
     }
-    await submit()
+    await submit();
   } catch (error) {
-    console.error('handleSave:', error)
-    message.error(error)
+    console.error('handleSave:', error);
+    message.error(error);
   }
-  loading.value = false
-}
+  loading.value = false;
+};
 
 const handleAdd = () => {
   const map: Record<number, Ref> = {
@@ -143,13 +146,13 @@ const handleAdd = () => {
     [ProfileStep.Outbounds]: outboundRef,
     [ProfileStep.Route]: routeRef,
     [ProfileStep.Dns]: dnsRef,
-  }
-  map[currentStep.value]!.value.handleAdd()
-}
+  };
+  map[currentStep.value]!.value.handleAdd();
+};
 
 const handlePreview = async () => {
   try {
-    const config = await generateConfig(profile.value)
+    const config = await generateConfig(profile.value);
     const m = modal({
       title: profile.value.name,
       cancelText: 'common.close',
@@ -157,21 +160,21 @@ const handlePreview = async () => {
       width: '90',
       submit: false,
       maskClosable: true,
-    })
+    });
     m.setContent(CodeViewer, {
       modelValue: JSON.stringify(config, null, 2),
       lang: 'json',
       copyable: true,
-    }).open()
+    }).open();
   } catch (error) {
-    message.error(error)
+    message.error(error);
   }
-}
+};
 
 if (id) {
-  const p = profilesStore.getProfileById(id)
+  const p = profilesStore.getProfileById(id);
   if (p) {
-    profile.value = deepClone(p)
+    profile.value = deepClone(p);
   }
 }
 
@@ -249,7 +252,9 @@ const modalSlots = {
       Button,
       {
         class: 'mr-auto',
-        disabled: !profile.value.name || currentStep.value === ProfileStepItems.length - 1,
+        disabled:
+          !profile.value.name ||
+          currentStep.value === ProfileStepItems.length - 1,
         onClick: handleNextStep,
       },
       () => t('common.nextStep'),
@@ -275,9 +280,9 @@ const modalSlots = {
       },
       () => t('common.save'),
     ),
-}
+};
 
-defineExpose({ modalSlots })
+defineExpose({ modalSlots });
 </script>
 
 <template>
@@ -303,7 +308,10 @@ defineExpose({ modalSlots })
       />
     </div>
     <div v-if="currentStep === ProfileStep.Experimental">
-      <ExperimentalForm v-model="profile.experimental" :outbound-options="outboundOptions" />
+      <ExperimentalForm
+        v-model="profile.experimental"
+        :outbound-options="outboundOptions"
+      />
     </div>
     <div v-if="currentStep === ProfileStep.Certificate">
       <CertForm v-model="profile.cert" />

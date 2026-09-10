@@ -11,4 +11,4 @@ export default {
   },
   disable_version_fallback: '禁用低版本回退',
   headers: '自定义请求标头',
-}
+};

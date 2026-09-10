@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   enable: 'Enable',
@@ -32,4 +32,4 @@ export default {
   mixedPort: 'Mixed Port',
   httpPort: 'HTTP(s) Port',
   socksPort: 'SOCKS5 Port',
-} satisfies MessageSchema['inbounds']
+} satisfies MessageSchema['inbounds'];

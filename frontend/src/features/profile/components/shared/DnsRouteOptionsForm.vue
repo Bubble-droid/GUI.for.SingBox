@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { DnsRouteOptionsFormData } from '@profile/types/profiles/shared'
-import { useI18n } from 'vue-i18n'
+import type { DnsRouteOptionsFormData } from '@profile/types/profiles/shared';
+import { useI18n } from 'vue-i18n';
 
-const model = defineModel<DnsRouteOptionsFormData>({ required: true })
-const { t } = useI18n()
+const model = defineModel<DnsRouteOptionsFormData>({ required: true });
+const { t } = useI18n();
 </script>
 
 <template>

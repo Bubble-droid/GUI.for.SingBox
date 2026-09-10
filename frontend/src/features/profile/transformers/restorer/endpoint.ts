@@ -1,4 +1,4 @@
-import { EndpointType } from '@profile/constant/kernel'
+import { EndpointType } from '@profile/constant/kernel';
 import {
   createWireGuardPeer,
   createOpenConnectTnccCert,
@@ -7,7 +7,7 @@ import {
   createOpenVpnPullFilter,
   createOpenVpnPushDnsServer,
   createEndpoint,
-} from '@profile/defaults/endpoint'
+} from '@profile/defaults/endpoint';
 import type {
   EndpointItem,
   OpenConnectEndpoint,
@@ -18,45 +18,47 @@ import type {
   TailscaleEndpoint,
   WireGuardEndpoint,
   WireGuardPeer,
-} from '@profile/types/profiles/endpoint'
-import type { Endpoint, EndpointOf } from '@profile/types/sing-box/config'
-import { normalizeArray } from '@profile/utils/helper'
-import type { openconnect_tncc_certificate } from '@zhexin/typebox/endpoint'
+} from '@profile/types/profiles/endpoint';
+import type { Endpoint, EndpointOf } from '@profile/types/sing-box/config';
+import { normalizeArray } from '@profile/utils/helper';
+import type { openconnect_tncc_certificate } from '@zhexin/typebox/endpoint';
 
-import { sampleID } from '@/utils/others'
+import { sampleID } from '@/utils/others';
 
-import type { Recordable } from '@/types/typescript'
+import type { Recordable } from '@/types/typescript';
 
-import { restoreDialer, restoreUdpNat, restoreListen } from './shared'
-import type { IdMaps } from './types'
+import { restoreDialer, restoreUdpNat, restoreListen } from './shared';
+import type { IdMaps } from './types';
 
-const restorePeers = (peers: EndpointOf<'wireguard'>['peers'] = []): WireGuardPeer[] => {
-  const peer = createWireGuardPeer()
+const restorePeers = (
+  peers: EndpointOf<'wireguard'>['peers'] = [],
+): WireGuardPeer[] => {
+  const peer = createWireGuardPeer();
   return peers.map((p) => {
-    const { allowed_ips, reserved, ...rest } = p
+    const { allowed_ips, reserved, ...rest } = p;
     return {
       ...peer,
       ...rest,
       allowed_ips: normalizeArray(allowed_ips),
       reserved: normalizeArray(reserved).map(String),
-    }
-  })
-}
+    };
+  });
+};
 
 const restoreWireGuard = (
   wireguard: EndpointOf<typeof EndpointType.WireGuard>,
   maps: IdMaps,
 ): WireGuardEndpoint => {
-  const { type, tag, ...rest } = wireguard
-  const id = maps.endpoints.get(tag) ?? sampleID()
+  const { type, tag, ...rest } = wireguard;
+  const id = maps.endpoints.get(tag) ?? sampleID();
   const base = {
     id,
     tag,
     type,
-  }
-  const template = createEndpoint(EndpointType.WireGuard)
-  const { dialer, rest: reset1 } = restoreDialer(rest, maps)
-  const { udpNat, rest: final } = restoreUdpNat(reset1)
+  };
+  const template = createEndpoint(EndpointType.WireGuard);
+  const { dialer, rest: reset1 } = restoreDialer(rest, maps);
+  const { udpNat, rest: final } = restoreUdpNat(reset1);
 
   return {
     ...template,
@@ -69,22 +71,22 @@ const restoreWireGuard = (
       dialer,
       udpNat,
     },
-  }
-}
+  };
+};
 
 const restoreTailscale = (
   tailscale: EndpointOf<typeof EndpointType.Tailscale>,
   maps: IdMaps,
 ): TailscaleEndpoint => {
-  const { type, tag, ...rest } = tailscale
-  const id = maps.endpoints.get(tag) ?? sampleID()
+  const { type, tag, ...rest } = tailscale;
+  const id = maps.endpoints.get(tag) ?? sampleID();
   const base = {
     id,
     tag,
     type,
-  }
-  const template = createEndpoint(EndpointType.Tailscale)
-  const { dialer, rest: reset1 } = restoreDialer(rest, maps)
+  };
+  const template = createEndpoint(EndpointType.Tailscale);
+  const { dialer, rest: reset1 } = restoreDialer(rest, maps);
 
   return {
     ...template,
@@ -94,61 +96,65 @@ const restoreTailscale = (
       ...reset1,
       advertise_routes: normalizeArray(reset1.advertise_routes),
       advertise_tags:
-        'advertise_tags' in reset1 ? normalizeArray(reset1.advertise_tags as string) : [],
-      relay_server_static_endpoints: normalizeArray(reset1.relay_server_static_endpoints),
+        'advertise_tags' in reset1
+          ? normalizeArray(reset1.advertise_tags as string)
+          : [],
+      relay_server_static_endpoints: normalizeArray(
+        reset1.relay_server_static_endpoints,
+      ),
       ssh_server: restoreSshServer(reset1.ssh_server, template.config),
       dialer,
     },
-  }
-}
+  };
+};
 
 const restoreSshServer = (
   sshServer: EndpointOf<typeof EndpointType.Tailscale>['ssh_server'],
   config: TailscaleEndpoint['config'],
 ): TailscaleEndpoint['config']['ssh_server'] => {
   if (typeof sshServer === 'boolean') {
-    return { ...config.ssh_server, enabled: sshServer }
+    return { ...config.ssh_server, enabled: sshServer };
   }
-  return { ...config.ssh_server, ...sshServer }
-}
+  return { ...config.ssh_server, ...sshServer };
+};
 
 const restoreTnccCerts = (
   certificates: openconnect_tncc_certificate[] = [],
 ): OpenConnectTnccCertificate[] => {
-  const template = createOpenConnectTnccCert()
+  const template = createOpenConnectTnccCert();
   return normalizeArray(certificates).map((c) => ({
     ...template,
     ...c,
     certificate: 'certificate' in c ? normalizeArray(c.certificate) : [],
-  }))
-}
+  }));
+};
 
 const restoreFormEntries = (
   formEntries: EndpointOf<typeof EndpointType.OpenConnect>['form_entries'] = [],
 ): OpenConnectFormEntry[] => {
-  const template = createOpenConnectFormEntry()
+  const template = createOpenConnectFormEntry();
   return normalizeArray(formEntries).map((v) => ({
     ...template,
     ...v,
-  }))
-}
+  }));
+};
 
 const restoreOpenConnect = (
   openconnect: EndpointOf<typeof EndpointType.OpenConnect>,
   maps: IdMaps,
 ): OpenConnectEndpoint => {
-  const { type, tag, ...rest } = openconnect
-  const id = maps.endpoints.get(tag) ?? sampleID()
+  const { type, tag, ...rest } = openconnect;
+  const id = maps.endpoints.get(tag) ?? sampleID();
   const base = {
     id,
     tag,
     type,
-  }
-  const template = createEndpoint(EndpointType.OpenConnect)
-  const { dialer, rest: reset1 } = restoreDialer(rest, maps)
-  const { udpNat, rest: final } = restoreUdpNat(reset1)
+  };
+  const template = createEndpoint(EndpointType.OpenConnect);
+  const { dialer, rest: reset1 } = restoreDialer(rest, maps);
+  const { udpNat, rest: final } = restoreUdpNat(reset1);
 
-  const { tncc = {}, tls = {} } = final
+  const { tncc = {}, tls = {} } = final;
 
   return {
     ...template,
@@ -163,47 +169,56 @@ const restoreOpenConnect = (
       tncc: {
         ...template.config.tncc,
         ...tncc,
-        certificates: 'certificates' in tncc ? restoreTnccCerts(tncc.certificates) : [],
+        certificates:
+          'certificates' in tncc ? restoreTnccCerts(tncc.certificates) : [],
       },
-      fortinet_host_check: { ...template.config.fortinet_host_check, ...final.fortinet_host_check },
+      fortinet_host_check: {
+        ...template.config.fortinet_host_check,
+        ...final.fortinet_host_check,
+      },
       tls: {
         ...template.config.tls,
         ...tls,
         peer_fingerprint: normalizeArray(tls.peer_fingerprint),
         certificate_authority:
-          'certificate_authority' in tls ? normalizeArray(tls.certificate_authority) : [],
+          'certificate_authority' in tls
+            ? normalizeArray(tls.certificate_authority)
+            : [],
         client_certificate:
-          'client_certificate' in tls ? normalizeArray(tls.client_certificate) : [],
+          'client_certificate' in tls
+            ? normalizeArray(tls.client_certificate)
+            : [],
         client_key: 'client_key' in tls ? normalizeArray(tls.client_key) : [],
-        mca_certificate: 'mca_certificate' in tls ? normalizeArray(tls.mca_certificate) : [],
+        mca_certificate:
+          'mca_certificate' in tls ? normalizeArray(tls.mca_certificate) : [],
         mca_key: 'mca_key' in tls ? normalizeArray(tls.mca_key) : [],
       },
       form_entries: restoreFormEntries(final.form_entries),
       dialer,
       udpNat,
     },
-  }
-}
+  };
+};
 
 const restoreOpenVpnClient = (
   openvpn: EndpointOf<typeof EndpointType.OpenVpnClient>,
   maps: IdMaps,
 ): OpenVpnClientEndpoint => {
-  const { type, tag, ...rest } = openvpn
-  const id = maps.endpoints.get(tag) ?? sampleID()
+  const { type, tag, ...rest } = openvpn;
+  const id = maps.endpoints.get(tag) ?? sampleID();
   const base = {
     id,
     tag,
     type,
-  }
-  const template = createEndpoint(EndpointType.OpenVpnClient)
-  const { dialer, rest: reset1 } = restoreDialer(rest, maps)
-  const { udpNat, rest: final } = restoreUdpNat(reset1)
+  };
+  const template = createEndpoint(EndpointType.OpenVpnClient);
+  const { dialer, rest: reset1 } = restoreDialer(rest, maps);
+  const { udpNat, rest: final } = restoreUdpNat(reset1);
 
-  const servers = createOpenVpnServerRemoteItem()
-  const pullFilter = createOpenVpnPullFilter()
+  const servers = createOpenVpnServerRemoteItem();
+  const pullFilter = createOpenVpnPullFilter();
 
-  const tls = final.tls
+  const tls = final.tls;
 
   return {
     ...template,
@@ -231,9 +246,12 @@ const restoreOpenVpnClient = (
       tls: {
         ...template.config.tls,
         ...tls,
-        certificate: 'certificate' in tls ? normalizeArray(tls.certificate) : [],
+        certificate:
+          'certificate' in tls ? normalizeArray(tls.certificate) : [],
         client_certificate:
-          'client_certificate' in tls ? normalizeArray(tls.client_certificate) : [],
+          'client_certificate' in tls
+            ? normalizeArray(tls.client_certificate)
+            : [],
         client_key: 'client_key' in tls ? normalizeArray(tls.client_key) : [],
         peer_fingerprint: normalizeArray(final.tls.peer_fingerprint),
         remote_certificate_ku: normalizeArray(final.tls.remote_certificate_ku),
@@ -249,27 +267,27 @@ const restoreOpenVpnClient = (
       dialer,
       udpNat,
     } as OpenVpnClientEndpoint['config'],
-  }
-}
+  };
+};
 
 const restoreOpenVpnServer = (
   openvpn: EndpointOf<typeof EndpointType.OpenVpnServer>,
   maps: IdMaps,
 ): OpenVpnServerEndpoint => {
-  const { type, tag, ...rest } = openvpn
-  const id = maps.endpoints.get(tag) ?? sampleID()
+  const { type, tag, ...rest } = openvpn;
+  const id = maps.endpoints.get(tag) ?? sampleID();
   const base = {
     id,
     tag,
     type,
-  }
-  const template = createEndpoint(EndpointType.OpenVpnServer)
-  const { listen, rest: reset1 } = restoreListen(rest, maps)
-  const { udpNat, rest: final } = restoreUdpNat(reset1)
+  };
+  const template = createEndpoint(EndpointType.OpenVpnServer);
+  const { listen, rest: reset1 } = restoreListen(rest, maps);
+  const { udpNat, rest: final } = restoreUdpNat(reset1);
 
-  const { tls, push = {} } = final
+  const { tls, push = {} } = final;
 
-  const pushDnsServer = createOpenVpnPushDnsServer()
+  const pushDnsServer = createOpenVpnPushDnsServer();
 
   return {
     ...template,
@@ -284,10 +302,13 @@ const restoreOpenVpnServer = (
       tls: {
         ...template.config.tls,
         ...tls,
-        certificate: 'certificate' in tls ? normalizeArray(tls.certificate) : [],
+        certificate:
+          'certificate' in tls ? normalizeArray(tls.certificate) : [],
         key: 'key' in tls ? normalizeArray(tls.key) : [],
         client_certificate:
-          'client_certificate' in tls ? normalizeArray(tls.client_certificate) : [],
+          'client_certificate' in tls
+            ? normalizeArray(tls.client_certificate)
+            : [],
         peer_fingerprint: normalizeArray(tls.peer_fingerprint),
         remote_certificate_ku: normalizeArray(tls.remote_certificate_ku),
         control_wrap: {
@@ -318,29 +339,32 @@ const restoreOpenVpnServer = (
       listen,
       udpNat,
     },
-  }
-}
+  };
+};
 
-export const restoreEndpoints = (maps: IdMaps, endpoints: Endpoint[] = []): EndpointItem[] =>
+export const restoreEndpoints = (
+  maps: IdMaps,
+  endpoints: Endpoint[] = [],
+): EndpointItem[] =>
   endpoints.flatMap((raw): EndpointItem[] => {
     switch (raw.type) {
       case EndpointType.WireGuard: {
-        return [restoreWireGuard(raw, maps)]
+        return [restoreWireGuard(raw, maps)];
       }
       case EndpointType.Tailscale: {
-        return [restoreTailscale(raw, maps)]
+        return [restoreTailscale(raw, maps)];
       }
       case EndpointType.OpenConnect: {
-        return [restoreOpenConnect(raw, maps)]
+        return [restoreOpenConnect(raw, maps)];
       }
       case EndpointType.OpenVpnClient: {
-        return [restoreOpenVpnClient(raw, maps)]
+        return [restoreOpenVpnClient(raw, maps)];
       }
       case EndpointType.OpenVpnServer: {
-        return [restoreOpenVpnServer(raw, maps)]
+        return [restoreOpenVpnServer(raw, maps)];
       }
       default: {
-        return []
+        return [];
       }
     }
-  })
+  });

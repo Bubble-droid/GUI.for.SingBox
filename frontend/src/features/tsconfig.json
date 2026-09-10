@@ -35,7 +35,9 @@
     "../assets/globalMethods.ts",
     "../components/components.ts",
     "../directives/directives.ts",
+    "../lang/i18n.ts",
     "./**/*.ts",
     "./**/*.vue"
-  ]
+  ],
+  "exclude": ["eslint-config.js"]
 }

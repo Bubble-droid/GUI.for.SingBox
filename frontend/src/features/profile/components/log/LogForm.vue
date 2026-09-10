@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { LogLevelOptions } from '@profile/constant/options'
-import type { LogSection } from '@profile/types/profiles'
-import { useI18n } from 'vue-i18n'
+import { LogLevelOptions } from '@profile/constant/options';
+import type { LogSection } from '@profile/types/profiles';
+import { useI18n } from 'vue-i18n';
 
-const model = defineModel<LogSection>({ required: true })
+const model = defineModel<LogSection>({ required: true });
 
-const { t } = useI18n()
+const { t } = useI18n();
 </script>
 
 <template>

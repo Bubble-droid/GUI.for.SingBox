@@ -72,4 +72,4 @@ export default {
     invalid: '无效参数',
     invert: '反向匹配',
   },
-}
+};

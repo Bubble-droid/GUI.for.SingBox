@@ -1,25 +1,28 @@
 <script lang="ts" setup>
-import { NetworkStrategyOptions, NetworkTypeOptions } from '@profile/constant/options.ts'
-import type { DialerFormData } from '@profile/types/profiles/shared.ts'
-import { useI18n } from 'vue-i18n'
+import {
+  NetworkStrategyOptions,
+  NetworkTypeOptions,
+} from '@profile/constant/options.ts';
+import type { DialerFormData } from '@profile/types/profiles/shared.ts';
+import { useI18n } from 'vue-i18n';
 
-import { useBool } from '@/hooks/useBool.ts'
+import { useBool } from '@/hooks/useBool.ts';
 
-import type { OptionItem } from '@/types/component.ts'
+import type { OptionItem } from '@/types/component.ts';
 
-import DomainResolverForm from './DomainResolverForm.vue'
+import DomainResolverForm from './DomainResolverForm.vue';
 
 interface Props {
-  netnsOptions: OptionItem[]
-  outboundOptions: OptionItem[]
-  dnsServerOptions: OptionItem[]
+  netnsOptions: OptionItem[];
+  outboundOptions: OptionItem[];
+  dnsServerOptions: OptionItem[];
 }
 
-const model = defineModel<DialerFormData>({ required: true })
-defineProps<Props>()
-const { t } = useI18n()
+const model = defineModel<DialerFormData>({ required: true });
+defineProps<Props>();
+const { t } = useI18n();
 
-const [showDialer, toggleShow] = useBool(false)
+const [showDialer, toggleShow] = useBool(false);
 </script>
 
 <template>
@@ -100,11 +103,19 @@ const [showDialer, toggleShow] = useBool(false)
     </div>
     <div class="form-item">
       {{ t('kernel.shared.dialer.network_strategy') }}
-      <Select v-model="model.network_strategy" :options="NetworkStrategyOptions" clearable />
+      <Select
+        v-model="model.network_strategy"
+        :options="NetworkStrategyOptions"
+        clearable
+      />
     </div>
     <div class="form-item">
       {{ t('kernel.shared.dialer.network_type') }}
-      <MultipleSelect v-model="model.network_type" :options="NetworkTypeOptions" clearable />
+      <MultipleSelect
+        v-model="model.network_type"
+        :options="NetworkTypeOptions"
+        clearable
+      />
     </div>
     <div class="form-item">
       {{ t('kernel.shared.dialer.fallback_network_type') }}
@@ -123,5 +134,8 @@ const [showDialer, toggleShow] = useBool(false)
       <Input v-model="model.network_fallback_delay" editable clearable />
     </div>
   </div>
-  <DomainResolverForm v-model="model.domain_resolver" :dns-server-options="dnsServerOptions" />
+  <DomainResolverForm
+    v-model="model.domain_resolver"
+    :dns-server-options="dnsServerOptions"
+  />
 </template>

@@ -25,4 +25,4 @@ export default {
   exclude: '排除',
   icon: '图标',
   hidden: '隐藏',
-}
+};

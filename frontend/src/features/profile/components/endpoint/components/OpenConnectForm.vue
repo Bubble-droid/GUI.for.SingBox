@@ -1,33 +1,36 @@
 <script lang="ts" setup>
-import PortInput from '@profile/components/shared/PortInput.vue'
+import PortInput from '@profile/components/shared/PortInput.vue';
 import {
   OpenConnectFlavorOptions,
   OpenConnectTokenModeOptions,
   OpenConnectReportedOsOptions,
   OpenConnectCompressionModeOptions,
-} from '@profile/constant/options'
-import { createOpenConnectFormEntry, createOpenConnectTnccCert } from '@profile/defaults/endpoint'
-import type { OpenConnectEndpoint } from '@profile/types/profiles/endpoint'
-import { useI18n } from 'vue-i18n'
+} from '@profile/constant/options';
+import {
+  createOpenConnectFormEntry,
+  createOpenConnectTnccCert,
+} from '@profile/defaults/endpoint';
+import type { OpenConnectEndpoint } from '@profile/types/profiles/endpoint';
+import { useI18n } from 'vue-i18n';
 
-const model = defineModel<OpenConnectEndpoint['config']>({ required: true })
-const { t } = useI18n()
+const model = defineModel<OpenConnectEndpoint['config']>({ required: true });
+const { t } = useI18n();
 
 const addTnccCert = () => {
-  model.value.tncc.certificates.push(createOpenConnectTnccCert())
-}
+  model.value.tncc.certificates.push(createOpenConnectTnccCert());
+};
 
 const deleteTnccCert = (index: number) => {
-  model.value.tncc.certificates.splice(index, 1)
-}
+  model.value.tncc.certificates.splice(index, 1);
+};
 
 const addFormEntry = () => {
-  model.value.form_entries.push(createOpenConnectFormEntry())
-}
+  model.value.form_entries.push(createOpenConnectFormEntry());
+};
 
 const deleteFormEntry = (index: number) => {
-  model.value.form_entries.splice(index, 1)
-}
+  model.value.form_entries.splice(index, 1);
+};
 </script>
 
 <template>
@@ -45,7 +48,11 @@ const deleteFormEntry = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openconnect.flavor.title') }}
-    <Select v-model="model.flavor" :options="OpenConnectFlavorOptions" clearable />
+    <Select
+      v-model="model.flavor"
+      :options="OpenConnectFlavorOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openconnect.username') }}
@@ -67,7 +74,11 @@ const deleteFormEntry = (index: number) => {
   <Divider>{{ t('kernel.endpoints.openconnect.token.title') }}</Divider>
   <div class="form-item">
     {{ t('kernel.endpoints.openconnect.token.mode.title') }}
-    <Select v-model="model.token.mode" :options="OpenConnectTokenModeOptions" clearable />
+    <Select
+      v-model="model.token.mode"
+      :options="OpenConnectTokenModeOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openconnect.token.secret') }}
@@ -96,7 +107,11 @@ const deleteFormEntry = (index: number) => {
 
   <div class="form-item">
     {{ t('kernel.endpoints.openconnect.reported_os.title') }}
-    <Select v-model="model.reported_os" :options="OpenConnectReportedOsOptions" clearable />
+    <Select
+      v-model="model.reported_os"
+      :options="OpenConnectReportedOsOptions"
+      clearable
+    />
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openconnect.user_agent') }}
@@ -156,32 +171,58 @@ const deleteFormEntry = (index: number) => {
   </div>
   <div class="form-item">
     {{ t('kernel.endpoints.openconnect.tncc.certificates.title') }}
-    <Button icon="add" type="primary" @click="addTnccCert">{{ t('common.add') }}</Button>
+    <Button icon="add" type="primary" @click="addTnccCert">{{
+      t('common.add')
+    }}</Button>
   </div>
   <div v-if="model.tncc.certificates.length" class="flex flex-col gap-8 mt-8">
-    <Card v-for="(cert, index) in model.tncc.certificates" :key="index" :title="`${index + 1}`">
+    <Card
+      v-for="(cert, index) in model.tncc.certificates"
+      :key="index"
+      :title="`${index + 1}`"
+    >
       <template #extra>
-        <Button icon="delete" type="text" size="small" @click="deleteTnccCert(index)" />
+        <Button
+          icon="delete"
+          type="text"
+          size="small"
+          @click="deleteTnccCert(index)"
+        />
       </template>
-      <div class="form-item" :class="{ 'items-start': !!cert.certificate.length }">
+      <div
+        class="form-item"
+        :class="{ 'items-start': !!cert.certificate.length }"
+      >
         {{ t('kernel.endpoints.openconnect.tncc.certificates.certificate') }}
         <InputList v-model="cert.certificate" />
       </div>
       <div class="form-item">
-        {{ t('kernel.endpoints.openconnect.tncc.certificates.certificate_path') }}
+        {{
+          t('kernel.endpoints.openconnect.tncc.certificates.certificate_path')
+        }}
         <Input v-model="cert.certificate_path" editable clearable />
       </div>
     </Card>
   </div>
 
-  <Divider>{{ t('kernel.endpoints.openconnect.fortinet_host_check.title') }}</Divider>
+  <Divider>{{
+    t('kernel.endpoints.openconnect.fortinet_host_check.title')
+  }}</Divider>
   <div class="form-item">
     {{ t('kernel.endpoints.openconnect.fortinet_host_check.hostcheck') }}
     <Input v-model="model.fortinet_host_check.hostcheck" editable clearable />
   </div>
   <div class="form-item">
-    {{ t('kernel.endpoints.openconnect.fortinet_host_check.check_virtual_desktop') }}
-    <Input v-model="model.fortinet_host_check.check_virtual_desktop" editable clearable />
+    {{
+      t(
+        'kernel.endpoints.openconnect.fortinet_host_check.check_virtual_desktop',
+      )
+    }}
+    <Input
+      v-model="model.fortinet_host_check.check_virtual_desktop"
+      editable
+      clearable
+    />
   </div>
 
   <Divider />
@@ -271,7 +312,10 @@ const deleteFormEntry = (index: number) => {
     {{ t('kernel.endpoints.openconnect.tls.server_name') }}
     <Input v-model="model.tls.server_name" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.peer_fingerprint.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.peer_fingerprint.length }"
+  >
     {{ t('kernel.endpoints.openconnect.tls.peer_fingerprint') }}
     <InputList v-model="model.tls.peer_fingerprint" />
   </div>
@@ -279,7 +323,10 @@ const deleteFormEntry = (index: number) => {
     {{ t('kernel.endpoints.openconnect.tls.system_trust_disabled') }}
     <Switch v-model="model.tls.system_trust_disabled" />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.certificate_authority.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.certificate_authority.length }"
+  >
     {{ t('kernel.endpoints.openconnect.tls.certificate_authority') }}
     <InputList v-model="model.tls.certificate_authority" />
   </div>
@@ -287,7 +334,10 @@ const deleteFormEntry = (index: number) => {
     {{ t('kernel.endpoints.openconnect.tls.certificate_authority_path') }}
     <Input v-model="model.tls.certificate_authority_path" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.client_certificate.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.client_certificate.length }"
+  >
     {{ t('kernel.endpoints.openconnect.tls.client_certificate') }}
     <InputList v-model="model.tls.client_certificate" />
   </div>
@@ -295,7 +345,10 @@ const deleteFormEntry = (index: number) => {
     {{ t('kernel.endpoints.openconnect.tls.client_certificate_path') }}
     <Input v-model="model.tls.client_certificate_path" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.client_key.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.client_key.length }"
+  >
     {{ t('kernel.endpoints.openconnect.tls.client_key') }}
     <InputList v-model="model.tls.client_key" />
   </div>
@@ -307,7 +360,10 @@ const deleteFormEntry = (index: number) => {
     {{ t('kernel.endpoints.openconnect.tls.client_key_password') }}
     <Input v-model="model.tls.client_key_password" editable clearable />
   </div>
-  <div class="form-item" :class="{ 'items-start': !!model.tls.mca_certificate.length }">
+  <div
+    class="form-item"
+    :class="{ 'items-start': !!model.tls.mca_certificate.length }"
+  >
     {{ t('kernel.endpoints.openconnect.tls.mca_certificate') }}
     <InputList v-model="model.tls.mca_certificate" />
   </div>
@@ -330,12 +386,23 @@ const deleteFormEntry = (index: number) => {
 
   <div class="form-item">
     {{ t('kernel.endpoints.openconnect.form_entries.title') }}
-    <Button icon="add" type="primary" @click="addFormEntry">{{ t('common.add') }}</Button>
+    <Button icon="add" type="primary" @click="addFormEntry">{{
+      t('common.add')
+    }}</Button>
   </div>
   <div v-if="model.form_entries.length" class="flex flex-col gap-8 mt-8">
-    <Card v-for="(entry, index) in model.form_entries" :key="index" :title="`${index + 1}`">
+    <Card
+      v-for="(entry, index) in model.form_entries"
+      :key="index"
+      :title="`${index + 1}`"
+    >
       <template #extra>
-        <Button icon="delete" type="text" size="small" @click="deleteFormEntry(index)" />
+        <Button
+          icon="delete"
+          type="text"
+          size="small"
+          @click="deleteFormEntry(index)"
+        />
       </template>
       <div class="form-item">
         {{ t('kernel.endpoints.openconnect.form_entries.form_id') }}

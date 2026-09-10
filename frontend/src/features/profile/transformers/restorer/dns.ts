@@ -1,11 +1,15 @@
-import { DnsActionKind, DnsRuleType, DnsServerType } from '@profile/constant/kernel'
-import { createDnsServer, createDnsRule } from '@profile/defaults/dns'
-import type { DnsRuleItem, DnsServerItem } from '@profile/types/profiles/dns'
-import type { DnsServer } from '@profile/types/sing-box/dns'
+import {
+  DnsActionKind,
+  DnsRuleType,
+  DnsServerType,
+} from '@profile/constant/kernel';
+import { createDnsServer, createDnsRule } from '@profile/defaults/dns';
+import type { DnsRuleItem, DnsServerItem } from '@profile/types/profiles/dns';
+import type { DnsServer } from '@profile/types/sing-box/dns';
 
-import type { Recordable } from '@/types/typescript'
+import type { Recordable } from '@/types/typescript';
 
-import { supportedRuleTypes } from './shared'
+import { supportedRuleTypes } from './shared';
 
 export const restoreDnsServers = (
   servers: DnsServer[],
@@ -13,10 +17,10 @@ export const restoreDnsServers = (
   OutboundsIds: Recordable<string>,
 ): DnsServerItem[] =>
   servers.flatMap((raw) => {
-    const server = createDnsServer()
-    server.id = DnsServersIds[raw.tag]!
-    server.tag = raw.tag
-    server.type = raw.type as DnsServerType
+    const server = createDnsServer();
+    server.id = DnsServersIds[raw.tag]!;
+    server.tag = raw.tag;
+    server.type = raw.type as DnsServerType;
     if (
       (
         [
@@ -32,10 +36,10 @@ export const restoreDnsServers = (
       ).includes(raw.type)
     ) {
       if ('detour' in raw) {
-        server.detour = OutboundsIds[raw.detour!]!
+        server.detour = OutboundsIds[raw.detour!]!;
       }
       if ('domain_resolver' in raw) {
-        server.domain_resolver = DnsServersIds[raw.domain_resolver as string]!
+        server.domain_resolver = DnsServersIds[raw.domain_resolver as string]!;
       }
       if (
         (
@@ -50,45 +54,46 @@ export const restoreDnsServers = (
         ).includes(raw.type)
       ) {
         if ('server' in raw) {
-          server.server = raw.server
+          server.server = raw.server;
         }
         if ('server_port' in raw) {
-          server.server_port = String(raw.server_port)
+          server.server_port = String(raw.server_port);
         }
         if (
-          ([DnsServerType.Https, DnsServerType.H3] as string[]).includes(raw.type) &&
+          ([DnsServerType.Https, DnsServerType.H3] as string[]).includes(
+            raw.type,
+          ) &&
           'path' in raw
         ) {
-          server.path = raw.path as string
+          server.path = raw.path as string;
         }
       }
     } else if (DnsServerType.Hosts === server.type) {
       if ('path' in raw) {
-        server.hosts_path = raw.path as string[]
+        server.hosts_path = raw.path as string[];
       }
       if ('predefined' in raw) {
-        server.predefined = Object.entries<string[] | string>(raw.predefined!).reduce<Recordable>(
-          (p, [key, value]) => {
-            p[key] = Array.isArray(value) ? value.join(',') : value
-            return p
-          },
-          {},
-        )
+        server.predefined = Object.entries<string[] | string>(
+          raw.predefined!,
+        ).reduce<Recordable>((p, [key, value]) => {
+          p[key] = Array.isArray(value) ? value.join(',') : value;
+          return p;
+        }, {});
       }
     } else if (DnsServerType.Dhcp === server.type) {
       if ('interface' in raw) {
-        server.interface = raw.interface as string
+        server.interface = raw.interface as string;
       }
     } else if (DnsServerType.FakeIp === server.type) {
       if ('inet4_range' in raw) {
-        server.inet4_range = raw.inet4_range
+        server.inet4_range = raw.inet4_range;
       }
       if ('inet6_range' in raw) {
-        server.inet6_range = raw.inet6_range
+        server.inet6_range = raw.inet6_range;
       }
     }
-    return server
-  })
+    return server;
+  });
 
 export const restoreDnsRules = (
   rules: Recordable[],
@@ -97,15 +102,15 @@ export const restoreDnsRules = (
   DnsServersIds: Recordable,
 ): DnsRuleItem[] =>
   rules.flatMap((raw: Recordable, i) => {
-    const rule = createDnsRule()
-    rule.id = `rule-${i}`
-    rule.action = raw['action'] ?? DnsActionKind.Route
+    const rule = createDnsRule();
+    rule.id = `rule-${i}`;
+    rule.action = raw['action'] ?? DnsActionKind.Route;
 
-    const hits = supportedRuleTypes.filter((key) => key in raw)
+    const hits = supportedRuleTypes.filter((key) => key in raw);
     if (hits.length === 1) {
-      rule.type = hits[0] as DnsRuleType
+      rule.type = hits[0] as DnsRuleType;
     } else {
-      rule.type = DnsRuleType.Inline
+      rule.type = DnsRuleType.Inline;
     }
 
     if (rule.type === DnsRuleType.Inline) {
@@ -121,30 +126,36 @@ export const restoreDnsRules = (
         },
         null,
         2,
-      )
+      );
     } else if (rule.type === DnsRuleType.Inbound) {
-      rule.payload = InboundsIds[raw[rule.type]]
+      rule.payload = InboundsIds[raw[rule.type]];
     } else if (rule.type === DnsRuleType.RuleSet) {
-      const rs = Array.isArray(raw[rule.type]) ? raw[rule.type] : [raw[rule.type]]
-      rule.payload = rs.map((tag: string) => RouteRuleSetIds[tag]).join(',')
+      const rs = Array.isArray(raw[rule.type])
+        ? raw[rule.type]
+        : [raw[rule.type]];
+      rule.payload = rs.map((tag: string) => RouteRuleSetIds[tag]).join(',');
     } else {
       rule.payload = Array.isArray(raw[rule.type])
         ? raw[rule.type].join(',')
-        : String(raw[rule.type])
+        : String(raw[rule.type]);
     }
 
     if (DnsActionKind.Route === raw['action']) {
       if ('server' in raw) {
-        rule.server = DnsServersIds[raw['server']]
+        rule.server = DnsServersIds[raw['server']];
       }
       if ('strategy' in raw) {
-        rule.strategy = raw['strategy']
+        rule.strategy = raw['strategy'];
       }
     } else if (DnsActionKind.Reject === raw['action']) {
       if ('method' in raw) {
-        rule.server = raw['method']
+        rule.server = raw['method'];
       }
-    } else if ([DnsActionKind.RouteOptions, DnsActionKind.Predefined].includes(raw['action'])) {
+    } else if (
+      [DnsActionKind.RouteOptions, DnsActionKind.Predefined].includes(
+        raw['action'],
+      )
+    ) {
       rule.server = JSON.stringify(
         {
           ...raw,
@@ -155,24 +166,26 @@ export const restoreDnsRules = (
           strategy: undefined,
           server: undefined,
           ...supportedRuleTypes.reduce<Recordable>((p, c) => {
-            p[c] = undefined
-            return p
+            p[c] = undefined;
+            return p;
           }, {}),
         },
         null,
         2,
-      )
+      );
     }
-    if ([DnsActionKind.Route, DnsActionKind.RouteOptions].includes(raw['action'])) {
+    if (
+      [DnsActionKind.Route, DnsActionKind.RouteOptions].includes(raw['action'])
+    ) {
       if ('disable_cache' in raw) {
-        rule.disable_cache = raw['disable_cache']
+        rule.disable_cache = raw['disable_cache'];
       }
       if ('client_subnet' in raw) {
-        rule.client_subnet = raw['client_subnet']
+        rule.client_subnet = raw['client_subnet'];
       }
     }
     if ('invert' in raw) {
-      rule.invert = raw['invert']
+      rule.invert = raw['invert'];
     }
-    return rule
-  })
+    return rule;
+  });

@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import type { Http2FormData } from '@profile/types/profiles/shared'
-import { useI18n } from 'vue-i18n'
+import type { Http2FormData } from '@profile/types/profiles/shared';
+import { useI18n } from 'vue-i18n';
 
-import { useBool } from '@/hooks/useBool'
+import { useBool } from '@/hooks/useBool';
 
-const model = defineModel<Http2FormData>({ required: true })
-const { t } = useI18n()
+const model = defineModel<Http2FormData>({ required: true });
+const { t } = useI18n();
 
-const [showHttp2, toggleShow] = useBool(false)
+const [showHttp2, toggleShow] = useBool(false);
 </script>
 
 <template>
@@ -35,7 +35,12 @@ const [showHttp2, toggleShow] = useBool(false)
     </div>
     <div class="form-item">
       {{ t('kernel.shared.http2.max_concurrent_streams') }}
-      <Input v-model="model.max_concurrent_streams" type="number" editable clearable />
+      <Input
+        v-model="model.max_concurrent_streams"
+        type="number"
+        editable
+        clearable
+      />
     </div>
   </div>
 </template>

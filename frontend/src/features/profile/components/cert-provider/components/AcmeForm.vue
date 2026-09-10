@@ -1,40 +1,47 @@
 <script lang="ts" setup>
-import Dns01ChallengeForm from '@profile/components/shared/Dns01ChallengeForm.vue'
-import PortInput from '@profile/components/shared/PortInput.vue'
-import { AcmeProvider } from '@profile/constant/kernel'
-import { AcmeProviderOptions, AcmeKeyTypeOptions } from '@profile/constant/options'
-import type { AcmeCertProvider } from '@profile/types/profiles/cert-provider'
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import Dns01ChallengeForm from '@profile/components/shared/Dns01ChallengeForm.vue';
+import PortInput from '@profile/components/shared/PortInput.vue';
+import { AcmeProvider } from '@profile/constant/kernel';
+import {
+  AcmeProviderOptions,
+  AcmeKeyTypeOptions,
+} from '@profile/constant/options';
+import type { AcmeCertProvider } from '@profile/types/profiles/cert-provider';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import { useBool } from '@/hooks/useBool'
+import { useBool } from '@/hooks/useBool';
 
-import type { OptionItem } from '@/types/component'
+import type { OptionItem } from '@/types/component';
 
 interface Props {
-  httpClientOptions: OptionItem[]
-  dnsServerOptions: OptionItem[]
+  httpClientOptions: OptionItem[];
+  dnsServerOptions: OptionItem[];
 }
 
-const model = defineModel<AcmeCertProvider['config']>({ required: true })
-defineProps<Props>()
-const { t } = useI18n()
+const model = defineModel<AcmeCertProvider['config']>({ required: true });
+defineProps<Props>();
+const { t } = useI18n();
 
 const providerSelect = computed({
   get() {
     const isPredefined = AcmeProviderOptions.some(
-      (opt) => opt.value === model.value.provider && opt.value !== AcmeProvider.Custom,
-    )
-    return isPredefined ? model.value.provider : AcmeProvider.Custom
+      (opt) =>
+        opt.value === model.value.provider && opt.value !== AcmeProvider.Custom,
+    );
+    return isPredefined ? model.value.provider : AcmeProvider.Custom;
   },
   set(val) {
-    model.value.provider = val === AcmeProvider.Custom ? ('' as AcmeProvider) : val
+    model.value.provider =
+      val === AcmeProvider.Custom ? ('' as AcmeProvider) : val;
   },
-})
+});
 
-const isCustomProvider = computed(() => providerSelect.value === AcmeProvider.Custom)
+const isCustomProvider = computed(
+  () => providerSelect.value === AcmeProvider.Custom,
+);
 
-const [showEab, toggleEab] = useBool(false)
+const [showEab, toggleEab] = useBool(false);
 </script>
 
 <template>
@@ -94,7 +101,11 @@ const [showEab, toggleEab] = useBool(false)
   </div>
   <div class="form-item">
     {{ t('kernel.certificate_providers.acme.http_client') }}
-    <Select v-model="model.http_client" :options="httpClientOptions" clearable />
+    <Select
+      v-model="model.http_client"
+      :options="httpClientOptions"
+      clearable
+    />
   </div>
 
   <!-- External Account Binding -->
@@ -114,5 +125,8 @@ const [showEab, toggleEab] = useBool(false)
     </div>
   </div>
 
-  <Dns01ChallengeForm v-model="model.dns01_challenge" :dns-server-options="dnsServerOptions" />
+  <Dns01ChallengeForm
+    v-model="model.dns01_challenge"
+    :dns-server-options="dnsServerOptions"
+  />
 </template>

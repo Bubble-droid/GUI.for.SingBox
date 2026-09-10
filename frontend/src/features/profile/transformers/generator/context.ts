@@ -1,13 +1,13 @@
-import type { GenerateContext } from '@profile/transformers/generator/types'
+import type { GenerateContext } from '@profile/transformers/generator/types';
 
-import { StoreDep, useStoreDeps } from '@/stores/deps'
+import { StoreDep, useStoreDeps } from '@/stores/deps';
 
 export const getGenerateContext = (): GenerateContext => {
-  const appSettingsStore = useStoreDeps(StoreDep.AppSettingsStore)
-  const envStore = useStoreDeps(StoreDep.EnvStore)
-  const pluginsStore = useStoreDeps(StoreDep.PluginsStore)
-  const subscribesStore = useStoreDeps(StoreDep.SubscribesStore)
-  const ruleSetStore = useStoreDeps(StoreDep.RulesetsStore)
+  const appSettingsStore = useStoreDeps(StoreDep.AppSettingsStore);
+  const envStore = useStoreDeps(StoreDep.EnvStore);
+  const pluginsStore = useStoreDeps(StoreDep.PluginsStore);
+  const subscribesStore = useStoreDeps(StoreDep.SubscribesStore);
+  const ruleSetStore = useStoreDeps(StoreDep.RulesetsStore);
 
   return {
     appSettings: appSettingsStore.app,
@@ -15,5 +15,5 @@ export const getGenerateContext = (): GenerateContext => {
     onGenerate: pluginsStore.onGenerateTrigger,
     getSubscribe: subscribesStore.getSubscribeById,
     getRuleSet: ruleSetStore.getRulesetById,
-  }
-}
+  };
+};

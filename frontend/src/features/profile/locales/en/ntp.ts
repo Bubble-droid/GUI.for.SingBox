@@ -1,4 +1,4 @@
-import type { MessageSchema } from '@profile/locales/types'
+import type { MessageSchema } from '@profile/locales/types';
 
 export default {
   enabled: 'Enable NTP Server',
@@ -16,4 +16,4 @@ export default {
   },
   server_port: 'NTP Server Port',
   interval: 'Sync Interval',
-} satisfies MessageSchema['ntp']
+} satisfies MessageSchema['ntp'];

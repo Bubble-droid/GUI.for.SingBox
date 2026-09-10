@@ -41,4 +41,4 @@ export default {
     action: '规则动作',
     server: '目标DNS服务器的标签',
   },
-}
+};

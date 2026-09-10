@@ -1,39 +1,39 @@
 <script lang="ts" setup>
-import { DomainStrategyOptions } from '@profile/constant/options.ts'
-import type { DnsSection } from '@profile/types/profiles/dns.ts'
-import type { RuleSetItem } from '@profile/types/profiles/route.ts'
-import { computed, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { DomainStrategyOptions } from '@profile/constant/options.ts';
+import type { DnsSection } from '@profile/types/profiles/dns.ts';
+import type { RuleSetItem } from '@profile/types/profiles/route.ts';
+import { computed, ref, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import type { OptionItem } from '@/types/component.ts'
+import type { OptionItem } from '@/types/component.ts';
 
-import RuleList from './RuleList.vue'
-import ServerList from './ServerList.vue'
+import RuleList from './RuleList.vue';
+import ServerList from './ServerList.vue';
 
 interface Props {
-  inboundOptions: OptionItem[]
-  outboundOptions: OptionItem[]
-  ruleSet: RuleSetItem[]
+  inboundOptions: OptionItem[];
+  outboundOptions: OptionItem[];
+  ruleSet: RuleSetItem[];
 }
 
-const model = defineModel<DnsSection>({ required: true })
+const model = defineModel<DnsSection>({ required: true });
 
-defineProps<Props>()
+defineProps<Props>();
 
 const serversOptions = computed(() =>
   model.value.servers.map((v) => ({ label: v.tag, value: v.id })),
-)
+);
 
-const activeKey = ref('common')
-const rulesConfigRef = useTemplateRef('rulesConfigRef')
-const serversConfigRef = useTemplateRef('serversConfigRef')
+const activeKey = ref('common');
+const rulesConfigRef = useTemplateRef('rulesConfigRef');
+const serversConfigRef = useTemplateRef('serversConfigRef');
 const tabs = [
   { key: 'common', tab: 'kernel.dns.tab.common' },
   { key: 'servers', tab: 'kernel.dns.tab.servers' },
   { key: 'rules', tab: 'kernel.dns.tab.rules' },
-]
+];
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const handleAdd = () => {
   const handlerMap: Record<string, (() => void) | undefined> = {
@@ -42,11 +42,11 @@ const handleAdd = () => {
     },
     rules: rulesConfigRef.value?.handleAdd,
     servers: serversConfigRef.value?.handleAdd,
-  }
-  handlerMap[activeKey.value]?.()
-}
+  };
+  handlerMap[activeKey.value]?.();
+};
 
-defineExpose({ handleAdd })
+defineExpose({ handleAdd });
 </script>
 
 <template>

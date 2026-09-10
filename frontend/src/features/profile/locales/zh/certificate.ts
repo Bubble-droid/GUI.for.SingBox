@@ -10,4 +10,4 @@ export default {
   certificate: '信任的证书内容 (PEM 格式)',
   certificate_path: '信任的证书文件路径',
   certificate_directory_path: '信任的证书目录路径',
-}
+};

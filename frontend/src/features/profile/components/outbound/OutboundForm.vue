@@ -1,29 +1,30 @@
 <script setup lang="ts">
-import { OutboundType } from '@profile/constant/kernel'
-import { OutboundOptions } from '@profile/constant/options'
-import type { OutboundItem } from '@profile/types/profiles/outbound'
-import { ref, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { OutboundType } from '@profile/constant/kernel';
+import { OutboundOptions } from '@profile/constant/options';
+import type { OutboundItem } from '@profile/types/profiles/outbound';
+import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import { BuiltInOutbound } from '@/constant/kernel'
-import { useSubscribesStore } from '@/stores/subscribes'
+import { BuiltInOutbound } from '@/constant/kernel';
+import { useSubscribesStore } from '@/stores/subscribes';
 
 interface Props {
-  outbounds: OutboundItem[]
+  outbounds: OutboundItem[];
 }
 
-const outbound = defineModel<OutboundItem>({ required: true })
+const outbound = defineModel<OutboundItem>({ required: true });
 
-const { outbounds } = defineProps<Props>()
+const { outbounds } = defineProps<Props>();
 
-const { t } = useI18n()
-const subscribesStore = useSubscribesStore()
-const expandedSet = ref<Set<string>>(new Set(['Built-in', 'Subscription']))
+const { t } = useI18n();
+const subscribesStore = useSubscribesStore();
+const expandedSet = ref<Set<string>>(new Set(['Built-in', 'Subscription']));
 
 const isGroupType = computed(
   () =>
-    outbound.value.type === OutboundType.Selector || outbound.value.type === OutboundType.UrlTest,
-)
+    outbound.value.type === OutboundType.Selector ||
+    outbound.value.type === OutboundType.UrlTest,
+);
 
 const outboundGroups = computed(() => [
   {
@@ -43,33 +44,46 @@ const outboundGroups = computed(() => [
       type: 'Subscribe',
     })),
   },
-  ...subscribesStore.subscribes.map(({ id, name, proxies }) => ({ id, name, proxies })),
-])
+  ...subscribesStore.subscribes.map(({ id, name, proxies }) => ({
+    id,
+    name,
+    proxies,
+  })),
+]);
 
-const handleAddProxy = (groupID: string, proxyID: string, proxyName: string) => {
+const handleAddProxy = (
+  groupID: string,
+  proxyID: string,
+  proxyName: string,
+) => {
   if (groupID === 'Built-in' && proxyID === outbound.value.id) {
-    return
+    return;
   }
 
-  const idx = outbound.value.outbounds.findIndex((item) => item.id === proxyID)
+  const idx = outbound.value.outbounds.findIndex((item) => item.id === proxyID);
   if (idx !== -1) {
-    outbound.value.outbounds.splice(idx, 1)
+    outbound.value.outbounds.splice(idx, 1);
   } else {
-    outbound.value.outbounds.push({ id: proxyID, tag: proxyName, type: groupID })
+    outbound.value.outbounds.push({
+      id: proxyID,
+      tag: proxyName,
+      type: groupID,
+    });
   }
-}
+};
 
-const isInuse = (proxyID: string) => outbound.value.outbounds.some((item) => item.id === proxyID)
+const isInuse = (proxyID: string) =>
+  outbound.value.outbounds.some((item) => item.id === proxyID);
 
 const toggleExpanded = (key: string) => {
   if (expandedSet.value.has(key)) {
-    expandedSet.value.delete(key)
+    expandedSet.value.delete(key);
   } else {
-    expandedSet.value.add(key)
+    expandedSet.value.add(key);
   }
-}
+};
 
-const isExpanded = (key: string) => expandedSet.value.has(key)
+const isExpanded = (key: string) => expandedSet.value.has(key);
 </script>
 
 <template>
@@ -126,7 +140,8 @@ const isExpanded = (key: string) => expandedSet.value.has(key)
 
   <template v-if="isGroupType">
     <Divider>
-      {{ t('kernel.outbounds.refsOutbound') }} & {{ t('kernel.outbounds.refsSubscription') }}
+      {{ t('kernel.outbounds.refsOutbound') }} &
+      {{ t('kernel.outbounds.refsSubscription') }}
     </Divider>
 
     <div v-for="group in outboundGroups" :key="group.id" class="group">
@@ -148,7 +163,9 @@ const isExpanded = (key: string) => expandedSet.value.has(key)
         <Empty
           v-if="group.proxies.length === 0"
           :description="
-            group.id === 'Subscription' ? t('kernel.outbounds.noSubs') : t('kernel.outbounds.empty')
+            group.id === 'Subscription'
+              ? t('kernel.outbounds.noSubs')
+              : t('kernel.outbounds.empty')
           "
         />
         <div v-else class="w-full grid grid-cols-4 gap-8 p-8">
