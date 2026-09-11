@@ -21,6 +21,7 @@
     "no-magic-numbers": "off",
     "no-ternary": "off",
     "no-nested-ternary": "off",
+    "one-var": "off",
     "new-cap": "off",
     "id-length": "off",
     "sort-imports": "off",

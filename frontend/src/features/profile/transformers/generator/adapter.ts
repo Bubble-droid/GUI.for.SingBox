@@ -1,3 +1,3 @@
 import type { Recordable } from '@/types/typescript';
 
-export const adaptToStableBranch = (_: Recordable) => {};
+export const adaptToStableBranch = (_config: Recordable) => {};
