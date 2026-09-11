@@ -53,6 +53,7 @@
     "eslint-plugin-vue": "^10.10.0",
     "golar": "^0.1.10",
     "husky": "^9.1.7",
+    "knip": "^6.35.1",
     "less": "^4.8.1",
     "lint-staged": "^17.4.1",
     "npm-run-all2": "^9.0.3",
