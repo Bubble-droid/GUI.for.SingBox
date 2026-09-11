@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import * as Vue from 'vue'
 
 import { Plugins } from '@/assets/pluginApis'

@@ -10,15 +10,15 @@ import type { TagItem } from './shared';
 
 export interface RuleSetItem extends TagItem {
   type: RuleSetType;
-  // inline
+  // Inline
   rules: string;
-  // local
+  // Local
   path: string;
-  // remote
+  // Remote
   url: string;
   download_detour: string;
   update_interval: string;
-  // local or remote
+  // Local or remote
   format: RuleSetFormat;
 }
 
@@ -29,11 +29,11 @@ export interface RouteRuleItem {
   payload: string;
   invert: boolean;
   action: RouteActionKind;
-  // action = route
+  // Action = route
   outbound: string;
-  // action = sniff
+  // Action = sniff
   sniffer: string[];
-  // action = resolve
+  // Action = resolve
   strategy: DomainStrategy;
   server: string;
 }

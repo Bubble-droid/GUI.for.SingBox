@@ -171,6 +171,7 @@ export const generateRuleItem = (
       });
       const value = extra[rule.type] as unknown[];
       if (value.length === 1) {
+        // oxlint-disable-next-line prefer-destructuring
         extra[rule.type] = value[0];
       }
       break;

@@ -13,7 +13,7 @@ export interface OutboundItem extends TagItem {
   interval: string;
   tolerance: number;
   interrupt_exist_connections: boolean;
-  // gui
+  // Gui
   include: string;
   exclude: string;
   icon: string;

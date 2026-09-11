@@ -20,6 +20,7 @@ export default withVueTs(
     files: ['**/*.{ts,vue}'],
     extends: [pluginVue.configs['flat/recommended'], vueTsConfigs.recommended],
     rules: {
+      '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': ['off'],
       'vue/no-v-html': ['off'],
       'vue/multi-word-component-names': [

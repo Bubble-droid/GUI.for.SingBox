@@ -22,10 +22,6 @@ const subscribesStore = useSubscribesStore();
 const isGroupType = (type: string): boolean =>
   type === OutboundType.Selector || type === OutboundType.UrlTest;
 
-const handleAdd = () => {
-  openOutboundModal(createOutbound(), -1);
-};
-
 const handleDeleteGroup = (index: number) => {
   model.value.splice(index, 1);
 };
@@ -74,6 +70,10 @@ const openOutboundModal = (outbound: OutboundItem, index: number) => {
     modelValue: draft.value,
     outbounds: model.value,
   }).open();
+};
+
+const handleAdd = () => {
+  openOutboundModal(createOutbound(), -1);
 };
 
 const handleEditGroup = (index: number) => {

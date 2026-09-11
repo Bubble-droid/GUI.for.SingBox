@@ -117,8 +117,14 @@ const mixinAndScriptConfig = computed({
   },
 });
 
-const handlePrevStep = () => currentStep.value--;
-const handleNextStep = () => currentStep.value++;
+const handlePrevStep = () => {
+  currentStep.value -= 1;
+  return currentStep.value;
+};
+const handleNextStep = () => {
+  currentStep.value += 1;
+  return currentStep.value;
+};
 
 const handleSave = async () => {
   loading.value = true;

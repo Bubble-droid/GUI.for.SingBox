@@ -44,6 +44,7 @@ export const generateDnsServerURL = (dnsServer: DnsServerItem) => {
   }
 };
 
+// oxlint-disable-next-line max-params
 export const generateDns = (
   dns: DnsSection,
   rule_set: RuleSetItem[],

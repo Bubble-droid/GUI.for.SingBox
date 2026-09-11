@@ -74,6 +74,16 @@ const restoreWireGuard = (
   };
 };
 
+const restoreSshServer = (
+  sshServer: EndpointOf<typeof EndpointType.Tailscale>['ssh_server'],
+  config: TailscaleEndpoint['config'],
+): TailscaleEndpoint['config']['ssh_server'] => {
+  if (typeof sshServer === 'boolean') {
+    return { ...config.ssh_server, enabled: sshServer };
+  }
+  return { ...config.ssh_server, ...sshServer };
+};
+
 const restoreTailscale = (
   tailscale: EndpointOf<typeof EndpointType.Tailscale>,
   maps: IdMaps,
@@ -106,16 +116,6 @@ const restoreTailscale = (
       dialer,
     },
   };
-};
-
-const restoreSshServer = (
-  sshServer: EndpointOf<typeof EndpointType.Tailscale>['ssh_server'],
-  config: TailscaleEndpoint['config'],
-): TailscaleEndpoint['config']['ssh_server'] => {
-  if (typeof sshServer === 'boolean') {
-    return { ...config.ssh_server, enabled: sshServer };
-  }
-  return { ...config.ssh_server, ...sshServer };
 };
 
 const restoreTnccCerts = (
@@ -218,7 +218,7 @@ const restoreOpenVpnClient = (
   const servers = createOpenVpnServerRemoteItem();
   const pullFilter = createOpenVpnPullFilter();
 
-  const tls = final.tls;
+  const { tls } = final;
 
   return {
     ...template,

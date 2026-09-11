@@ -15,6 +15,7 @@ import type { Recordable } from '@/types/typescript';
 import { generateRuleItem } from './shared';
 import type { GenerateContext } from './types';
 
+// oxlint-disable-next-line max-params
 export const generateRoute = (
   route: RouteSection,
   inbounds: InboundItem[],

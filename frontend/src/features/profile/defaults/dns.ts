@@ -146,10 +146,10 @@ export const createDnsRule = (): DnsRuleItem => ({
   payload: '',
   action: DnsActionKind.Route,
   invert: false,
-  // route
+  // Route
   server: '',
   strategy: '' as DomainStrategy,
-  // route/route-options
+  // Route/route-options
   disable_cache: false,
   client_subnet: '',
 });

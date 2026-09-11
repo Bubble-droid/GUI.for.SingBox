@@ -12,6 +12,7 @@ import type { Recordable } from '@/types/typescript';
 
 import type { RestoreContext } from './types';
 
+// oxlint-disable-next-line max-params
 export const restoreOutbounds = (
   outbounds: Recordable[],
   OutboundsIds: Recordable,

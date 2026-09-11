@@ -250,7 +250,6 @@ export const restoreProfile = (
       disable_expire: config.dns?.disable_expire ?? template.dns.disable_expire,
 
       independent_cache:
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         config.dns?.independent_cache ?? template.dns.independent_cache,
       final: DnsServersIds[config.dns?.final ?? ''] ?? template.dns.final,
       strategy: config.dns?.strategy ?? template.dns.strategy,

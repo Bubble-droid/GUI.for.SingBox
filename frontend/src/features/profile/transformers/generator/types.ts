@@ -1,7 +1,7 @@
 import type { usePluginsStore } from '@/stores/plugins';
 import type { useRulesetsStore } from '@/stores/rulesets';
 import type { useSubscribesStore } from '@/stores/subscribes';
-import type * as App from '@/types/app';
+import type { AppSettings, AppEnv } from '@/types/app';
 
 export interface GenerateOptions {
   enableStableConfigCompat?: boolean;
@@ -21,8 +21,8 @@ export interface TagMaps {
 }
 
 export interface GenerateContext {
-  appSettings: App.AppSettings;
-  appEnv: App.AppEnv;
+  appSettings: AppSettings;
+  appEnv: AppEnv;
   onGenerate: ReturnType<typeof usePluginsStore>['onGenerateTrigger'];
   getSubscribe: ReturnType<typeof useSubscribesStore>['getSubscribeById'];
   getRuleSet: ReturnType<typeof useRulesetsStore>['getRulesetById'];

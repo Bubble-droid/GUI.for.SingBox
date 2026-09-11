@@ -31,7 +31,7 @@ import { deepClone, deepAssign } from '@/utils/others';
 
 import type { Recordable } from '@/types/typescript';
 
-import { _adaptToStableBranch } from './adapter';
+import { adaptToStableBranch } from './adapter';
 import { generateCertProviders } from './cert-provider';
 import { getGenerateContext } from './context';
 import { generateDns } from './dns';
@@ -124,10 +124,6 @@ export const generateConfig = async (
   originalProfile: Profile,
   options: GenerateOptions = {},
 ) => {
-  if (typeof options === 'boolean') {
-    options = { enableStableConfigCompat: options };
-  }
-
   const ctx = getGenerateContext();
   const isMainBranch = ctx.appSettings.kernel.branch === Branch.Main;
 
@@ -150,8 +146,8 @@ export const generateConfig = async (
     dnsServers: buildIdTagMapping(profile.dns.servers),
   };
 
-  // step 1
-  let config = cleanObject(
+  // Step 1
+  let config = cleanObject<SingBoxConfig>(
     {
       log: { ...profile.log },
       ntp: generateNtp(profile.ntp, tagMaps),
@@ -182,21 +178,21 @@ export const generateConfig = async (
         profile.inbounds,
         profile.outbounds,
       ) as Dns,
-    } satisfies SingBoxConfig,
+    },
     true,
   );
 
-  // adapt to stable branch
+  // Adapt to stable branch
   if (enableStableConfigCompat) {
-    _adaptToStableBranch(config);
+    adaptToStableBranch(config);
   }
 
-  // step 2
+  // Step 2
   if (enablePluginProcessing) {
     config = await ctx.onGenerate(config, originalProfile);
   }
 
-  // step 3
+  // Step 3
   if (enableMixinProcessing) {
     const { priority, config: mixin } = originalProfile.mixin;
     if (priority === 'mixin') {
@@ -206,9 +202,12 @@ export const generateConfig = async (
     }
   }
 
-  // step 4
+  // Step 4
   if (enableScriptProcessing) {
-    const fn = new globalThis.AsyncFunction(
+    const fn = new globalThis.AsyncFunction<
+      [config: SingBoxConfig],
+      SingBoxConfig
+    >(
       'config',
       `${originalProfile.script.code}; return await onGenerate(config)`,
     );

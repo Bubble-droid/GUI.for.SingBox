@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-// oxlint-disable typescript/no-explicit-any
+// oxlint-disable no-underscore-dangle typescript/no-explicit-any
 import type { DomainStrategy } from '@profile/constant/kernel';
 import {
   DnsRuleType,

@@ -11,7 +11,7 @@
     "typeAware": true,
     "typeCheck": false,
     "reportUnusedDisableDirectives": "warn",
-    "respectEslintDisableDirectives": true
+    "respectEslintDisableDirectives": false
   },
   "rules": {
     "no-unused-expressions": [

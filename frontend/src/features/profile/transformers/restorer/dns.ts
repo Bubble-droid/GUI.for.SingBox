@@ -95,6 +95,7 @@ export const restoreDnsServers = (
     return server;
   });
 
+// oxlint-disable-next-line max-params
 export const restoreDnsRules = (
   rules: Recordable[],
   InboundsIds: Recordable,

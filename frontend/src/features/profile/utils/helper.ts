@@ -76,7 +76,6 @@ export const cleanObject = <T extends object>(
 type Many<T> = T | readonly T[];
 
 export const normalizeArray = <T>(value: Many<T> | null | undefined): T[] => {
-  // oxlint-disable-next-line eqeqeq no-eq-null
   if (value == null) {
     return [];
   }

@@ -14,7 +14,7 @@ export interface DnsServerItem extends TagItem {
   // [local,tcp,udp,tls,quic,https/h3,dhcp]
   detour: string;
   domain_resolver: string;
-  // hosts
+  // Hosts
   hosts_path: string[];
   predefined: Recordable<string>;
   // [tcp,udp,tls,quic/https,h3]
@@ -22,9 +22,9 @@ export interface DnsServerItem extends TagItem {
   server_port: string;
   // [https,h3]
   path: string;
-  // dhcp
+  // Dhcp
   interface: string;
-  // fakeip
+  // Fakeip
   inet4_range: string;
   inet6_range: string;
 }
@@ -36,10 +36,10 @@ export interface DnsRuleItem {
   payload: string;
   action: DnsActionKind;
   invert: boolean;
-  // route
+  // Route
   server: string;
   strategy: DomainStrategy;
-  // route/route-options
+  // Route/route-options
   disable_cache: boolean;
   client_subnet: string;
 }

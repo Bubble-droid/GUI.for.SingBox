@@ -61,14 +61,14 @@ const handleAddProxy = (
   }
 
   const idx = outbound.value.outbounds.findIndex((item) => item.id === proxyID);
-  if (idx !== -1) {
-    outbound.value.outbounds.splice(idx, 1);
-  } else {
+  if (idx === -1) {
     outbound.value.outbounds.push({
       id: proxyID,
       tag: proxyName,
       type: groupID,
     });
+  } else {
+    outbound.value.outbounds.splice(idx, 1);
   }
 };
 

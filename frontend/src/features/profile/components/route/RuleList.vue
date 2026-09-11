@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+// oxlint-disable no-underscore-dangle
 import type { DomainStrategy } from '@profile/constant/kernel';
 import {
   RouteRuleType,

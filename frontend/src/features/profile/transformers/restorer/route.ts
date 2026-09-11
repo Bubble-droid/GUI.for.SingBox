@@ -11,6 +11,7 @@ import type { Recordable } from '@/types/typescript';
 import { supportedRuleTypes } from './shared';
 import type { RestoreContext } from './types';
 
+// oxlint-disable-next-line max-params
 export const restoreRuleSet = (
   rulesets: Recordable[],
   RouteRuleSetIds: Recordable,
@@ -58,6 +59,7 @@ export const restoreRuleSet = (
     return ruleset;
   });
 
+// oxlint-disable-next-line max-params
 export const restoreRouteRules = (
   rules: Recordable[],
   InboundsIds: Recordable,

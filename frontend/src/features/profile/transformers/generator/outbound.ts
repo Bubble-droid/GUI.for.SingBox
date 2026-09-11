@@ -1,4 +1,4 @@
-// oxlint-disable max-depth
+// oxlint-disable no-underscore-dangle
 import { OutboundType } from '@profile/constant/kernel';
 import type { OutboundItem } from '@profile/types/profiles/outbound';
 import type { Outbound, OutboundOf } from '@profile/types/sing-box/config';
@@ -59,6 +59,7 @@ export const generateOutbounds = async (
           if (targetSub.length === 0) {
             const sub = ctx.getSubscribe(subId);
             if (sub) {
+              // oxlint-disable-next-line no-await-in-loop
               const subStr = await ReadFile(sub.path);
               const proxies = JSON.parse(subStr) as Outbound[];
               SubscriptionCache[subId] = proxies;
