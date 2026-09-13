@@ -141,7 +141,7 @@ const getTrayMenus = () => {
               checkable: true,
               checked: proxy.name === group.now,
               event: () => {
-                handleUseProxy(group, proxy)
+                void handleUseProxy(group, proxy)
               },
             }
           }),
@@ -164,7 +164,7 @@ const getTrayMenus = () => {
             text,
             event: () => {
               pluginsStore.manualTrigger(id, event as any).catch((err: any) => {
-                Notify('Error', err.message || err)
+                void Notify('Error', err.message || err)
               })
             },
           }

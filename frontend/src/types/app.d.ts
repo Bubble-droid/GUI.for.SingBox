@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-redundant-type-constituents
 declare namespace App {
   type OS = 'windows' | 'linux' | 'darwin'
   type Theme = 'auto' | 'light' | 'dark'

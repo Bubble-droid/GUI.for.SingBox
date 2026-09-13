@@ -18,7 +18,7 @@ type Command = {
   label: string
   cmd: string
   desc?: string
-  handler?: () => Promise<any> | any
+  handler?: () => MaybePromise<any>
   children?: Command[]
 }
 

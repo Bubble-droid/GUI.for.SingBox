@@ -53,11 +53,13 @@
     "eslint-plugin-vue": "^10.11.0",
     "golar": "^0.1.10",
     "husky": "^9.1.7",
+    "knip": "^6.37.0",
     "less": "^4.9.1",
     "lint-staged": "^17.5.1",
     "npm-run-all2": "^9.0.3",
     "oxfmt": "^0.66.0",
     "oxlint": "^1.81.0",
+    "oxlint-tsgolint": "^7.0.2002",
     "typescript": "6.0.3",
     "vite": "8.2.2"
   }

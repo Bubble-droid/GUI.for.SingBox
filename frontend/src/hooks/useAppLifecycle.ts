@@ -42,7 +42,7 @@ export const useAppLifecycle = () => {
 
   const offBeforeExitApp = EventsOn('onBeforeExitApp', async () => {
     if (appSettings.app.exitOnClose) {
-      exitApp()
+      void exitApp()
       return
     }
 

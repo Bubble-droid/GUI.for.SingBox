@@ -22,5 +22,6 @@
     "inferTemplateDollarSlots": true,
     "fallthroughAttributes": true
   },
-  "include": ["../../env.d.ts", "../**/*.d.ts", "./**/*.ts", "./**/*.vue"]
+  "include": ["../../env.d.ts", "../**/*.d.ts", "./**/*.ts", "./**/*.vue"],
+  "exclude": ["eslint-config.js"]
 }

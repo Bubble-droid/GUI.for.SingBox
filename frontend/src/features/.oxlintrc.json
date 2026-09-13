@@ -1,0 +1,67 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../../.oxlintrc.json"],
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "promise",
+    "vue"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "error",
+    "style": "warn"
+  },
+  "rules": {
+    "no-magic-numbers": "off",
+    "no-ternary": "off",
+    "no-nested-ternary": "off",
+    "one-var": "off",
+    "new-cap": "off",
+    "id-length": "off",
+    "sort-imports": "off",
+    "sort-keys": "off",
+    "max-statements": "off",
+
+    "unicorn/no-nested-ternary": "off",
+    "unicorn/prefer-ternary": "off",
+    "unicorn/numeric-separators-style": "off",
+
+    "oxc/no-map-spread": "off",
+
+    "import/prefer-default-export": "off",
+    "import/exports-last": "off",
+    "import/group-exports": "off",
+    "import/no-named-export": "off",
+    "import/no-anonymous-default-export": "off",
+
+    "typescript/no-explicit-any": "error",
+    "no-duplicate-imports": [
+      "error",
+      {
+        "allowSeparateTypeImports": true
+      }
+    ],
+    "unicorn/filename-case": [
+      "error",
+      {
+        "cases": {
+          "kebabCase": true,
+          "pascalCase": true,
+          "lowercase": true
+        }
+      }
+    ],
+    "oxc/no-barrel-file": [
+      "error",
+      {
+        "threshold": 1
+      }
+    ],
+    "import/no-cycle": "error"
+  }
+}

@@ -5,7 +5,7 @@ import { scopeCompletionSource, localCompletionSource, snippets } from '@codemir
 import { PluginTriggerEvent } from '@/enums/app'
 import i18n from '@/lang'
 
-export const getCompletions = (pluginScope: any = undefined) => {
+export const getCompletions = (pluginScope?: any) => {
   const { t } = i18n.global
 
   const snippetsCompletions: Completion[] = [
@@ -235,7 +235,7 @@ export const getCompletions = (pluginScope: any = undefined) => {
     /**
      * Global methods include all APIs of `Plugins` and `Plugin Metadata`
      */
-    scopeCompletionSource({ ...window, Plugin: pluginScope }),
+    scopeCompletionSource({ ...(window as Recordable), Plugin: pluginScope }),
     /**
      * Code Snippets
      */

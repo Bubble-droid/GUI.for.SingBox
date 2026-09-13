@@ -35,7 +35,7 @@ type HttpServerHandler = (
       status: Response['status'],
       headers: Response['headers'],
       body: Response['body'],
-      options: Response['options'],
+      options?: Response['options'],
     ) => void
   },
 ) => Promise<void>
