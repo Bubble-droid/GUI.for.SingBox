@@ -1,25 +1,24 @@
-import skipFormatting from 'eslint-config-prettier/flat'
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import { globalIgnores } from 'eslint/config'
+import { withVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import prettierConfig from 'eslint-config-prettier'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import pluginVue from 'eslint-plugin-vue'
 
-export default defineConfigWithVueTs(
+import { featuresStrictConfig } from './src/features/eslint-config.js'
+
+export default withVueTs(
   {
-    name: 'app/files-to-lint',
-    files: ['**/*.{ts,vue}'],
+    scriptLangs: ['ts'],
+    rootDir: import.meta.dirname,
   },
 
-  globalIgnores(['**/dist/**', '**/wailsjs/**']),
-
-  ...pluginVue.configs['flat/recommended'],
-  vueTsConfigs.recommended,
-
-  skipFormatting,
-
-  ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
+  {
+    ignores: ['**/dist/**', '**/wailsjs/**'],
+  },
 
   {
+    name: 'app/base-rules',
+    files: ['**/*.{ts,vue}'],
+    extends: [pluginVue.configs['flat/recommended'], vueTsConfigs.recommended],
     rules: {
       '@typescript-eslint/no-explicit-any': ['off'],
       'vue/no-v-html': ['off'],
@@ -29,6 +28,26 @@ export default defineConfigWithVueTs(
           ignores: ['index'],
         },
       ],
+
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
     },
   },
+
+  featuresStrictConfig,
+
+  ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
+  ...pluginOxlint.buildFromOxlintConfigFile('./src/features/.oxlintrc.json'),
+
+  prettierConfig,
 )

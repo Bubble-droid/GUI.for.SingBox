@@ -32,7 +32,7 @@ type StreamEvent =
     }
 
 interface Request {
-  method: App.RequestMethod
+  method?: App.RequestMethod
   url: string
   headers?: {
     'Content-Type'?: 'application/json' | 'application/x-www-form-urlencoded' | 'text/plain'

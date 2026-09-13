@@ -1,3 +1,4 @@
+// oxlint-disable typescript/require-array-sort-compare
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { parse } from 'yaml'
@@ -28,7 +29,9 @@ type PluginRuntimeCache = {
     modulePromise: Promise<
       {
         default?: MaybePromise<
-          (Plugin: App.Plugin) => Partial<Record<PluginTriggerEvent, (...args: any[]) => any>>
+          (
+            Plugin: App.Plugin,
+          ) => MaybePromise<Partial<Record<PluginTriggerEvent, (...args: any[]) => any>>>
         >
       } & {
         [k in PluginTriggerEvent]: MaybePromise<(...args: any[]) => any>
@@ -394,7 +397,7 @@ export const usePluginsStore = defineStore('plugins', () => {
 
         if (p === 'status') {
           plugin.status = newValue
-          updatePluginState(plugin.id, plugin)
+          void updatePluginState(plugin.id, plugin)
           return true
         }
 
@@ -790,7 +793,7 @@ export const usePluginsStore = defineStore('plugins', () => {
     const exitCode = await runPluginEvent(id, event, args)
     if (isNumber(exitCode) && exitCode !== plugin.status) {
       plugin.status = exitCode
-      editPlugin(id, plugin)
+      void editPlugin(id, plugin)
     }
     return exitCode
   }
@@ -830,7 +833,7 @@ export const usePluginsStore = defineStore('plugins', () => {
 
   watch([_watchMenus, _watchDisabled], () => {
     if (appSettingsStore.app.addPluginToMenu) {
-      updateTrayAndMenus()
+      void updateTrayAndMenus()
     }
   })
 

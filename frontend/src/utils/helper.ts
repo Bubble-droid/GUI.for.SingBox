@@ -273,7 +273,7 @@ export const handleChangeMode = async (mode: 'direct' | 'global' | 'rule') => {
 
   if (mode === kernelApiStore.config.mode) return
 
-  kernelApiStore.updateConfig('mode', mode)
+  void kernelApiStore.updateConfig('mode', mode)
 
   const { connections } = await getConnections()
   const promises = (connections || []).map((v) => deleteConnection(v.id))
@@ -339,7 +339,7 @@ export const reloadApp = async () => {
     timedout = true
     appStore.isAppReloading = false
     destroy()
-    confirm('Warning', t('titlebar.reloadTimeout')).then(WindowReloadApp)
+    void confirm('Warning', t('titlebar.reloadTimeout')).then(WindowReloadApp)
   }, 10_000)
 
   try {
@@ -350,7 +350,7 @@ export const reloadApp = async () => {
     }
   } catch (err: any) {
     clearTimeout(timeoutId)
-    confirm('Error', t('titlebar.reloadError', { reason: err })).then(WindowReloadApp)
+    void confirm('Error', t('titlebar.reloadError', { reason: err })).then(WindowReloadApp)
   }
 
   appStore.isAppReloading = false
@@ -374,7 +374,7 @@ export const exitApp = async () => {
     timedout = true
     appStore.isAppExiting = false
     destroy()
-    confirm('Warning', t('titlebar.exitTimeout')).then(ExitApp)
+    void confirm('Warning', t('titlebar.exitTimeout')).then(ExitApp)
   }, 10_000)
 
   try {
@@ -387,11 +387,11 @@ export const exitApp = async () => {
     await pluginsStore.onShutdownTrigger()
     if (!timedout) {
       clearTimeout(timeoutId)
-      ExitApp()
+      void ExitApp()
     }
   } catch (err: any) {
     clearTimeout(timeoutId)
-    confirm('Error', t('titlebar.exitError', { reason: err })).then(ExitApp)
+    void confirm('Error', t('titlebar.exitError', { reason: err })).then(ExitApp)
   }
 
   appStore.isAppExiting = false

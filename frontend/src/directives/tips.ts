@@ -20,7 +20,7 @@ export default {
     el.onmouseenter = (e: MouseEvent) => {
       if (binding.value) {
         el.dataset.showTips = 'true'
-        show(e.clientX, e.clientY)
+        void show(e.clientX, e.clientY)
       }
     }
 

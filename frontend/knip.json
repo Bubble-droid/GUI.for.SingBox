@@ -1,0 +1,7 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "tags": ["-lintignore"],
+  "entry": ["src/main.ts"],
+  "project": ["src/**/*.{ts,vue}"],
+  "ignore": ["src/bridge/wailsjs/**", "src/**/__tests__/**"]
+}

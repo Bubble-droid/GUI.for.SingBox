@@ -53,7 +53,7 @@ export const useAppBootstrap = () => {
     await sleep(Math.max(0, MIN_SPLASH_DURATION - duration))
 
     loading.value = false
-    kernelApiStore.initCoreState()
+    void kernelApiStore.initCoreState()
   }
 
   initialize().catch(showError)

@@ -143,7 +143,7 @@ export const useCoreBranch = (isAlpha = false) => {
         await PreserveCorePermissions(CoreBakFilePath, CoreFilePath)
       }
 
-      refreshLocalVersion()
+      void refreshLocalVersion()
       downloadCompleted.value = true
       message.success('common.success')
     } catch (error: any) {
@@ -223,7 +223,7 @@ export const useCoreBranch = (isAlpha = false) => {
     } else {
       await doRollback()
     }
-    refreshLocalVersion()
+    void refreshLocalVersion()
     message.success('common.success')
   }
 
@@ -247,8 +247,8 @@ export const useCoreBranch = (isAlpha = false) => {
     }, 500),
   )
 
-  refreshLocalVersion()
-  refreshRemoteVersion()
+  void refreshLocalVersion()
+  void refreshRemoteVersion()
 
   return {
     restartable,

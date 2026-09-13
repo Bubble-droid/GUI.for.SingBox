@@ -118,7 +118,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
   })
 
   const saveAppSettings = debounce((config: string) => {
-    WriteFile(UserFilePath, config)
+    void WriteFile(UserFilePath, config)
   }, 500)
 
   const setupAppSettings = async () => {
@@ -203,7 +203,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     lang(lang: string) {
       i18n.global.locale.value = lang
       if (!i18n.global.availableLocales.includes(lang)) {
-        loadLocale(lang)
+        void loadLocale(lang)
       }
     },
     color(color: App.Color, primary: string, secondary: string) {
@@ -260,7 +260,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     )
     const lastModifiedSettings = stringify(settings)
     if (latestUserSettings !== lastModifiedSettings) {
-      saveAppSettings(lastModifiedSettings).then(() => {
+      void saveAppSettings(lastModifiedSettings).then(() => {
         latestUserSettings = lastModifiedSettings
       })
     } else {

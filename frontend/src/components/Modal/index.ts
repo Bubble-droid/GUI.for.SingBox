@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-redundant-type-constituents
 import {
   ref,
   defineComponent,
