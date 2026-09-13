@@ -3,8 +3,12 @@ package main
 import (
 	"context"
 	"embed"
+	"fmt"
+	"os"
+
 	"guiforcores/bridge"
-	"time"
+	"guiforcores/config"
+	"guiforcores/icon"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -19,13 +23,15 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
-//go:embed frontend/dist/favicon.ico
-var icon []byte
-
 func main() {
-	app := bridge.CreateApp(assets)
+	app := bridge.CreateApp()
 
-	trayStart, trayEnd := bridge.CreateTray(app, icon)
+	trayStart, trayEnd := bridge.CreateTray(app, icon.AppIcon)
+
+	uniqueID := config.Info.AppID
+	if bridge.Config.MultipleInstance {
+		uniqueID = fmt.Sprintf("%s-%d", config.Info.AppID, os.Getpid())
+	}
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -33,7 +39,7 @@ func main() {
 		MinHeight:        400,
 		DisableResize:    false,
 		Menu:             app.AppMenu,
-		Title:            bridge.Env.AppName,
+		Title:            config.Info.AppTitle,
 		Frameless:        bridge.Env.OS != "darwin",
 		Width:            bridge.Config.Width,
 		Height:           bridge.Config.Height,
@@ -54,28 +60,22 @@ func main() {
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
-				Title:   bridge.Env.AppName,
+				Title:   config.Info.AppTitle,
 				Message: "© 2026 GUI.for.Cores",
-				Icon:    icon,
+				Icon:    icon.AppIcon,
 			},
 		},
 		Linux: &linux.Options{
-			Icon:                icon,
+			Icon:                icon.AppIcon,
 			WindowIsTranslucent: false,
-			ProgramName:         bridge.Env.AppName,
+			ProgramName:         config.Info.AppID,
 			WebviewGpuPolicy:    linux.WebviewGpuPolicy(bridge.Config.WebviewGpuPolicy),
 		},
 		AssetServer: &assetserver.Options{
-			Assets:     assets,
-			Middleware: bridge.RollingRelease,
+			Assets: assets,
 		},
 		SingleInstanceLock: &options.SingleInstanceLock{
-			UniqueId: func() string {
-				if bridge.Config.MultipleInstance {
-					return time.Now().String()
-				}
-				return bridge.Env.AppName
-			}(),
+			UniqueId: uniqueID,
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
 				runtime.Show(app.Ctx)
 				runtime.EventsEmit(app.Ctx, "onLaunchApp", data.Args)
@@ -83,6 +83,7 @@ func main() {
 		},
 		OnStartup: func(ctx context.Context) {
 			app.Ctx = ctx
+			bridge.Startup(assets)
 			runtime.InitializeNotifications(ctx)
 			trayStart()
 		},
