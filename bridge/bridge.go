@@ -13,6 +13,8 @@ import (
 
 	sysruntime "runtime"
 
+	"guiforcores/config"
+
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -35,14 +37,7 @@ var Env = &EnvResult{
 	IsPrivileged: false,
 }
 
-// NewApp creates a new App application struct
-func NewApp() *App {
-	return &App{
-		AppMenu: menu.NewMenu(),
-	}
-}
-
-func CreateApp(fs embed.FS) *App {
+func init() {
 	exePath, err := os.Executable()
 	if err != nil {
 		panic(err)
@@ -51,6 +46,8 @@ func CreateApp(fs embed.FS) *App {
 	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
 	Env.AppName = filepath.Base(exePath)
 
+	Env.AppVersion = config.Info.AppVersion
+
 	if slices.Contains(os.Args, "tasksch") {
 		Env.FromTaskSch = true
 	}
@@ -58,7 +55,16 @@ func CreateApp(fs embed.FS) *App {
 	if priv, err := IsPrivileged(); err == nil {
 		Env.IsPrivileged = priv
 	}
+}
 
+// NewApp creates a new App application struct
+func NewApp() *App {
+	return &App{
+		AppMenu: menu.NewMenu(),
+	}
+}
+
+func CreateApp() *App {
 	app := NewApp()
 
 	if Env.OS == "darwin" {
@@ -70,11 +76,15 @@ func CreateApp(fs embed.FS) *App {
 		processFixedWebView2Runtime()
 	}
 
-	extractEmbeddedFiles(fs)
-
 	loadConfig()
 
 	return app
+}
+
+func Startup(fs embed.FS) {
+	log.Printf("Build Version: %s", Env.AppVersion)
+
+	extractEmbeddedFiles(fs)
 }
 
 func (a *App) IsStartup() bool {
@@ -93,7 +103,7 @@ func (a *App) ExitApp() {
 
 func (a *App) RestartApp() FlagResult {
 	log.Printf("RestartApp")
-	exePath := resolvePath(Env.AppName)
+	exePath := filepath.Join(Env.BasePath, Env.AppName)
 
 	cmd := exec.Command(exePath)
 	SetCmdWindowHidden(cmd)
