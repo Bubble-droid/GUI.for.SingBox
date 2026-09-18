@@ -419,7 +419,7 @@ export const generateDnsServerURL = (dnsServer: App.DnsServerConfig) => {
   return address
 }
 
-const _adaptToStableBranch = (_: Recordable) => {}
+const _adaptToStableBranch = (_config: Recordable) => {}
 
 type GenerateConfigOptions = {
   enableStableConfigCompat?: boolean

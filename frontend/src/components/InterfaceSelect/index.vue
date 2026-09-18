@@ -7,7 +7,7 @@ interface Props {
   border?: boolean
 }
 
-const model = defineModel<string>()
+const model = defineModel<string>({ required: true })
 
 withDefaults(defineProps<Props>(), {
   border: true,
