@@ -6,7 +6,7 @@ interface Props {
   size?: 'default' | 'small'
 }
 
-const model = defineModel<string | number | boolean>()
+const model = defineModel<string | number | boolean>({ required: true })
 
 withDefaults(defineProps<Props>(), {
   options: () => [],
