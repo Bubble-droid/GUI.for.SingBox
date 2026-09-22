@@ -2,3 +2,15 @@ build/bin
 frontend/dist
 
 .DS_Store
+
+vendor
+tools
+dist
+branches
+
+package/dist
+package/cores
+package/tmp
+
+.agents/skills
+.agents/containers
