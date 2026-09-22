@@ -27,4 +27,4 @@ export default {
   updated(el: any, binding: DirectiveBinding) {
     updateMenus(el, binding)
   },
-} as Directive
+} satisfies Directive<HTMLElement, App.Menu[]>

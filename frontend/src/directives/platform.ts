@@ -15,4 +15,4 @@ export default {
     const supports = binding.value
     el.style.display = supports.includes(envStore.env.os) ? '' : 'none'
   },
-} as Directive
+} satisfies Directive<HTMLElement, App.OS[]>

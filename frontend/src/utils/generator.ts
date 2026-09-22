@@ -135,6 +135,7 @@ const generateInbounds = (inbounds: App.Inbound[]) => {
           : undefined,
       }
     }
+    return []
   })
 }
 

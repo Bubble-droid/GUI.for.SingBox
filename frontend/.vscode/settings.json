@@ -2,7 +2,7 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
     "tsconfig.json": "tsconfig.*.json, env.d.ts",
-    "package.json": "package-lock.json, pnpm*, .oxlint*, eslint*, .oxfmtrc*, .editorconfig, .lintstagedrc*"
+    "package.json": "package-lock.json, pnpm*, .oxlint*, eslint*, .oxfmtrc*, .editorconfig, golar*, .lintstagedrc*"
   },
   "editor.codeActionsOnSave": {
     "source.fixAll.ts": "never",

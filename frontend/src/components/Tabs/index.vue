@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useSlots, type Component } from 'vue'
+import { computed, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 type TabItemType = {
@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emits = defineEmits(['update:activeKey'])
 
 const { t } = useI18n()
-const slots = useSlots()
+const slots = defineSlots()
 
 const isTop = computed(() => props.tabPosition === 'top')
 

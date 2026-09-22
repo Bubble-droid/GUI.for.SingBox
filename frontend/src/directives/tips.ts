@@ -34,4 +34,4 @@ export default {
     appStore.tipsShow = false
     el.dataset.showTips = 'false'
   },
-} as Directive
+} satisfies Directive<HTMLElement, string>
