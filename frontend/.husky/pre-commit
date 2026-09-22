@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+echo "🧹 [Pre-commit] Checking and formatting staged code..."
+
+# 1. Frontend formatting & linting
+if [ -d "frontend" ]; then
+  echo "==> [Frontend] Running lint-staged..."
+  (cd frontend && pnpm lint-staged) || {
+    echo "❌ [Frontend] lint-staged failed. Aborting commit!"
+    exit 1
+  }
+fi
+
+# 2. Go formatting
+STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACMR '*.go')
+
+if [ -n "$STAGED_GO_FILES" ]; then
+  echo "==> [Backend] Formatting staged Go files..."
+  echo "$STAGED_GO_FILES" | xargs gofmt -w
+  echo "$STAGED_GO_FILES" | xargs git add
+fi
+
+echo "✅ [Pre-commit] Formatting completed successfully!"

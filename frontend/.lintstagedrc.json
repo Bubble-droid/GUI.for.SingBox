@@ -1,0 +1,8 @@
+{
+  "*.{js,ts,vue}": [
+    "oxlint --fix --fix-suggestions",
+    "eslint --fix --cache",
+    "oxfmt --no-error-on-unmatched-pattern"
+  ],
+  "!(*.js|*.ts|*.vue)": ["oxfmt --no-error-on-unmatched-pattern"]
+}

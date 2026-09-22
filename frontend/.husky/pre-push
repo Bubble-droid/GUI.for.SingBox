@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+echo "🔍 [Pre-push] Starting global static quality checks..."
+
+# 1. Frontend Vue / TypeScript type checking
+if [ -d "frontend" ]; then
+  echo "==> [Frontend] Checking Vue/TS type safety..."
+  (cd frontend && pnpm type-check) || {
+    echo "❌ [Frontend] Type check failed. Aborting push!"
+    exit 1
+  }
+fi
+
+# 2. Go backend static analysis
+echo "==> [Backend] Checking Go code logic..."
+go vet ./... || {
+  echo "❌ [Backend] Go static check failed. Aborting push!"
+  exit 1
+}
+
+echo "🎉 [Pre-push] All checks passed. Push allowed!"
