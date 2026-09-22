@@ -205,7 +205,7 @@ class Picker {
       const { t } = i18n.global
       const dom = document.createElement('div')
       dom.style.cssText = ContainerCssText
-      const vnode = h(PickerComp<ValueType, PickerType>, {
+      const vnode = h(PickerComp<ValueType, PickerType> as any, {
         type,
         title,
         options,

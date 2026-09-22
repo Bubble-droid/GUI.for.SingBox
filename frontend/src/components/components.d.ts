@@ -23,7 +23,7 @@ declare module 'vue' {
     MarkdownViewer: (typeof import('./MarkdownViewer/index.vue'))['default']
     Modal: (typeof import('./Modal/index.vue'))['default']
     ModalContainer: (typeof import('./ModalContainer/index.vue'))['default']
-    MultipleSelect: (typeof import('./Select/index.vue'))['default']
+    MultipleSelect: (typeof import('./MultipleSelect/index.vue'))['default']
     Pagination: (typeof import('./Pagination/index.vue'))['default']
     Picker: (typeof import('./Picker/index.vue'))['default']
     Progress: (typeof import('./Progress/index.vue'))['default']

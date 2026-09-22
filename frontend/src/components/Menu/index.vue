@@ -114,7 +114,7 @@ onUnmounted(() => document.removeEventListener('click', onClick))
             size="small"
             @click.stop="handleClick(m)"
           >
-            <Divider v-if="m.separator" :key="m.label + '_divider'" size="small">
+            <Divider v-if="m.separator" :key="m.label + '_divider'">
               {{ t(m.label) }}
             </Divider>
             <div v-else class="text-nowrap">{{ t(m.label) }}</div>

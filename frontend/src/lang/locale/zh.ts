@@ -829,4 +829,4 @@ export default {
     title: '命令',
     noMatching: '没有匹配到命令',
   },
-}
+} as const
