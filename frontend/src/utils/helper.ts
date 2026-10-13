@@ -31,6 +31,7 @@ import {
   confirm,
   APP_TITLE,
   getAutoStartConfiguration,
+  APP_ID,
 } from '@/utils'
 
 // Permissions Helper
@@ -192,8 +193,8 @@ const getPlistPath = async () => {
 }
 
 const getDesktopPath = async () => {
-  const home = await GetEnv('HOME')
-  return `${home}/.config/autostart/${APP_TITLE}.desktop`
+  const configHome = (await GetEnv('XDG_CONFIG_HOME')) || `${await GetEnv('HOME')}/.config`
+  return `${configHome}/autostart/${APP_ID}.desktop`
 }
 
 export const IsAutoStartEnabled = async () => {

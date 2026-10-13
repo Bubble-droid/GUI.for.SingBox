@@ -16,7 +16,7 @@ import { LanguageOptions, LocalesFilePath, RollingReleaseDirectory } from '@/con
 import { OS } from '@/enums/app'
 import { loadLocale } from '@/lang'
 import {
-  APP_TITLE,
+  APP_ID,
   APP_VERSION,
   APP_VERSION_API,
   getGitHubApiAuthorization,
@@ -166,7 +166,7 @@ export const useAppStore = defineStore('app', () => {
         await UnzipZIPFile(downloadCacheFile, 'data/.cache')
         await RemoveFile(downloadCacheFile)
         await MoveFile(appPath, cur_pkg_bak)
-        await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_TITLE}.app`, appPath)
+        await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_ID}.app`, appPath)
         await Exec('xattr', ['-rd', 'com.apple.quarantine', appPath])
         await RemoveFile(`${cur_pkg_bak}/Contents/MacOS/${RollingReleaseDirectory}`)
         await RemoveFile(cur_pkg_bak)
@@ -174,7 +174,7 @@ export const useAppStore = defineStore('app', () => {
         const suffix = { [OS.Windows]: '.exe', [OS.Linux]: '' }[os]
         await MoveFile(appName, appName + '.bak')
         await UnzipZIPFile(downloadCacheFile, '.')
-        await MoveFile(APP_TITLE + suffix, appName)
+        await MoveFile(APP_ID + suffix, appName)
         await RemoveFile(downloadCacheFile)
         await RemoveFile(RollingReleaseDirectory)
       }
@@ -201,7 +201,7 @@ export const useAppStore = defineStore('app', () => {
       const { tag_name, assets } = body
 
       const { os, arch } = envStore.env
-      const assetName = `${APP_TITLE}-${os}-${arch}.zip`
+      const assetName = `${APP_ID}-${os}-${arch}.zip`
 
       const asset = assets.find((v: any) => v.name === assetName)
       if (!asset) throw 'Asset Not Found:' + assetName

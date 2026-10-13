@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"embed"
-	"guiforcores/bridge"
 	"time"
+
+	"guiforcores/bridge"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -35,7 +36,7 @@ func main() {
 	trayStart, trayEnd := bridge.CreateTray(app, trayIcon)
 
 	// Create application with options
-	err := wails.Run(&options.App{
+	opts := &options.App{
 		MinWidth:         600,
 		MinHeight:        400,
 		DisableResize:    false,
@@ -109,7 +110,10 @@ func main() {
 		Debug: options.Debug{
 			OpenInspectorOnStartup: true,
 		},
-	})
+	}
+	bridge.ApplyForkOptions(opts)
+
+	err := wails.Run(opts)
 
 	if err != nil {
 		println("Error:", err.Error())
