@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -237,10 +238,37 @@ func (a *App) OpenDir(path string) FlagResult {
 	return FlagResult{true, "Success"}
 }
 
+func isRemoteURI(raw string) bool {
+	u, err := url.Parse(raw)
+	if err != nil {
+		return false
+	}
+
+	if u.Scheme == "" {
+		return false
+	}
+
+	if len(u.Scheme) == 1 {
+		return false
+	}
+
+	if strings.ToLower(u.Scheme) == "file" {
+		return false
+	}
+
+	return true
+}
+
 func (a *App) OpenURI(uri string) FlagResult {
 	log.Printf("OpenURI: %s", uri)
 
-	err := browser.OpenURL(uri)
+	target := uri
+
+	if !isRemoteURI(uri) {
+		target = resolvePath(uri)
+	}
+
+	err := browser.OpenURL(target)
 	if err != nil {
 		return FlagResult{false, err.Error()}
 	}
