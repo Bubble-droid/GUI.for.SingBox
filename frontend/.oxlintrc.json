@@ -15,5 +15,36 @@
         "allowTernary": true
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/features/**/*.{ts,vue}"],
+      "plugins": ["import", "promise"],
+      "rules": {
+        "typescript/consistent-type-imports": "error",
+        "typescript/no-import-type-side-effects": "error",
+        "typescript/no-explicit-any": "error",
+
+        "import/consistent-type-specifier-style": "error",
+
+        "no-duplicate-imports": [
+          "error",
+          {
+            "allowSeparateTypeImports": true
+          }
+        ],
+        "unicorn/filename-case": [
+          "error",
+          {
+            "cases": {
+              "kebabCase": true,
+              "pascalCase": true,
+              "lowercase": true
+            }
+          }
+        ],
+        "oxc/no-barrel-file": "error"
+      }
+    }
+  ]
 }

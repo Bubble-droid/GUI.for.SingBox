@@ -1,8 +1,8 @@
-import skipFormatting from 'eslint-config-prettier/flat'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import { globalIgnores } from 'eslint/config'
+import prettierConfig from 'eslint-config-prettier'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import pluginVue from 'eslint-plugin-vue'
+import { globalIgnores } from 'eslint/config'
 
 export default defineConfigWithVueTs(
   {
@@ -14,10 +14,6 @@ export default defineConfigWithVueTs(
 
   ...pluginVue.configs['flat/recommended'],
   vueTsConfigs.recommended,
-
-  skipFormatting,
-
-  ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   {
     rules: {
@@ -31,4 +27,36 @@ export default defineConfigWithVueTs(
       ],
     },
   },
+
+  {
+    name: 'features/strict-rules',
+    files: ['src/features/**/*.{ts,vue}'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      'vue/define-macros-order': [
+        'error',
+        {
+          order: ['defineOptions', 'defineModel', 'defineProps', 'defineEmits', 'defineSlots'],
+          defineExposeLast: true,
+        },
+      ],
+      'vue/component-api-style': ['error', ['script-setup', 'composition']],
+      'vue/no-duplicate-class-names': 'error',
+    },
+  },
+
+  ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
+
+  prettierConfig,
 )
