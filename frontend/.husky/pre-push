@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+IS_DELETE_ONLY=true
+while read -r local_ref local_sha; do
+  if [ "$local_sha" != "0000000000000000000000000000000000000000" ] && [ "$local_ref" != "(delete)" ]; then
+    IS_DELETE_ONLY=false
+    break
+  fi
+done
+
+if [ "$IS_DELETE_ONLY" = true ]; then
+  exit 0
+fi
+
+echo "🔍 [Pre-push] Starting global static quality checks..."
+
+if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+  echo "⚠️  [Warning] You have uncommitted changes in your working tree."
+  echo "    The checks below will run against your current disk files, not just the pushed commits."
+fi
+
+# 1. Frontend Vue / TypeScript type checking
+if [ -d "frontend" ]; then
+  if [ ! -d "frontend/node_modules" ]; then
+    echo "⚠️  [Frontend] node_modules not found. Run 'pnpm install' in frontend first. Skipping type-check..."
+  else
+    echo "==> [Frontend] Checking Vue/TS type safety..."
+    (cd frontend && pnpm type-check) || {
+      echo "❌ [Frontend] Type check failed. Aborting push!"
+      exit 1
+    }
+  fi
+fi
+
+# 2. Go backend static analysis
+echo "==> [Backend] Checking Go code logic..."
+go vet ./... || {
+  echo "❌ [Backend] Go static check (go vet) failed. Aborting push!"
+  exit 1
+}
+
+echo "🎉 [Pre-push] All checks passed. Push allowed!"

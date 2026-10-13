@@ -2,9 +2,12 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
     "tsconfig.json": "tsconfig.*.json, env.d.ts",
-    "package.json": "package-lock.json, pnpm*, .oxlint*, eslint*, .oxfmtrc*, .editorconfig"
+    "package.json": "package-lock.json, pnpm*, .oxlint*, eslint*, .oxfmtrc*, .editorconfig, .lintstagedrc*"
   },
   "editor.codeActionsOnSave": {
+    "source.fixAll.ts": "never",
+    "source.removeUnused.ts": "never",
+    "source.removeUnusedImports": "explicit",
     "source.fixAll": "explicit"
   },
   "editor.formatOnSave": true,
