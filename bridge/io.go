@@ -240,6 +240,8 @@ func (a *App) OpenDir(path string) FlagResult {
 func (a *App) OpenURI(uri string) FlagResult {
 	log.Printf("OpenURI: %s", uri)
 
+	uri = a.resolveOpenTarget(uri)
+
 	err := browser.OpenURL(uri)
 	if err != nil {
 		return FlagResult{false, err.Error()}
