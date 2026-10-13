@@ -1,6 +1,6 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+  "include": ["env.d.ts", "src/**/*.ts", "src/**/*.vue"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     // Extra safety for array and object lookups, but may have false positives.
@@ -9,6 +9,9 @@
     "lib": ["ESNext", "DOM"],
 
     "paths": {
+      "@profile/*": ["./src/features/profile/*"],
+      "@features/*": ["./src/features/*"],
+
       "@/*": ["./src/*"],
       "@wails/*": ["./src/bridge/wailsjs/*"]
     },

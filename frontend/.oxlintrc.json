@@ -7,6 +7,10 @@
   "categories": {
     "correctness": "error"
   },
+  "options": {
+    "reportUnusedDisableDirectives": "warn",
+    "respectEslintDisableDirectives": false
+  },
   "rules": {
     "no-unused-expressions": [
       "error",
