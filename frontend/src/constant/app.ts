@@ -145,12 +145,7 @@ export const DefaultPluginHubSources = () => [
   {
     enable: true,
     name: APP_TITLE,
-    url: `https://raw.githubusercontent.com/GUI-for-Cores/Plugin-Hub/main/plugins/${
-      {
-        'GUI.for.Clash': 'gfc',
-        'GUI.for.SingBox': 'gfs',
-      }[APP_TITLE]
-    }.json`,
+    url: `https://raw.githubusercontent.com/GUI-for-Cores/Plugin-Hub/main/plugins/gfs.json`,
   },
 ]
 

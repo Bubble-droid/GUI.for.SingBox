@@ -13,6 +13,8 @@ import (
 
 	sysruntime "runtime"
 
+	"guiforcores/config"
+
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -27,12 +29,27 @@ var Env = &EnvResult{
 	PreventExit:  true,
 	FromTaskSch:  false,
 	WebviewPath:  "",
-	AppName:      "",
+	ExecName:     "",
 	AppVersion:   "v1.28.1",
 	BasePath:     "",
 	OS:           sysruntime.GOOS,
 	ARCH:         sysruntime.GOARCH,
 	IsPrivileged: false,
+}
+
+func init() {
+	execPath := getExecPath()
+	Env.BasePath = filepath.ToSlash(filepath.Dir(execPath))
+	Env.ExecName = filepath.Base(execPath)
+
+	if slices.Contains(os.Args, "tasksch") {
+		Env.FromTaskSch = true
+	}
+
+	if priv, err := IsPrivileged(); err == nil {
+		Env.IsPrivileged = priv
+	}
+
 }
 
 // NewApp creates a new App application struct
@@ -43,22 +60,6 @@ func NewApp() *App {
 }
 
 func CreateApp() *App {
-	exePath, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-
-	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
-	Env.AppName = filepath.Base(exePath)
-
-	if slices.Contains(os.Args, "tasksch") {
-		Env.FromTaskSch = true
-	}
-
-	if priv, err := IsPrivileged(); err == nil {
-		Env.IsPrivileged = priv
-	}
-
 	app := NewApp()
 
 	if Env.OS == "darwin" {
@@ -100,7 +101,7 @@ func (a *App) ExitApp() {
 
 func (a *App) RestartApp() FlagResult {
 	log.Printf("RestartApp")
-	exePath := resolvePath(Env.AppName)
+	exePath := filepath.Join(Env.BasePath, Env.ExecName)
 
 	cmd := exec.Command(exePath)
 	SetCmdWindowHidden(cmd)
@@ -120,7 +121,7 @@ func (a *App) GetEnv(key string) any {
 		return os.Getenv(key)
 	}
 	return EnvResult{
-		AppName:      Env.AppName,
+		ExecName:     Env.ExecName,
 		AppVersion:   Env.AppVersion,
 		BasePath:     Env.BasePath,
 		OS:           Env.OS,
@@ -159,7 +160,7 @@ func createMacOSSymlink() {
 	}
 
 	linkPath := filepath.Join(Env.BasePath, "data")
-	appPath := filepath.Join("/Users", currentUser.Username, "Library", "Application Support", Env.AppName)
+	appPath := filepath.Join("/Users", currentUser.Username, "Library", "Application Support", config.Info.AppID)
 
 	if err := os.MkdirAll(appPath, os.ModePerm); err != nil {
 		log.Printf("Failed to create macOS app data directory: %v", err)

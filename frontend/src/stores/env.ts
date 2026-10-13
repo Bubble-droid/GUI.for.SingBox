@@ -11,7 +11,7 @@ export const useEnvStore = defineStore('env', () => {
   const kernelApiStore = useKernelApiStore()
 
   const env = ref<App.AppEnv>({
-    appName: '',
+    execName: '',
     appVersion: '',
     basePath: '',
     appPath: '',
@@ -25,11 +25,11 @@ export const useEnvStore = defineStore('env', () => {
 
   const setupEnv = async () => {
     const _env = await GetEnv()
-    let appPath = `${_env.basePath}/${_env.appName}`
+    let appPath = `${_env.basePath}/${_env.execName}`
     if (_env.os === OS.Windows) {
       appPath = appPath.replaceAll('/', '\\')
     } else if (_env.os === OS.Darwin) {
-      appPath = appPath.replace(`/Contents/MacOS/${_env.appName}`, '')
+      appPath = appPath.replace(`/Contents/MacOS/${_env.execName}`, '')
     }
     env.value = { ..._env, appPath }
   }

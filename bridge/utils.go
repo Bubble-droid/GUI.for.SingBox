@@ -194,3 +194,11 @@ func RollingRelease(next http.Handler) http.Handler {
 		http.ServeFile(w, r, filePath)
 	})
 }
+
+func getExecPath() string {
+	execPath, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	return execPath
+}
