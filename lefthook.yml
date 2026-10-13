@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://lefthook.dev/schema.json
+
+glob_matcher: doublestar
+
+pre-commit:
+  parallel: false
+  commands:
+    go-format:
+      glob: "**/*.go"
+      run: gofmt -w {staged_files}
+      stage_fixed: true
+
+    frontend-lint:
+      root: "frontend/"
+      glob: "**/*.{js,ts,vue}"
+      exclude: "**/wailsjs/**"
+      run: pnpm oxlint --fix {staged_files} && pnpm eslint --fix --cache {staged_files} && pnpm oxfmt --no-error-on-unmatched-pattern {staged_files}
+      stage_fixed: true
+
+pre-push:
+  parallel: true
+  commands:
+    backend-check:
+      run: go vet ./...
+
+    frontend-typecheck:
+      root: "frontend/"
+      run: pnpm type-check
