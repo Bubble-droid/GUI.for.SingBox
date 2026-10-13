@@ -13,6 +13,7 @@ export default defineConfig({
   },
   resolve: {
     extensions: ['.ts', '.js'],
+    tsconfigPaths: true,
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@wails': fileURLToPath(new URL('./src/bridge/wailsjs', import.meta.url)),

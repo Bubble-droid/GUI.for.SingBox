@@ -15,5 +15,29 @@
         "allowTernary": true
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/features/**/*.{ts,vue}"],
+      "rules": {
+        "no-duplicate-imports": [
+          "error",
+          {
+            "allowSeparateTypeImports": true
+          }
+        ],
+        "unicorn/filename-case": [
+          "error",
+          {
+            "cases": {
+              "kebabCase": true,
+              "pascalCase": true,
+              "lowercase": true
+            }
+          }
+        ],
+        "oxc/no-barrel-file": "error"
+      }
+    }
+  ]
 }
