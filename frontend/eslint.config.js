@@ -4,6 +4,8 @@ import { globalIgnores } from 'eslint/config'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import pluginVue from 'eslint-plugin-vue'
 
+import { featuresStrictRules } from './eslint/features.js'
+
 export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
@@ -31,4 +33,6 @@ export default defineConfigWithVueTs(
       ],
     },
   },
+
+  featuresStrictRules,
 )

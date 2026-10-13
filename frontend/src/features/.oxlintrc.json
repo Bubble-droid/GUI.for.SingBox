@@ -1,0 +1,23 @@
+{
+  "extends": ["../../.oxlintrc.json"],
+  "rules": {
+    "no-duplicate-imports": [
+      "error",
+      {
+        "allowSeparateTypeImports": true
+      }
+    ],
+    "unicorn/filename-case": [
+      "error",
+      {
+        "cases": {
+          "kebabCase": true,
+          "pascalCase": true,
+          "lowercase": true
+        }
+      }
+    ],
+    "oxc/no-barrel-file": "error",
+    "import/no-cycle": "error"
+  }
+}
