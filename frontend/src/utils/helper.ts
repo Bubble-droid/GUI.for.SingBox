@@ -11,7 +11,6 @@ import {
   WindowReloadApp,
   WriteFile,
 } from '@/bridge'
-import { CoreWorkingDirectory } from '@/constant/kernel'
 import { OS, RequestProxyMode } from '@/enums/app'
 import { RulesetFormat } from '@/enums/kernel'
 import i18n from '@/lang'
@@ -418,8 +417,8 @@ export const processMagicVariables = (str: string) => {
   const { env } = useEnvStore()
   let result = str
   Object.entries({
-    $APP_BASE_PATH: env.basePath,
-    $CORE_BASE_PATH: CoreWorkingDirectory,
+    $APP_BASE_PATH: '',
+    $CORE_BASE_PATH: `${env.paths.data}/sing-box`,
   }).forEach(([source, target]) => {
     result = result.replaceAll(source, target)
   })

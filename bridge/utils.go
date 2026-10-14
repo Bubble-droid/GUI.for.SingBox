@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"guiforcores/internal/apppaths"
 )
 
 type requestTransportKey struct {
@@ -23,7 +25,7 @@ var requestTransportCache sync.Map
 
 func resolvePath(path string) string {
 	if !filepath.IsAbs(path) {
-		path = filepath.Join(Env.BasePath, path)
+		path = apppaths.ResolvePath(path, Env.BasePath)
 	}
 	return filepath.ToSlash(filepath.Clean(path))
 }

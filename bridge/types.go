@@ -13,6 +13,12 @@ type App struct {
 	AppMenu *menu.Menu
 }
 
+type EnvPaths struct {
+	Data   string `json:"data"`
+	Config string `json:"config"`
+	Cache  string `json:"cache"`
+}
+
 type EnvResult struct {
 	IsStartup    bool   `json:"-"`
 	PreventExit  bool   `json:"-"`
@@ -24,6 +30,8 @@ type EnvResult struct {
 	OS           string `json:"os"`
 	ARCH         string `json:"arch"`
 	IsPrivileged bool   `json:"isPrivileged"`
+
+	Paths EnvPaths `json:"paths"`
 }
 
 type RequestOptions struct {

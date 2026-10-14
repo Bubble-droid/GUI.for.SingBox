@@ -95,7 +95,7 @@ func (a *App) ExitApp() {
 
 func (a *App) RestartApp() FlagResult {
 	log.Printf("RestartApp")
-	exePath := resolvePath(Env.AppName)
+	exePath := filepath.Join(Env.BasePath, Env.AppName)
 
 	cmd := exec.Command(exePath)
 	SetCmdWindowHidden(cmd)
@@ -121,6 +121,12 @@ func (a *App) GetEnv(key string) any {
 		OS:           Env.OS,
 		ARCH:         Env.ARCH,
 		IsPrivileged: Env.IsPrivileged,
+
+		Paths: EnvPaths{
+			Data:   appPaths.AppDataPath,
+			Config: appPaths.AppConfigPath,
+			Cache:  appPaths.AppCachePath,
+		},
 	}
 }
 
