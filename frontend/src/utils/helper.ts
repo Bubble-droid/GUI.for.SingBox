@@ -417,6 +417,7 @@ export const processMagicVariables = (str: string) => {
   const { env } = useEnvStore()
   let result = str
   Object.entries({
+    '$APP_BASE_PATH/$CORE_BASE_PATH': `${env.appDataPath}/sing-box`,
     $APP_BASE_PATH: env.basePath,
     $CORE_BASE_PATH: CoreWorkingDirectory,
   }).forEach(([source, target]) => {

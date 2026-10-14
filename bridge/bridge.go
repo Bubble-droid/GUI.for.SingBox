@@ -14,6 +14,7 @@ import (
 	sysruntime "runtime"
 
 	"guiforcores/config"
+	"guiforcores/platform"
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
@@ -37,6 +38,8 @@ var Env = &EnvResult{
 	IsPrivileged: false,
 }
 
+var appPaths *platform.AppPaths
+
 func init() {
 	execPath := getExecPath()
 	Env.BasePath = filepath.ToSlash(filepath.Dir(execPath))
@@ -50,6 +53,7 @@ func init() {
 		Env.IsPrivileged = priv
 	}
 
+	appPaths = platform.NewAppPaths(Env.BasePath)
 }
 
 // NewApp creates a new App application struct
@@ -77,6 +81,8 @@ func CreateApp() *App {
 
 func Startup(fs embed.FS) {
 	log.Printf("Build Version: %s", Env.AppVersion)
+
+	appPaths.LogPathSummary()
 
 	if Env.OS == "darwin" {
 		createMacOSSymlink()
@@ -127,6 +133,10 @@ func (a *App) GetEnv(key string) any {
 		OS:           Env.OS,
 		ARCH:         Env.ARCH,
 		IsPrivileged: Env.IsPrivileged,
+
+		AppDataPath:   appPaths.AppDataPath,
+		AppConfigPath: appPaths.AppConfigPath,
+		AppCachePath:  appPaths.AppCachePath,
 	}
 }
 

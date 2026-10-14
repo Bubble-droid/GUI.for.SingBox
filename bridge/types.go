@@ -24,6 +24,10 @@ type EnvResult struct {
 	OS           string `json:"os"`
 	ARCH         string `json:"arch"`
 	IsPrivileged bool   `json:"isPrivileged"`
+
+	AppDataPath   string `json:"appDataPath"`
+	AppConfigPath string `json:"appConfigPath"`
+	AppCachePath  string `json:"appCachePath"`
 }
 
 type RequestOptions struct {

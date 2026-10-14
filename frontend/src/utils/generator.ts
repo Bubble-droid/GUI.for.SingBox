@@ -14,6 +14,7 @@ import {
 } from '@/enums/kernel'
 import {
   useAppSettingsStore,
+  useEnvStore,
   usePluginsStore,
   useRulesetsStore,
   useSubscribesStore,
@@ -210,6 +211,7 @@ const generateRoute = (
   const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
   const isInboundEnabled = (id: string) => inbounds.find((v) => v.id === id)?.enable
 
+  const envStore = useEnvStore()
   const rulesetsStore = useRulesetsStore()
 
   const extra: Recordable = {}
@@ -253,7 +255,7 @@ const generateRoute = (
         extra.rules = JSON.parse(ruleset.rules)
       } else if (ruleset.type === RulesetType.Local) {
         const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
-        extra.path = _ruleset?.path.replace('data/', '../')
+        extra.path = _ruleset?.path.replace(/^data\//v, `${envStore.env.appDataPath}/`)
         extra.format = ruleset.format
       } else if (ruleset.type === RulesetType.Remote) {
         extra.url = ruleset.url

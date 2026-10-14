@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -12,6 +13,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"guiforcores/config"
+	"guiforcores/platform"
 )
 
 type requestTransportKey struct {
@@ -21,11 +25,22 @@ type requestTransportKey struct {
 
 var requestTransportCache sync.Map
 
-func resolvePath(path string) string {
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(Env.BasePath, path)
+func resolvePath(rawPath string) string {
+	if rawPath == "" {
+		return ""
 	}
-	return filepath.ToSlash(filepath.Clean(path))
+
+	cleanPath := filepath.Clean(rawPath)
+	if filepath.IsAbs(cleanPath) {
+		return cleanPath
+	}
+
+	resolvedPath := appPaths.Resolve(cleanPath)
+	if config.Info.IsDev {
+		log.Printf("Real Path: %s", platform.MaskUserHome(resolvedPath))
+	}
+
+	return resolvedPath
 }
 
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {

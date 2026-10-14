@@ -7,7 +7,7 @@ import {
   RuleType as RouteRuleType,
   DnsServer,
 } from '@/enums/kernel'
-import { useProfilesStore, useRulesetsStore, useSubscribesStore } from '@/stores'
+import { useEnvStore, useProfilesStore, useRulesetsStore, useSubscribesStore } from '@/stores'
 
 import { createTextMatcher, deepAssign, sampleID } from './others'
 
@@ -315,7 +315,11 @@ const restoreRouteRuleset = (
   RouteRuleSetIds: Recordable,
   HttpClientOutboundIds: Recordable,
 ): App.ProfileRuleSet[] => {
+  const envStore = useEnvStore()
   const rulesetsStore = useRulesetsStore()
+
+  const dataPathRegExp = new RegExp(`^${envStore.env.appDataPath}/`)
+
   return rulesets.flatMap((raw) => {
     const ruleset = Defaults.DefaultRouteRuleset()
     ruleset.id = RouteRuleSetIds[raw.tag]
@@ -328,7 +332,9 @@ const restoreRouteRuleset = (
       }
     } else if (raw.type === RulesetType.Local) {
       if ('path' in raw) {
-        const r = rulesetsStore.rulesets.find((v) => v.path === raw.path.replace('../', 'data/'))
+        const r = rulesetsStore.rulesets.find(
+          (v) => v.path === raw.path.replace(dataPathRegExp, 'data/'),
+        )
         if (r) {
           ruleset.path = r.id
         } else {
