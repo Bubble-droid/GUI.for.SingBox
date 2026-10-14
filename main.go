@@ -23,7 +23,7 @@ var assets embed.FS
 var icon []byte
 
 func main() {
-	app := bridge.CreateApp(assets)
+	app := bridge.CreateApp()
 
 	trayStart, trayEnd := bridge.CreateTray(app, icon)
 
@@ -83,6 +83,7 @@ func main() {
 		},
 		OnStartup: func(ctx context.Context) {
 			app.Ctx = ctx
+			bridge.Startup(assets)
 			runtime.InitializeNotifications(ctx)
 			trayStart()
 		},
