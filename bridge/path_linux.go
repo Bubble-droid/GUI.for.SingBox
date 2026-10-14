@@ -3,6 +3,7 @@
 package bridge
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -39,9 +40,39 @@ func resolvePath(path string) string {
 
 	resolvedPath := filepath.Join(basePath, cleanPath)
 
+	logResolvedPath(path, resolvedPath)
+
 	return resolvedPath
 }
 
 func isDataPath(path string) bool {
 	return path == "data" || strings.HasPrefix(path, "data/")
+}
+
+func logResolvedPath(rawPath string, resolvedPath string) {
+	if isDev {
+		log.Printf("resolvePath: %q -> %s", rawPath, maskUserHome(resolvedPath))
+	}
+}
+
+func maskUserHome(targetPath string) string {
+	if targetPath == "" {
+		return ""
+	}
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil || homeDir == "" {
+		return targetPath
+	}
+
+	rel, err := filepath.Rel(homeDir, targetPath)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return targetPath
+	}
+
+	if rel == "." {
+		return "~"
+	}
+
+	return filepath.Join("~", rel)
 }
