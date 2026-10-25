@@ -54,6 +54,10 @@ func CreateApp(fs embed.FS) *App {
 	Env.DataPath = Env.BasePath
 	setDataPath()
 
+	if GitVersion != unknown {
+		Env.AppVersion = GitVersion
+	}
+
 	if slices.Contains(os.Args, "tasksch") {
 		Env.FromTaskSch = true
 	}
