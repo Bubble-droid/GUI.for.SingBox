@@ -53,6 +53,10 @@ func CreateApp() *App {
 
 	initDataDir()
 
+	if GitVersion != unknown {
+		Env.AppVersion = GitVersion
+	}
+
 	if slices.Contains(os.Args, "tasksch") {
 		Env.FromTaskSch = true
 	}
