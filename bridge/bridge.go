@@ -59,6 +59,8 @@ func CreateApp(fs embed.FS) *App {
 		Env.IsPrivileged = priv
 	}
 
+	forkInit()
+
 	app := NewApp()
 
 	if Env.OS == "darwin" {
