@@ -127,6 +127,7 @@ func (a *App) GetEnv(key string) any {
 			Config: appPaths.AppConfigPath,
 			Cache:  appPaths.AppCachePath,
 		},
+		Capabilities: Env.Capabilities,
 	}
 }
 

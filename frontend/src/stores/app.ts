@@ -138,6 +138,10 @@ export const useAppStore = defineStore('app', () => {
   const updatable = computed(() => downloadUrl.value && APP_VERSION !== remoteVersion.value)
 
   const downloadApp = async () => {
+    if (envStore.env.capabilities.systemPackage) {
+      message.info('about.updatesManagedByOS')
+      return
+    }
     downloading.value = true
     const { appName, os, appPath } = envStore.env
     const ext = os === OS.Windows ? '.zip' : '.tar.gz'
@@ -196,6 +200,12 @@ export const useAppStore = defineStore('app', () => {
 
   const checkForUpdates = async (showTips = false) => {
     if (checkForUpdatesLoading.value || downloading.value) return
+    if (envStore.env.capabilities.systemPackage) {
+      if (showTips) {
+        message.info('about.updatesManagedByOS')
+      }
+      return
+    }
     checkForUpdatesLoading.value = true
     remoteVersion.value = APP_VERSION
     downloadDigest.value = ''

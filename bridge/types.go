@@ -19,6 +19,10 @@ type EnvPaths struct {
 	Cache  string `json:"cache"`
 }
 
+type EnvCapabilities struct {
+	SystemPackage bool `json:"systemPackage"`
+}
+
 type EnvResult struct {
 	IsStartup    bool   `json:"-"`
 	PreventExit  bool   `json:"-"`
@@ -31,7 +35,8 @@ type EnvResult struct {
 	ARCH         string `json:"arch"`
 	IsPrivileged bool   `json:"isPrivileged"`
 
-	Paths EnvPaths `json:"paths"`
+	Paths        EnvPaths        `json:"paths"`
+	Capabilities EnvCapabilities `json:"capabilities"`
 }
 
 type RequestOptions struct {

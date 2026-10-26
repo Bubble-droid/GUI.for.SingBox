@@ -5,6 +5,7 @@ import (
 
 	"guiforcores/internal/apppaths"
 	"guiforcores/internal/buildinfo"
+	"guiforcores/internal/cli"
 )
 
 // appPaths is the fork-owned, XDG-aware path resolver. It is nil until
@@ -18,6 +19,10 @@ var appPaths *apppaths.Paths
 // to one line, which makes rebasing onto upstream cheaper.
 func forkInit() {
 	Env.AppVersion = buildinfo.GitVersion
+
+	if Env.OS == "linux" {
+		Env.Capabilities.SystemPackage = cli.IsLinuxSystemPackage()
+	}
 
 	appPaths = apppaths.New(Env.BasePath)
 	apppaths.SetDefault(appPaths)

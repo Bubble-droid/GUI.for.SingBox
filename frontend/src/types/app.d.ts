@@ -26,6 +26,9 @@ declare namespace App {
       config: string
       cache: string
     }
+    capabilities: {
+      systemPackage: boolean
+    }
   }
 
   interface TrayContent {

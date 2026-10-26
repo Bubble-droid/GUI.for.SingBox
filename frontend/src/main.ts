@@ -7,6 +7,7 @@ import './assets/globalMethods'
 import App from './App.vue'
 import components from './components'
 import directives from './directives'
+import { mergeFeaturesMessage } from './features/lang/i18n.ts'
 import i18n from './lang'
 import router from './router'
 import { setAppContext } from './utils'
@@ -20,5 +21,7 @@ app.use(router)
 app.use(i18n)
 app.use(components)
 app.use(directives)
+
+mergeFeaturesMessage()
 
 app.mount('#app')

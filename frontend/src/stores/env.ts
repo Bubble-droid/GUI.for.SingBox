@@ -23,6 +23,9 @@ export const useEnvStore = defineStore('env', () => {
       config: '',
       cache: '',
     },
+    capabilities: {
+      systemPackage: false,
+    },
   })
 
   const systemProxy = ref(false)
