@@ -11,6 +11,7 @@ import {
   HttpCancel,
   ReadDir,
   Exec,
+  UnzipTarGZFile,
 } from '@/bridge'
 import { LanguageOptions, LocalesFilePath, RollingReleaseDirectory } from '@/constant/app'
 import { OS } from '@/enums/app'
@@ -139,7 +140,9 @@ export const useAppStore = defineStore('app', () => {
   const downloadApp = async () => {
     downloading.value = true
     try {
-      const downloadCacheFile = 'data/.cache/gui.zip'
+      const { appName, os, appPath } = envStore.env
+      const ext = os === OS.Windows ? '.zip' : '.tar.gz'
+      const downloadCacheFile = `data/.cache/gui${ext}`
 
       const { update, destroy } = message.info('common.downloading', 10 * 60 * 1_000, () => {
         HttpCancel(downloadCacheFile)
@@ -159,11 +162,9 @@ export const useAppStore = defineStore('app', () => {
         },
       ).finally(destroy)
 
-      const { appName, os, appPath } = envStore.env
-
       if (os === OS.Darwin) {
         const cur_pkg_bak = appPath + '.bak'
-        await UnzipZIPFile(downloadCacheFile, 'data/.cache')
+        await UnzipTarGZFile(downloadCacheFile, 'data/.cache')
         await RemoveFile(downloadCacheFile)
         await MoveFile(appPath, cur_pkg_bak)
         await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_TITLE}.app`, appPath)
@@ -173,7 +174,11 @@ export const useAppStore = defineStore('app', () => {
       } else {
         const suffix = { [OS.Windows]: '.exe', [OS.Linux]: '' }[os]
         await MoveFile(appName, appName + '.bak')
-        await UnzipZIPFile(downloadCacheFile, '.')
+        if (os === OS.Windows) {
+          await UnzipZIPFile(downloadCacheFile, '.')
+        } else {
+          await UnzipTarGZFile(downloadCacheFile, '.')
+        }
         await MoveFile(APP_TITLE + suffix, appName)
         await RemoveFile(downloadCacheFile)
         await RemoveFile(RollingReleaseDirectory)
@@ -201,7 +206,8 @@ export const useAppStore = defineStore('app', () => {
       const { tag_name, assets } = body
 
       const { os, arch } = envStore.env
-      const assetName = `${APP_TITLE}-${os}-${arch}.zip`
+      const ext = os === OS.Windows ? '.zip' : '.tar.gz'
+      const assetName = `${APP_TITLE}-${tag_name.replace(/^v/, '')}-${os}-${arch}${ext}`
 
       const asset = assets.find((v: any) => v.name === assetName)
       if (!asset) throw 'Asset Not Found:' + assetName
