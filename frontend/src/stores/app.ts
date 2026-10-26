@@ -138,6 +138,10 @@ export const useAppStore = defineStore('app', () => {
   const updatable = computed(() => downloadUrl.value && APP_VERSION !== remoteVersion.value)
 
   const downloadApp = async () => {
+    if (envStore.env.systemPackage) {
+      message.info('about.updatesManagedByOS')
+      return
+    }
     downloading.value = true
     try {
       const { appName, os, appPath } = envStore.env
@@ -194,6 +198,12 @@ export const useAppStore = defineStore('app', () => {
 
   const checkForUpdates = async (showTips = false) => {
     if (checkForUpdatesLoading.value || downloading.value) return
+    if (envStore.env.systemPackage) {
+      if (showTips) {
+        message.info('about.updatesManagedByOS')
+      }
+      return
+    }
     checkForUpdatesLoading.value = true
     remoteVersion.value = APP_VERSION
     downloadDigest.value = ''

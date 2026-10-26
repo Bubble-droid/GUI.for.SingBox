@@ -22,6 +22,7 @@ declare namespace App {
     os: OS
     arch: string
     isPrivileged: boolean
+    systemPackage: boolean
   }
 
   interface TrayContent {

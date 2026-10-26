@@ -1,10 +1,17 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
-import { GetEnv, GetSystemProxy, SetSystemDNS, SetSystemProxy } from '@/bridge'
+import {
+  GetEnv,
+  GetSystemProxy,
+  RemoveFile,
+  SetSystemDNS,
+  SetSystemProxy,
+  WriteFile,
+} from '@/bridge'
 import { OS } from '@/enums/app'
 import { useAppSettingsStore, useKernelApiStore } from '@/stores'
-import { formatProxyHost, ignoredError, updateTrayAndMenus } from '@/utils'
+import { formatProxyHost, ignoredError, sampleID, updateTrayAndMenus } from '@/utils'
 
 export const useEnvStore = defineStore('env', () => {
   const appSettings = useAppSettingsStore()
@@ -19,6 +26,7 @@ export const useEnvStore = defineStore('env', () => {
     os: '' as App.OS,
     arch: '',
     isPrivileged: false,
+    systemPackage: false,
   })
 
   const systemProxy = ref(false)
@@ -33,6 +41,32 @@ export const useEnvStore = defineStore('env', () => {
       appPath = appPath.replace(`/Contents/MacOS/${_env.appName}`, '')
     }
     env.value = { ..._env, appPath }
+
+    checkLinuxSystemPackage().then((r) => {
+      env.value.systemPackage = r
+    })
+  }
+
+  const linuxSystemPrefixes = ['/usr/bin/', '/usr/sbin/', '/usr/local/bin/', '/opt/']
+
+  const checkLinuxSystemPackage = async () => {
+    if (env.value.os !== 'linux') return false
+
+    for (const p of linuxSystemPrefixes) {
+      if (env.value.appPath.startsWith(p)) {
+        return true
+      }
+    }
+
+    const writeTestFile = `${env.value.basePath}/.write-test-${sampleID()}`
+    try {
+      await WriteFile(writeTestFile, 'test')
+      return true
+    } catch {
+      return false
+    } finally {
+      await RemoveFile(writeTestFile).catch()
+    }
   }
 
   const updateSystemProxyStatus = async () => {
