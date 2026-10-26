@@ -147,6 +147,10 @@ export const useAppStore = defineStore('app', () => {
   const updatable = computed(() => downloadUrl.value && APP_VERSION !== remoteVersion.value)
 
   const downloadApp = async () => {
+    if (envStore.env.isSystemPackage) {
+      message.info('about.updatesManagedByOS')
+      return
+    }
     downloading.value = true
     try {
       const { appName, os, appPath } = envStore.env

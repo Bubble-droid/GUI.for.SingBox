@@ -811,6 +811,7 @@ export default {
     updateSuccessful: 'Update completed',
     newVersion: 'New version found',
     latestVersion: 'Already the latest version',
+    updatesManagedByOS: 'Updates are managed by your operating system',
   },
   titlebar: {
     pin: 'Pin',
