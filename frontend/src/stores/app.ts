@@ -11,6 +11,7 @@ import {
   HttpCancel,
   ReadDir,
   Exec,
+  UnzipTarGZFile,
 } from '@/bridge'
 import { LanguageOptions, LocalesFilePath, RollingReleaseDirectory } from '@/constant/app'
 import { OS } from '@/enums/app'
@@ -138,8 +139,11 @@ export const useAppStore = defineStore('app', () => {
 
   const downloadApp = async () => {
     downloading.value = true
+    const { appName, os, appPath } = envStore.env
+    const ext = os === OS.Windows ? '.zip' : '.tar.gz'
+
     try {
-      const downloadCacheFile = 'data/.cache/gui.zip'
+      const downloadCacheFile = `data/.cache/gui${ext}`
 
       const { update, destroy } = message.info('common.downloading', 10 * 60 * 1_000, () => {
         HttpCancel(downloadCacheFile)
@@ -159,11 +163,14 @@ export const useAppStore = defineStore('app', () => {
         },
       ).finally(destroy)
 
-      const { appName, os, appPath } = envStore.env
+      if (os === OS.Windows) {
+        await UnzipZIPFile(downloadCacheFile, 'data/.cache')
+      } else {
+        await UnzipTarGZFile(downloadCacheFile, 'data/.cache')
+      }
 
       if (os === OS.Darwin) {
         const cur_pkg_bak = appPath + '.bak'
-        await UnzipZIPFile(downloadCacheFile, 'data/.cache')
         await RemoveFile(downloadCacheFile)
         await MoveFile(appPath, cur_pkg_bak)
         await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_ID}.app`, appPath)
@@ -201,7 +208,8 @@ export const useAppStore = defineStore('app', () => {
       const { tag_name, assets } = body
 
       const { os, arch } = envStore.env
-      const assetName = `${APP_ID}-${os}-${arch}.zip`
+      const ext = os === OS.Windows ? '.zip' : '.tar.gz'
+      const assetName = `${APP_ID}_${tag_name.replace(/^v/, '')}_${os}_${arch}${ext}`
 
       const asset = assets.find((v: any) => v.name === assetName)
       if (!asset) throw 'Asset Not Found:' + assetName
