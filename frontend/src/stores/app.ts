@@ -12,6 +12,7 @@ import {
   HttpCancel,
   ReadDir,
   Exec,
+  UnzipTarGZFile,
 } from '@/bridge'
 import {
   BackupDirectory,
@@ -32,6 +33,7 @@ import {
   sampleID,
   sleep,
   modal,
+  APP_ID,
 } from '@/utils'
 
 import AboutView from '@/components/_common/AboutView.vue'
@@ -147,7 +149,9 @@ export const useAppStore = defineStore('app', () => {
   const downloadApp = async () => {
     downloading.value = true
     try {
-      const downloadCacheFile = 'data/.cache/gui.zip'
+      const { appName, os, appPath } = envStore.env
+      const ext = os === OS.Windows ? '.zip' : '.tar.gz'
+      const downloadCacheFile = `data/.cache/gui${ext}`
 
       const { update, destroy } = message.info('common.downloading', 10 * 60 * 1_000, () => {
         HttpCancel(downloadCacheFile)
@@ -167,21 +171,21 @@ export const useAppStore = defineStore('app', () => {
         },
       ).finally(destroy)
 
-      const { appName, os, appPath } = envStore.env
-
-      if (os === OS.Darwin) {
+      if (os === OS.Windows) {
         await UnzipZIPFile(downloadCacheFile, CacheDirectory)
-        await RemoveFile(downloadCacheFile)
-        await MoveFile(appPath, `${BackupDirectory}/${appName}.bak`)
+      } else {
+        await UnzipTarGZFile(downloadCacheFile, CacheDirectory)
+      }
+      await MoveFile(appPath, `${BackupDirectory}/${appName}.bak`)
+      if (os === OS.Darwin) {
         await MoveFile(`${CacheDirectory}/${APP_TITLE}.app`, appPath)
         await Exec('xattr', ['-rd', 'com.apple.quarantine', appPath])
+      } else if (os === OS.Windows) {
+        await MoveFile(`${CacheDirectory}/${APP_TITLE}.exe`, appPath)
       } else {
-        const suffix = { [OS.Windows]: '.exe', [OS.Linux]: '' }[os]
-        await MoveFile(appPath, `${BackupDirectory}/${appName}.bak`)
-        await UnzipZIPFile(downloadCacheFile, CacheDirectory)
-        await MoveFile(`${CacheDirectory}/${APP_TITLE}${suffix}`, appPath)
-        await RemoveFile(downloadCacheFile)
+        await MoveFile(`${CacheDirectory}/${APP_ID}`, appPath)
       }
+      await RemoveFile(downloadCacheFile)
       await RemoveFile(RollingReleaseDirectory)
       message.success('about.updateSuccessfulRestart')
       restartable.value = true
@@ -210,7 +214,8 @@ export const useAppStore = defineStore('app', () => {
       const { tag_name, assets } = release
 
       const { os, arch } = envStore.env
-      const assetName = `${APP_TITLE}-${os}-${arch}.zip`
+      const ext = os === OS.Windows ? '.zip' : '.tar.gz'
+      const assetName = `${APP_TITLE}-${tag_name.replace(/^v/, '')}-${os}-${arch}${ext}`
 
       const asset = assets.find((v) => v.name === assetName)
       if (!asset) throw 'Asset Not Found:' + assetName
