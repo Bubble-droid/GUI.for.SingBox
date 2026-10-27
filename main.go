@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"guiforcores/bridge"
+	"os"
 	"time"
 
 	"github.com/wailsapp/wails/v2"
@@ -26,6 +27,15 @@ var icon []byte
 var appIcon []byte
 
 func main() {
+	cmd := bridge.HandleFlags(os.Args[1:])
+	if cmd.Action == bridge.ActionExit {
+		os.Exit(cmd.ExitCode)
+	}
+
+	if cmd.FromTaskSch {
+		bridge.Env.FromTaskSch = true
+	}
+
 	app := bridge.CreateApp(assets)
 
 	trayIcon := icon
@@ -33,6 +43,7 @@ func main() {
 		trayIcon = appIcon
 	}
 	trayStart, trayEnd := bridge.CreateTray(app, trayIcon)
+	var isTrayStarted bool
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -84,19 +95,35 @@ func main() {
 				return bridge.Env.AppName
 			}(),
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
+				if bridge.IsQuit(data.Args) {
+					runtime.EventsEmit(app.Ctx, "onExitApp")
+					return
+				}
 				runtime.Show(app.Ctx)
 				runtime.EventsEmit(app.Ctx, "onLaunchApp", data.Args)
 			},
 		},
 		OnStartup: func(ctx context.Context) {
 			app.Ctx = ctx
+
+			if cmd.Action == bridge.ActionQuit {
+				go func() {
+					time.Sleep(50 * time.Millisecond)
+					app.ExitApp()
+				}()
+				return
+			}
+
 			runtime.InitializeNotifications(ctx)
 			trayStart()
+			isTrayStarted = true
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
 			if !bridge.Env.PreventExit {
-				trayEnd()
-				runtime.CleanupNotifications(ctx)
+				if isTrayStarted {
+					trayEnd()
+					runtime.CleanupNotifications(ctx)
+				}
 				return false
 			}
 			runtime.EventsEmit(ctx, "onBeforeExitApp")
