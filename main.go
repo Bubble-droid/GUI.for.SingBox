@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/Bubble-droid/GUI.for.SingBox/bridge"
@@ -45,6 +46,13 @@ func main() {
 	}
 	trayStart, trayEnd := bridge.CreateTray(app, trayIcon)
 	var isTrayStarted bool
+
+	var sigHandler atomic.Pointer[bridge.Handler]
+	defer func() {
+		if h := sigHandler.Load(); h != nil {
+			h.Close()
+		}
+	}()
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -116,9 +124,21 @@ func main() {
 				return
 			}
 
+			sigHandler.Store(bridge.Setup(app))
+
 			runtime.InitializeNotifications(ctx)
 			trayStart()
 			isTrayStarted = true
+		},
+		OnDomReady: func(ctx context.Context) {
+			if h := sigHandler.Load(); h != nil {
+				h.Ready()
+			}
+		},
+		OnShutdown: func(ctx context.Context) {
+			if h := sigHandler.Load(); h != nil {
+				h.Close()
+			}
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
 			if !bridge.Env.PreventExit {
