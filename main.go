@@ -4,10 +4,12 @@ import (
 	"context"
 	"embed"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"guiforcores/bridge"
 	"guiforcores/internal/cli"
+	"guiforcores/internal/signals"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -46,6 +48,13 @@ func main() {
 	}
 	trayStart, trayEnd := bridge.CreateTray(app, trayIcon)
 	var isTrayStarted bool
+
+	var sigHandler atomic.Pointer[signals.Handler]
+	defer func() {
+		if h := sigHandler.Load(); h != nil {
+			h.Close()
+		}
+	}()
 
 	// Create application with options
 	opts := &options.App{
@@ -116,9 +125,21 @@ func main() {
 				return
 			}
 
+			sigHandler.Store(signals.Setup(app))
+
 			runtime.InitializeNotifications(ctx)
 			trayStart()
 			isTrayStarted = true
+		},
+		OnDomReady: func(ctx context.Context) {
+			if h := sigHandler.Load(); h != nil {
+				h.Ready()
+			}
+		},
+		OnShutdown: func(ctx context.Context) {
+			if h := sigHandler.Load(); h != nil {
+				h.Close()
+			}
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
 			if !bridge.Env.PreventExit {
