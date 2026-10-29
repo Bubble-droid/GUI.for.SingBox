@@ -2,3 +2,8 @@ build/bin
 frontend/dist
 
 .DS_Store
+
+/.agents/
+/.bin/
+/.worktrees/
+/dist/
