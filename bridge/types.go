@@ -21,9 +21,12 @@ type EnvResult struct {
 	AppName      string `json:"appName"`
 	AppVersion   string `json:"appVersion"`
 	BasePath     string `json:"basePath"`
+	DataDir      string `json:"dataDir"`
 	OS           string `json:"os"`
 	ARCH         string `json:"arch"`
 	IsPrivileged bool   `json:"isPrivileged"`
+
+	IsSystemPackage bool `json:"isSystemPackage"`
 }
 
 type RequestOptions struct {

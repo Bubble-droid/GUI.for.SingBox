@@ -13,7 +13,13 @@ import {
   ReadDir,
   Exec,
 } from '@/bridge'
-import { LanguageOptions, LocalesFilePath, RollingReleaseDirectory } from '@/constant/app'
+import {
+  BackupDirectory,
+  CacheDirectory,
+  LanguageOptions,
+  LocalesFilePath,
+  RollingReleaseDirectory,
+} from '@/constant/app'
 import { OS } from '@/enums/app'
 import { loadLocale } from '@/lang'
 import {
@@ -164,22 +170,19 @@ export const useAppStore = defineStore('app', () => {
       const { appName, os, appPath } = envStore.env
 
       if (os === OS.Darwin) {
-        const cur_pkg_bak = appPath + '.bak'
-        await UnzipZIPFile(downloadCacheFile, 'data/.cache')
+        await UnzipZIPFile(downloadCacheFile, CacheDirectory)
         await RemoveFile(downloadCacheFile)
-        await MoveFile(appPath, cur_pkg_bak)
-        await MoveFile(`${cur_pkg_bak}/Contents/MacOS/data/.cache/${APP_TITLE}.app`, appPath)
+        await MoveFile(appPath, `${BackupDirectory}/${appName}.bak`)
+        await MoveFile(`${CacheDirectory}/${APP_TITLE}.app`, appPath)
         await Exec('xattr', ['-rd', 'com.apple.quarantine', appPath])
-        await RemoveFile(`${cur_pkg_bak}/Contents/MacOS/${RollingReleaseDirectory}`)
-        await RemoveFile(cur_pkg_bak)
       } else {
         const suffix = { [OS.Windows]: '.exe', [OS.Linux]: '' }[os]
-        await MoveFile(appName, appName + '.bak')
-        await UnzipZIPFile(downloadCacheFile, '.')
-        await MoveFile(APP_TITLE + suffix, appName)
+        await MoveFile(appPath, `${BackupDirectory}/${appName}.bak`)
+        await UnzipZIPFile(downloadCacheFile, CacheDirectory)
+        await MoveFile(`${CacheDirectory}/${APP_TITLE}${suffix}`, appPath)
         await RemoveFile(downloadCacheFile)
-        await RemoveFile(RollingReleaseDirectory)
       }
+      await RemoveFile(RollingReleaseDirectory)
       message.success('about.updateSuccessfulRestart')
       restartable.value = true
     } catch (error: any) {

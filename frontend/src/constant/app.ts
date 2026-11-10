@@ -33,6 +33,10 @@ export const RulesetHubFilePath = 'data/.cache/ruleset-list.json'
 
 export const RollingReleaseDirectory = 'data/rolling-release'
 
+export const BackupDirectory = 'data/backup'
+
+export const CacheDirectory = 'data/.cache'
+
 export const DefaultFontFamily =
   'system-ui, "Microsoft YaHei UI", "Source Han Sans CN", "Twemoji Mozilla", sans-serif'
 

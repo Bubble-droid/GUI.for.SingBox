@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -30,6 +29,7 @@ var Env = &EnvResult{
 	AppName:      "",
 	AppVersion:   "v1.28.1",
 	BasePath:     "",
+	DataDir:      "",
 	OS:           sysruntime.GOOS,
 	ARCH:         sysruntime.GOARCH,
 	IsPrivileged: false,
@@ -51,6 +51,8 @@ func CreateApp() *App {
 	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
 	Env.AppName = filepath.Base(exePath)
 
+	initDataDir()
+
 	if slices.Contains(os.Args, "tasksch") {
 		Env.FromTaskSch = true
 	}
@@ -62,7 +64,6 @@ func CreateApp() *App {
 	app := NewApp()
 
 	if Env.OS == "darwin" {
-		createMacOSSymlink()
 		createMacOSMenus(app)
 	}
 
@@ -95,7 +96,7 @@ func (a *App) ExitApp() {
 
 func (a *App) RestartApp() FlagResult {
 	log.Printf("RestartApp")
-	exePath := resolvePath(Env.AppName)
+	exePath := filepath.Join(Env.BasePath, Env.AppName)
 
 	cmd := exec.Command(exePath)
 	SetCmdWindowHidden(cmd)
@@ -118,9 +119,12 @@ func (a *App) GetEnv(key string) any {
 		AppName:      Env.AppName,
 		AppVersion:   Env.AppVersion,
 		BasePath:     Env.BasePath,
+		DataDir:      Env.DataDir,
 		OS:           Env.OS,
 		ARCH:         Env.ARCH,
 		IsPrivileged: Env.IsPrivileged,
+
+		IsSystemPackage: Env.IsSystemPackage,
 	}
 }
 
@@ -146,26 +150,6 @@ func (a *App) ShowMainWindow() {
 	runtime.WindowShow(a.Ctx)
 }
 
-func createMacOSSymlink() {
-	currentUser, err := user.Current()
-	if err != nil {
-		log.Printf("Failed to resolve current user: %v", err)
-		return
-	}
-
-	linkPath := filepath.Join(Env.BasePath, "data")
-	appPath := filepath.Join("/Users", currentUser.Username, "Library", "Application Support", Env.AppName)
-
-	if err := os.MkdirAll(appPath, os.ModePerm); err != nil {
-		log.Printf("Failed to create macOS app data directory: %v", err)
-		return
-	}
-
-	if err := os.Symlink(appPath, linkPath); err != nil && !os.IsExist(err) {
-		log.Printf("Failed to create macOS data symlink: %v", err)
-	}
-}
-
 func createMacOSMenus(app *App) {
 	appMenu := app.AppMenu.AddSubmenu("App")
 	appMenu.AddText("Show", keys.CmdOrCtrl("s"), func(_ *menu.CallbackData) {
@@ -184,7 +168,7 @@ func createMacOSMenus(app *App) {
 }
 
 func processFixedWebView2Runtime() {
-	webviewDir := filepath.Join(Env.BasePath, "data", "WebView2")
+	webviewDir := filepath.Join(Env.DataDir, "WebView2")
 
 	err := filepath.Walk(webviewDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
