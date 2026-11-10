@@ -14,10 +14,12 @@ export const useEnvStore = defineStore('env', () => {
     appName: '',
     appVersion: '',
     basePath: '',
+    dataDir: '',
     appPath: '',
     os: '' as App.OS,
     arch: '',
     isPrivileged: false,
+    isSystemPackage: false,
   })
 
   const systemProxy = ref(false)

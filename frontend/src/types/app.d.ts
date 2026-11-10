@@ -17,10 +17,12 @@ declare namespace App {
     appName: string
     appVersion: string
     basePath: string
+    dataDir: string
     appPath: string
     os: OS
     arch: string
     isPrivileged: boolean
+    isSystemPackage: boolean
   }
 
   interface TrayContent {

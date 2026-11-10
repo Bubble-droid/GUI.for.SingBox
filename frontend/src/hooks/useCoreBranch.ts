@@ -16,6 +16,7 @@ import {
   FileExists,
   OpenDir,
 } from '@/bridge'
+import { BackupDirectory } from '@/constant/app'
 import { CoreWorkingDirectory } from '@/constant/kernel'
 import { Branch, OS } from '@/enums/app'
 import { useAppSettingsStore, useEnvStore, useKernelApiStore } from '@/stores'
@@ -70,8 +71,9 @@ export const useCoreBranch = (isAlpha = false) => {
 
   const grantable = computed(() => localVersion.value && envStore.env.os !== OS.Windows)
 
-  const CoreFilePath = `${CoreWorkingDirectory}/${getKernelFileName(isAlpha)}`
-  const CoreBakFilePath = `${CoreFilePath}.bak`
+  const coreFileName = getKernelFileName(isAlpha)
+  const CoreFilePath = `${CoreWorkingDirectory}/${coreFileName}`
+  const CoreBakFilePath = `${BackupDirectory}/${coreFileName}.bak`
 
   const downloadCore = async () => {
     downloading.value = true
@@ -105,6 +107,7 @@ export const useCoreBranch = (isAlpha = false) => {
       }
 
       await MakeDir(CoreWorkingDirectory)
+      await MakeDir(BackupDirectory)
 
       await Download(
         asset.browser_download_url,

@@ -416,9 +416,20 @@ export const getKernelAssetFileName = (version: string) => {
 export const processMagicVariables = (str: string) => {
   const { env } = useEnvStore()
   let result = str
+
+  // Legacy configs located the core data with $APP_BASE_PATH/$CORE_BASE_PATH,
+  // which only worked when data lived beside the binary (portable mode). In
+  // user-data (XDG) mode $APP_BASE_PATH no longer points at the data root, so
+  // rewrite the composed pattern to the real data dir first. This keeps the old
+  // launch config working no matter which storage mode is active.
+  // CoreWorkingDirectory is already a relative data path (starts with `data/`),
+  // so strip that prefix and append it to the real data dir.
+  const coreDir = CoreWorkingDirectory.slice('data/'.length)
+  result = result.replaceAll('$APP_BASE_PATH/$CORE_BASE_PATH', `${env.dataDir}/${coreDir}`)
+
   Object.entries({
     $APP_BASE_PATH: env.basePath,
-    $CORE_BASE_PATH: CoreWorkingDirectory,
+    $APP_DATA_DIR: env.dataDir,
   }).forEach(([source, target]) => {
     result = result.replaceAll(source, target)
   })
