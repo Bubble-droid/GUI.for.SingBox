@@ -42,7 +42,7 @@ func NewApp() *App {
 	}
 }
 
-func CreateApp(fs embed.FS) *App {
+func CreateApp() *App {
 	exePath, err := os.Executable()
 	if err != nil {
 		panic(err)
@@ -70,11 +70,13 @@ func CreateApp(fs embed.FS) *App {
 		processFixedWebView2Runtime()
 	}
 
-	extractEmbeddedFiles(fs)
-
 	loadConfig()
 
 	return app
+}
+
+func Startup(fs embed.FS) {
+	extractEmbeddedFiles(fs)
 }
 
 func (a *App) IsStartup() bool {

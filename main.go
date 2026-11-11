@@ -27,7 +27,7 @@ var icon []byte
 var appIcon []byte
 
 func main() {
-	app := bridge.CreateApp(assets)
+	app := bridge.CreateApp()
 
 	trayIcon := icon
 	if bridge.Env.OS == "linux" {
@@ -91,6 +91,7 @@ func main() {
 		},
 		OnStartup: func(ctx context.Context) {
 			app.Ctx = ctx
+			bridge.Startup(assets)
 			runtime.InitializeNotifications(ctx)
 			trayStart()
 		},
