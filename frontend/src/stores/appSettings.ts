@@ -109,6 +109,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     addPluginToMenu: false,
     addGroupToMenu: false,
     rollingRelease: true,
+    updateIncludePrerelease: false,
     debugModalSideBySide: false,
     debugOutline: false,
     debugNoAnimation: false,
@@ -203,6 +204,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     }
 
     settings.systemTitleBar ??= false
+    settings.updateIncludePrerelease ??= false
 
     if (pluginSourcesMigrated) {
       await WriteFile(UserFilePath, stringify(settings))

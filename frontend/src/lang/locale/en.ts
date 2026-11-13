@@ -748,6 +748,7 @@ export default {
     contentProtection: 'Content Protection',
     contentProtectionTips: 'Blocks screen capture (Restart Required)',
     rollingRelease: 'Enable Rolling Release',
+    updateIncludePrerelease: 'Include Pre-release Versions in Updates',
     debugModalSideBySide: 'Open modals side by side',
     debugOutline: 'Show component outlines',
     debugNoAnimation: 'Disable animations',

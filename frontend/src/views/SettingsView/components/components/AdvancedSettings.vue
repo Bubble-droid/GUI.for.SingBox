@@ -38,6 +38,10 @@ const handleOpenRollingReleaseFolder = async () => {
       </div>
     </div>
     <div class="px-8 py-12 flex items-center justify-between">
+      <div class="text-16 font-bold">{{ $t('settings.updateIncludePrerelease') }}</div>
+      <Switch v-model="appSettings.app.updateIncludePrerelease" />
+    </div>
+    <div class="px-8 py-12 flex items-center justify-between">
       <div class="text-16 font-bold">{{ $t('settings.realMemoryUsage') }}</div>
       <Switch v-model="appSettings.app.kernel.realMemoryUsage" />
     </div>
