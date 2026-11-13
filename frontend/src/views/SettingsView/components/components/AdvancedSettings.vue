@@ -34,7 +34,7 @@ const handleOpenRollingReleaseFolder = async () => {
       </div>
       <div class="flex items-center gap-4">
         <Button type="primary" icon="folder" size="small" @click="handleOpenRollingReleaseFolder" />
-        <Switch v-model="appSettings.app.rollingRelease" />
+        <Switch v-model="appSettings.app.rollingRelease" disabled />
       </div>
     </div>
     <div class="px-8 py-12 flex items-center justify-between">

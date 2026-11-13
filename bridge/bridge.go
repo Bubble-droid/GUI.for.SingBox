@@ -298,6 +298,9 @@ func loadConfig() {
 		Config.Height = 540
 	}
 
+	// Rolling release is globally disabled: never serve rolling-release assets
+	Config.RollingRelease = false
+
 	Config.StartHidden = Env.FromTaskSch && Config.WindowStartState == int(options.Minimised)
 
 	if !Env.FromTaskSch {
