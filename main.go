@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"embed"
-	"guiforcores/bridge"
 	"time"
+
+	"github.com/Bubble-droid/GUI.for.SingBox/bridge"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"

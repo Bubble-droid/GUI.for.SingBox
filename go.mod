@@ -1,4 +1,4 @@
-module guiforcores
+module github.com/Bubble-droid/GUI.for.SingBox
 
 go 1.27.3
 
