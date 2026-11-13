@@ -1,3 +1,4 @@
+import type { GitHubRelease } from '@features/types/github'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -29,6 +30,7 @@ import {
 
 import AboutView from '@/components/_common/AboutView.vue'
 
+import { useAppSettingsStore } from './appSettings'
 import { useEnvStore } from './env'
 
 export const useAppStore = defineStore('app', () => {
@@ -193,17 +195,21 @@ export const useAppStore = defineStore('app', () => {
     remoteVersion.value = APP_VERSION
     downloadDigest.value = ''
     try {
-      const { body } = await HttpGet<Record<string, any>>(APP_VERSION_API, {
+      const { body } = await HttpGet<GitHubRelease[] | { message: string }>(APP_VERSION_API, {
         Authorization: getGitHubApiAuthorization(),
       })
-      if (body.message) throw body.message
+      if (!Array.isArray(body)) throw body.message
 
-      const { tag_name, assets } = body
+      const includePrerelease = useAppSettingsStore().app.updateIncludePrerelease
+      const release = body.find((v) => !v.draft && (includePrerelease || !v.prerelease))
+      if (!release) throw 'Release Not Found'
+
+      const { tag_name, assets } = release
 
       const { os, arch } = envStore.env
       const assetName = `${APP_TITLE}-${os}-${arch}.zip`
 
-      const asset = assets.find((v: any) => v.name === assetName)
+      const asset = assets.find((v) => v.name === assetName)
       if (!asset) throw 'Asset Not Found:' + assetName
       if (asset.uploader.login !== 'github-actions[bot]') {
         await confirm('common.warning', 'settings.kernel.risk', {
