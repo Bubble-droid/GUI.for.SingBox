@@ -8,8 +8,8 @@ require (
 	github.com/oschwald/geoip2-golang v1.13.0
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/wailsapp/wails/v2 v2.17.0
-	golang.org/x/sys v0.49.0
+	github.com/wailsapp/wails/v2 v2.17.1
+	golang.org/x/sys v0.50.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -23,13 +23,13 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jchv/go-winloader v0.0.0-20250406163304-c1995be93bd1 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
-	github.com/labstack/echo/v4 v4.16.0 // indirect
+	github.com/labstack/echo/v4 v4.16.4 // indirect
 	github.com/labstack/gommon v0.5.0 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.1 // indirect
 	github.com/leaanthony/gosod v1.0.4 // indirect
 	github.com/leaanthony/slicer v1.6.0 // indirect
 	github.com/leaanthony/u v1.1.1 // indirect
-	github.com/lufia/plan9stats v0.0.0-20260802145828-341c2f0c90b5 // indirect
+	github.com/lufia/plan9stats v0.0.0-20261101121723-be84dd9509a0 // indirect
 	github.com/mattn/go-colorable v0.1.16 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
@@ -46,9 +46,9 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.23 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/crypto v0.58.0 // indirect
-	golang.org/x/net v0.61.0 // indirect
-	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/crypto v0.59.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
+	golang.org/x/text v0.44.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
 
