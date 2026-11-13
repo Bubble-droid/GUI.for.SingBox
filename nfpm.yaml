@@ -76,6 +76,8 @@ overrides:
       - libkf6config-bin
       - libglib2.0-bin
       - network-manager
+    scripts:
+      postinstall: ./packaging/linux/scripts/deb/postinstall.sh
 
   rpm:
     depends:
@@ -87,6 +89,8 @@ overrides:
       - kf6-kconfig
       - glib2
       - NetworkManager
+    scripts:
+      postinstall: ./packaging/linux/scripts/rpm/postinstall.sh
 
 deb:
   compression: zstd
