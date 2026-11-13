@@ -108,7 +108,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     multipleInstance: false,
     addPluginToMenu: false,
     addGroupToMenu: false,
-    rollingRelease: true,
+    rollingRelease: false,
     updateIncludePrerelease: false,
     debugModalSideBySide: false,
     debugOutline: false,
@@ -205,6 +205,9 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
 
     settings.systemTitleBar ??= false
     settings.updateIncludePrerelease ??= false
+
+    // Rolling release is globally disabled
+    settings.rollingRelease = false
 
     if (pluginSourcesMigrated) {
       await WriteFile(UserFilePath, stringify(settings))
