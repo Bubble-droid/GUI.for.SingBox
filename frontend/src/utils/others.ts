@@ -4,7 +4,7 @@ import { stringify } from 'yaml'
 import { OS } from '@/enums/app'
 import { useAppSettingsStore } from '@/stores'
 import appDts from '@/types/app.d.ts?raw'
-import { APP_TITLE, APP_VERSION, isValidIPv4, isValidIPv6 } from '@/utils'
+import { APP_ID, APP_TITLE, APP_VERSION, isValidIPv4, isValidIPv6 } from '@/utils'
 
 export const getAppDts = () => appDts
 
@@ -318,9 +318,13 @@ export const getAutoStartConfiguration = (os: App.OS, appPath: string, delay = 3
   }
   if (os === OS.Linux) {
     const desktop = `[Desktop Entry]
+Version=1.0
 Type=Application
+Name=${APP_TITLE}
 Exec=${appPath} tasksch
-Name=${APP_TITLE}`
+Icon=${APP_ID}
+Terminal=false
+StartupWMClass=${APP_ID}`
     return desktop
   }
   if (os === OS.Darwin) {
