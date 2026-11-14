@@ -17,6 +17,9 @@ PKG_NAME="gui-for-singbox"
 # Paths
 BIN_DIR="build/bin"
 PKGS_DIR="dist"
+CORES_DIR="${PKGS_DIR}/cores"
+CORES_CACHE_DIR="${CORES_DIR}/.cache"
+CORE_MANIFEST="packaging/linux/cores/cores.txt"
 
 # Package descriptions
 DESC="A GUI client for sing-box"
@@ -143,6 +146,140 @@ check_binary() {
   fi
 }
 
+# === bundled sing-box cores ===
+_CORES_PREPARED=0
+
+core_version() {
+  local channel="$1"
+  local version
+
+  if [[ ! -f "$CORE_MANIFEST" ]]; then
+    echo "==> Error: Core manifest '${CORE_MANIFEST}' not found." >&2
+    return 1
+  fi
+
+  version="$(awk -v channel="$channel" 'NF == 2 && $1 == channel { print $2; found = 1; exit } END { exit !found }' "$CORE_MANIFEST")" || {
+    echo "==> Error: No version for channel '${channel}' in '${CORE_MANIFEST}'." >&2
+    return 1
+  }
+
+  printf '%s\n' "$version"
+}
+
+core_release_arch() {
+  case "$ARCH" in
+  arm) echo "armv7" ;;
+  *) echo "$ARCH" ;;
+  esac
+}
+
+core_asset_name() {
+  local version="$1"
+  echo "sing-box-${version}-linux-$(core_release_arch)-glibc.tar.gz"
+}
+
+core_sha256() {
+  local channel="$1"
+  local release_arch
+  release_arch="$(core_release_arch)"
+
+  awk -v channel="$channel" -v arch="$release_arch" \
+    'NF == 3 && $1 == channel && $2 == arch { print $3; found = 1; exit } END { exit !found }' \
+    "$CORE_MANIFEST"
+}
+
+download_core_asset() {
+  local url="$1"
+  local dest="$2"
+  local expected="$3"
+  local attempt tmp actual
+
+  tmp="${dest}.part"
+
+  if [[ -f "$dest" ]]; then
+    if echo "${expected}  ${dest}" | sha256sum -c --status -; then
+      echo "==> Using cached $(basename "$dest")"
+      return 0
+    fi
+    echo "==> Cached $(basename "$dest") checksum mismatch, downloading again..." >&2
+    rm -f "$dest"
+  fi
+
+  for attempt in 1 2 3; do
+    echo "==> Downloading $(basename "$dest") (attempt ${attempt}/3)..."
+    rm -f "$tmp"
+
+    if curl -fL --connect-timeout 20 --silent --show-error -o "$tmp" "$url"; then
+      actual="$(sha256sum "$tmp" | awk '{ print $1 }')"
+      if [[ "$actual" == "$expected" ]]; then
+        mv -f "$tmp" "$dest"
+        return 0
+      fi
+      echo "==> Error: SHA-256 mismatch for $(basename "$dest")" >&2
+    else
+      echo "==> Error: Failed to download $(basename "$dest")" >&2
+    fi
+
+    rm -f "$tmp"
+    if [[ "$attempt" -lt 3 ]]; then
+      sleep 2
+    fi
+  done
+
+  echo "==> Error: $(basename "$dest") could not be downloaded after 3 attempts." >&2
+  return 1
+}
+
+prepare_core() {
+  local channel="$1"
+  local output_name="$2"
+  local version asset expected url tarball tmp_dir member license_member asset_dir
+
+  version="$(core_version "$channel")"
+  asset="$(core_asset_name "$version")"
+  if ! expected="$(core_sha256 "$channel")"; then
+    expected=""
+  fi
+  asset_dir="${asset%.tar.gz}"
+
+  if [[ -z "$expected" ]]; then
+    echo "==> Error: No SHA-256 checksum for '${channel}' on '$(core_release_arch)' in '${CORE_MANIFEST}'." >&2
+    return 1
+  fi
+
+  url="https://github.com/SagerNet/sing-box/releases/download/v${version}/${asset}"
+  tarball="${CORES_CACHE_DIR}/${asset}"
+  member="${asset_dir}/sing-box"
+  license_member="${asset_dir}/LICENSE"
+
+  mkdir -p "$CORES_CACHE_DIR" "$CORES_DIR"
+  download_core_asset "$url" "$tarball" "$expected"
+
+  tmp_dir="$(mktemp -d "${CORES_CACHE_DIR}/extract.XXXXXX")"
+  if ! tar -xzf "$tarball" -C "$tmp_dir" "$member" "$license_member"; then
+    rm -rf "$tmp_dir"
+    echo "==> Error: Failed to extract '${member}' and '${license_member}' from $(basename "$tarball")." >&2
+    return 1
+  fi
+
+  install -m 0755 "${tmp_dir}/${member}" "${CORES_DIR}/${output_name}"
+  install -m 0644 "${tmp_dir}/${license_member}" "${CORES_DIR}/${output_name}.LICENSE"
+  rm -rf "$tmp_dir"
+
+  echo "==> Bundled sing-box ${channel} ${version} as ${CORES_DIR}/${output_name}"
+}
+
+prepare_cores() {
+  if [[ "$_CORES_PREPARED" -eq 1 ]]; then
+    return 0
+  fi
+
+  echo "==> Preparing bundled sing-box cores (${ARCH})..."
+  prepare_core stable sing-box
+  prepare_core alpha sing-box-alpha
+  _CORES_PREPARED=1
+}
+
 cleanup_macos_patch() {
   if [[ "$_PATCH_MACOS_DONE" -eq 1 ]]; then
     rm -rf "$ROOT_DIR/vendor"
@@ -239,6 +376,7 @@ dev() {
 
 package_deb() {
   check_binary
+  prepare_cores
   mkdir -p "$PKGS_DIR"
   echo "==> Packaging Debian (.deb) for ${DEB_ARCH}..."
   PACKAGER="$PACKAGER" DESCRIPTION="$DESC_DEB" ARCH="$DEB_ARCH" VERSION="$PKG_VERSION" \
@@ -247,6 +385,7 @@ package_deb() {
 
 package_rpm() {
   check_binary
+  prepare_cores
   mkdir -p "$PKGS_DIR"
   echo "==> Packaging RPM (.rpm) for ${SYS_ARCH}..."
   PACKAGER="$PACKAGER" DESCRIPTION="$DESC_RPM" ARCH="$SYS_ARCH" VERSION="$PKG_VERSION" \
@@ -255,6 +394,7 @@ package_rpm() {
 
 package_pacman() {
   check_binary
+  prepare_cores
   mkdir -p "$PKGS_DIR"
   echo "==> Packaging Pacman (.pkg.tar.zst) for ${SYS_ARCH}..."
   PACKAGER="$PACKAGER" DESCRIPTION="$DESC" ARCH="$SYS_ARCH" VERSION="$ARCH_PKG_VERSION" \
@@ -272,7 +412,7 @@ clean_bin() {
 }
 
 clean_pkgs() {
-  rm -rf "${PKGS_DIR:?}/${PKG_NAME:?}"*
+  rm -rf "${PKGS_DIR:?}/${PKG_NAME:?}"* "$CORES_DIR"
 }
 
 clean() {
@@ -306,7 +446,7 @@ Available targets:
   package-rpm          - Package RPM package (.rpm)
   package-pacman       - Package Arch package (.pkg.tar.zst)
   package-linux        - Run all package
-  clean                - Remove build outputs and packages
+  clean                - Remove build outputs, packages, and bundled core cache
 
 Environment variable overrides:
   ARCH                 - Override architecture (default: $(go env GOARCH))

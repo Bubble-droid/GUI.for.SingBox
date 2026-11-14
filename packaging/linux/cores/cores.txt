@@ -1,0 +1,14 @@
+# Bundled sing-box cores.
+#
+# Version rows use: <channel> <version>
+# Checksum rows use: <channel> <release-arch> <sha256>
+#
+# Update a channel here; the checksum rows do not repeat the version.
+
+stable 1.14.4
+alpha 1.15.0-alpha.13
+
+stable amd64 231e57c18378f780a08de832844a1ca9716e17a7bcf82964b350844d243c03ac
+stable arm64 241cb4ccbf1a003235f8a969cc25d28cc74487df52721f6de28be7e37eae2ae9
+alpha amd64 bbacd7b220ca9bd361e6f4d2cc716fd8d7ac2d821f18c6276175e72ba6f0a61a
+alpha arm64 1e14f1dee14d1fefb5120f77ff2aaf1e2c23d797ee64025024fda0e18d4cf21c
