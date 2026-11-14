@@ -9,6 +9,7 @@
     "lib": ["ESNext", "DOM"],
 
     "paths": {
+      "@daemon/*": ["./src/features/daemon/*"],
       "@profile/*": ["./src/features/profile/*"],
 
       "@/*": ["./src/*"],

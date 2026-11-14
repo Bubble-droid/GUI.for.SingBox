@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { isDaemonCoreMode } from '@daemon/mode'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -16,6 +17,7 @@ defineProps<Props>()
 const model = defineModel<App.Profile['route']>({ required: true })
 
 const activeKey = ref('common')
+const daemonMode = isDaemonCoreMode()
 const rulesConfigRef = useTemplateRef('rulesConfigRef')
 const rulesetConfigRef = useTemplateRef('rulesetConfigRef')
 const tabs = [
@@ -43,7 +45,11 @@ defineExpose({ handleAdd })
     <template #common>
       <div class="form-item">
         {{ t('kernel.route.find_process') }}
-        <Switch v-model="model.find_process" />
+        <Switch
+          v-model="model.find_process"
+          :disabled="daemonMode"
+          :label="daemonMode ? t('kernel.route.find_processDaemon') : ''"
+        />
       </div>
       <div class="form-item">
         {{ t('kernel.route.auto_detect_interface') }}

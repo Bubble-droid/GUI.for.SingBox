@@ -1,3 +1,5 @@
+import { applyDaemonCoreConfig } from '@daemon/config'
+import { isDaemonCoreMode } from '@daemon/mode'
 import { parse } from 'yaml'
 
 import { ReadFile, WriteFile } from '@/bridge'
@@ -15,19 +17,39 @@ import {
 } from '@/enums/kernel'
 import {
   useAppSettingsStore,
+  useEnvStore,
   usePluginsStore,
   useRulesetsStore,
   useSubscribesStore,
 } from '@/stores'
-import { deepAssign, deepClone, APP_TITLE, createTextMatcher } from '@/utils'
+import { deepAssign, deepClone, APP_TITLE, createTextMatcher, processMagicVariables } from '@/utils'
 
 const dataPrefix = `${DataDirectory}/`
 
-// The generated core config lives in data/sing-box, so local rulesets are
-// referenced relative to that directory.
-const toRelativeDataPath = (path?: string) => {
+// The generated core config lives in data/sing-box. Portable cores resolve
+// local rulesets relative to that directory; the daemon core runs in its own
+// working directory, so the same paths must become absolute user data paths.
+const toCoreDataPath = (path?: string) => {
   if (!path?.startsWith(dataPrefix)) return path
-  return `../${path.slice(dataPrefix.length)}`
+  const relativePath = path.slice(dataPrefix.length)
+  if (isDaemonCoreMode()) {
+    return `${useEnvStore().env.dataDir}/${relativePath}`
+  }
+  return `../${relativePath}`
+}
+
+// expandMagicVariables rewrites magic variables inside plugin, mixin and script
+// output. The daemon runs as root with a fixed environment, so every path must
+// be absolute before submission.
+const expandMagicVariables = (value: any): any => {
+  if (typeof value === 'string') return processMagicVariables(value)
+  if (Array.isArray(value)) return value.map((item) => expandMagicVariables(item))
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, expandMagicVariables(item)]),
+    )
+  }
+  return value
 }
 
 const _generateRule = (
@@ -265,7 +287,7 @@ const generateRoute = (
         extra.rules = JSON.parse(ruleset.rules)
       } else if (ruleset.type === RulesetType.Local) {
         const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
-        extra.path = toRelativeDataPath(_ruleset?.path)
+        extra.path = toCoreDataPath(_ruleset?.path)
         extra.format = ruleset.format
       } else if (ruleset.type === RulesetType.Remote) {
         extra.url = ruleset.url
@@ -282,7 +304,9 @@ const generateRoute = (
       }
     }),
     auto_detect_interface: route.auto_detect_interface,
-    find_process: route.find_process ? true : undefined,
+    // The package daemon runs as root and must attribute every connection to
+    // a system process, so process lookup stays enabled in daemon mode.
+    find_process: route.find_process || isDaemonCoreMode() ? true : undefined,
     final: getOutbound(route.final),
     default_http_client: getOutbound(route.default_http_client),
     default_domain_resolver: {
@@ -517,6 +541,12 @@ export const generateConfig = async (
     }
   }
 
+  // The daemon runs the core as root with a fixed working directory, so plugin,
+  // mixin and script output must not contain relative magic variables.
+  if (isDaemonCoreMode()) {
+    config = expandMagicVariables(config)
+  }
+
   return config
 }
 
@@ -529,7 +559,15 @@ export const generateConfigFile = async (
   const _config = await generateConfig(profile)
   const config = await beforeWrite(_config)
 
+  // The daemon core runs inside its own per-user directory, so the cache file
+  // stays relative there. Portable cores keep the same layout.
   config.experimental.cache_file.path = 'cache.db'
 
-  await WriteFile(CoreConfigFilePath, JSON.stringify({ $schema: header, ...config }, null, 2))
+  const document = { $schema: header, ...config }
+  if (isDaemonCoreMode()) {
+    await applyDaemonCoreConfig(document)
+    return
+  }
+
+  await WriteFile(CoreConfigFilePath, JSON.stringify(document, null, 2))
 }

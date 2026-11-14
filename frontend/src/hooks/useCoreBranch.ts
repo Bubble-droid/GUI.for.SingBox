@@ -1,3 +1,5 @@
+import { isDaemonCoreMode, getCoreChannel } from '@daemon/mode'
+import { daemonCoreDirectory, readDaemonCoreVersion } from '@daemon/version'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -59,23 +61,35 @@ export const useCoreBranch = (isAlpha = false) => {
   const appSettings = useAppSettingsStore()
   const kernelApiStore = useKernelApiStore()
 
+  // The system package bundles both core channels and the root daemon owns
+  // their lifecycle. Self-update, file capabilities and rollback are disabled.
+  const daemonMode = isDaemonCoreMode()
+
   const restartable = computed(() => {
+    if (daemonMode) return false
     const { branch } = appSettings.app.kernel
     if (!kernelApiStore.running) return false
     return localVersion.value && downloadCompleted.value && (branch === Branch.Alpha) === isAlpha
   })
 
   const updatable = computed(
-    () => remoteVersion.value && localVersion.value !== remoteVersion.value,
+    () => !daemonMode && remoteVersion.value && localVersion.value !== remoteVersion.value,
   )
 
-  const grantable = computed(() => localVersion.value && envStore.env.os !== OS.Windows)
+  const grantable = computed(
+    () => !daemonMode && localVersion.value && envStore.env.os !== OS.Windows,
+  )
 
   const coreFileName = getKernelFileName(isAlpha)
   const CoreFilePath = `${CoreWorkingDirectory}/${coreFileName}`
   const CoreBakFilePath = `${BackupDirectory}/${coreFileName}.bak`
 
   const downloadCore = async () => {
+    if (daemonMode) {
+      message.error('settings.kernel.daemon.updateDisabled')
+      return
+    }
+
     downloading.value = true
     downloadProgress.value = ''
     cancelDownload.value = undefined
@@ -159,6 +173,21 @@ export const useCoreBranch = (isAlpha = false) => {
 
   const getLocalVersion = async (showTips = false) => {
     localVersionLoading.value = true
+
+    if (daemonMode) {
+      try {
+        const version = await readDaemonCoreVersion(getCoreChannel(isAlpha))
+        versionDetail.value = version
+        return version.match(/version (\S+)/)?.[1] || version
+      } catch (error: any) {
+        console.log(error)
+        showTips && message.error(error)
+        return ''
+      } finally {
+        localVersionLoading.value = false
+      }
+    }
+
     try {
       const res = await Exec(CoreFilePath, ['version'])
       versionDetail.value = res.trim()
@@ -173,6 +202,7 @@ export const useCoreBranch = (isAlpha = false) => {
   }
 
   const getRemoteVersion = async (showTips = false) => {
+    if (daemonMode) return ''
     remoteVersionLoading.value = true
     try {
       const { body } = await HttpGet<Record<string, any>>(releaseUrl, {
@@ -215,6 +245,7 @@ export const useCoreBranch = (isAlpha = false) => {
   }
 
   const rollbackCore = async () => {
+    if (daemonMode) return
     await confirm('common.warning', 'settings.kernel.rollback')
 
     const doRollback = () => MoveFile(CoreBakFilePath, CoreFilePath)
@@ -235,6 +266,12 @@ export const useCoreBranch = (isAlpha = false) => {
   }
 
   const openFileLocation = async () => {
+    if (daemonMode) {
+      await OpenDir(
+        (await daemonCoreDirectory(getCoreChannel(isAlpha))) || '/usr/lib/gui-for-singbox',
+      )
+      return
+    }
     await OpenDir(CoreWorkingDirectory)
   }
 
@@ -246,6 +283,10 @@ export const useCoreBranch = (isAlpha = false) => {
   watch(
     [localVersion, downloadCompleted],
     debounce(async () => {
+      if (daemonMode) {
+        rollbackable.value = false
+        return
+      }
       rollbackable.value = await FileExists(CoreBakFilePath)
     }, 500),
   )
@@ -254,6 +295,7 @@ export const useCoreBranch = (isAlpha = false) => {
   refreshRemoteVersion()
 
   return {
+    daemonMode,
     restartable,
     updatable,
     grantable,

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
+import { DaemonClearCache } from '@/bridge/daemon'
+
 import { RemoveFile } from '@/bridge'
 import { CoreCacheFilePath } from '@/constant/kernel'
 import { useCoreBranch } from '@/hooks/useCoreBranch'
@@ -19,6 +21,7 @@ const { t } = useI18n()
 const kernelApiStore = useKernelApiStore()
 
 const {
+  daemonMode,
   restartable,
   updatable,
   grantable,
@@ -43,7 +46,13 @@ const {
 
 const handleClearCoreCache = async () => {
   try {
-    if (kernelApiStore.running) {
+    if (daemonMode) {
+      if (kernelApiStore.running) {
+        await kernelApiStore.restartCore(DaemonClearCache)
+      } else {
+        await DaemonClearCache()
+      }
+    } else if (kernelApiStore.running) {
       await kernelApiStore.restartCore(() => RemoveFile(CoreCacheFilePath))
     } else {
       await RemoveFile(CoreCacheFilePath)
@@ -99,6 +108,7 @@ const handleClearCoreCache = async () => {
       @click="openFileLocation"
     />
     <Button
+      v-if="!daemonMode"
       v-tips="'settings.kernel.config.name'"
       type="text"
       size="small"
@@ -121,6 +131,7 @@ const handleClearCoreCache = async () => {
         {{ localVersionLoading ? 'Loading' : localVersion || t('kernel.notFound') }}
       </Tag>
       <Tag
+        v-if="!daemonMode"
         :color="updatable ? 'purple' : 'default'"
         class="cursor-pointer"
         @click="refreshRemoteVersion(true)"
@@ -128,6 +139,9 @@ const handleClearCoreCache = async () => {
         {{ t('settings.kernel.remote') }}
         :
         {{ remoteVersionLoading ? 'Loading' : remoteVersion }}
+      </Tag>
+      <Tag v-else color="green">
+        {{ t('settings.kernel.daemon.managed') }}
       </Tag>
       <Button
         v-show="!localVersionLoading && !remoteVersionLoading && updatable"

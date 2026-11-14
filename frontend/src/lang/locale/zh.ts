@@ -167,6 +167,7 @@ export default {
         rule_set: '规则集',
       },
       find_process: '查找进程信息',
+      find_processDaemon: '系统守护进程方案强制启用，以追踪系统进程连接',
       auto_detect_interface: '自动检测出站接口',
       default_interface: '出站接口名称',
       final: '默认出站标签',
@@ -783,6 +784,10 @@ export default {
         name: '运行时配置',
         env: '环境变量',
         args: '运行参数',
+      },
+      daemon: {
+        managed: '由系统守护进程管理',
+        updateDisabled: '系统软件包安装的核心由系统包管理器更新，不支持自动更新',
       },
     },
     plugin: {

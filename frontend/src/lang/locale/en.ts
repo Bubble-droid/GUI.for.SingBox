@@ -167,6 +167,7 @@ export default {
         rule_set: 'Rule-Set',
       },
       find_process: 'Find Process',
+      find_processDaemon: 'Forced by the system daemon mode to track system process connections',
       auto_detect_interface: 'Auto Detect Interface',
       default_interface: 'Default Interface',
       final: 'Final Outbound Tag',
@@ -785,6 +786,11 @@ export default {
         name: 'Runtime Configuration',
         env: 'Environment Variables',
         args: 'Runtime Arguments',
+      },
+      daemon: {
+        managed: 'Managed by the system daemon',
+        updateDisabled:
+          'The system package manager updates the packaged core; self-update is disabled',
       },
     },
     plugin: {

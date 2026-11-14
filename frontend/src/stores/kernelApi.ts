@@ -1,6 +1,17 @@
+import { readDaemonCoreConfig } from '@daemon/config'
+import { readDaemonCoreLog, waitForDaemonCoreApi } from '@daemon/lifecycle'
+import { isDaemonCoreMode, getCoreChannel } from '@daemon/mode'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import {
+  OnDaemonCoreState,
+  DaemonWatch,
+  DaemonStatus,
+  DaemonStart,
+  DaemonStop,
+} from '@/bridge/daemon'
 
 import {
   getProxies,
@@ -96,7 +107,9 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     }
 
     if (!runtimeProfile) {
-      const txt = await ReadFile(CoreConfigFilePath)
+      const txt = isDaemonCoreMode()
+        ? await readDaemonCoreConfig()
+        : await ReadFile(CoreConfigFilePath)
       runtimeProfile = restoreProfile(JSON.parse(txt))
       const profile = profilesStore.currentProfile
       if (profile) {
@@ -254,8 +267,64 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   const coreStateLoading = ref(true)
   let isCoreStartedByThisInstance = false
   let { promise: coreStoppedPromise, resolve: coreStoppedResolver } = Promise.withResolvers()
+  let unsubscribeDaemonState: (() => void) | undefined
+
+  const recordDaemonLog = async () => {
+    const logs = await readDaemonCoreLog().catch(() => '')
+    logs.split('\n').forEach((line) => line && logsStore.recordKernelLog(line))
+  }
+
+  const waitForDaemonApi = () => waitForDaemonCoreApi(() => probeApiAvailability().then(Boolean))
+
+  const initDaemonCoreState = async () => {
+    unsubscribeDaemonState?.()
+    unsubscribeDaemonState = OnDaemonCoreState(async (status) => {
+      try {
+        if (status.state === 'running') {
+          if (running.value && corePid.value === status.pid) return
+          if (await waitForDaemonApi()) {
+            await onCoreStarted(status.pid)
+          }
+          return
+        }
+        if (status.state === 'failed') {
+          status.lastError && message.error(status.lastError)
+          await recordDaemonLog()
+        }
+        if (status.state === 'stopped' || status.state === 'failed') {
+          await onCoreStopped()
+        }
+      } catch (error: any) {
+        message.error(error)
+      }
+    })
+
+    await DaemonWatch()
+    const status = await DaemonStatus()
+
+    coreStateLoading.value = false
+
+    if (status.state === 'running') {
+      if (await waitForDaemonApi()) {
+        await onCoreStarted(status.pid)
+      }
+    } else {
+      if (status.state === 'failed' && status.lastError) {
+        message.error(status.lastError)
+        await recordDaemonLog()
+      }
+      if (appSettingsStore.app.autoStartKernel) {
+        await startCore()
+      }
+    }
+  }
 
   const initCoreState = async () => {
+    if (isDaemonCoreMode()) {
+      await initDaemonCoreState()
+      return
+    }
+
     corePid.value = Number(await ReadFile(CorePidFilePath).catch(() => -1))
     const processName = corePid.value === -1 ? '' : await ProcessInfo(corePid.value).catch(() => '')
     running.value = processName.startsWith('sing-box')
@@ -304,6 +373,8 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   }
 
   const onCoreStarted = async (pid: number) => {
+    if (running.value && corePid.value === pid) return
+
     corePid.value = pid
     running.value = true
     needRestart.value = false
@@ -325,13 +396,15 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   }
 
   const onCoreStopped = async () => {
-    if (!isCoreStartedByThisInstance) {
-      await RemoveFile(CorePidFilePath)
-    }
+    if (!running.value && corePid.value === -1) return
 
     corePid.value = -1
     running.value = false
     needRestart.value = false
+
+    if (!isDaemonCoreMode() && !isCoreStartedByThisInstance) {
+      await RemoveFile(CorePidFilePath)
+    }
 
     destroyWebsocket()
 
@@ -369,6 +442,16 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
         pluginsStore.onBeforeCoreStartTrigger(config, profile),
       )
       const isAlpha = branch === Branch.Alpha
+
+      if (isDaemonCoreMode()) {
+        const status = await DaemonStart(getCoreChannel(isAlpha))
+        if (!(await waitForDaemonApi())) {
+          throw t('kernel.startupFailed')
+        }
+        await onCoreStarted(status.pid)
+        return
+      }
+
       const pid = await runCoreProcess(isAlpha)
       pid && (await onCoreStarted(pid))
     } finally {
@@ -382,6 +465,13 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     stopping.value = true
     try {
       await pluginsStore.onBeforeCoreStopTrigger()
+
+      if (isDaemonCoreMode()) {
+        await DaemonStop()
+        await onCoreStopped()
+        return
+      }
+
       await KillProcess(corePid.value)
       await (isCoreStartedByThisInstance ? coreStoppedPromise : onCoreStopped())
     } finally {
