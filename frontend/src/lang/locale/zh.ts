@@ -813,7 +813,7 @@ export default {
     updateSuccessful: '更新完成',
     newVersion: '发现新版本',
     latestVersion: '已经是最新版本了',
-    updatesManagedByOS: '更新由您的操作系统管理',
+    updatesRequireWritableDir: '安装目录不可写，无法自动更新',
   },
   titlebar: {
     pin: '置顶',

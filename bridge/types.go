@@ -27,6 +27,10 @@ type EnvResult struct {
 	IsPrivileged bool   `json:"isPrivileged"`
 
 	IsSystemPackage bool `json:"isSystemPackage"`
+	// IsBinaryDirWritable reports whether the binary can replace itself on
+	// update. It accounts for the package build flag, legacy path detection
+	// and the actual directory permission.
+	IsBinaryDirWritable bool `json:"isBinaryDirWritable"`
 }
 
 type RequestOptions struct {

@@ -147,8 +147,8 @@ export const useAppStore = defineStore('app', () => {
   const updatable = computed(() => downloadUrl.value && APP_VERSION !== remoteVersion.value)
 
   const downloadApp = async () => {
-    if (envStore.env.isSystemPackage) {
-      message.info('about.updatesManagedByOS')
+    if (!envStore.env.isBinaryDirWritable) {
+      message.info('about.updatesRequireWritableDir')
       return
     }
     downloading.value = true

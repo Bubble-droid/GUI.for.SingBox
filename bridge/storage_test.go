@@ -9,11 +9,14 @@ func setTestEnv(t *testing.T, basePath string) {
 	t.Helper()
 
 	prevBasePath, prevDataDir, prevCacheDir, prevConfigDir := Env.BasePath, Env.DataDir, appCacheDir, appConfigDir
+	prevSystemPackage, prevWritable := Env.IsSystemPackage, Env.IsBinaryDirWritable
 	t.Cleanup(func() {
 		Env.BasePath = prevBasePath
 		Env.DataDir = prevDataDir
 		appCacheDir = prevCacheDir
 		appConfigDir = prevConfigDir
+		Env.IsSystemPackage = prevSystemPackage
+		Env.IsBinaryDirWritable = prevWritable
 	})
 
 	Env.BasePath = filepath.ToSlash(basePath)

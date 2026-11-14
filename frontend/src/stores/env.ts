@@ -20,6 +20,7 @@ export const useEnvStore = defineStore('env', () => {
     arch: '',
     isPrivileged: false,
     isSystemPackage: false,
+    isBinaryDirWritable: false,
   })
 
   const systemProxy = ref(false)
