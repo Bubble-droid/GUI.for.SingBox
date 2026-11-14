@@ -8,6 +8,28 @@ export function CloseMMDB(arg1:string,arg2:string):Promise<bridge.FlagResult>;
 
 export function CopyFile(arg1:string,arg2:string):Promise<bridge.FlagResult>;
 
+export function DaemonApplyConfig(arg1:string,arg2:string):Promise<bridge.FlagResult>;
+
+export function DaemonClearCache():Promise<bridge.FlagResult>;
+
+export function DaemonGetConfig():Promise<bridge.FlagResult>;
+
+export function DaemonInfo():Promise<bridge.FlagResult>;
+
+export function DaemonReadLog(arg1:number):Promise<bridge.FlagResult>;
+
+export function DaemonRestart(arg1:string):Promise<bridge.FlagResult>;
+
+export function DaemonStart(arg1:string):Promise<bridge.FlagResult>;
+
+export function DaemonStatus():Promise<bridge.FlagResult>;
+
+export function DaemonStop():Promise<bridge.FlagResult>;
+
+export function DaemonSwitch(arg1:string):Promise<bridge.FlagResult>;
+
+export function DaemonWatch():Promise<bridge.FlagResult>;
+
 export function Download(arg1:string,arg2:string,arg3:string,arg4:Record<string, string>,arg5:string,arg6:bridge.RequestOptions):Promise<bridge.HTTPResult>;
 
 export function Exec(arg1:string,arg2:Array<string>,arg3:bridge.ExecOptions):Promise<bridge.FlagResult>;

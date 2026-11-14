@@ -14,6 +14,50 @@ export function CopyFile(arg1, arg2) {
   return window['go']['bridge']['App']['CopyFile'](arg1, arg2);
 }
 
+export function DaemonApplyConfig(arg1, arg2) {
+  return window['go']['bridge']['App']['DaemonApplyConfig'](arg1, arg2);
+}
+
+export function DaemonClearCache() {
+  return window['go']['bridge']['App']['DaemonClearCache']();
+}
+
+export function DaemonGetConfig() {
+  return window['go']['bridge']['App']['DaemonGetConfig']();
+}
+
+export function DaemonInfo() {
+  return window['go']['bridge']['App']['DaemonInfo']();
+}
+
+export function DaemonReadLog(arg1) {
+  return window['go']['bridge']['App']['DaemonReadLog'](arg1);
+}
+
+export function DaemonRestart(arg1) {
+  return window['go']['bridge']['App']['DaemonRestart'](arg1);
+}
+
+export function DaemonStart(arg1) {
+  return window['go']['bridge']['App']['DaemonStart'](arg1);
+}
+
+export function DaemonStatus() {
+  return window['go']['bridge']['App']['DaemonStatus']();
+}
+
+export function DaemonStop() {
+  return window['go']['bridge']['App']['DaemonStop']();
+}
+
+export function DaemonSwitch(arg1) {
+  return window['go']['bridge']['App']['DaemonSwitch'](arg1);
+}
+
+export function DaemonWatch() {
+  return window['go']['bridge']['App']['DaemonWatch']();
+}
+
 export function Download(arg1, arg2, arg3, arg4, arg5, arg6) {
   return window['go']['bridge']['App']['Download'](arg1, arg2, arg3, arg4, arg5, arg6);
 }
