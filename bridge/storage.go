@@ -75,23 +75,30 @@ func dataDir() string {
 	return Env.DataDir
 }
 
-// xdgDataDir returns the per-user data directory for the app.
-func xdgDataDir() string {
+// userDataDir returns the per-user data directory for the app.
+func userDataDir() string {
 	return filepath.ToSlash(filepath.Join(xdg.DataHome, appDirName))
 }
 
-// xdgCacheDir returns the per-user cache directory for the app.
-func xdgCacheDir() string {
+// userCacheDir returns the per-user cache directory for the app.
+func userCacheDir() string {
 	return filepath.ToSlash(filepath.Join(xdg.CacheHome, appDirName))
 }
 
 // userConfigDir returns the per-user config directory for the app.
 func userConfigDir() string {
-	base := userConfigBase()
+	base := filepath.ToSlash(xdg.ConfigHome)
 	if base == "" {
 		return filepath.ToSlash(filepath.Join(Env.DataDir, "config"))
 	}
 	return filepath.ToSlash(filepath.Join(base, appDirName))
+}
+
+// isSystemPackageBuild reports whether the binary was built for a system
+// package. The injected build variable is the only source of truth for the
+// value exposed to the frontend.
+func isSystemPackageBuild() bool {
+	return SystemPackage == "true"
 }
 
 // appCacheDir and appConfigDir hold the resolved cache and config
@@ -212,16 +219,16 @@ func initDataDir() {
 
 	switch {
 	case !Env.IsBinaryDirWritable:
-		Env.DataDir = xdgDataDir()
-		appCacheDir = xdgCacheDir()
+		Env.DataDir = userDataDir()
+		appCacheDir = userCacheDir()
 		appConfigDir = userConfigDir()
 	case portableDataDirExists(portableDataDir):
 		Env.DataDir = filepath.ToSlash(portableDataDir)
 		appCacheDir = ""
 		appConfigDir = ""
 	default:
-		Env.DataDir = xdgDataDir()
-		appCacheDir = xdgCacheDir()
+		Env.DataDir = userDataDir()
+		appCacheDir = userCacheDir()
 		appConfigDir = userConfigDir()
 	}
 
