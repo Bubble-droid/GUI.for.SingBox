@@ -155,7 +155,7 @@ export const useAppStore = defineStore('app', () => {
     try {
       const { appName, os, appPath } = envStore.env
       const ext = os === OS.Windows ? '.zip' : '.tar.gz'
-      const downloadCacheFile = `data/.cache/gui${ext}`
+      const downloadCacheFile = `${CacheDirectory}/gui${ext}`
 
       const { update, destroy } = message.info('common.downloading', 10 * 60 * 1_000, () => {
         HttpCancel(downloadCacheFile)

@@ -1,14 +1,29 @@
 <script lang="ts" setup>
 import { MakeDir, OpenDir } from '@/bridge'
-import { RollingReleaseDirectory } from '@/constant/app'
+import {
+  CacheDirectory,
+  ConfigDirectory,
+  DataDirectory,
+  RollingReleaseDirectory,
+} from '@/constant/app'
 import { OS } from '@/enums/app'
-import { useAppSettingsStore, useEnvStore } from '@/stores'
+import { useAppSettingsStore } from '@/stores'
 
 const appSettings = useAppSettingsStore()
-const envStore = useEnvStore()
 
 const handleOpenFolder = async () => {
-  await OpenDir(envStore.env.dataDir)
+  await MakeDir(DataDirectory)
+  await OpenDir(DataDirectory)
+}
+
+const handleOpenConfigFolder = async () => {
+  await MakeDir(ConfigDirectory)
+  await OpenDir(ConfigDirectory)
+}
+
+const handleOpenCacheFolder = async () => {
+  await MakeDir(CacheDirectory)
+  await OpenDir(CacheDirectory)
 }
 
 const handleOpenRollingReleaseFolder = async () => {
@@ -25,6 +40,18 @@ const handleOpenRollingReleaseFolder = async () => {
       <div class="text-16 font-bold">{{ $t('settings.appFolder.name') }}</div>
       <Button type="primary" icon="folder" @click="handleOpenFolder">
         <span class="ml-8">{{ $t('settings.appFolder.open') }}</span>
+      </Button>
+    </div>
+    <div class="px-8 py-12 flex items-center justify-between">
+      <div class="text-16 font-bold">{{ $t('settings.appFolder.config') }}</div>
+      <Button type="primary" icon="folder" @click="handleOpenConfigFolder">
+        <span class="ml-8">{{ $t('settings.appFolder.openConfig') }}</span>
+      </Button>
+    </div>
+    <div class="px-8 py-12 flex items-center justify-between">
+      <div class="text-16 font-bold">{{ $t('settings.appFolder.cache') }}</div>
+      <Button type="primary" icon="folder" @click="handleOpenCacheFolder">
+        <span class="ml-8">{{ $t('settings.appFolder.openCache') }}</span>
       </Button>
     </div>
     <div class="px-8 py-12 flex items-center justify-between">

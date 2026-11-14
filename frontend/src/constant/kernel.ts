@@ -16,11 +16,12 @@ import {
   Network,
 } from '@/enums/kernel'
 
-export const CoreWorkingDirectory = 'data/sing-box'
-export const CorePidFilePath = CoreWorkingDirectory + '/pid.txt'
-export const CoreLogFilePath = CoreWorkingDirectory + '/sing-box.log'
-export const CoreConfigFilePath = CoreWorkingDirectory + '/config.json'
-export const CoreCacheFilePath = CoreWorkingDirectory + '/cache.db'
+export const CoreDirectoryName = 'sing-box'
+export const CoreWorkingDirectory = `data/${CoreDirectoryName}`
+export const CorePidFilePath = `${CoreWorkingDirectory}/pid.txt`
+export const CoreLogFilePath = `${CoreWorkingDirectory}/sing-box.log`
+export const CoreConfigFilePath = `${CoreWorkingDirectory}/config.json`
+export const CoreCacheFilePath = `${CoreWorkingDirectory}/cache.db`
 
 export const ModeOptions = [
   {
@@ -326,7 +327,7 @@ export const DefaultConnections = () => {
 }
 
 export const DefaultCoreConfig = () => {
-  const workDir = CoreWorkingDirectory.replace('data', '$APP_DATA_DIR')
+  const workDir = `$APP_DATA_DIR/${CoreDirectoryName}`
   return {
     env: {},
     args: ['run', '--disable-color', '-c', `${workDir}/config.json`, '-D', workDir],

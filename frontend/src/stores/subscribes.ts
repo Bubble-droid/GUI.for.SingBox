@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { parse } from 'yaml'
 
 import { ReadFile, WriteFile, Requests } from '@/bridge'
-import { DefaultSubscribeScript, SubscribesFilePath } from '@/constant/app'
+import { DefaultSubscribeScript, SubscribesDirectory, SubscribesFilePath } from '@/constant/app'
 import { DefaultExcludeProtocols } from '@/constant/kernel'
 import { PluginTriggerEvent, RequestMethod, RequestProxyMode } from '@/enums/app'
 import { usePluginsStore } from '@/stores'
@@ -265,7 +265,7 @@ export const useSubscribesStore = defineStore('subscribes', () => {
       type: 'Http',
       url: options.url || '',
       website: '',
-      path: `data/subscribes/${id}.json`,
+      path: `${SubscribesDirectory}/${id}.json`,
       include: '',
       exclude: '',
       includeProtocol: '',

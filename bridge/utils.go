@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"sync"
@@ -177,7 +178,7 @@ func RollingRelease(next http.Handler) http.Handler {
 			url = "/index.html"
 		}
 
-		filePath := resolvePath("data/rolling-release" + url)
+		filePath := resolvePath(path.Join("data", "rolling-release", url))
 		if _, err := os.Stat(filePath); err != nil {
 			next.ServeHTTP(w, r)
 			return

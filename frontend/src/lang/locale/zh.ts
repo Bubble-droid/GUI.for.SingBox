@@ -687,6 +687,10 @@ export default {
     appFolder: {
       name: '数据文件夹',
       open: '打开数据文件夹',
+      config: '配置文件夹',
+      openConfig: '打开配置文件夹',
+      cache: '缓存文件夹',
+      openCache: '打开缓存文件夹',
     },
     lang: {
       name: '语言',

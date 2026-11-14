@@ -2,6 +2,7 @@
 import { ref, inject, watch, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { LocalDirectory, RulesetsDirectory } from '@/constant/app'
 import { RulesetFormatOptions } from '@/constant/kernel'
 import { RulesetFormat } from '@/enums/kernel'
 import { useRulesetsStore } from '@/stores'
@@ -29,9 +30,18 @@ const ruleset = ref<App.RuleSet>({
   type: 'Http',
   url: '',
   count: 0,
-  path: `data/rulesets/${sampleID()}.srs`,
+  path: `${RulesetsDirectory}/${sampleID()}.srs`,
   disabled: false,
 })
+
+const localUrlPlaceholder = computed(
+  () =>
+    `${LocalDirectory}/{filename}.${ruleset.value.format === RulesetFormat.Binary ? 'srs' : 'json'}`,
+)
+const localPathPlaceholder = computed(
+  () =>
+    `${RulesetsDirectory}/{filename}.${ruleset.value.format === RulesetFormat.Binary ? 'srs' : 'json'}`,
+)
 
 const { t } = useI18n()
 const rulesetsStore = useRulesetsStore()
@@ -160,12 +170,7 @@ defineExpose({ modalSlots })
         <Input
           v-model="ruleset.url"
           allow-paste
-          :placeholder="
-            ruleset.type === 'Http'
-              ? 'http(s):/' + '/'
-              : 'data/local/{filename}.' +
-                (ruleset.format === RulesetFormat.Binary ? 'srs' : 'json')
-          "
+          :placeholder="ruleset.type === 'Http' ? 'http(s)://' : localUrlPlaceholder"
           class="w-full"
         />
       </div>
@@ -173,11 +178,7 @@ defineExpose({ modalSlots })
     <div class="form-item">
       {{ t('ruleset.path') }} *
       <div class="min-w-[75%]">
-        <Input
-          v-model="ruleset.path"
-          :placeholder="`data/rulesets/{filename}.${ruleset.format === RulesetFormat.Binary ? 'srs' : 'json'}`"
-          class="w-full"
-        />
+        <Input v-model="ruleset.path" :placeholder="localPathPlaceholder" class="w-full" />
       </div>
     </div>
   </div>

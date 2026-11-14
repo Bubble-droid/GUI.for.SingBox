@@ -16,7 +16,7 @@ import {
   FileExists,
   OpenDir,
 } from '@/bridge'
-import { BackupDirectory } from '@/constant/app'
+import { BackupDirectory, CacheDirectory } from '@/constant/app'
 import { CoreWorkingDirectory } from '@/constant/kernel'
 import { Branch, OS } from '@/enums/app'
 import { useAppSettingsStore, useEnvStore, useKernelApiStore } from '@/stores'
@@ -98,7 +98,7 @@ export const useCoreBranch = (isAlpha = false) => {
         })
       }
 
-      const downloadCacheFile = `data/.cache/${assetName}`
+      const downloadCacheFile = `${CacheDirectory}/${assetName}`
 
       cancelDownload.value = () => {
         HttpCancel(downloadCacheFile)
@@ -128,13 +128,13 @@ export const useCoreBranch = (isAlpha = false) => {
       await ignoredError(MoveFile, CoreFilePath, CoreBakFilePath)
 
       if (assetName.endsWith('.zip')) {
-        await UnzipZIPFile(downloadCacheFile, 'data/.cache')
-        const tmpPath = `data/.cache/${assetName.replace('.zip', '')}`
+        await UnzipZIPFile(downloadCacheFile, CacheDirectory)
+        const tmpPath = `${CacheDirectory}/${assetName.replace('.zip', '')}`
         await MoveFile(`${tmpPath}/${stableFileName}`, CoreFilePath)
         await RemoveFile(tmpPath)
       } else if (assetName.endsWith('.tar.gz')) {
-        await UnzipTarGZFile(downloadCacheFile, 'data/.cache')
-        const tmpPath = `data/.cache/${assetName.replace('.tar.gz', '')}`
+        await UnzipTarGZFile(downloadCacheFile, CacheDirectory)
+        const tmpPath = `${CacheDirectory}/${assetName.replace('.tar.gz', '')}`
         await MoveFile(`${tmpPath}/${stableFileName}`, CoreFilePath)
         await RemoveFile(tmpPath)
       }

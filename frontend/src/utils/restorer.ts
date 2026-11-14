@@ -1,3 +1,4 @@
+import { DataDirectory } from '@/constant/app'
 import * as Defaults from '@/constant/profile'
 import {
   Inbound,
@@ -33,6 +34,14 @@ const supportedRuleTypes = [
   RouteRuleType.IpAcceptAny,
   RouteRuleType.ClashMode,
 ]
+
+const dataPrefix = `${DataDirectory}/`
+
+// Local ruleset paths are stored relative to data/sing-box in generated configs.
+const toDataPath = (path: string) => {
+  if (!path.startsWith('../')) return path
+  return `${dataPrefix}${path.slice('../'.length)}`
+}
 
 const buildTagIdMapping = (prefix: string, arr?: Recordable[]): Recordable<string> => {
   if (!arr) return {}
@@ -329,7 +338,7 @@ const restoreRouteRuleset = (
       }
     } else if (ruleset.type === RulesetType.Local) {
       if ('path' in raw) {
-        const r = rulesetsStore.rulesets.find((v) => v.path === raw.path.replace('../', 'data/'))
+        const r = rulesetsStore.rulesets.find((v) => v.path === toDataPath(raw.path))
         if (r) {
           ruleset.path = r.id
         } else {

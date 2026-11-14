@@ -8,26 +8,30 @@ import (
 func setTestEnv(t *testing.T, basePath string) {
 	t.Helper()
 
-	prevBasePath, prevDataDir, prevCacheDir := Env.BasePath, Env.DataDir, appCacheDir
+	prevBasePath, prevDataDir, prevCacheDir, prevConfigDir := Env.BasePath, Env.DataDir, appCacheDir, appConfigDir
 	t.Cleanup(func() {
 		Env.BasePath = prevBasePath
 		Env.DataDir = prevDataDir
 		appCacheDir = prevCacheDir
+		appConfigDir = prevConfigDir
 	})
 
 	Env.BasePath = filepath.ToSlash(basePath)
 	Env.DataDir = filepath.ToSlash(basePath)
 	appCacheDir = ""
+	appConfigDir = ""
 }
 
 func TestResolvePath(t *testing.T) {
 	basePath := filepath.ToSlash(t.TempDir())
 	dataDir := filepath.ToSlash(t.TempDir())
 	cacheDir := filepath.ToSlash(t.TempDir())
+	configDir := filepath.ToSlash(t.TempDir())
 
 	setTestEnv(t, basePath)
 	Env.DataDir = dataDir
 	appCacheDir = cacheDir
+	appConfigDir = configDir
 
 	underBase := func(parts ...string) string {
 		return filepath.ToSlash(filepath.Join(append([]string{basePath}, parts...)...))
@@ -37,6 +41,9 @@ func TestResolvePath(t *testing.T) {
 	}
 	underCache := func(parts ...string) string {
 		return filepath.ToSlash(filepath.Join(append([]string{cacheDir}, parts...)...))
+	}
+	underConfig := func(parts ...string) string {
+		return filepath.ToSlash(filepath.Join(append([]string{configDir}, parts...)...))
 	}
 
 	tests := []struct {
@@ -68,6 +75,15 @@ func TestResolvePath(t *testing.T) {
 		{name: "cache file", path: "data/.cache/plugin-list.json", want: underCache("plugin-list.json")},
 		{name: "cache icons", path: "data/.cache/icons/logo.png", want: underCache("icons", "logo.png")},
 
+		// Config paths
+		{name: "config directory", path: "data/config", want: configDir},
+		{name: "config directory trailing slash", path: "data/config/", want: configDir},
+		{name: "config file", path: "data/config/user.yaml", want: underConfig("user.yaml")},
+		{name: "config nested file", path: "data/config/nested/file.yaml", want: underConfig("nested", "file.yaml")},
+		{name: "config duplicate slashes", path: "data//config//user.yaml", want: underConfig("user.yaml")},
+		{name: "config parent segments", path: "data/../data/config/user.yaml", want: underConfig("user.yaml")},
+		{name: "config prefix guard", path: "data/configuration/user.yaml", want: underData("configuration", "user.yaml")},
+
 		// Absolute paths are never remapped
 		{name: "absolute data file", path: underData("user.yaml"), want: underData("user.yaml")},
 		{name: "absolute base data directory", path: underBase("data"), want: underBase("data")},
@@ -87,6 +103,21 @@ func TestResolvePath(t *testing.T) {
 				t.Fatalf("resolvePath(%q) = %q, want %q", tt.path, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestResolvePathConfigFallback(t *testing.T) {
+	basePath := filepath.ToSlash(t.TempDir())
+	dataDir := filepath.ToSlash(t.TempDir())
+
+	setTestEnv(t, basePath)
+	Env.DataDir = dataDir
+	appConfigDir = ""
+
+	got := resolvePath("data/config/user.yaml")
+	want := filepath.ToSlash(filepath.Join(dataDir, "config", "user.yaml"))
+	if got != want {
+		t.Errorf("resolvePath(data/config/user.yaml) = %q, want %q", got, want)
 	}
 }
 

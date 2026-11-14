@@ -9,6 +9,12 @@ import (
 	"github.com/adrg/xdg"
 )
 
+const (
+	dataLogicalPrefix   = "data"
+	configLogicalPrefix = "data/config"
+	cacheLogicalPrefix  = "data/.cache"
+)
+
 func resolvePath(path string) string {
 	cleanPath := filepath.ToSlash(filepath.Clean(path))
 
@@ -16,13 +22,19 @@ func resolvePath(path string) string {
 		return cleanPath
 	}
 
-	if rel, ok := trimCachePrefix(cleanPath); ok {
+	if rel, ok := trimLogicalPrefix(cleanPath, cacheLogicalPrefix); ok {
 		resolvedPath := filepath.ToSlash(filepath.Join(cacheDir(), rel))
 		logResolvedPath(path, resolvedPath)
 		return resolvedPath
 	}
 
-	if rel, ok := trimDataPrefix(cleanPath); ok {
+	if rel, ok := trimLogicalPrefix(cleanPath, configLogicalPrefix); ok {
+		resolvedPath := filepath.ToSlash(filepath.Join(configDir(), rel))
+		logResolvedPath(path, resolvedPath)
+		return resolvedPath
+	}
+
+	if rel, ok := trimLogicalPrefix(cleanPath, dataLogicalPrefix); ok {
 		resolvedPath := filepath.ToSlash(filepath.Join(dataDir(), rel))
 		logResolvedPath(path, resolvedPath)
 		return resolvedPath
@@ -33,18 +45,7 @@ func resolvePath(path string) string {
 	return resolvedPath
 }
 
-func trimDataPrefix(path string) (string, bool) {
-	if path == "data" {
-		return "", true
-	}
-	if rest, ok := strings.CutPrefix(path, "data/"); ok {
-		return rest, true
-	}
-	return "", false
-}
-
-func trimCachePrefix(path string) (string, bool) {
-	const prefix = "data/.cache"
+func trimLogicalPrefix(path string, prefix string) (string, bool) {
 	if path == prefix {
 		return "", true
 	}
@@ -62,29 +63,51 @@ func cacheDir() string {
 	return filepath.ToSlash(filepath.Join(Env.DataDir, ".cache"))
 }
 
+func configDir() string {
+	if appConfigDir != "" {
+		return appConfigDir
+	}
+	// Fallback: under the data directory, preserving the portable layout.
+	return filepath.ToSlash(filepath.Join(Env.DataDir, "config"))
+}
+
 func dataDir() string {
 	return Env.DataDir
 }
 
-// xdgDataDir returns the per-user XDG data directory for the app.
+// xdgDataDir returns the per-user data directory for the app.
 func xdgDataDir() string {
 	return filepath.ToSlash(filepath.Join(xdg.DataHome, appDirName))
 }
 
-// xdgCacheDir returns the per-user XDG cache directory for the app.
+// xdgCacheDir returns the per-user cache directory for the app.
 func xdgCacheDir() string {
 	return filepath.ToSlash(filepath.Join(xdg.CacheHome, appDirName))
 }
 
-// appCacheDir holds the resolved cache directory; empty means fall back to
-// dataDir/.cache, preserving the portable self-contained layout. It is
-// package-internal and not part of Env.
-var appCacheDir string
+// userConfigDir returns the per-user config directory for the app.
+func userConfigDir() string {
+	base := userConfigBase()
+	if base == "" {
+		return filepath.ToSlash(filepath.Join(Env.DataDir, "config"))
+	}
+	return filepath.ToSlash(filepath.Join(base, appDirName))
+}
 
-// portableMarkerExists reports whether the portable marker file exists.
-func portableMarkerExists(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
+// appCacheDir and appConfigDir hold the resolved cache and config
+// directories; empty means fall back to a subdirectory of Env.DataDir,
+// preserving the portable self-contained layout. They are package-internal
+// and not part of Env.
+var (
+	appCacheDir  string
+	appConfigDir string
+)
+
+// portableDataDirExists reports whether the portable data directory exists.
+// Only the data directory itself is probed, never its contents.
+func portableDataDirExists(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && info.IsDir()
 }
 
 // isDirWritable reports whether dir can host new files (i.e. is writable).
@@ -109,40 +132,91 @@ func ensureDirs() {
 	if err := os.MkdirAll(cacheDir(), os.ModePerm); err != nil {
 		log.Printf("Failed to create cache directory %s: %v", cacheDir(), err)
 	}
+	if err := os.MkdirAll(configDir(), os.ModePerm); err != nil {
+		log.Printf("Failed to create config directory %s: %v", configDir(), err)
+	}
 }
 
-// initDataDir resolves the data and cache directories for the current
+// legacyConfigFiles lists the YAML files that used to live directly in the
+// data directory before configuration was moved into its own directory.
+var legacyConfigFiles = []string{
+	"user.yaml",
+	"profiles.yaml",
+	"subscribes.yaml",
+	"rulesets.yaml",
+	"plugins.yaml",
+	"scheduledtasks.yaml",
+}
+
+// migrateLegacyConfigs moves configuration files from the old data directory
+// to the config directory. Existing files in the target directory always win.
+func migrateLegacyConfigs(sourceDir string, targetDir string) {
+	if filepath.Clean(sourceDir) == filepath.Clean(targetDir) {
+		return
+	}
+
+	for _, name := range legacyConfigFiles {
+		source := filepath.Join(sourceDir, name)
+		target := filepath.Join(targetDir, name)
+
+		info, err := os.Stat(source)
+		if err != nil || info.IsDir() {
+			continue
+		}
+		if _, err := os.Stat(target); err == nil {
+			continue
+		}
+		if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+			log.Printf("Failed to create config directory %s: %v", targetDir, err)
+			continue
+		}
+		if err := moveFileAcrossDevices(source, target); err != nil {
+			log.Printf("Failed to migrate legacy config %s: %v", maskUserHome(source), err)
+			continue
+		}
+		log.Printf("Migrated legacy config: %s", maskUserHome(target))
+	}
+}
+
+// initDataDir resolves the data, cache and config directories for the current
 // installation. The resolution order is:
-//  1. Installed as a system package (Linux) — always use XDG directories.
-//  2. App binary directory is not writable — use XDG directories.
-//  3. Portable marker exists next to the app root — stay self-contained:
-//     data under root/data, cache under data/.cache (appCacheDir left empty).
-//  4. Default — use XDG directories.
+//  1. Installed as a system package (Linux) — always use per-user directories.
+//  2. App binary directory is not writable — use per-user directories.
+//  3. Portable data directory exists next to the app root — stay
+//     self-contained: data under root/data, config under data/config and cache
+//     under data/.cache.
+//  4. Default — use per-user directories.
 //
 // Platform hooks are supplied by the platform files:
 //   - portableRoot: the app root hosting portable data (macOS strips the
 //     bundle-internal .app/Contents/MacOS segments; Linux is BasePath).
 //   - isSystemPackage: real detection on Linux, always false elsewhere.
+//   - userConfigBase: the platform user config directory.
 func initDataDir() {
 	root := portableRoot()
-	portableMarker := filepath.Join(root, "data", "user.yaml")
+	portableDataDir := filepath.Join(root, "data")
 
 	switch {
 	case isSystemPackage():
 		Env.IsSystemPackage = true
 		Env.DataDir = xdgDataDir()
 		appCacheDir = xdgCacheDir()
+		appConfigDir = userConfigDir()
 	case !isDirWritable(Env.BasePath):
 		Env.DataDir = xdgDataDir()
 		appCacheDir = xdgCacheDir()
-	case portableMarkerExists(portableMarker):
-		Env.DataDir = filepath.ToSlash(filepath.Join(root, "data"))
+		appConfigDir = userConfigDir()
+	case portableDataDirExists(portableDataDir):
+		Env.DataDir = filepath.ToSlash(portableDataDir)
 		appCacheDir = ""
+		appConfigDir = ""
 	default:
 		Env.DataDir = xdgDataDir()
 		appCacheDir = xdgCacheDir()
+		appConfigDir = userConfigDir()
 	}
 
+	migrateLegacyConfigs(Env.DataDir, configDir())
 	ensureDirs()
 }
 

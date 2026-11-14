@@ -257,7 +257,7 @@ func extractFiles(fs embed.FS, srcDir, dstDir string) {
 
 	for _, file := range files {
 		fileName := file.Name()
-		dstPath := resolvePath(dstDir + "/" + fileName)
+		dstPath := resolvePath(filepath.Join(dstDir, fileName))
 		if _, err := os.Stat(dstPath); os.IsNotExist(err) {
 			log.Printf("InitResources [%s]: %s", dstDir, fileName)
 			data, err := fs.ReadFile(srcDir + "/" + fileName)
@@ -273,7 +273,7 @@ func extractFiles(fs embed.FS, srcDir, dstDir string) {
 }
 
 func loadConfig() {
-	b, err := os.ReadFile(resolvePath("data/user.yaml"))
+	b, err := os.ReadFile(resolvePath("data/config/user.yaml"))
 	if err == nil {
 		if err := yaml.Unmarshal(b, &Config); err != nil {
 			log.Printf("Failed to parse user config: %v", err)

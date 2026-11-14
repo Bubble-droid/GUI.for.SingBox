@@ -11,7 +11,8 @@ import {
   WindowReloadApp,
   WriteFile,
 } from '@/bridge'
-import { CoreWorkingDirectory } from '@/constant/kernel'
+import { CacheDirectory, RulesetsDirectory } from '@/constant/app'
+import { CoreDirectoryName } from '@/constant/kernel'
 import { OS, RequestProxyMode } from '@/enums/app'
 import { RulesetFormat } from '@/enums/kernel'
 import i18n from '@/lang'
@@ -218,7 +219,7 @@ export const EnableAutoStart = async (delay = 10) => {
   const { os, appPath, isPrivileged } = useEnvStore().env
   const configuration = getAutoStartConfiguration(os, appPath, delay)
   if (os === OS.Windows) {
-    const xmlPath = await AbsolutePath('data/.cache/tasksch.xml')
+    const xmlPath = await AbsolutePath(`${CacheDirectory}/tasksch.xml`)
     await WriteFile(xmlPath, configuration)
     const fn = isPrivileged ? Exec : RunWithPowerShell
     await fn('SchTasks', ['/Create', '/F', '/TN', APP_TITLE, '/XML', xmlPath], {
@@ -285,7 +286,7 @@ export const addToRuleSet = async (
   id: 'direct' | 'reject' | 'proxy',
   payloads: Record<string, any>[],
 ) => {
-  const path = `data/rulesets/${id}.json`
+  const path = `${RulesetsDirectory}/${id}.json`
 
   const rulesetsStoe = useRulesetsStore()
   let ruleset = rulesetsStoe.getRulesetById(id)
@@ -423,10 +424,11 @@ export const processMagicVariables = (str: string) => {
   // user-data (XDG) mode $APP_BASE_PATH no longer points at the data root, so
   // rewrite the composed pattern to the real data dir first. This keeps the old
   // launch config working no matter which storage mode is active.
-  // CoreWorkingDirectory is already a relative data path (starts with `data/`),
-  // so strip that prefix and append it to the real data dir.
-  const coreDir = CoreWorkingDirectory.slice('data/'.length)
-  result = result.replaceAll('$APP_BASE_PATH/$CORE_BASE_PATH', `${env.dataDir}/${coreDir}`)
+  // The core working directory lives under the real data dir.
+  result = result.replaceAll(
+    '$APP_BASE_PATH/$CORE_BASE_PATH',
+    `${env.dataDir}/${CoreDirectoryName}`,
+  )
 
   Object.entries({
     $APP_BASE_PATH: env.basePath,

@@ -11,31 +11,43 @@ import {
   WebviewGpuPolicy,
   WindowStartState,
 } from '@/enums/app'
-import { APP_TITLE } from '@/utils'
+import { APP_TITLE } from '@/utils/env'
 
-export const LocalesFilePath = 'data/locales'
+export const DataDirectory = 'data'
 
-export const UserFilePath = 'data/user.yaml'
+export const ConfigDirectory = `${DataDirectory}/config`
 
-export const ProfilesFilePath = 'data/profiles.yaml'
+export const CacheDirectory = `${DataDirectory}/.cache`
 
-export const SubscribesFilePath = 'data/subscribes.yaml'
+export const LocalesFilePath = `${DataDirectory}/locales`
 
-export const RulesetsFilePath = 'data/rulesets.yaml'
+export const UserFilePath = `${ConfigDirectory}/user.yaml`
 
-export const PluginsFilePath = 'data/plugins.yaml'
+export const ProfilesFilePath = `${ConfigDirectory}/profiles.yaml`
 
-export const ScheduledTasksFilePath = 'data/scheduledtasks.yaml'
+export const SubscribesFilePath = `${ConfigDirectory}/subscribes.yaml`
 
-export const PluginHubFilePath = 'data/.cache/plugin-list.json'
+export const RulesetsFilePath = `${ConfigDirectory}/rulesets.yaml`
 
-export const RulesetHubFilePath = 'data/.cache/ruleset-list.json'
+export const PluginsFilePath = `${ConfigDirectory}/plugins.yaml`
 
-export const RollingReleaseDirectory = 'data/rolling-release'
+export const ScheduledTasksFilePath = `${ConfigDirectory}/scheduledtasks.yaml`
 
-export const BackupDirectory = 'data/backup'
+export const PluginHubFilePath = `${CacheDirectory}/plugin-list.json`
 
-export const CacheDirectory = 'data/.cache'
+export const RulesetHubFilePath = `${CacheDirectory}/ruleset-list.json`
+
+export const RollingReleaseDirectory = `${DataDirectory}/rolling-release`
+
+export const BackupDirectory = `${DataDirectory}/backup`
+
+export const LocalDirectory = `${DataDirectory}/local`
+
+export const SubscribesDirectory = `${DataDirectory}/subscribes`
+
+export const PluginsDirectory = `${DataDirectory}/plugins`
+
+export const RulesetsDirectory = `${DataDirectory}/rulesets`
 
 export const DefaultFontFamily =
   'system-ui, "Microsoft YaHei UI", "Source Han Sans CN", "Twemoji Mozilla", sans-serif'

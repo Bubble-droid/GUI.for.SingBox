@@ -1,6 +1,7 @@
 import { parse } from 'yaml'
 
 import { ReadFile, WriteFile } from '@/bridge'
+import { DataDirectory } from '@/constant/app'
 import { CoreConfigFilePath } from '@/constant/kernel'
 import { Branch } from '@/enums/app'
 import {
@@ -19,6 +20,15 @@ import {
   useSubscribesStore,
 } from '@/stores'
 import { deepAssign, deepClone, APP_TITLE, createTextMatcher } from '@/utils'
+
+const dataPrefix = `${DataDirectory}/`
+
+// The generated core config lives in data/sing-box, so local rulesets are
+// referenced relative to that directory.
+const toRelativeDataPath = (path?: string) => {
+  if (!path?.startsWith(dataPrefix)) return path
+  return `../${path.slice(dataPrefix.length)}`
+}
 
 const _generateRule = (
   rule: App.Rule | App.DnsRule,
@@ -255,7 +265,7 @@ const generateRoute = (
         extra.rules = JSON.parse(ruleset.rules)
       } else if (ruleset.type === RulesetType.Local) {
         const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
-        extra.path = _ruleset?.path.replace('data/', '../')
+        extra.path = toRelativeDataPath(_ruleset?.path)
         extra.format = ruleset.format
       } else if (ruleset.type === RulesetType.Remote) {
         extra.url = ruleset.url
