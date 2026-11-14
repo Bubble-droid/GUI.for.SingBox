@@ -1,7 +1,7 @@
 SHELL := bash
 TASK := ./scripts/task.sh
 
-.PHONY: init install-tools install-wails install-nfpm dev build-frontend build-windows build-macos build-linux all package-deb package-rpm package-pacman package-linux clean help
+.PHONY: init install-tools install-wails install-nfpm dev build-frontend build-windows build-macos build-linux build-linux-package all package-deb package-rpm package-pacman package-linux clean help
 
 all:
 	@bash $(TASK) all
@@ -35,6 +35,9 @@ build-macos:
 
 build-linux:
 	@bash $(TASK) build-linux
+
+build-linux-package:
+	@bash $(TASK) build-linux-package
 
 package-deb:
 	@bash $(TASK) package-deb

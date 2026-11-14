@@ -8,13 +8,19 @@ import (
 const unknown = "unknown"
 
 var (
-	// Set by -ldflags in release builds; see doc.go.
+	// Set by -ldflags in release builds.
 	GitVersion   = unknown
 	GitCommit    = unknown
 	GitTreeState = unknown
 	BuildDate    = unknown
 	BuiltBy      = unknown
 	ModuleSum    = unknown
+
+	// SystemPackage records whether this binary was built for a system
+	// package. Linux package builds inject "true" via -ldflags; "false"
+	// disables the per-user directory layout, and unknown keeps the runtime
+	// path-based detection in charge.
+	SystemPackage = unknown
 
 	GoVersion = runtime.Version()
 	Compiler  = runtime.Compiler

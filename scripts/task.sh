@@ -110,6 +110,18 @@ LDFLAGS=(
 )
 LDFLAGS_BASE="${LDFLAGS[*]}"
 
+# Dedicated Linux package binary: inject the system package flag so package
+# installs always use the per-user directories. Builds without the flag keep
+# the path-based detection as a fallback.
+PACKAGE_LDFLAGS=(
+  "-X '${GO_MODULE}/bridge.SystemPackage=true'"
+)
+LDFLAGS_PACKAGE="${LDFLAGS_BASE} ${PACKAGE_LDFLAGS[*]}"
+
+# Records that build/bin/gui-for-singbox was produced by
+# build-linux-package, so packaging steps can reuse it across make runs.
+LINUX_PACKAGE_MARKER="${BIN_DIR}/.linux-package"
+
 # === prerequisites & init ===
 _PATCH_MACOS_DONE=0
 
@@ -139,11 +151,14 @@ init() {
 }
 
 # === packaging (nFPM) ===
-check_binary() {
-  if [[ ! -f "${BIN_DIR}/${PKG_NAME}" ]]; then
-    echo "==> Error: Linux binary '${BIN_DIR}/${PKG_NAME}' not found. Please run '$(basename "$0") build-linux' first." >&2
-    exit 1
+# ensure_package_binary guarantees the binary the packages ship was built with
+# the system package flag. A portable build (or a fresh checkout) triggers the
+# dedicated package build instead of being packaged silently.
+ensure_package_binary() {
+  if [[ -f "${BIN_DIR}/${PKG_NAME}" && -f "$LINUX_PACKAGE_MARKER" ]]; then
+    return 0
   fi
+  build_linux_package
 }
 
 # === bundled sing-box cores ===
@@ -343,10 +358,17 @@ build_macos() {
 build_linux() {
   echo "==> Building Linux binary (${ARCH})..."
   GOOS=linux GOARCH="$ARCH" "$WALIS_BIN" build "${WAILS_FLAGS[@]}" -ldflags "$LDFLAGS_BASE" -tags webkit2_41 -o "$PKG_NAME"
+  rm -f "$LINUX_PACKAGE_MARKER"
   (
     cd "$BIN_DIR" &&
       tar -czvf "${APP_NAME}-${ARCHIVE_VERSION}-linux-${ARCH}.tar.gz" "$PKG_NAME"
   )
+}
+
+build_linux_package() {
+  echo "==> Building dedicated Linux package binary (${ARCH})..."
+  GOOS=linux GOARCH="$ARCH" "$WALIS_BIN" build "${WAILS_FLAGS[@]}" -ldflags "$LDFLAGS_PACKAGE" -tags webkit2_41 -o "$PKG_NAME"
+  touch "$LINUX_PACKAGE_MARKER"
 }
 
 all() {
@@ -375,7 +397,7 @@ dev() {
 }
 
 package_deb() {
-  check_binary
+  ensure_package_binary
   prepare_cores
   mkdir -p "$PKGS_DIR"
   echo "==> Packaging Debian (.deb) for ${DEB_ARCH}..."
@@ -384,7 +406,7 @@ package_deb() {
 }
 
 package_rpm() {
-  check_binary
+  ensure_package_binary
   prepare_cores
   mkdir -p "$PKGS_DIR"
   echo "==> Packaging RPM (.rpm) for ${SYS_ARCH}..."
@@ -393,7 +415,7 @@ package_rpm() {
 }
 
 package_pacman() {
-  check_binary
+  ensure_package_binary
   prepare_cores
   mkdir -p "$PKGS_DIR"
   echo "==> Packaging Pacman (.pkg.tar.zst) for ${SYS_ARCH}..."
@@ -408,7 +430,7 @@ package_linux() {
 }
 
 clean_bin() {
-  rm -rf "${BIN_DIR:?}/${APP_NAME:?}"* "${BIN_DIR:?}/${PKG_NAME:?}"*
+  rm -rf "${BIN_DIR:?}/${APP_NAME:?}"* "${BIN_DIR:?}/${PKG_NAME:?}"* "$LINUX_PACKAGE_MARKER"
 }
 
 clean_pkgs() {
@@ -441,7 +463,8 @@ Available targets:
   build-frontend       - Install frontend dependencies and build assets
   build-windows        - Build Windows binary and package zip
   build-macos          - Patch and build macOS application bundle (.app)
-  build-linux          - Build Linux binary and package tar.gz
+  build-linux          - Build portable Linux binary and package tar.gz
+  build-linux-package  - Build dedicated Linux binary for system packages
   package-deb          - Package Debian package (.deb)
   package-rpm          - Package RPM package (.rpm)
   package-pacman       - Package Arch package (.pkg.tar.zst)
@@ -477,6 +500,7 @@ main() {
     build-windows) build_windows ;;
     build-macos) build_macos ;;
     build-linux) build_linux ;;
+    build-linux-package) build_linux_package ;;
     package-deb) package_deb ;;
     package-rpm) package_rpm ;;
     package-pacman) package_pacman ;;

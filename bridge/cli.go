@@ -164,7 +164,7 @@ func printVersion(w io.Writer) {
 	fmt.Fprintf(w, "Compiler       : %s\n", Compiler)
 	fmt.Fprintf(w, "Module sum     : %s\n", ModuleSum)
 	fmt.Fprintf(w, "Platform       : %s\n", Platform)
-
+	fmt.Fprintf(w, "System package : %s\n", SystemPackage)
 }
 
 func getProgramName() string {

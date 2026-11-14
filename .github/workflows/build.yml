@@ -263,6 +263,9 @@ jobs:
       - name: Build Linux Binary
         run: make build-linux
 
+      - name: Build Linux Package Binary
+        run: make build-linux-package
+
       - name: Package DEB
         run: make package-deb
 
