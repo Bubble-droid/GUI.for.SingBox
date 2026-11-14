@@ -122,6 +122,9 @@ LDFLAGS_PACKAGE="${LDFLAGS_BASE} ${PACKAGE_LDFLAGS[*]}"
 # build-linux-package, so packaging steps can reuse it across make runs.
 LINUX_PACKAGE_MARKER="${BIN_DIR}/.linux-package"
 
+# Records that build/bin/gui-for-singbox-daemon was produced for packaging.
+DAEMON_MARKER="${BIN_DIR}/.daemon-build"
+
 # === prerequisites & init ===
 _PATCH_MACOS_DONE=0
 
@@ -159,6 +162,15 @@ ensure_package_binary() {
     return 0
   fi
   build_linux_package
+}
+
+# ensure_daemon_binary guarantees the packaged daemon exists. It is a pure Go
+# binary, so it never depends on GTK or WebKit.
+ensure_daemon_binary() {
+  if [[ -f "${BIN_DIR}/${PKG_NAME}-daemon" && -f "$DAEMON_MARKER" ]]; then
+    return 0
+  fi
+  build_daemon
 }
 
 # === bundled sing-box cores ===
@@ -359,6 +371,7 @@ build_linux() {
   echo "==> Building Linux binary (${ARCH})..."
   GOOS=linux GOARCH="$ARCH" "$WALIS_BIN" build "${WAILS_FLAGS[@]}" -ldflags "$LDFLAGS_BASE" -tags webkit2_41 -o "$PKG_NAME"
   rm -f "$LINUX_PACKAGE_MARKER"
+  rm -f "$DAEMON_MARKER"
   (
     cd "$BIN_DIR" &&
       tar -czvf "${APP_NAME}-${ARCHIVE_VERSION}-linux-${ARCH}.tar.gz" "$PKG_NAME"
@@ -369,6 +382,16 @@ build_linux_package() {
   echo "==> Building dedicated Linux package binary (${ARCH})..."
   GOOS=linux GOARCH="$ARCH" "$WALIS_BIN" build "${WAILS_FLAGS[@]}" -ldflags "$LDFLAGS_PACKAGE" -tags webkit2_41 -o "$PKG_NAME"
   touch "$LINUX_PACKAGE_MARKER"
+  build_daemon
+}
+
+build_daemon() {
+  echo "==> Building Linux core daemon (${ARCH})..."
+  mkdir -p "$BIN_DIR"
+  CGO_ENABLED=0 GOOS=linux GOARCH="$ARCH" go build -trimpath -buildvcs=false \
+    -ldflags "-X '${GO_MODULE}/internal/daemon.Version=${APP_VERSION}'" \
+    -o "${BIN_DIR}/${PKG_NAME}-daemon" ./cmd/daemon
+  touch "$DAEMON_MARKER"
 }
 
 all() {
@@ -398,6 +421,7 @@ dev() {
 
 package_deb() {
   ensure_package_binary
+  ensure_daemon_binary
   prepare_cores
   mkdir -p "$PKGS_DIR"
   echo "==> Packaging Debian (.deb) for ${DEB_ARCH}..."
@@ -407,6 +431,7 @@ package_deb() {
 
 package_rpm() {
   ensure_package_binary
+  ensure_daemon_binary
   prepare_cores
   mkdir -p "$PKGS_DIR"
   echo "==> Packaging RPM (.rpm) for ${SYS_ARCH}..."
@@ -416,6 +441,7 @@ package_rpm() {
 
 package_pacman() {
   ensure_package_binary
+  ensure_daemon_binary
   prepare_cores
   mkdir -p "$PKGS_DIR"
   echo "==> Packaging Pacman (.pkg.tar.zst) for ${SYS_ARCH}..."
@@ -430,7 +456,7 @@ package_linux() {
 }
 
 clean_bin() {
-  rm -rf "${BIN_DIR:?}/${APP_NAME:?}"* "${BIN_DIR:?}/${PKG_NAME:?}"* "$LINUX_PACKAGE_MARKER"
+  rm -rf "${BIN_DIR:?}/${APP_NAME:?}"* "${BIN_DIR:?}/${PKG_NAME:?}"* "$LINUX_PACKAGE_MARKER" "$DAEMON_MARKER"
 }
 
 clean_pkgs() {

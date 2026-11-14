@@ -33,10 +33,30 @@ contents:
     dst: /usr/lib/gui-for-singbox/gui-for-singbox
     file_info:
       mode: 0755
+  - src: ./build/bin/gui-for-singbox-daemon
+    dst: /usr/lib/gui-for-singbox/gui-for-singbox-daemon
+    file_info:
+      mode: 0755
   - src: ./packaging/linux/gui-for-singbox.sh
     dst: /usr/bin/gui-for-singbox
     file_info:
       mode: 0755
+  - src: ./packaging/linux/gui-for-singbox-daemon.socket
+    dst: /usr/lib/systemd/system/gui-for-singbox-daemon.socket
+    file_info:
+      mode: 0644
+  - src: ./packaging/linux/gui-for-singbox-daemon.service
+    dst: /usr/lib/systemd/system/gui-for-singbox-daemon.service
+    file_info:
+      mode: 0644
+  - src: ./packaging/linux/sysusers/gui-for-singbox.conf
+    dst: /usr/lib/sysusers.d/gui-for-singbox.conf
+    file_info:
+      mode: 0644
+  - src: ./packaging/linux/tmpfiles/gui-for-singbox.conf
+    dst: /usr/lib/tmpfiles.d/gui-for-singbox.conf
+    file_info:
+      mode: 0644
   - src: ./dist/cores/sing-box
     dst: /usr/lib/gui-for-singbox/cores/sing-box
     file_info:
@@ -77,7 +97,7 @@ overrides:
       - gtk3
       - webkit2gtk-4.1
       - polkit
-      - libcap
+      - systemd
     suggests:
       - "kconfig: Configure KDE system proxy"
       - "glib2: Configure GNOME system proxy"
@@ -88,14 +108,12 @@ overrides:
       - libc6 (>= 2.31)
       - libgtk-3-0
       - libwebkit2gtk-4.1-0
-      - pkexec
-      - libcap2-bin
+      - policykit-1 | polkitd
+      - systemd
     suggests:
       - libkf6config-bin
       - libglib2.0-bin
       - network-manager
-    scripts:
-      postinstall: ./packaging/linux/scripts/deb/postinstall.sh
 
   rpm:
     depends:
@@ -103,13 +121,11 @@ overrides:
       - gtk3
       - webkit2gtk4.1
       - polkit
-      - libcap
+      - systemd
     suggests:
       - kf6-kconfig
       - glib2
       - NetworkManager
-    scripts:
-      postinstall: ./packaging/linux/scripts/rpm/postinstall.sh
 
 deb:
   compression: zstd

@@ -1,0 +1,13 @@
+[Unit]
+Description=GUI for SingBox Daemon Socket
+
+[Socket]
+ListenStream=/run/gui-for-singbox/daemon.sock
+SocketMode=0660
+SocketUser=root
+SocketGroup=gui-for-singbox
+DirectoryMode=0750
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target
