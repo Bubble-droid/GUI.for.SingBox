@@ -49,20 +49,61 @@ func TestIsSystemPackageBuildFlag(t *testing.T) {
 	})
 
 	SystemPackage = "true"
-	if !isSystemPackage() {
+	if !isSystemPackageBuild() {
 		t.Fatal("SystemPackage=true should report a system package build")
+	}
+	if !isSystemPackage() {
+		t.Fatal("SystemPackage=true should drive the directory layout")
 	}
 
 	SystemPackage = "false"
+	if isSystemPackageBuild() {
+		t.Fatal("SystemPackage=false should not report a system package build")
+	}
 	if isSystemPackage() {
 		t.Fatal("SystemPackage=false should disable system package detection")
 	}
 
-	// Unknown falls back to the path-based detection; the test binary does not
-	// live under a system package prefix.
+	// Unknown keeps the build flag false; the directory layout falls back to
+	// the path-based detection, which does not match the test binary.
 	SystemPackage = unknown
+	if isSystemPackageBuild() {
+		t.Fatal("unknown build flag must not report a system package build")
+	}
 	if isSystemPackage() {
 		t.Fatal("path-based fallback should not report a system package for the test binary")
+	}
+}
+
+func TestIsBinaryDirWritable(t *testing.T) {
+	setTestEnv(t, t.TempDir())
+
+	prev := SystemPackage
+	t.Cleanup(func() {
+		SystemPackage = prev
+	})
+
+	SystemPackage = unknown
+	if !isBinaryDirWritable() {
+		t.Fatal("a writable base path outside system prefixes should be updatable")
+	}
+
+	SystemPackage = "true"
+	if isBinaryDirWritable() {
+		t.Fatal("the injected package flag must disable in-place updates")
+	}
+
+	SystemPackage = unknown
+	readOnlyBase := t.TempDir()
+	if err := os.Chmod(readOnlyBase, 0o555); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		os.Chmod(readOnlyBase, 0o755)
+	})
+	Env.BasePath = readOnlyBase
+	if isBinaryDirWritable() {
+		t.Fatal("a read-only base path must disable in-place updates")
 	}
 }
 
@@ -83,6 +124,13 @@ func TestInitDataDirPortable(t *testing.T) {
 	initDataDir()
 
 	assertDataDir(t, filepath.ToSlash(filepath.Join(basePath, "data")))
+
+	if Env.IsSystemPackage {
+		t.Fatal("portable mode is not a system package install")
+	}
+	if !Env.IsBinaryDirWritable {
+		t.Fatal("portable mode keeps the binary directory writable")
+	}
 
 	// Portable mode keeps all paths self-contained under data instead of
 	// shunting them to the user's XDG directories.
@@ -128,6 +176,13 @@ func TestInitDataDirSystemPackageFlagWins(t *testing.T) {
 	assertDataDir(t, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
 	assertCacheDir(t, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
 	assertConfigDir(t, filepath.ToSlash(filepath.Join(configHome, appDirName)))
+
+	if !Env.IsSystemPackage {
+		t.Fatal("the injected flag should be exposed verbatim")
+	}
+	if Env.IsBinaryDirWritable {
+		t.Fatal("a system package install must not be updated in place")
+	}
 }
 
 func TestInitDataDirPortableUnicodeBasePath(t *testing.T) {
@@ -212,6 +267,10 @@ func TestInitDataDirNotWritable(t *testing.T) {
 	assertDataDir(t, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
 	assertCacheDir(t, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
 	assertConfigDir(t, filepath.ToSlash(filepath.Join(configHome, appDirName)))
+
+	if Env.IsBinaryDirWritable {
+		t.Fatal("a read-only base path must not be updatable in place")
+	}
 }
 
 func TestInitDataDirXDG(t *testing.T) {

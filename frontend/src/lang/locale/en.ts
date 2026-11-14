@@ -815,7 +815,8 @@ export default {
     updateSuccessful: 'Update completed',
     newVersion: 'New version found',
     latestVersion: 'Already the latest version',
-    updatesManagedByOS: 'Updates are managed by your operating system',
+    updatesRequireWritableDir:
+      'The install directory is not writable, so automatic updates are unavailable',
   },
   titlebar: {
     pin: 'Pin',

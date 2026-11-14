@@ -33,6 +33,16 @@ var systemPackagePrefixes = []string{
 	"/var/lib/flatpak/",
 }
 
+// isSystemPackageBuild reports whether the binary was built for a system
+// package. The injected build variable is the only source of truth for the
+// value exposed to the frontend.
+func isSystemPackageBuild() bool {
+	return SystemPackage == "true"
+}
+
+// isSystemPackage decides the directory layout. The injected build variable
+// wins when present; otherwise the path-based detection below keeps older
+// binaries working as a compatibility fallback.
 func isSystemPackage() bool {
 	switch SystemPackage {
 	case "true":
@@ -40,9 +50,10 @@ func isSystemPackage() bool {
 	case "false":
 		return false
 	}
+	return detectSystemPackagePath()
+}
 
-	// Compatibility fallback: builds without the injected flag keep the
-	// path-based detection.
+func detectSystemPackagePath() bool {
 	exe, err := os.Executable()
 	if err != nil {
 		return false

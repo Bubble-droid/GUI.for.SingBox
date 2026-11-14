@@ -23,6 +23,7 @@ declare namespace App {
     arch: string
     isPrivileged: boolean
     isSystemPackage: boolean
+    isBinaryDirWritable: boolean
   }
 
   interface TrayContent {

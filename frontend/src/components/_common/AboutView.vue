@@ -35,8 +35,10 @@ const handleRestartApp = async () => {
   }
 }
 
-if (Date.now() - appStore.lastCheckTime > 60_000) {
-  appStore.checkForUpdates()
+if (envStore.env.isBinaryDirWritable) {
+  if (Date.now() - appStore.lastCheckTime > 60_000) {
+    appStore.checkForUpdates()
+  }
 }
 
 defineExpose({

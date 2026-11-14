@@ -128,7 +128,8 @@ func (a *App) GetEnv(key string) any {
 		ARCH:         Env.ARCH,
 		IsPrivileged: Env.IsPrivileged,
 
-		IsSystemPackage: Env.IsSystemPackage,
+		IsSystemPackage:     Env.IsSystemPackage,
+		IsBinaryDirWritable: Env.IsBinaryDirWritable,
 	}
 }
 

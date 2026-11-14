@@ -122,6 +122,16 @@ func isDirWritable(dir string) bool {
 	return true
 }
 
+// isBinaryDirWritable reports whether the running binary may be replaced in
+// place. It combines the injected package flag, the legacy path detection and
+// the actual directory permission.
+func isBinaryDirWritable() bool {
+	if isSystemPackage() {
+		return false
+	}
+	return isDirWritable(Env.BasePath)
+}
+
 // ensureDirs creates the target data and cache directories up front; later
 // read/write operations (config load, pid lock, embedded extraction) rely on
 // their existence.
@@ -180,29 +190,28 @@ func migrateLegacyConfigs(sourceDir string, targetDir string) {
 
 // initDataDir resolves the data, cache and config directories for the current
 // installation. The resolution order is:
-//  1. Installed as a system package (Linux) — always use per-user directories.
-//  2. App binary directory is not writable — use per-user directories.
-//  3. Portable data directory exists next to the app root — stay
+//  1. Installed as a system package or the app binary directory is not
+//     writable — use per-user directories.
+//  2. Portable data directory exists next to the app root — stay
 //     self-contained: data under root/data, config under data/config and cache
 //     under data/.cache.
-//  4. Default — use per-user directories.
+//  3. Default — use per-user directories.
 //
 // Platform hooks are supplied by the platform files:
 //   - portableRoot: the app root hosting portable data (macOS strips the
 //     bundle-internal .app/Contents/MacOS segments; Linux is BasePath).
 //   - isSystemPackage: real detection on Linux, always false elsewhere.
+//   - isSystemPackageBuild: the injected package flag, reported as-is.
 //   - userConfigBase: the platform user config directory.
 func initDataDir() {
 	root := portableRoot()
 	portableDataDir := filepath.Join(root, "data")
 
+	Env.IsSystemPackage = isSystemPackageBuild()
+	Env.IsBinaryDirWritable = isBinaryDirWritable()
+
 	switch {
-	case isSystemPackage():
-		Env.IsSystemPackage = true
-		Env.DataDir = xdgDataDir()
-		appCacheDir = xdgCacheDir()
-		appConfigDir = userConfigDir()
-	case !isDirWritable(Env.BasePath):
+	case !Env.IsBinaryDirWritable:
 		Env.DataDir = xdgDataDir()
 		appCacheDir = xdgCacheDir()
 		appConfigDir = userConfigDir()

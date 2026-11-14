@@ -38,6 +38,12 @@ func portableRoot() string {
 	return root
 }
 
+// isSystemPackageBuild reports whether the binary was built for a system
+// package. The injected build variable is the only source of truth.
+func isSystemPackageBuild() bool {
+	return SystemPackage == "true"
+}
+
 // isSystemPackage is only meaningful on Linux. On other platforms no system
 // package detection is performed, so this always reports false.
 func isSystemPackage() bool {
