@@ -1,7 +1,8 @@
 # Linux 系统守护进程核心管理方案（规划稿）
 
-- 状态：仅规划，尚未开始实现
+- 状态：阶段 1-4 已实现，阶段 5 验收与文档维护中
 - 目标分支：`feat/linux-daemon-integration`
+- 使用说明：`docs/linux-daemon.md`
 - 适用平台：Linux 系统包安装（`IsSystemPackage == true`）
 - 非目标平台：Windows、macOS、Linux 便携包/解压运行
 
@@ -1062,7 +1063,7 @@ export const isDaemonCoreMode = () => {
 - 验证 TUN、系统代理、系统 DNS。
 - 验证升级后状态保留、核心文件更新、unit 更新。
 - 验证无 systemd 环境明确报错。
-- 更新文档和故障排查。
+- 更新文档和故障排查：`docs/linux-daemon.md`。
 
 ## 17. 测试计划
 
