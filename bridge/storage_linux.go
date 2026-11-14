@@ -34,6 +34,15 @@ var systemPackagePrefixes = []string{
 }
 
 func isSystemPackage() bool {
+	switch SystemPackage {
+	case "true":
+		return true
+	case "false":
+		return false
+	}
+
+	// Compatibility fallback: builds without the injected flag keep the
+	// path-based detection.
 	exe, err := os.Executable()
 	if err != nil {
 		return false

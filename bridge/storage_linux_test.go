@@ -42,6 +42,30 @@ func assertConfigDir(t *testing.T, want string) {
 	}
 }
 
+func TestIsSystemPackageBuildFlag(t *testing.T) {
+	prev := SystemPackage
+	t.Cleanup(func() {
+		SystemPackage = prev
+	})
+
+	SystemPackage = "true"
+	if !isSystemPackage() {
+		t.Fatal("SystemPackage=true should report a system package build")
+	}
+
+	SystemPackage = "false"
+	if isSystemPackage() {
+		t.Fatal("SystemPackage=false should disable system package detection")
+	}
+
+	// Unknown falls back to the path-based detection; the test binary does not
+	// live under a system package prefix.
+	SystemPackage = unknown
+	if isSystemPackage() {
+		t.Fatal("path-based fallback should not report a system package for the test binary")
+	}
+}
+
 func TestInitDataDirPortable(t *testing.T) {
 	basePath := t.TempDir()
 	if err := os.Mkdir(filepath.Join(basePath, "data"), 0o755); err != nil {
@@ -76,6 +100,34 @@ func TestInitDataDirPortable(t *testing.T) {
 	if gotConfig != wantConfig {
 		t.Fatalf("resolvePath(data/config/...) = %q, want %q", gotConfig, wantConfig)
 	}
+}
+
+func TestInitDataDirSystemPackageFlagWins(t *testing.T) {
+	basePath := t.TempDir()
+	if err := os.Mkdir(filepath.Join(basePath, "data"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	prev := SystemPackage
+	t.Cleanup(func() {
+		SystemPackage = prev
+	})
+	SystemPackage = "true"
+
+	dataHome := filepath.Join(t.TempDir(), "xdg")
+	cacheHome := filepath.Join(t.TempDir(), "cache")
+	configHome := filepath.Join(t.TempDir(), "config")
+	setTestEnv(t, basePath)
+	xdg.DataHome = dataHome
+	xdg.CacheHome = cacheHome
+	xdg.ConfigHome = configHome
+
+	initDataDir()
+
+	// The injected flag outranks the portable data directory.
+	assertDataDir(t, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
+	assertCacheDir(t, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
+	assertConfigDir(t, filepath.ToSlash(filepath.Join(configHome, appDirName)))
 }
 
 func TestInitDataDirPortableUnicodeBasePath(t *testing.T) {
