@@ -689,6 +689,10 @@ export default {
     appFolder: {
       name: 'Data Folder',
       open: 'Open data folder',
+      config: 'Config Folder',
+      openConfig: 'Open config folder',
+      cache: 'Cache Folder',
+      openCache: 'Open cache folder',
     },
     lang: {
       name: 'Language',
