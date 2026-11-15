@@ -257,7 +257,7 @@ func extractFiles(fs embed.FS, srcDir, dstDir string) {
 
 	for _, file := range files {
 		fileName := file.Name()
-		dstPath := resolvePath(dstDir + "/" + fileName)
+		dstPath := resolvePath(filepath.Join(dstDir, fileName))
 		if _, err := os.Stat(dstPath); os.IsNotExist(err) {
 			log.Printf("InitResources [%s]: %s", dstDir, fileName)
 			data, err := fs.ReadFile(srcDir + "/" + fileName)

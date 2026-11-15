@@ -6,7 +6,9 @@ import { HttpGet } from '@/bridge'
 import {
   DefaultTestTimeout,
   DefaultTestURL,
+  LocalDirectory,
   RequestMethodOptions,
+  SubscribesDirectory,
   SubscriptionRequestProxyModeOptions,
 } from '@/constant/app'
 import { RequestProxyMode } from '@/enums/app'
@@ -30,6 +32,8 @@ const appSettingsStore = useAppSettingsStore()
 const loading = ref(false)
 const proxyTesting = ref(false)
 const sub = ref<App.Subscription>(subscribeStore.getSubscribeTemplate())
+const localSubscribeUrlPlaceholder = `${LocalDirectory}/{filename}.json`
+const subscribePathPlaceholder = `${SubscribesDirectory}/{filename}.json`
 
 const isManual = computed(() => sub.value.type === 'Manual')
 const isRemote = computed(() => sub.value.type === 'Http')
@@ -143,7 +147,7 @@ defineExpose({ modalSlots })
       <div class="min-w-[75%]">
         <Input
           v-model="sub.url"
-          :placeholder="sub.type === 'Http' ? 'http(s)://' : 'data/local/{filename}.json'"
+          :placeholder="sub.type === 'Http' ? 'http(s)://' : localSubscribeUrlPlaceholder"
           allow-paste
           class="w-full"
         />
@@ -152,7 +156,7 @@ defineExpose({ modalSlots })
     <div class="form-item">
       {{ t('subscribe.path') }} *
       <div class="min-w-[75%]">
-        <Input v-model="sub.path" placeholder="data/subscribes/{filename}.json" class="w-full" />
+        <Input v-model="sub.path" :placeholder="subscribePathPlaceholder" class="w-full" />
       </div>
     </div>
     <Divider v-if="!isManual">

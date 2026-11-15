@@ -2,7 +2,12 @@
 import { ref, inject, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { PluginsTriggerOptions, DraggableOptions } from '@/constant/app'
+import {
+  LocalDirectory,
+  PluginsDirectory,
+  PluginsTriggerOptions,
+  DraggableOptions,
+} from '@/constant/app'
 import { PluginTrigger } from '@/enums/app'
 import { useBool } from '@/hooks'
 import { usePluginsStore } from '@/stores'
@@ -19,6 +24,8 @@ const props = defineProps<Props>()
 const official = computed(() => pluginsStore.findPluginInHubById(plugin.value.id))
 const loading = ref(false)
 const pluginID = sampleID()
+const localPluginUrlPlaceholder = `${LocalDirectory}/plugin-{filename}.js`
+const pluginPathPlaceholder = `${PluginsDirectory}/plugin-{filename}.js`
 const plugin = ref<App.Plugin>({
   id: pluginID,
   version: 'v1.0.0',
@@ -29,7 +36,7 @@ const plugin = ref<App.Plugin>({
   type: 'File',
   url: '',
   status: 0,
-  path: `data/plugins/plugin-${pluginID}.js`,
+  path: `${PluginsDirectory}/plugin-${pluginID}.js`,
   triggers: [PluginTrigger.OnManual],
   hasUI: false,
   menus: {},
@@ -227,7 +234,7 @@ defineExpose({ modalSlots })
       <div class="min-w-[75%]">
         <Input
           v-model="plugin.url"
-          :placeholder="plugin.type === 'Http' ? 'http(s)://' : 'data/local/plugin-{filename}.js'"
+          :placeholder="plugin.type === 'Http' ? 'http(s)://' : localPluginUrlPlaceholder"
           allow-paste
           class="w-full"
         />
@@ -236,11 +243,7 @@ defineExpose({ modalSlots })
     <div class="form-item">
       {{ t('plugin.path') }} *
       <div class="min-w-[75%]">
-        <Input
-          v-model="plugin.path"
-          placeholder="data/plugins/plugin-{filename}.js"
-          class="w-full"
-        />
+        <Input v-model="plugin.path" :placeholder="pluginPathPlaceholder" class="w-full" />
       </div>
     </div>
     <div class="form-item">

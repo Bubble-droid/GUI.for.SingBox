@@ -274,7 +274,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   const runCoreProcess = async (isAlpha: boolean) => {
     let stopped = false
     const pid = await ExecBackground(
-      CoreWorkingDirectory + '/' + getKernelFileName(isAlpha),
+      `${CoreWorkingDirectory}/${getKernelFileName(isAlpha)}`,
       getKernelRuntimeArgs(isAlpha),
       undefined,
       async (end) => {

@@ -6,7 +6,7 @@ import {
   ShowMainWindow,
   UpdateTrayAndMenus,
 } from '@/bridge'
-import { ColorOptions, ThemeOptions } from '@/constant/app'
+import { CacheDirectory, ColorOptions, ThemeOptions } from '@/constant/app'
 import { ModeOptions } from '@/constant/kernel'
 import { OS } from '@/enums/app'
 import i18n from '@/lang'
@@ -35,13 +35,13 @@ const getTrayIcons = () => {
   const themeMode = appSettings.themeMode
   const ext = envStore.env.os === OS.Linux ? '.png' : '.ico'
   const folder = envStore.env.os === OS.Linux ? 'imgs' : 'icons'
-  let icon = `data/.cache/${folder}/tray_normal_${themeMode}${ext}`
+  let icon = `${CacheDirectory}/${folder}/tray_normal_${themeMode}${ext}`
 
   if (kernelApiStore.running) {
     if (kernelApiStore.config.tun.enable) {
-      icon = `data/.cache/${folder}/tray_tun_${themeMode}${ext}`
+      icon = `${CacheDirectory}/${folder}/tray_tun_${themeMode}${ext}`
     } else if (envStore.systemProxy) {
-      icon = `data/.cache/${folder}/tray_proxy_${themeMode}${ext}`
+      icon = `${CacheDirectory}/${folder}/tray_proxy_${themeMode}${ext}`
     }
   }
   return icon

@@ -3,6 +3,7 @@ import { computed, h, inject, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { HttpGet } from '@/bridge'
+import { RulesetsDirectory } from '@/constant/app'
 import { BuiltInOutbound } from '@/constant/kernel'
 import { DefaultRouteRule, DefaultRouteRuleset } from '@/constant/profile'
 import { RulesetFormat, RulesetType, RuleType } from '@/enums/kernel'
@@ -65,7 +66,7 @@ const handleAddRuleset = async (ruleset: App.RulesetHub['list'][number], format:
       disabled: false,
       type: 'Http',
       format,
-      path: 'data/rulesets/' + file,
+      path: `${RulesetsDirectory}/${file}`,
       url,
       count: ruleset.count,
     })
