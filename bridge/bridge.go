@@ -273,7 +273,7 @@ func extractFiles(fs embed.FS, srcDir, dstDir string) {
 }
 
 func loadConfig() {
-	b, err := os.ReadFile(resolvePath("data/user.yaml"))
+	b, err := os.ReadFile(resolvePath("data/config/user.yaml"))
 	if err == nil {
 		if err := yaml.Unmarshal(b, &Config); err != nil {
 			log.Printf("Failed to parse user config: %v", err)

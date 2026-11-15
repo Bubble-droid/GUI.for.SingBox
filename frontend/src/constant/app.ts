@@ -15,17 +15,17 @@ import { APP_TITLE } from '@/utils'
 
 export const LocalesFilePath = 'data/locales'
 
-export const UserFilePath = 'data/user.yaml'
+export const UserFilePath = 'data/config/user.yaml'
 
-export const ProfilesFilePath = 'data/profiles.yaml'
+export const ProfilesFilePath = 'data/config/profiles.yaml'
 
-export const SubscribesFilePath = 'data/subscribes.yaml'
+export const SubscribesFilePath = 'data/config/subscribes.yaml'
 
-export const RulesetsFilePath = 'data/rulesets.yaml'
+export const RulesetsFilePath = 'data/config/rulesets.yaml'
 
-export const PluginsFilePath = 'data/plugins.yaml'
+export const PluginsFilePath = 'data/config/plugins.yaml'
 
-export const ScheduledTasksFilePath = 'data/scheduledtasks.yaml'
+export const ScheduledTasksFilePath = 'data/config/scheduledtasks.yaml'
 
 export const PluginHubFilePath = 'data/.cache/plugin-list.json'
 

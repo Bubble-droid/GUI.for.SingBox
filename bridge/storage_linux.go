@@ -6,9 +6,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/adrg/xdg"
 )
 
 const appDirName = "gui-for-singbox"
+
+// userConfigBase returns the per-user config directory root on Linux.
+func userConfigBase() string {
+	return filepath.ToSlash(xdg.ConfigHome)
+}
 
 // portableRoot returns the app root hosting portable data. On Linux the binary
 // runs from the app root directly, so portable data lives next to the binary
