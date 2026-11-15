@@ -1,28 +1,16 @@
-package bridge
+package storage
 
 import (
 	"path/filepath"
 	"testing"
 )
 
-func setTestEnv(t *testing.T, basePath string) {
-	t.Helper()
-
-	prevBasePath, prevDataDir, prevCacheDir, prevConfigDir := Env.BasePath, Env.DataDir, appCacheDir, appConfigDir
-	prevSystemPackage, prevWritable := Env.IsSystemPackage, Env.IsBinaryDirWritable
-	t.Cleanup(func() {
-		Env.BasePath = prevBasePath
-		Env.DataDir = prevDataDir
-		appCacheDir = prevCacheDir
-		appConfigDir = prevConfigDir
-		Env.IsSystemPackage = prevSystemPackage
-		Env.IsBinaryDirWritable = prevWritable
+func newTestStorage(basePath string) *Storage {
+	return New(Config{
+		BasePath:      filepath.ToSlash(basePath),
+		OS:            "linux",
+		SystemPackage: "unknown",
 	})
-
-	Env.BasePath = filepath.ToSlash(basePath)
-	Env.DataDir = filepath.ToSlash(basePath)
-	appCacheDir = ""
-	appConfigDir = ""
 }
 
 func TestResolvePath(t *testing.T) {
@@ -31,10 +19,10 @@ func TestResolvePath(t *testing.T) {
 	cacheDir := filepath.ToSlash(t.TempDir())
 	configDir := filepath.ToSlash(t.TempDir())
 
-	setTestEnv(t, basePath)
-	Env.DataDir = dataDir
-	appCacheDir = cacheDir
-	appConfigDir = configDir
+	s := newTestStorage(basePath)
+	s.paths.DataDir = dataDir
+	s.paths.CacheDir = cacheDir
+	s.paths.ConfigDir = configDir
 
 	underBase := func(parts ...string) string {
 		return filepath.ToSlash(filepath.Join(append([]string{basePath}, parts...)...))
@@ -99,11 +87,11 @@ func TestResolvePath(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := resolvePath(tt.path)
+			got := s.ResolvePath(tt.path)
 			t.Logf("input=%q resolved=%q", tt.path, got)
 
 			if got != tt.want {
-				t.Fatalf("resolvePath(%q) = %q, want %q", tt.path, got, tt.want)
+				t.Fatalf("ResolvePath(%q) = %q, want %q", tt.path, got, tt.want)
 			}
 		})
 	}
@@ -113,14 +101,13 @@ func TestResolvePathConfigFallback(t *testing.T) {
 	basePath := filepath.ToSlash(t.TempDir())
 	dataDir := filepath.ToSlash(t.TempDir())
 
-	setTestEnv(t, basePath)
-	Env.DataDir = dataDir
-	appConfigDir = ""
+	s := newTestStorage(basePath)
+	s.paths.DataDir = dataDir
 
-	got := resolvePath("data/config/user.yaml")
+	got := s.ResolvePath("data/config/user.yaml")
 	want := filepath.ToSlash(filepath.Join(dataDir, "config", "user.yaml"))
 	if got != want {
-		t.Errorf("resolvePath(data/config/user.yaml) = %q, want %q", got, want)
+		t.Errorf("ResolvePath(data/config/user.yaml) = %q, want %q", got, want)
 	}
 }
 
@@ -128,13 +115,12 @@ func TestResolvePathCacheFallback(t *testing.T) {
 	basePath := filepath.ToSlash(t.TempDir())
 	dataDir := filepath.ToSlash(t.TempDir())
 
-	setTestEnv(t, basePath)
-	Env.DataDir = dataDir
-	appCacheDir = "" // Empty cache dir should fall back to dataDir/.cache
+	s := newTestStorage(basePath)
+	s.paths.DataDir = dataDir // Empty cache dir should fall back to dataDir/.cache
 
-	got := resolvePath("data/.cache/icons/logo.png")
+	got := s.ResolvePath("data/.cache/icons/logo.png")
 	want := filepath.ToSlash(filepath.Join(dataDir, ".cache", "icons", "logo.png"))
 	if got != want {
-		t.Errorf("resolvePath(data/.cache/icons/logo.png) = %q, want %q", got, want)
+		t.Errorf("ResolvePath(data/.cache/icons/logo.png) = %q, want %q", got, want)
 	}
 }

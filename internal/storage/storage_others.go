@@ -1,6 +1,6 @@
 //go:build !linux
 
-package bridge
+package storage
 
 import (
 	"path/filepath"
@@ -16,9 +16,9 @@ const appDirName = "GUI.for.SingBox"
 // the app lives in a bundle Foo.app/Contents/MacOS/<exe>; portable data sits
 // beside the .app root, so strip the bundle-internal segments. This mirrors
 // upstream: it always yields the app root and only that root is probed.
-func portableRoot() string {
-	root := Env.BasePath
-	if Env.OS == "darwin" {
+func portableRoot(cfg Config) string {
+	root := cfg.BasePath
+	if cfg.OS == "darwin" {
 		if bundle, ok := strings.CutSuffix(root, ".app/Contents/MacOS"); ok {
 			root = filepath.Dir(bundle)
 		}
@@ -28,6 +28,6 @@ func portableRoot() string {
 
 // isSystemPackage is only meaningful on Linux. On other platforms no system
 // package detection is performed, so this always reports false.
-func isSystemPackage() bool {
+func (s *Storage) isSystemPackage() bool {
 	return false
 }

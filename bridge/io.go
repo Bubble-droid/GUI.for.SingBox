@@ -15,6 +15,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/storage"
+
 	"github.com/pkg/browser"
 )
 
@@ -147,49 +149,12 @@ func (a *App) MoveFile(source string, target string) FlagResult {
 			return FlagResult{false, err.Error()}
 		}
 
-		if err := moveFileAcrossDevices(fullSource, fullTarget); err != nil {
+		if err := storage.MoveFileAcrossDevices(fullSource, fullTarget); err != nil {
 			return FlagResult{false, err.Error()}
 		}
 	}
 
 	return FlagResult{true, "Success"}
-}
-
-func moveFileAcrossDevices(src string, dst string) error {
-	srcFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	info, err := srcFile.Stat()
-	if err != nil {
-		return err
-	}
-
-	if info.IsDir() {
-		return fmt.Errorf("cannot move directory across devices: %s", src)
-	}
-
-	dstFile, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, info.Mode().Perm())
-	if err != nil {
-		return err
-	}
-
-	if _, err := io.Copy(dstFile, srcFile); err != nil {
-		dstFile.Close()
-		return err
-	}
-
-	if err := dstFile.Close(); err != nil {
-		return err
-	}
-
-	if err := os.Chmod(dst, info.Mode().Perm()); err != nil {
-		return err
-	}
-
-	return os.Remove(src)
 }
 
 func (a *App) RemoveFile(path string) FlagResult {

@@ -14,6 +14,7 @@ import (
 
 	"github.com/Bubble-droid/GUI.for.SingBox/internal/build"
 	"github.com/Bubble-droid/GUI.for.SingBox/internal/info"
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/storage"
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
@@ -23,6 +24,10 @@ import (
 )
 
 var Config = &AppConfig{}
+
+// Store resolves logical paths against the directory layout resolved at
+// startup.
+var Store *storage.Storage
 
 var Env = &EnvResult{
 	IsStartup:    true,
@@ -45,6 +50,22 @@ func NewApp() *App {
 	}
 }
 
+// initStorage resolves the data, cache and config directories from the
+// injected build and environment values.
+func initStorage() {
+	Store = storage.New(storage.Config{
+		BasePath:      Env.BasePath,
+		OS:            Env.OS,
+		SystemPackage: build.SystemPackage,
+		Dev:           build.Dev,
+	})
+
+	paths := Store.Init()
+	Env.DataDir = paths.DataDir
+	Env.IsSystemPackage = paths.IsSystemPackage
+	Env.IsBinaryDirWritable = paths.IsBinaryDirWritable
+}
+
 func CreateApp() *App {
 	exePath, err := os.Executable()
 	if err != nil {
@@ -54,7 +75,7 @@ func CreateApp() *App {
 	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
 	Env.AppName = filepath.Base(exePath)
 
-	initDataDir()
+	initStorage()
 
 	if info.Current.GitVersion != build.Unknown {
 		Env.AppVersion = info.Current.GitVersion

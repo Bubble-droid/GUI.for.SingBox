@@ -21,6 +21,10 @@ type requestTransportKey struct {
 
 var requestTransportCache sync.Map
 
+func resolvePath(path string) string {
+	return Store.ResolvePath(path)
+}
+
 func requestProxy(proxyAddr string) func(*http.Request) (*url.URL, error) {
 	proxy := http.ProxyFromEnvironment
 

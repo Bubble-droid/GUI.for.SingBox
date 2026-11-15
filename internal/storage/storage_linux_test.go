@@ -1,6 +1,6 @@
 //go:build linux
 
-package bridge
+package storage
 
 import (
 	"os"
@@ -8,94 +8,84 @@ import (
 	"testing"
 
 	"github.com/adrg/xdg"
-
-	"github.com/Bubble-droid/GUI.for.SingBox/internal/build"
 )
 
-func assertDataDir(t *testing.T, want string) {
+func assertDataDir(t *testing.T, s *Storage, want string) {
 	t.Helper()
 
 	t.Logf(
 		"basePath=%q xdgDataHome=%q home=%q resolved=%q",
-		Env.BasePath,
+		s.cfg.BasePath,
 		os.Getenv("XDG_DATA_HOME"),
 		os.Getenv("HOME"),
-		Env.DataDir,
+		s.DataDir(),
 	)
 
-	if Env.DataDir != want {
-		t.Fatalf("DataDir = %q, want %q", Env.DataDir, want)
+	if s.DataDir() != want {
+		t.Fatalf("DataDir = %q, want %q", s.DataDir(), want)
 	}
 }
 
-func assertCacheDir(t *testing.T, want string) {
+func assertCacheDir(t *testing.T, s *Storage, want string) {
 	t.Helper()
 
-	if appCacheDir != want {
-		t.Fatalf("appCacheDir = %q, want %q", appCacheDir, want)
+	if s.CacheDir() != want {
+		t.Fatalf("CacheDir = %q, want %q", s.CacheDir(), want)
 	}
 }
 
-func assertConfigDir(t *testing.T, want string) {
+func assertConfigDir(t *testing.T, s *Storage, want string) {
 	t.Helper()
 
-	if appConfigDir != want {
-		t.Fatalf("appConfigDir = %q, want %q", appConfigDir, want)
+	if s.ConfigDir() != want {
+		t.Fatalf("ConfigDir = %q, want %q", s.ConfigDir(), want)
 	}
 }
 
 func TestIsSystemPackageBuildFlag(t *testing.T) {
-	prev := build.SystemPackage
-	t.Cleanup(func() {
-		build.SystemPackage = prev
-	})
+	s := newTestStorage(t.TempDir())
 
-	build.SystemPackage = "true"
-	if !isSystemPackageBuild() {
-		t.Fatal("build.SystemPackage=true should report a system package build")
+	s.cfg.SystemPackage = "true"
+	if !s.isSystemPackageBuild() {
+		t.Fatal("SystemPackage=true should report a system package build")
 	}
-	if !isSystemPackage() {
-		t.Fatal("build.SystemPackage=true should drive the directory layout")
+	if !s.isSystemPackage() {
+		t.Fatal("SystemPackage=true should drive the directory layout")
 	}
 
-	build.SystemPackage = "false"
-	if isSystemPackageBuild() {
-		t.Fatal("build.SystemPackage=false should not report a system package build")
+	s.cfg.SystemPackage = "false"
+	if s.isSystemPackageBuild() {
+		t.Fatal("SystemPackage=false should not report a system package build")
 	}
-	if isSystemPackage() {
-		t.Fatal("build.SystemPackage=false should disable system package detection")
+	if s.isSystemPackage() {
+		t.Fatal("SystemPackage=false should disable system package detection")
 	}
 
 	// Unknown keeps the build flag false; the directory layout falls back to
 	// the path-based detection, which does not match the test binary.
-	build.SystemPackage = build.Unknown
-	if isSystemPackageBuild() {
-		t.Fatal("build.Unknown build flag must not report a system package build")
+	s.cfg.SystemPackage = "unknown"
+	if s.isSystemPackageBuild() {
+		t.Fatal("unknown build flag must not report a system package build")
 	}
-	if isSystemPackage() {
+	if s.isSystemPackage() {
 		t.Fatal("path-based fallback should not report a system package for the test binary")
 	}
 }
 
 func TestIsBinaryDirWritable(t *testing.T) {
-	setTestEnv(t, t.TempDir())
+	s := newTestStorage(t.TempDir())
 
-	prev := build.SystemPackage
-	t.Cleanup(func() {
-		build.SystemPackage = prev
-	})
-
-	build.SystemPackage = build.Unknown
-	if !isBinaryDirWritable() {
+	s.cfg.SystemPackage = "unknown"
+	if !s.isBinaryDirWritable() {
 		t.Fatal("a writable base path outside system prefixes should be updatable")
 	}
 
-	build.SystemPackage = "true"
-	if isBinaryDirWritable() {
+	s.cfg.SystemPackage = "true"
+	if s.isBinaryDirWritable() {
 		t.Fatal("the injected package flag must disable in-place updates")
 	}
 
-	build.SystemPackage = build.Unknown
+	s.cfg.SystemPackage = "unknown"
 	readOnlyBase := t.TempDir()
 	if err := os.Chmod(readOnlyBase, 0o555); err != nil {
 		t.Fatal(err)
@@ -103,8 +93,8 @@ func TestIsBinaryDirWritable(t *testing.T) {
 	t.Cleanup(func() {
 		os.Chmod(readOnlyBase, 0o755)
 	})
-	Env.BasePath = readOnlyBase
-	if isBinaryDirWritable() {
+	s.cfg.BasePath = readOnlyBase
+	if s.isBinaryDirWritable() {
 		t.Fatal("a read-only base path must disable in-place updates")
 	}
 }
@@ -115,7 +105,7 @@ func TestInitDataDirPortable(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	dataHome := filepath.Join(t.TempDir(), "xdg")
 	cacheHome := filepath.Join(t.TempDir(), "cache")
 	configHome := filepath.Join(t.TempDir(), "config")
@@ -123,32 +113,32 @@ func TestInitDataDirPortable(t *testing.T) {
 	xdg.CacheHome = cacheHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
-	assertDataDir(t, filepath.ToSlash(filepath.Join(basePath, "data")))
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(basePath, "data")))
 
-	if Env.IsSystemPackage {
+	if s.Paths().IsSystemPackage {
 		t.Fatal("portable mode is not a system package install")
 	}
-	if !Env.IsBinaryDirWritable {
+	if !s.Paths().IsBinaryDirWritable {
 		t.Fatal("portable mode keeps the binary directory writable")
 	}
 
 	// Portable mode keeps all paths self-contained under data instead of
 	// shunting them to the user's XDG directories.
-	assertCacheDir(t, "")
-	assertConfigDir(t, "")
+	assertCacheDir(t, s, filepath.ToSlash(filepath.Join(basePath, "data", ".cache")))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(basePath, "data", "config")))
 
-	gotCache := resolvePath("data/.cache/icons/logo.png")
+	gotCache := s.ResolvePath("data/.cache/icons/logo.png")
 	wantCache := filepath.ToSlash(filepath.Join(basePath, "data", ".cache", "icons", "logo.png"))
 	if gotCache != wantCache {
-		t.Fatalf("resolvePath(data/.cache/...) = %q, want %q", gotCache, wantCache)
+		t.Fatalf("ResolvePath(data/.cache/...) = %q, want %q", gotCache, wantCache)
 	}
 
-	gotConfig := resolvePath("data/config/user.yaml")
+	gotConfig := s.ResolvePath("data/config/user.yaml")
 	wantConfig := filepath.ToSlash(filepath.Join(basePath, "data", "config", "user.yaml"))
 	if gotConfig != wantConfig {
-		t.Fatalf("resolvePath(data/config/...) = %q, want %q", gotConfig, wantConfig)
+		t.Fatalf("ResolvePath(data/config/...) = %q, want %q", gotConfig, wantConfig)
 	}
 }
 
@@ -158,31 +148,26 @@ func TestInitDataDirSystemPackageFlagWins(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	prev := build.SystemPackage
-	t.Cleanup(func() {
-		build.SystemPackage = prev
-	})
-	build.SystemPackage = "true"
-
 	dataHome := filepath.Join(t.TempDir(), "xdg")
 	cacheHome := filepath.Join(t.TempDir(), "cache")
 	configHome := filepath.Join(t.TempDir(), "config")
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
+	s.cfg.SystemPackage = "true"
 	xdg.DataHome = dataHome
 	xdg.CacheHome = cacheHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
 	// The injected flag outranks the portable data directory.
-	assertDataDir(t, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
-	assertCacheDir(t, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
-	assertConfigDir(t, filepath.ToSlash(filepath.Join(configHome, appDirName)))
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
+	assertCacheDir(t, s, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(configHome, appDirName)))
 
-	if !Env.IsSystemPackage {
+	if !s.Paths().IsSystemPackage {
 		t.Fatal("the injected flag should be exposed verbatim")
 	}
-	if Env.IsBinaryDirWritable {
+	if s.Paths().IsBinaryDirWritable {
 		t.Fatal("a system package install must not be updated in place")
 	}
 }
@@ -193,16 +178,16 @@ func TestInitDataDirPortableUnicodeBasePath(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	dataHome := filepath.Join(t.TempDir(), "xdg")
 	configHome := filepath.Join(t.TempDir(), "config")
 	xdg.DataHome = dataHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
-	assertDataDir(t, filepath.ToSlash(filepath.Join(basePath, "data")))
-	assertConfigDir(t, "")
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(basePath, "data")))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(basePath, "data", "config")))
 }
 
 func TestInitDataDirPortableEmptyDataDir(t *testing.T) {
@@ -211,16 +196,16 @@ func TestInitDataDirPortableEmptyDataDir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	dataHome := filepath.Join(t.TempDir(), "xdg")
 	configHome := filepath.Join(t.TempDir(), "config")
 	xdg.DataHome = dataHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
-	assertDataDir(t, filepath.ToSlash(filepath.Join(basePath, "data")))
-	assertConfigDir(t, "")
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(basePath, "data")))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(basePath, "data", "config")))
 }
 
 func TestInitDataDirPortableIgnoresNestedContent(t *testing.T) {
@@ -233,17 +218,17 @@ func TestInitDataDirPortableIgnoresNestedContent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	dataHome := filepath.Join(t.TempDir(), "xdg")
 	configHome := filepath.Join(t.TempDir(), "config")
 	xdg.DataHome = dataHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
 	// Only the data directory itself is probed; its contents do not matter.
-	assertDataDir(t, filepath.ToSlash(filepath.Join(basePath, "data")))
-	assertConfigDir(t, "")
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(basePath, "data")))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(basePath, "data", "config")))
 }
 
 func TestInitDataDirNotWritable(t *testing.T) {
@@ -256,7 +241,7 @@ func TestInitDataDirNotWritable(t *testing.T) {
 		os.Chmod(basePath, 0o755)
 	})
 
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	dataHome := filepath.Join(t.TempDir(), "xdg")
 	cacheHome := filepath.Join(t.TempDir(), "cache")
 	configHome := filepath.Join(t.TempDir(), "config")
@@ -264,13 +249,13 @@ func TestInitDataDirNotWritable(t *testing.T) {
 	xdg.CacheHome = cacheHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
-	assertDataDir(t, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
-	assertCacheDir(t, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
-	assertConfigDir(t, filepath.ToSlash(filepath.Join(configHome, appDirName)))
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
+	assertCacheDir(t, s, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(configHome, appDirName)))
 
-	if Env.IsBinaryDirWritable {
+	if s.Paths().IsBinaryDirWritable {
 		t.Fatal("a read-only base path must not be updatable in place")
 	}
 }
@@ -281,32 +266,32 @@ func TestInitDataDirXDG(t *testing.T) {
 	cacheHome := filepath.Join(t.TempDir(), "cache")
 	configHome := filepath.Join(t.TempDir(), "config")
 
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	xdg.DataHome = dataHome
 	xdg.CacheHome = cacheHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
-	assertDataDir(t, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
-	assertCacheDir(t, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
-	assertConfigDir(t, filepath.ToSlash(filepath.Join(configHome, appDirName)))
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
+	assertCacheDir(t, s, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(configHome, appDirName)))
 }
 
 func TestInitDataDirXDGFallback(t *testing.T) {
 	basePath := t.TempDir()
 	homeDir := t.TempDir()
 
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	// Set XDG variables via xdg package directly
 	xdg.DataHome = filepath.Join(homeDir, ".local", "share")
 	xdg.CacheHome = filepath.Join(homeDir, ".cache")
 	xdg.ConfigHome = filepath.Join(homeDir, ".config")
 
-	initDataDir()
+	s.Init()
 
-	assertDataDir(t, filepath.ToSlash(filepath.Join(homeDir, ".local", "share", appDirName)))
-	assertConfigDir(t, filepath.ToSlash(filepath.Join(homeDir, ".config", appDirName)))
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(homeDir, ".local", "share", appDirName)))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(homeDir, ".config", appDirName)))
 }
 
 func TestInitDataDirIgnoresCase(t *testing.T) {
@@ -317,14 +302,14 @@ func TestInitDataDirIgnoresCase(t *testing.T) {
 
 	dataHome := filepath.Join(t.TempDir(), "xdg")
 	configHome := filepath.Join(t.TempDir(), "config")
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	xdg.DataHome = dataHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
-	assertDataDir(t, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
-	assertConfigDir(t, filepath.ToSlash(filepath.Join(configHome, appDirName)))
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(configHome, appDirName)))
 }
 
 func TestInitDataDirIgnoresDataFile(t *testing.T) {
@@ -335,14 +320,14 @@ func TestInitDataDirIgnoresDataFile(t *testing.T) {
 
 	dataHome := filepath.Join(t.TempDir(), "xdg")
 	configHome := filepath.Join(t.TempDir(), "config")
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	xdg.DataHome = dataHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
-	assertDataDir(t, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
-	assertConfigDir(t, filepath.ToSlash(filepath.Join(configHome, appDirName)))
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(configHome, appDirName)))
 }
 
 func TestInitDataDirMigratesLegacyConfigs(t *testing.T) {
@@ -360,15 +345,15 @@ func TestInitDataDirMigratesLegacyConfigs(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	xdg.DataHome = dataHome
 	xdg.CacheHome = cacheHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
-	assertDataDir(t, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
-	assertConfigDir(t, filepath.ToSlash(filepath.Join(configHome, appDirName)))
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(configHome, appDirName)))
 
 	migrated := filepath.Join(configHome, appDirName, "user.yaml")
 	content, err := os.ReadFile(migrated)
@@ -404,12 +389,12 @@ func TestInitDataDirKeepsExistingConfigDuringMigration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	setTestEnv(t, basePath)
+	s := newTestStorage(basePath)
 	xdg.DataHome = dataHome
 	xdg.CacheHome = cacheHome
 	xdg.ConfigHome = configHome
 
-	initDataDir()
+	s.Init()
 
 	content, err := os.ReadFile(filepath.Join(configDir, "user.yaml"))
 	if err != nil {

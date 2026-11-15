@@ -954,7 +954,7 @@ export const isDaemonCoreMode = () => {
 | Linux 系统包 | true | 包内 stable/alpha | 守护进程 | root，完整特权，systemd 沙箱 |
 | Linux 系统包，systemd 不可用 | true | 包内 stable/alpha | 不可用，明确报错 | 不静默回退 |
 
-判定以 `Env.IsSystemPackage` 为准，不根据二进制路径二次猜测。`bridge/storage_linux.go` 现有路径检测仅保留为旧二进制的兼容后备。
+判定以 `Env.IsSystemPackage` 为准，不根据二进制路径二次猜测。`internal/storage/storage_linux.go` 现有路径检测仅保留为旧二进制的兼容后备。
 
 ## 15. 文件级改动清单
 
