@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/info"
 )
 
 type Action int
@@ -155,16 +157,16 @@ func printHelp(w io.Writer) {
 func printVersion(w io.Writer) {
 	prog := getProgramName()
 	fmt.Fprintf(w, "%s - %s\n\n", prog, appDesc)
-	fmt.Fprintf(w, "Git version    : %s\n", GitVersion)
-	fmt.Fprintf(w, "Git commit     : %s\n", GitCommit)
-	fmt.Fprintf(w, "Git tree state : %s\n", GitTreeState)
-	fmt.Fprintf(w, "Build date     : %s\n", BuildDate)
-	fmt.Fprintf(w, "Built by       : %s\n", BuiltBy)
-	fmt.Fprintf(w, "Go version     : %s\n", GoVersion)
-	fmt.Fprintf(w, "Compiler       : %s\n", Compiler)
-	fmt.Fprintf(w, "Module sum     : %s\n", ModuleSum)
-	fmt.Fprintf(w, "Platform       : %s\n", Platform)
-	fmt.Fprintf(w, "System package : %s\n", SystemPackage)
+	fmt.Fprintf(w, "Git version    : %s\n", info.Current.GitVersion)
+	fmt.Fprintf(w, "Git commit     : %s\n", info.Current.GitCommit)
+	fmt.Fprintf(w, "Git tree state : %s\n", info.Current.GitTreeState)
+	fmt.Fprintf(w, "Build date     : %s\n", info.Current.BuildDate)
+	fmt.Fprintf(w, "Built by       : %s\n", info.Current.BuiltBy)
+	fmt.Fprintf(w, "Go version     : %s\n", info.Current.GoVersion)
+	fmt.Fprintf(w, "Compiler       : %s\n", info.Current.Compiler)
+	fmt.Fprintf(w, "Module sum     : %s\n", info.Current.ModuleSum)
+	fmt.Fprintf(w, "Platform       : %s\n", info.Current.Platform)
+	fmt.Fprintf(w, "System package : %s\n", info.Current.SystemPackage)
 }
 
 func getProgramName() string {

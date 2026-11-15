@@ -90,7 +90,7 @@ polkit rules：
 
 ### 2.3 可保留的既有基础
 
-- `bridge.SystemPackage` 与 `Env.IsSystemPackage` 的判定逻辑。
+- `internal/build.SystemPackage` 与 `Env.IsSystemPackage` 的判定逻辑。
 - `packaging/linux/cores/cores.txt` 与 `scripts/task.sh` 的 stable/alpha 核心下载、校验逻辑。
 - `nfpm.yaml` 中现有应用、核心、桌面文件、DNS polkit 规则和许可证打包逻辑。
 - 系统代理与系统 DNS 的现有实现和 polkit 规则。

@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/adrg/xdg"
+
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/build"
 )
 
 const (
@@ -98,7 +100,7 @@ func userConfigDir() string {
 // package. The injected build variable is the only source of truth for the
 // value exposed to the frontend.
 func isSystemPackageBuild() bool {
-	return SystemPackage == "true"
+	return build.SystemPackage == "true"
 }
 
 // appCacheDir and appConfigDir hold the resolved cache and config
@@ -237,7 +239,7 @@ func initDataDir() {
 }
 
 func logResolvedPath(rawPath string, resolvedPath string) {
-	if isDev {
+	if build.Dev {
 		log.Printf("resolvePath: %q -> %s", rawPath, maskUserHome(resolvedPath))
 	}
 }

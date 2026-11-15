@@ -102,11 +102,11 @@ WAILS_FLAGS=(-m -s -trimpath -skipbindings -devtools)
 
 # Linker flags (array keeps values with spaces intact)
 LDFLAGS=(
-  "-X '${GO_MODULE}/bridge.GitVersion=${APP_VERSION}'"
-  "-X '${GO_MODULE}/bridge.GitCommit=${GIT_COMMIT}'"
-  "-X '${GO_MODULE}/bridge.GitTreeState=${GIT_TREE_STATE}'"
-  "-X '${GO_MODULE}/bridge.BuildDate=${BUILD_DATE}'"
-  "-X '${GO_MODULE}/bridge.BuiltBy=${BUILT_BY}'"
+  "-X '${GO_MODULE}/internal/build.GitVersion=${APP_VERSION}'"
+  "-X '${GO_MODULE}/internal/build.GitCommit=${GIT_COMMIT}'"
+  "-X '${GO_MODULE}/internal/build.GitTreeState=${GIT_TREE_STATE}'"
+  "-X '${GO_MODULE}/internal/build.BuildDate=${BUILD_DATE}'"
+  "-X '${GO_MODULE}/internal/build.BuiltBy=${BUILT_BY}'"
 )
 LDFLAGS_BASE="${LDFLAGS[*]}"
 
@@ -114,7 +114,7 @@ LDFLAGS_BASE="${LDFLAGS[*]}"
 # installs always use the per-user directories. Builds without the flag keep
 # the path-based detection as a fallback.
 PACKAGE_LDFLAGS=(
-  "-X '${GO_MODULE}/bridge.SystemPackage=true'"
+  "-X '${GO_MODULE}/internal/build.SystemPackage=true'"
 )
 LDFLAGS_PACKAGE="${LDFLAGS_BASE} ${PACKAGE_LDFLAGS[*]}"
 

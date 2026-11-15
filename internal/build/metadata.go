@@ -1,26 +1,28 @@
-package bridge
+// Package build records the metadata of the running binary.
+package build
 
 import (
 	"runtime"
 	"runtime/debug"
 )
 
-const unknown = "unknown"
+// Unknown is the placeholder for build metadata that was not injected.
+const Unknown = "unknown"
 
 var (
 	// Set by -ldflags in release builds.
-	GitVersion   = unknown
-	GitCommit    = unknown
-	GitTreeState = unknown
-	BuildDate    = unknown
-	BuiltBy      = unknown
-	ModuleSum    = unknown
+	GitVersion   = Unknown
+	GitCommit    = Unknown
+	GitTreeState = Unknown
+	BuildDate    = Unknown
+	BuiltBy      = Unknown
+	ModuleSum    = Unknown
 
 	// SystemPackage records whether this binary was built for a system
 	// package. Linux package builds inject "true" via -ldflags; "false"
 	// disables the per-user directory layout, and unknown keeps the runtime
 	// path-based detection in charge.
-	SystemPackage = unknown
+	SystemPackage = Unknown
 
 	GoVersion = runtime.Version()
 	Compiler  = runtime.Compiler
@@ -35,22 +37,22 @@ func init() {
 
 	GoVersion = info.GoVersion
 
-	if ModuleSum == unknown && info.Main.Sum != "" {
+	if ModuleSum == Unknown && info.Main.Sum != "" {
 		ModuleSum = info.Main.Sum
 	}
 
 	for _, setting := range info.Settings {
 		switch setting.Key {
 		case "vcs.revision":
-			if GitCommit == unknown {
+			if GitCommit == Unknown {
 				GitCommit = shortRevision(setting.Value)
 			}
 		case "vcs.time":
-			if BuildDate == unknown {
+			if BuildDate == Unknown {
 				BuildDate = setting.Value
 			}
 		case "vcs.modified":
-			if GitTreeState == unknown {
+			if GitTreeState == Unknown {
 				GitTreeState = treeState(setting.Value)
 			}
 		}

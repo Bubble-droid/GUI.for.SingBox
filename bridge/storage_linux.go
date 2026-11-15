@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/build"
 )
 
 const appDirName = "gui-for-singbox"
@@ -30,7 +32,7 @@ var systemPackagePrefixes = []string{
 // wins when present; otherwise the path-based detection below keeps older
 // binaries working as a compatibility fallback.
 func isSystemPackage() bool {
-	switch SystemPackage {
+	switch build.SystemPackage {
 	case "true":
 		return true
 	case "false":

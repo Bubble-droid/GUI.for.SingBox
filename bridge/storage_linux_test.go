@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/adrg/xdg"
+
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/build"
 )
 
 func assertDataDir(t *testing.T, want string) {
@@ -43,32 +45,32 @@ func assertConfigDir(t *testing.T, want string) {
 }
 
 func TestIsSystemPackageBuildFlag(t *testing.T) {
-	prev := SystemPackage
+	prev := build.SystemPackage
 	t.Cleanup(func() {
-		SystemPackage = prev
+		build.SystemPackage = prev
 	})
 
-	SystemPackage = "true"
+	build.SystemPackage = "true"
 	if !isSystemPackageBuild() {
-		t.Fatal("SystemPackage=true should report a system package build")
+		t.Fatal("build.SystemPackage=true should report a system package build")
 	}
 	if !isSystemPackage() {
-		t.Fatal("SystemPackage=true should drive the directory layout")
+		t.Fatal("build.SystemPackage=true should drive the directory layout")
 	}
 
-	SystemPackage = "false"
+	build.SystemPackage = "false"
 	if isSystemPackageBuild() {
-		t.Fatal("SystemPackage=false should not report a system package build")
+		t.Fatal("build.SystemPackage=false should not report a system package build")
 	}
 	if isSystemPackage() {
-		t.Fatal("SystemPackage=false should disable system package detection")
+		t.Fatal("build.SystemPackage=false should disable system package detection")
 	}
 
 	// Unknown keeps the build flag false; the directory layout falls back to
 	// the path-based detection, which does not match the test binary.
-	SystemPackage = unknown
+	build.SystemPackage = build.Unknown
 	if isSystemPackageBuild() {
-		t.Fatal("unknown build flag must not report a system package build")
+		t.Fatal("build.Unknown build flag must not report a system package build")
 	}
 	if isSystemPackage() {
 		t.Fatal("path-based fallback should not report a system package for the test binary")
@@ -78,22 +80,22 @@ func TestIsSystemPackageBuildFlag(t *testing.T) {
 func TestIsBinaryDirWritable(t *testing.T) {
 	setTestEnv(t, t.TempDir())
 
-	prev := SystemPackage
+	prev := build.SystemPackage
 	t.Cleanup(func() {
-		SystemPackage = prev
+		build.SystemPackage = prev
 	})
 
-	SystemPackage = unknown
+	build.SystemPackage = build.Unknown
 	if !isBinaryDirWritable() {
 		t.Fatal("a writable base path outside system prefixes should be updatable")
 	}
 
-	SystemPackage = "true"
+	build.SystemPackage = "true"
 	if isBinaryDirWritable() {
 		t.Fatal("the injected package flag must disable in-place updates")
 	}
 
-	SystemPackage = unknown
+	build.SystemPackage = build.Unknown
 	readOnlyBase := t.TempDir()
 	if err := os.Chmod(readOnlyBase, 0o555); err != nil {
 		t.Fatal(err)
@@ -156,11 +158,11 @@ func TestInitDataDirSystemPackageFlagWins(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	prev := SystemPackage
+	prev := build.SystemPackage
 	t.Cleanup(func() {
-		SystemPackage = prev
+		build.SystemPackage = prev
 	})
-	SystemPackage = "true"
+	build.SystemPackage = "true"
 
 	dataHome := filepath.Join(t.TempDir(), "xdg")
 	cacheHome := filepath.Join(t.TempDir(), "cache")

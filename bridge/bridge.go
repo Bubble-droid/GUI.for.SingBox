@@ -12,6 +12,9 @@ import (
 
 	sysruntime "runtime"
 
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/build"
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/info"
+
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -53,8 +56,8 @@ func CreateApp() *App {
 
 	initDataDir()
 
-	if GitVersion != unknown {
-		Env.AppVersion = GitVersion
+	if info.Current.GitVersion != build.Unknown {
+		Env.AppVersion = info.Current.GitVersion
 	}
 
 	if slices.Contains(os.Args, "tasksch") {
