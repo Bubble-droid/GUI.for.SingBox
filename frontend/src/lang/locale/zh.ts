@@ -812,6 +812,7 @@ export default {
   },
   about: {
     new: '新版本',
+    daemonVersion: '守护进程',
     restart: '重启软件',
     noDownloadLink: '没有发现下载链接',
     updateSuccessfulRestart: '更新完成，请重启软件',

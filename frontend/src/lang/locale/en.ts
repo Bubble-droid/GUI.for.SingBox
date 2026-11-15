@@ -815,6 +815,7 @@ export default {
   },
   about: {
     new: 'New',
+    daemonVersion: 'Daemon',
     restart: 'Restart APP',
     noDownloadLink: 'No download link found',
     updateSuccessfulRestart: 'Update completed, please restart the App',

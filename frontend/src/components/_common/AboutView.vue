@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { h, resolveComponent } from 'vue'
+import { isDaemonCoreMode } from '@daemon/mode'
+import { readDaemonVersion } from '@daemon/version'
+import { h, onMounted, ref, resolveComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import logo from '@/assets/logo'
@@ -12,6 +14,7 @@ import {
   PROJECT_URL,
   TG_GROUP,
   TG_CHANNEL,
+  ignoredError,
   message,
   RunWithOsaScript,
 } from '@/utils'
@@ -19,6 +22,13 @@ import {
 const { t } = useI18n()
 const envStore = useEnvStore()
 const appStore = useAppStore()
+
+const daemonVersion = ref('')
+
+onMounted(async () => {
+  if (!isDaemonCoreMode()) return
+  daemonVersion.value = (await ignoredError(readDaemonVersion)) || ''
+})
 
 const handleRestartApp = async () => {
   try {
@@ -111,6 +121,9 @@ defineExpose({
           {{ t('about.new') }}: {{ appStore.remoteVersion }}
         </Button>
       </template>
+    </div>
+    <div v-if="daemonVersion" class="pt-4 text-12" style="opacity: 0.7">
+      {{ t('about.daemonVersion') }}: {{ daemonVersion }}
     </div>
   </div>
 </template>

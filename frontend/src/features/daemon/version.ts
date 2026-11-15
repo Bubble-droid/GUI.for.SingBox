@@ -11,6 +11,9 @@ export const readDaemonCoreChannel = async (
   return info.channels.find((item) => item.name === channel)
 }
 
+/** readDaemonVersion returns the version of the daemon answering the socket. */
+export const readDaemonVersion = async () => (await DaemonInfo()).version || ''
+
 /** readDaemonCoreVersion returns the packaged core version text. */
 export const readDaemonCoreVersion = async (channel: CoreChannel) =>
   (await readDaemonCoreChannel(channel))?.version || ''
