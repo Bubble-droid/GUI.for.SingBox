@@ -1,4 +1,5 @@
-package bridge
+// Package cli parses command-line flags for the application.
+package cli
 
 import (
 	"flag"
@@ -11,6 +12,7 @@ import (
 	"github.com/Bubble-droid/GUI.for.SingBox/internal/info"
 )
 
+// Action is the startup action requested by the command line.
 type Action int
 
 const (
@@ -19,6 +21,7 @@ const (
 	ActionExit
 )
 
+// Result is the outcome of parsing the command line.
 type Result struct {
 	Action      Action
 	ExitCode    int
@@ -27,6 +30,7 @@ type Result struct {
 
 const appDesc string = "A GUI client for sing-box"
 
+// HandleFlags parses the process arguments and returns the requested action.
 func HandleFlags(args []string) Result {
 	if len(args) == 0 {
 		return Result{Action: ActionLaunch, ExitCode: 0}
@@ -35,6 +39,7 @@ func HandleFlags(args []string) Result {
 	return parse(args, os.Stdout, os.Stderr)
 }
 
+// IsQuit reports whether args request quitting the running instance.
 func IsQuit(args []string) bool {
 	for _, arg := range args {
 		trimmed := strings.TrimLeft(arg, "-")
@@ -95,7 +100,7 @@ func parse(args []string, stdout, stderr io.Writer) Result {
 		normalizedArgs[0] = "--tasksch"
 	}
 
-	fs := flag.NewFlagSet(getProgramName(), flag.ContinueOnError)
+	fs := flag.NewFlagSet(programName(), flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	fs.Usage = func() {}
 
@@ -143,7 +148,7 @@ func parse(args []string, stdout, stderr io.Writer) Result {
 }
 
 func printHelp(w io.Writer) {
-	prog := getProgramName()
+	prog := programName()
 	fmt.Fprintf(w, "%s - %s\n\n", prog, appDesc)
 	fmt.Fprintln(w, "Usage:")
 	fmt.Fprintf(w, "  %s [flags]\n\n", prog)
@@ -155,7 +160,7 @@ func printHelp(w io.Writer) {
 }
 
 func printVersion(w io.Writer) {
-	prog := getProgramName()
+	prog := programName()
 	fmt.Fprintf(w, "%s - %s\n\n", prog, appDesc)
 	fmt.Fprintf(w, "Git version    : %s\n", info.Current.GitVersion)
 	fmt.Fprintf(w, "Git commit     : %s\n", info.Current.GitCommit)
@@ -169,7 +174,9 @@ func printVersion(w io.Writer) {
 	fmt.Fprintf(w, "System package : %s\n", info.Current.SystemPackage)
 }
 
-func getProgramName() string {
+// programName returns the application name injected by the caller, falling
+// back to the executable name when none was provided.
+func programName() string {
 	execPath, err := os.Executable()
 	if err != nil {
 		panic(err)

@@ -1,6 +1,9 @@
-package bridge
+// Package signals manages graceful shutdown when the process receives an exit
+// signal.
+package signals
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/signal"
@@ -25,9 +28,18 @@ var exitSignals = []os.Signal{
 	syscall.SIGHUP,  // SIGHUP: controlling terminal disconnected
 }
 
+// Options carries the application hooks the signal handler needs. Passing
+// them in keeps this package independent of the bridge.
+type Options struct {
+	// Context returns the runtime context used to emit frontend events.
+	Context func() context.Context
+	// Exit asks the application to shut down gracefully.
+	Exit func()
+}
+
 // Handler manages cross-platform exit signals and lifecycle.
 type Handler struct {
-	app       *App
+	options   Options
 	sigChan   chan os.Signal
 	readyChan chan struct{}
 	readyOnce sync.Once
@@ -35,9 +47,9 @@ type Handler struct {
 }
 
 // Setup initializes the signal listener.
-func Setup(a *App) *Handler {
+func Setup(options Options) *Handler {
 	h := &Handler{
-		app:       a,
+		options:   options,
 		sigChan:   make(chan os.Signal, 10), // buffered so signals are not lost
 		readyChan: make(chan struct{}),
 	}
@@ -57,7 +69,9 @@ func (h *Handler) watch() {
 	// 2. Exit immediately when the frontend has not loaded yet.
 	select {
 	case <-h.readyChan:
-		runtime.EventsEmit(h.app.Ctx, "onExitApp")
+		if h.options.Context != nil {
+			runtime.EventsEmit(h.options.Context(), "onExitApp")
+		}
 	default:
 		log.Printf("Signals: Exit requested before frontend ready, exiting immediately")
 		h.Close()
@@ -73,7 +87,9 @@ func (h *Handler) watch() {
 		os.Exit(1)
 	case <-time.After(exitSignalTimeout):
 		log.Printf("Signals: Frontend exit timed out (%v), invoking backend ExitApp", exitSignalTimeout)
-		h.app.ExitApp()
+		if h.options.Exit != nil {
+			h.options.Exit()
+		}
 	}
 
 	// 4. Give ExitApp a short grace period to clean up.

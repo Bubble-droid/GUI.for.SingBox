@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/Bubble-droid/GUI.for.SingBox/bridge"
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/cli"
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/signals"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -29,8 +31,8 @@ var icon []byte
 var appIcon []byte
 
 func main() {
-	cmd := bridge.HandleFlags(os.Args[1:])
-	if cmd.Action == bridge.ActionExit {
+	cmd := cli.HandleFlags(os.Args[1:])
+	if cmd.Action == cli.ActionExit {
 		os.Exit(cmd.ExitCode)
 	}
 
@@ -47,7 +49,7 @@ func main() {
 	trayStart, trayEnd := bridge.CreateTray(app, trayIcon)
 	var isTrayStarted bool
 
-	var sigHandler atomic.Pointer[bridge.Handler]
+	var sigHandler atomic.Pointer[signals.Handler]
 	defer func() {
 		if h := sigHandler.Load(); h != nil {
 			h.Close()
@@ -104,7 +106,7 @@ func main() {
 				return bridge.Env.AppName
 			}(),
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
-				if bridge.IsQuit(data.Args) {
+				if cli.IsQuit(data.Args) {
 					runtime.EventsEmit(app.Ctx, "onExitApp")
 					return
 				}
@@ -116,7 +118,7 @@ func main() {
 			app.Ctx = ctx
 			bridge.Startup(assets)
 
-			if cmd.Action == bridge.ActionQuit {
+			if cmd.Action == cli.ActionQuit {
 				go func() {
 					time.Sleep(50 * time.Millisecond)
 					app.ExitApp()
@@ -124,7 +126,10 @@ func main() {
 				return
 			}
 
-			sigHandler.Store(bridge.Setup(app))
+			sigHandler.Store(signals.Setup(signals.Options{
+				Context: func() context.Context { return app.Ctx },
+				Exit:    app.ExitApp,
+			}))
 
 			runtime.InitializeNotifications(ctx)
 			trayStart()
