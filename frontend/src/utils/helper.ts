@@ -217,7 +217,11 @@ export const IsAutoStartEnabled = async () => {
 
 export const EnableAutoStart = async (delay = 10) => {
   const { os, appPath, isPrivileged } = useEnvStore().env
-  const configuration = getAutoStartConfiguration(os, appPath, delay)
+  const { windowStartState } = useAppSettingsStore().app
+  // The window state is settings-driven, so autostart is the only launch that
+  // carries a flag. It stays a one-shot override: user launch flags are never
+  // persisted here.
+  const configuration = getAutoStartConfiguration(os, appPath, windowStartState, delay)
   if (os === OS.Windows) {
     const xmlPath = await AbsolutePath(`${CacheDirectory}/tasksch.xml`)
     await WriteFile(xmlPath, configuration)

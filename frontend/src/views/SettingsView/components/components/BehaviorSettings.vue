@@ -56,15 +56,20 @@ const onTaskSchChange = async (v: boolean) => {
   }
 }
 
-const onStartupDelayChange = async (delay: number) => {
-  if (appSettings.app.startupDelay !== delay) {
-    try {
-      await EnableAutoStart(delay)
-      appSettings.app.startupDelay = delay
-    } catch (error: any) {
-      console.error(error)
-      message.error(error)
-    }
+const onAutoStartOptionChange = async <K extends 'startupDelay' | 'windowStartState'>(
+  key: K,
+  value: App.AppSettings[K],
+) => {
+  const old = appSettings.app[key]
+  if (old === value) return
+  appSettings.app[key] = value
+  if (!isAutoStart.value) return
+  try {
+    await EnableAutoStart(appSettings.app.startupDelay)
+  } catch (error: any) {
+    appSettings.app[key] = old
+    console.error(error)
+    message.error(error)
   }
 }
 
@@ -107,9 +112,9 @@ if (envStore.env.os === OS.Windows) {
       <div class="flex items-center">
         <Radio
           v-if="isAutoStart"
-          v-model="appSettings.app.windowStartState"
+          :model-value="appSettings.app.windowStartState"
           :options="WindowStateOptions"
-          type="number"
+          @change="(v: App.WindowStartState) => onAutoStartOptionChange('windowStartState', v)"
         />
         <Switch v-model="isAutoStart" class="ml-16" @change="onTaskSchChange" />
       </div>
@@ -128,7 +133,7 @@ if (envStore.env.os === OS.Windows) {
         :max="180"
         editable
         type="number"
-        @submit="onStartupDelayChange"
+        @submit="(v) => onAutoStartOptionChange('startupDelay', v)"
       >
         <template #suffix="{ showInput }">
           <span class="ml-4" @click="showInput">{{ $t('settings.startup.delay') }}</span>

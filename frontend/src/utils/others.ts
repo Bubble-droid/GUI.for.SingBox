@@ -268,7 +268,15 @@ export const transformRequestUrl = (url: string) => {
   return url
 }
 
-export const getAutoStartConfiguration = (os: App.OS, appPath: string, delay = 30) => {
+const escapeXml = (s: string) => s.replace(/[&<>]/g, (c) => `&#${c.charCodeAt(0)};`)
+
+export const getAutoStartConfiguration = (
+  os: App.OS,
+  appPath: string,
+  windowStartState: App.WindowStartState,
+  delay = 30,
+) => {
+  const arg = `--window-start-state=${windowStartState}`
   if (os === OS.Windows) {
     const xml = /*xml*/ `<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
@@ -309,25 +317,27 @@ export const getAutoStartConfiguration = (os: App.OS, appPath: string, delay = 3
   </Settings>
   <Actions Context="Author">
     <Exec>
-      <Command>${appPath}</Command>
-      <Arguments>tasksch</Arguments>
+      <Command>${escapeXml(appPath)}</Command>
+      <Arguments>${arg}</Arguments>
     </Exec>
   </Actions>
 </Task>`
     return xml
   }
   if (os === OS.Linux) {
+    const exec = `"${appPath.replace(/["`$\\]/g, '\\$&')}" ${arg}`
     const desktop = `[Desktop Entry]
 Version=1.0
 Type=Application
 Name=${APP_TITLE}
-Exec=${appPath} tasksch
+Exec=${exec.replace(/[%\\]/g, '$&$&')}
 Icon=${APP_ID}
 Terminal=false
 StartupWMClass=${APP_ID}`
     return desktop
   }
   if (os === OS.Darwin) {
+    const program = ['/usr/bin/open', appPath, '--args', arg]
     const plist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -337,10 +347,7 @@ StartupWMClass=${APP_ID}`
     <string>${APP_TITLE}</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/bin/open</string>
-        <string>${appPath}</string>
-        <string>--args</string>
-        <string>tasksch</string>
+${program.map((line) => `        <string>${escapeXml(line)}</string>`).join('\n')}
     </array>
     <key>RunAtLoad</key>
     <true/>

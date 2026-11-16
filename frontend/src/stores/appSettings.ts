@@ -209,6 +209,11 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     // Rolling release is globally disabled
     settings.rollingRelease = false
 
+    if (typeof settings.windowStartState === 'number') {
+      settings.windowStartState =
+        settings.windowStartState === 2 ? WindowStartState.Minimised : WindowStartState.Normal
+    }
+
     if (pluginSourcesMigrated) {
       await WriteFile(UserFilePath, stringify(settings))
     }
