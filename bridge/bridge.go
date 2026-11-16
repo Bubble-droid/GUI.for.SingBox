@@ -83,6 +83,7 @@ func CreateApp(opts LaunchOptions) *App {
 
 	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
 	Env.AppName = filepath.Base(exePath)
+	Env.FlagsFilePath = storage.LaunchFlagsPath()
 
 	initStorage(opts)
 
@@ -151,6 +152,7 @@ func (a *App) GetEnv(key string) any {
 
 		IsSystemPackage:     Env.IsSystemPackage,
 		IsBinaryDirWritable: Env.IsBinaryDirWritable,
+		FlagsFilePath:       Env.FlagsFilePath,
 	}
 }
 

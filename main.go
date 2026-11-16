@@ -12,6 +12,7 @@ import (
 	"github.com/Bubble-droid/GUI.for.SingBox/bridge"
 	"github.com/Bubble-droid/GUI.for.SingBox/internal/cli"
 	"github.com/Bubble-droid/GUI.for.SingBox/internal/signals"
+	"github.com/Bubble-droid/GUI.for.SingBox/internal/storage"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -38,10 +39,14 @@ func main() {
 		os.Exit(cmd.ExitCode)
 	}
 
+	// Persistent flags live in a fixed per-user file; command-line flags only
+	// override them for this run and are never written back.
+	launch := cli.LoadLaunchFlags(storage.LaunchFlagsPath()).WithOverride(cmd)
+
 	app := bridge.CreateApp(bridge.LaunchOptions{
-		DataDir:          cmd.DataDir,
-		Portable:         cmd.Portable,
-		WindowStartState: cmd.WindowStartState,
+		DataDir:          launch.DataDir,
+		Portable:         launch.Portable,
+		WindowStartState: launch.WindowStartState,
 	})
 
 	windowStartState := options.Normal

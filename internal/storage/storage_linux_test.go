@@ -172,6 +172,20 @@ func TestInitDataDirPortableNotWritable(t *testing.T) {
 	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(configHome, appDirName)))
 }
 
+func TestLaunchFlagsPath(t *testing.T) {
+	configHome := t.TempDir()
+	previousConfigHome := xdg.ConfigHome
+	xdg.ConfigHome = configHome
+	t.Cleanup(func() {
+		xdg.ConfigHome = previousConfigHome
+	})
+
+	want := filepath.ToSlash(filepath.Join(configHome, appDirName, launchFlagsFileName))
+	if got := LaunchFlagsPath(); got != want {
+		t.Fatalf("LaunchFlagsPath() = %q, want %q", got, want)
+	}
+}
+
 func TestInitDataDirSystemPackageFlagWins(t *testing.T) {
 	basePath := t.TempDir()
 	if err := os.Mkdir(filepath.Join(basePath, "data"), 0o755); err != nil {

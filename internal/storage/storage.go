@@ -18,6 +18,10 @@ const (
 	dataLogicalPrefix   = "data"
 	configLogicalPrefix = "data/config"
 	cacheLogicalPrefix  = "data/.cache"
+
+	// launchFlagsFileName is the fixed anchor file for persistent, user-level
+	// launch flags. It never moves with the data directory.
+	launchFlagsFileName = "flags.conf"
 )
 
 // Config carries the values the bridge injects at startup.
@@ -220,6 +224,18 @@ func userConfigDir(dataDir string) string {
 		return filepath.ToSlash(filepath.Join(dataDir, "config"))
 	}
 	return filepath.ToSlash(filepath.Join(base, appDirName))
+}
+
+// LaunchFlagsPath returns the fixed, per-user location of the persistent
+// launch flags file. It is resolved against the platform config directory, not
+// against the data directory, so it can still point at a custom data directory
+// when the data directory itself has moved.
+func LaunchFlagsPath() string {
+	base := filepath.ToSlash(xdg.ConfigHome)
+	if base == "" {
+		base = filepath.ToSlash(xdg.DataHome)
+	}
+	return filepath.ToSlash(filepath.Join(base, appDirName, launchFlagsFileName))
 }
 
 // isSystemPackageBuild reports whether the binary was built for a system
