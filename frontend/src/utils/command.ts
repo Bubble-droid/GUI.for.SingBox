@@ -1,4 +1,3 @@
-import { RestartApp } from '@/bridge'
 import { ColorOptions, ThemeOptions } from '@/constant/app'
 import { ModeOptions } from '@/constant/kernel'
 import { PluginTrigger, PluginTriggerEvent } from '@/enums/app'
@@ -162,11 +161,6 @@ export const getCommands = () => {
           label: 'titlebar.reload',
           cmd: 'Reload Window',
           handler: reloadApp,
-        },
-        {
-          label: 'tray.restartTip',
-          cmd: 'Restart APP',
-          handler: RestartApp,
         },
         {
           label: 'tray.exitTip',

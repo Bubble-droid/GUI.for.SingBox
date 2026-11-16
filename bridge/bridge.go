@@ -135,22 +135,6 @@ func (a *App) ExitApp() {
 	runtime.Quit(a.Ctx)
 }
 
-func (a *App) RestartApp() FlagResult {
-	log.Printf("RestartApp")
-	exePath := filepath.Join(Env.BasePath, Env.AppName)
-
-	cmd := exec.Command(exePath)
-	SetCmdWindowHidden(cmd)
-
-	if err := cmd.Start(); err != nil {
-		return FlagResult{false, err.Error()}
-	}
-
-	a.ExitApp()
-
-	return FlagResult{true, "Success"}
-}
-
 func (a *App) GetEnv(key string) any {
 	log.Printf("GetEnv: %s", key)
 	if key != "" {

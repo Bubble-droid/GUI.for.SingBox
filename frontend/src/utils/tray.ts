@@ -1,11 +1,4 @@
-import {
-  Notify,
-  RestartApp,
-  EventsOn,
-  EventsOff,
-  ShowMainWindow,
-  UpdateTrayAndMenus,
-} from '@/bridge'
+import { Notify, EventsOn, EventsOff, ShowMainWindow, UpdateTrayAndMenus } from '@/bridge'
 import { CacheDirectory, ColorOptions, ThemeOptions } from '@/constant/app'
 import { ModeOptions } from '@/constant/kernel'
 import { OS } from '@/enums/app'
@@ -315,12 +308,6 @@ const getTrayMenus = () => {
     },
     {
       type: 'separator',
-    },
-    {
-      type: 'item',
-      text: 'tray.restart',
-      tooltip: 'tray.restartTip',
-      event: RestartApp,
     },
     {
       type: 'item',

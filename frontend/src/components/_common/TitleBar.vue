@@ -9,7 +9,6 @@ import {
   WindowSetSize,
   WindowToggleMaximise,
   WindowIsMaximised,
-  RestartApp,
 } from '@/bridge'
 import { OS } from '@/enums/app'
 import { useAppSettingsStore, useKernelApiStore, useEnvStore, useAppStore } from '@/stores'
@@ -50,10 +49,6 @@ const menus: App.Menu[] = [
   {
     label: 'titlebar.reload',
     handler: reloadApp,
-  },
-  {
-    label: 'titlebar.restart',
-    handler: RestartApp,
   },
   {
     label: 'titlebar.exitApp',

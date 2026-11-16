@@ -7,8 +7,6 @@ import {
 
 import { sampleID } from '@/utils'
 
-export const RestartApp = Bridge.RestartApp
-
 export const ExitApp = Bridge.ExitApp
 
 export const ShowMainWindow = Bridge.ShowMainWindow

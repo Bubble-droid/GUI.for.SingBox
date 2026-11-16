@@ -5,19 +5,9 @@ import { h, onMounted, ref, resolveComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import logo from '@/assets/logo'
-import { BrowserOpenURL, ExitApp, RestartApp } from '@/bridge'
-import { OS } from '@/enums/app'
+import { BrowserOpenURL, ExitApp } from '@/bridge'
 import { useAppStore, useEnvStore } from '@/stores'
-import {
-  APP_TITLE,
-  APP_VERSION,
-  PROJECT_URL,
-  TG_GROUP,
-  TG_CHANNEL,
-  ignoredError,
-  message,
-  RunWithOsaScript,
-} from '@/utils'
+import { APP_TITLE, APP_VERSION, PROJECT_URL, TG_GROUP, TG_CHANNEL, ignoredError } from '@/utils'
 
 const { t } = useI18n()
 const envStore = useEnvStore()
@@ -29,21 +19,6 @@ onMounted(async () => {
   if (!isDaemonCoreMode()) return
   daemonVersion.value = (await ignoredError(readDaemonVersion)) || ''
 })
-
-const handleRestartApp = async () => {
-  try {
-    if (envStore.env.os === OS.Darwin) {
-      RunWithOsaScript('open', [envStore.env.appPath], {
-        wait: false,
-      })
-      await ExitApp()
-    } else {
-      await RestartApp()
-    }
-  } catch (error: any) {
-    message.error(error)
-  }
-}
 
 if (envStore.env.isBinaryDirWritable) {
   if (Date.now() - appStore.lastCheckTime > 60_000) {
@@ -94,14 +69,8 @@ defineExpose({
     <img :src="logo" class="w-64" draggable="false" />
     <div class="py-8 font-bold">{{ APP_TITLE }}</div>
     <div class="flex items-center">
-      <Button
-        v-if="appStore.restartable"
-        icon="restartApp"
-        size="small"
-        type="primary"
-        @click="handleRestartApp"
-      >
-        {{ t('about.restart') }}
+      <Button v-if="appStore.restartable" size="small" type="primary" @click="ExitApp">
+        {{ t('titlebar.exitApp') }}
       </Button>
       <template v-else>
         <Button
