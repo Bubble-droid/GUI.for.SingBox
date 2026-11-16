@@ -22,6 +22,7 @@ declare namespace App {
     isPrivileged: boolean
     isSystemPackage: boolean
     isBinaryDirWritable: boolean
+    flagsFilePath: string
   }
 
   interface TrayContent {

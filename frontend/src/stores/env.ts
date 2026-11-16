@@ -21,6 +21,7 @@ export const useEnvStore = defineStore('env', () => {
     isPrivileged: false,
     isSystemPackage: false,
     isBinaryDirWritable: false,
+    flagsFilePath: '',
   })
 
   const systemProxy = ref(false)
