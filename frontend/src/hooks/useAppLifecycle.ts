@@ -2,44 +2,30 @@ import { onUnmounted } from 'vue'
 
 import { EventsOn, WindowHide } from '@/bridge'
 import * as Stores from '@/stores'
-import { exitApp, message, modal, sampleID } from '@/utils'
+import { exitApp, message, modal } from '@/utils'
 
 import CommandView from '@/components/_common/CommandView.vue'
 
-export const useAppLifecycle = () => {
-  const appStore = Stores.useAppStore()
-  const appSettings = Stores.useAppSettingsStore()
+export const handleLaunchApp = async (args: string[]) => {
+  const links = args.filter((arg) => arg.includes('://'))
+
   const subscribesStore = Stores.useSubscribesStore()
-  let commandModal: ReturnType<typeof modal> | undefined
-
-  const offLaunchApp = EventsOn('onLaunchApp', async (args: string[]) => {
-    const arg = args.find((a) => a.includes('://'))
-    if (!arg) return
-
-    let _url
-    let _name = sampleID()
-
-    const url = new URL(arg)
-    if (url.pathname === '//install-config/' || url.hostname === 'import-remote-profile') {
-      _url = url.searchParams.get('url')
-      _name = url.searchParams.get('name') || sampleID()
-    } else if (url.pathname.startsWith('//import-remote-profile')) {
-      _url = url.searchParams.get('url')
-      _name = decodeURIComponent(url.hash).slice(1) || sampleID()
-    }
-
-    if (!_url) {
-      message.error('URL missing')
-      return
-    }
-
+  for (const link of links) {
     try {
-      await subscribesStore.importSubscribe(_name, _url)
+      await subscribesStore.importSubscribe(link)
       message.success('common.success')
     } catch (error) {
       message.error(error)
     }
-  })
+  }
+}
+
+export const useAppLifecycle = () => {
+  const appStore = Stores.useAppStore()
+  const appSettings = Stores.useAppSettingsStore()
+  let commandModal: ReturnType<typeof modal> | undefined
+
+  const offLaunchApp = EventsOn('onLaunchApp', handleLaunchApp)
 
   const offBeforeExitApp = EventsOn('onBeforeExitApp', async () => {
     if (appSettings.app.exitOnClose) {
