@@ -36,11 +36,16 @@ func main() {
 		os.Exit(cmd.ExitCode)
 	}
 
-	if cmd.FromTaskSch {
-		bridge.Env.FromTaskSch = true
-	}
+	app := bridge.CreateApp(bridge.LaunchOptions{
+		DataDir:          cmd.DataDir,
+		Portable:         cmd.Portable,
+		WindowStartState: cmd.WindowStartState,
+	})
 
-	app := bridge.CreateApp()
+	windowStartState := options.Normal
+	if bridge.Env.WindowStartState == bridge.WindowStartStateMinimised {
+		windowStartState = options.Minimised
+	}
 
 	trayIcon := icon
 	if bridge.Env.OS == "linux" {
@@ -66,8 +71,8 @@ func main() {
 		Frameless:        bridge.Env.OS != "darwin" && !bridge.Config.SystemTitleBar,
 		Width:            bridge.Config.Width,
 		Height:           bridge.Config.Height,
-		StartHidden:      bridge.Config.StartHidden,
-		WindowStartState: options.WindowStartState(bridge.Config.WindowStartState),
+		StartHidden:      windowStartState == options.Minimised,
+		WindowStartState: windowStartState,
 		BackgroundColour: &options.RGBA{R: 255, G: 255, B: 255, A: 1},
 		Windows: &windows.Options{
 			WebviewIsTransparent: true,

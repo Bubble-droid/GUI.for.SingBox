@@ -16,7 +16,6 @@ type App struct {
 type EnvResult struct {
 	IsStartup    bool   `json:"-"`
 	PreventExit  bool   `json:"-"`
-	FromTaskSch  bool   `json:"-"`
 	WebviewPath  string `json:"-"`
 	AppName      string `json:"appName"`
 	AppVersion   string `json:"appVersion"`
@@ -26,10 +25,9 @@ type EnvResult struct {
 	ARCH         string `json:"arch"`
 	IsPrivileged bool   `json:"isPrivileged"`
 
-	IsSystemPackage bool `json:"isSystemPackage"`
-	// IsBinaryDirWritable reports whether the binary can replace itself on
-	// update. It accounts for the package build flag, legacy path detection
-	// and the actual directory permission.
+	WindowStartState WindowStartState `json:"-"`
+
+	IsSystemPackage     bool `json:"isSystemPackage"`
 	IsBinaryDirWritable bool `json:"isBinaryDirWritable"`
 }
 
@@ -91,8 +89,17 @@ type HTTPResult struct {
 	Body    string      `json:"body"`
 }
 
+// WindowStartState is the window state requested for a single launch. It is
+// never persisted by the backend; autostart entries carry it as a one-shot
+// flag and a normal launch leaves it empty.
+type WindowStartState string
+
+const (
+	WindowStartStateNormal    WindowStartState = "normal"
+	WindowStartStateMinimised WindowStartState = "minimised"
+)
+
 type AppConfig struct {
-	WindowStartState  int  `yaml:"windowStartState"`
 	WebviewGpuPolicy  int  `yaml:"webviewGpuPolicy"`
 	ContentProtection bool `yaml:"contentProtection"`
 	Width             int  `yaml:"width"`
@@ -100,7 +107,6 @@ type AppConfig struct {
 	MultipleInstance  bool `yaml:"multipleInstance"`
 	RollingRelease    bool `yaml:"rollingRelease" default:"true"`
 	SystemTitleBar    bool `yaml:"systemTitleBar"`
-	StartHidden       bool
 }
 
 type TrayContent struct {

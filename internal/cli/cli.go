@@ -23,9 +23,14 @@ const (
 
 // Result is the outcome of parsing the command line.
 type Result struct {
-	Action      Action
-	ExitCode    int
-	FromTaskSch bool
+	Action   Action
+	ExitCode int
+
+	// Launch overrides apply to this run only; normal startup passes none of
+	// them and keeps whatever is persisted in the settings.
+	DataDir          string
+	Portable         bool
+	WindowStartState string
 }
 
 const appDesc string = "A GUI client for sing-box"
@@ -54,15 +59,30 @@ var knownFlagNames = map[string]struct{}{
 	"h": {}, "help": {},
 	"v": {}, "version": {},
 	"q": {}, "quit": {},
-	"t": {}, "tasksch": {},
+	"data-dir": {}, "portable": {},
+	"window-start-state": {},
+}
+
+// valueFlagNames lists flags that consume the following argument when they are
+// not written as --flag=value.
+var valueFlagNames = map[string]struct{}{
+	"data-dir":           {},
+	"window-start-state": {},
 }
 
 func filterKnownFlags(args []string) []string {
 	filtered := make([]string, 0, len(args))
+	expectValue := false
 
 	for _, arg := range args {
 		if arg == "--" {
 			break
+		}
+
+		if expectValue {
+			filtered = append(filtered, arg)
+			expectValue = false
+			continue
 		}
 
 		if arg == "-" || !strings.HasPrefix(arg, "-") {
@@ -70,12 +90,20 @@ func filterKnownFlags(args []string) []string {
 		}
 
 		name := strings.TrimLeft(arg, "-")
+		hasValue := false
 		if idx := strings.IndexByte(name, '='); idx >= 0 {
 			name = name[:idx]
+			hasValue = true
 		}
 
-		if _, ok := knownFlagNames[name]; ok {
-			filtered = append(filtered, arg)
+		if _, ok := knownFlagNames[name]; !ok {
+			continue
+		}
+
+		filtered = append(filtered, arg)
+
+		if _, ok := valueFlagNames[name]; ok && !hasValue {
+			expectValue = true
 		}
 	}
 
@@ -96,8 +124,6 @@ func parse(args []string, stdout, stderr io.Writer) Result {
 		normalizedArgs[0] = "--version"
 	case "quit":
 		normalizedArgs[0] = "--quit"
-	case "tasksch":
-		normalizedArgs[0] = "--tasksch"
 	}
 
 	fs := flag.NewFlagSet(programName(), flag.ContinueOnError)
@@ -105,10 +131,12 @@ func parse(args []string, stdout, stderr io.Writer) Result {
 	fs.Usage = func() {}
 
 	var (
-		help    bool
-		version bool
-		quit    bool
-		tasksch bool
+		help             bool
+		version          bool
+		quit             bool
+		dataDir          string
+		portable         bool
+		windowStartState string
 	)
 
 	fs.BoolVar(&help, "h", false, "Show help information")
@@ -117,8 +145,19 @@ func parse(args []string, stdout, stderr io.Writer) Result {
 	fs.BoolVar(&version, "version", false, "Show version information")
 	fs.BoolVar(&quit, "q", false, "Quit the running instance")
 	fs.BoolVar(&quit, "quit", false, "Quit the running instance")
-	fs.BoolVar(&tasksch, "t", false, "Run in background task scheduler mode")
-	fs.BoolVar(&tasksch, "tasksch", false, "Run in background task scheduler mode")
+	fs.StringVar(&dataDir, "data-dir", "", "Use a custom data directory for this run")
+	fs.BoolVar(&portable, "portable", false, "Keep data next to the application for this run")
+	fs.Func("window-start-state", "Window start state: normal or minimised", func(v string) error {
+		switch strings.ToLower(v) {
+		case "normal":
+			windowStartState = "normal"
+		case "minimised":
+			windowStartState = "minimised"
+		default:
+			return fmt.Errorf("invalid window start state %q (want normal or minimised)", v)
+		}
+		return nil
+	})
 
 	if err := fs.Parse(filterKnownFlags(normalizedArgs)); err != nil {
 		fmt.Fprintf(stderr, "Error: %s\n\n", formatFlagError(err))
@@ -141,9 +180,11 @@ func parse(args []string, stdout, stderr io.Writer) Result {
 	}
 
 	return Result{
-		Action:      ActionLaunch,
-		ExitCode:    0,
-		FromTaskSch: tasksch,
+		Action:           ActionLaunch,
+		ExitCode:         0,
+		DataDir:          dataDir,
+		Portable:         portable,
+		WindowStartState: windowStartState,
 	}
 }
 
@@ -153,10 +194,12 @@ func printHelp(w io.Writer) {
 	fmt.Fprintln(w, "Usage:")
 	fmt.Fprintf(w, "  %s [flags]\n\n", prog)
 	fmt.Fprintln(w, "Flags:")
-	fmt.Fprintln(w, "  -h, --help       Show help information")
-	fmt.Fprintln(w, "  -v, --version    Show version information")
-	fmt.Fprintln(w, "  -q, --quit       Quit the running instance")
-	fmt.Fprintln(w, "  -t, --tasksch    Run in background task scheduler mode")
+	fmt.Fprintln(w, "  -h, --help                    Show help information")
+	fmt.Fprintln(w, "  -v, --version                 Show version information")
+	fmt.Fprintln(w, "  -q, --quit                    Quit the running instance")
+	fmt.Fprintln(w, "      --data-dir <path>         Use a custom data directory for this run")
+	fmt.Fprintln(w, "      --portable                Keep data next to the application for this run")
+	fmt.Fprintln(w, "      --window-start-state <s>  Start the window normal or minimised for this run")
 }
 
 func printVersion(w io.Writer) {

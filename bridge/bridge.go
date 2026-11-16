@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	sysruntime "runtime"
@@ -18,7 +17,6 @@ import (
 
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
-	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gopkg.in/yaml.v3"
 )
@@ -32,7 +30,6 @@ var Store *storage.Storage
 var Env = &EnvResult{
 	IsStartup:    true,
 	PreventExit:  true,
-	FromTaskSch:  false,
 	WebviewPath:  "",
 	AppName:      "",
 	AppVersion:   "v1.28.1",
@@ -41,6 +38,16 @@ var Env = &EnvResult{
 	OS:           sysruntime.GOOS,
 	ARCH:         sysruntime.GOARCH,
 	IsPrivileged: false,
+}
+
+// LaunchOptions carries the one-shot overrides parsed from the command line.
+// Nothing here is persisted: normal startup always runs without arguments.
+type LaunchOptions struct {
+	DataDir  string
+	Portable bool
+	// WindowStartState is set by autostart entries and by an explicit
+	// --window-start-state flag. Normal startup leaves it empty.
+	WindowStartState string
 }
 
 // NewApp creates a new App application struct
@@ -52,12 +59,14 @@ func NewApp() *App {
 
 // initStorage resolves the data, cache and config directories from the
 // injected build and environment values.
-func initStorage() {
+func initStorage(opts LaunchOptions) {
 	Store = storage.New(storage.Config{
 		BasePath:      Env.BasePath,
 		OS:            Env.OS,
 		SystemPackage: build.SystemPackage,
 		Dev:           build.Dev,
+		DataDir:       opts.DataDir,
+		Portable:      opts.Portable,
 	})
 
 	paths := Store.Init()
@@ -66,7 +75,7 @@ func initStorage() {
 	Env.IsBinaryDirWritable = paths.IsBinaryDirWritable
 }
 
-func CreateApp() *App {
+func CreateApp(opts LaunchOptions) *App {
 	exePath, err := os.Executable()
 	if err != nil {
 		panic(err)
@@ -75,14 +84,10 @@ func CreateApp() *App {
 	Env.BasePath = filepath.ToSlash(filepath.Dir(exePath))
 	Env.AppName = filepath.Base(exePath)
 
-	initStorage()
+	initStorage(opts)
 
 	if info.Current.GitVersion != build.Unknown {
 		Env.AppVersion = info.Current.GitVersion
-	}
-
-	if slices.Contains(os.Args, "tasksch") {
-		Env.FromTaskSch = true
 	}
 
 	if priv, err := IsPrivileged(); err == nil {
@@ -100,6 +105,14 @@ func CreateApp() *App {
 	}
 
 	loadConfig()
+
+	// A command-line window state is a one-shot override for this run. Only
+	// autostart entries pass it; normal startup carries no arguments and
+	// always opens normally.
+	Env.WindowStartState = WindowStartStateNormal
+	if opts.WindowStartState != "" {
+		Env.WindowStartState = WindowStartState(opts.WindowStartState)
+	}
 
 	return app
 }
@@ -315,10 +328,4 @@ func loadConfig() {
 
 	// Rolling release is globally disabled: never serve rolling-release assets
 	Config.RollingRelease = false
-
-	Config.StartHidden = Env.FromTaskSch && Config.WindowStartState == int(options.Minimised)
-
-	if !Env.FromTaskSch {
-		Config.WindowStartState = int(options.Normal)
-	}
 }
