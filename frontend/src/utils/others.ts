@@ -440,6 +440,15 @@ export const base64UrlEncode = (str: string): string => {
   return base64Encode(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
+export const utf16leBase64Encode = (str: string): string => {
+  let bytes = '\xff\xfe'
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i)
+    bytes += String.fromCharCode(code & 0xff, code >> 8)
+  }
+  return btoa(bytes)
+}
+
 export const base64Encode = (str: string): string => {
   const bytes = new TextEncoder().encode(str)
   const len = bytes.length

@@ -33,6 +33,7 @@ import {
   APP_TITLE,
   getAutoStartConfiguration,
   APP_ID,
+  utf16leBase64Encode,
 } from '@/utils'
 
 // Permissions Helper
@@ -224,7 +225,7 @@ export const EnableAutoStart = async (delay = 10) => {
   const configuration = getAutoStartConfiguration(os, appPath, windowStartState, delay)
   if (os === OS.Windows) {
     const xmlPath = await AbsolutePath(`${CacheDirectory}/tasksch.xml`)
-    await WriteFile(xmlPath, configuration)
+    await WriteFile(xmlPath, utf16leBase64Encode(configuration), { Mode: 'Binary' })
     const fn = isPrivileged ? Exec : RunWithPowerShell
     await fn('SchTasks', ['/Create', '/F', '/TN', APP_TITLE, '/XML', xmlPath], {
       admin: true,
