@@ -66,8 +66,8 @@ func New(cfg Config) *Storage {
 //  2. Installed as a system package or the app binary directory is not
 //     writable — use per-user directories.
 //  3. Portable mode was requested or a portable data directory exists next to
-//     the app root — stay self-contained: data under root/data, config under
-//     data/config and cache under data/.cache.
+//     the app root, and that directory is writable — stay self-contained: data
+//     under root/data, config under data/config and cache under data/.cache.
 //  4. Default — use per-user directories.
 //
 // Platform hooks are supplied by the platform files:
@@ -79,6 +79,8 @@ func New(cfg Config) *Storage {
 func (s *Storage) Init() Paths {
 	root := portableRoot(s.cfg)
 	portableDataDir := filepath.Join(root, "data")
+	portableMode := s.cfg.Portable || portableDataDirExists(portableDataDir)
+	portableWritable := portableMode && dirWritable(portableDataDir)
 
 	s.paths.IsSystemPackage = s.isSystemPackageBuild()
 	s.paths.IsBinaryDirWritable = s.isBinaryDirWritable()
@@ -94,11 +96,14 @@ func (s *Storage) Init() Paths {
 		s.paths.DataDir = userDataDir()
 		s.paths.CacheDir = userCacheDir()
 		s.paths.ConfigDir = userConfigDir(s.paths.DataDir)
-	case s.cfg.Portable || portableDataDirExists(portableDataDir):
+	case portableWritable:
 		s.paths.DataDir = filepath.ToSlash(portableDataDir)
 		s.paths.CacheDir = ""
 		s.paths.ConfigDir = ""
 	default:
+		if portableMode {
+			log.Printf("Portable data directory %s is not writable; using per-user directories", MaskUserHome(portableDataDir))
+		}
 		s.paths.DataDir = userDataDir()
 		s.paths.CacheDir = userCacheDir()
 		s.paths.ConfigDir = userConfigDir(s.paths.DataDir)

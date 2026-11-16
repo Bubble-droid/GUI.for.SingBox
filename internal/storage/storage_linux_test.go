@@ -142,6 +142,36 @@ func TestInitDataDirPortable(t *testing.T) {
 	}
 }
 
+func TestInitDataDirPortableNotWritable(t *testing.T) {
+	basePath := t.TempDir()
+	portableDataDir := filepath.Join(basePath, "data")
+	if err := os.Mkdir(portableDataDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chmod(portableDataDir, 0o555); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		os.Chmod(portableDataDir, 0o755)
+	})
+
+	dataHome := filepath.Join(t.TempDir(), "xdg")
+	cacheHome := filepath.Join(t.TempDir(), "cache")
+	configHome := filepath.Join(t.TempDir(), "config")
+	s := newTestStorage(basePath)
+	xdg.DataHome = dataHome
+	xdg.CacheHome = cacheHome
+	xdg.ConfigHome = configHome
+
+	s.Init()
+
+	// An unwritable portable data directory must fall back to per-user
+	// locations instead of failing on the first write.
+	assertDataDir(t, s, filepath.ToSlash(filepath.Join(dataHome, appDirName)))
+	assertCacheDir(t, s, filepath.ToSlash(filepath.Join(cacheHome, appDirName)))
+	assertConfigDir(t, s, filepath.ToSlash(filepath.Join(configHome, appDirName)))
+}
+
 func TestInitDataDirSystemPackageFlagWins(t *testing.T) {
 	basePath := t.TempDir()
 	if err := os.Mkdir(filepath.Join(basePath, "data"), 0o755); err != nil {
