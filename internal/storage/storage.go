@@ -3,6 +3,7 @@
 package storage
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -212,15 +213,39 @@ func portableDataDirExists(path string) bool {
 	return err == nil && info.IsDir()
 }
 
-// isDirWritable reports whether dir can host new files (i.e. is writable).
-func isDirWritable(dir string) bool {
-	f, err := os.CreateTemp(dir, ".write-test-*")
+// dirWritable reports whether a new entry could be created at target. When the
+// target does not exist yet, the nearest existing ancestor is probed instead so
+// a rejected override leaves no directories behind.
+func dirWritable(target string) bool {
+	probe := target
+
+	for {
+		info, err := os.Stat(probe)
+		if err == nil {
+			if !info.IsDir() {
+				return false
+			}
+			break
+		}
+		if !errors.Is(err, os.ErrNotExist) {
+			return false
+		}
+
+		parent := filepath.Dir(probe)
+		if parent == probe {
+			return false
+		}
+		probe = parent
+	}
+
+	file, err := os.CreateTemp(probe, ".write-probe-*")
 	if err != nil {
 		return false
 	}
-	name := f.Name()
-	f.Close()
-	os.Remove(name)
+	name := file.Name()
+	_ = file.Close()
+	_ = os.Remove(name)
+
 	return true
 }
 
@@ -231,7 +256,7 @@ func (s *Storage) isBinaryDirWritable() bool {
 	if s.isSystemPackage() {
 		return false
 	}
-	return isDirWritable(s.cfg.BasePath)
+	return dirWritable(s.cfg.BasePath)
 }
 
 // legacyConfigFiles lists the YAML files that used to live directly in the
