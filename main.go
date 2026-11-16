@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"embed"
+	"encoding/hex"
 	"os"
 	"sync/atomic"
 	"time"
@@ -108,7 +110,11 @@ func main() {
 				if bridge.Config.MultipleInstance {
 					return time.Now().String()
 				}
-				return bridge.Env.AppName
+				// Scope the lock by the resolved data directory so instances
+				// with different data directories can coexist. The app name
+				// stays in the id and the path is hashed to keep it short.
+				sum := sha256.Sum256([]byte(bridge.Env.DataDir))
+				return bridge.Env.AppName + "-" + hex.EncodeToString(sum[:8])
 			}(),
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
 				if cli.IsQuit(data.Args) {
