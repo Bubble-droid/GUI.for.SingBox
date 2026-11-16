@@ -32,7 +32,7 @@ var Env = &EnvResult{
 	PreventExit:  true,
 	WebviewPath:  "",
 	AppName:      "",
-	AppVersion:   "v1.28.1",
+	AppVersion:   "",
 	BasePath:     "",
 	DataDir:      "",
 	OS:           sysruntime.GOOS,

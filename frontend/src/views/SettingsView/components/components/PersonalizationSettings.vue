@@ -49,10 +49,7 @@ const localeOptions = computed(() =>
   appStore.locales.map(({ label, value }) => ({ label: remoteLocales[value] ?? label, value })),
 )
 const downloadingLocales = ref<Set<string>>(new Set())
-const isLocaleInstalled = (locale: string) =>
-  appStore.locales.some(({ value }) => value === locale)
-
-
+const isLocaleInstalled = (locale: string) => appStore.locales.some(({ value }) => value === locale)
 
 const handleDownloadLocale = async (locale: string) => {
   downloadingLocales.value.add(locale)
@@ -62,7 +59,6 @@ const handleDownloadLocale = async (locale: string) => {
       `${LocalesFilePath}/${locale}.json`,
     )
     await appStore.loadLocales()
-    message.success('common.success')
   } catch (error) {
     message.error(error)
   }
@@ -76,7 +72,6 @@ const handleDeleteLocale = async (locale: string) => {
       appSettings.app.lang = Lang.EN
     }
     await appStore.loadLocales()
-    message.success('common.success')
   } catch (error) {
     message.error(error)
   }

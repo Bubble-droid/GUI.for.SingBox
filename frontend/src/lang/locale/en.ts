@@ -583,6 +583,7 @@ export default {
     url: 'Remote Url',
     path: 'Save Path',
     type: 'Type',
+    tags: 'Tags',
     menus: 'Menus',
     hasUI: 'Has user interface',
     context: 'Context',
