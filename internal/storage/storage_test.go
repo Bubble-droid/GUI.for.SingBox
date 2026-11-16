@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -122,5 +123,37 @@ func TestResolvePathCacheFallback(t *testing.T) {
 	want := filepath.ToSlash(filepath.Join(dataDir, ".cache", "icons", "logo.png"))
 	if got != want {
 		t.Errorf("ResolvePath(data/.cache/icons/logo.png) = %q, want %q", got, want)
+	}
+}
+
+func TestExpandUserPath(t *testing.T) {
+	t.Setenv("STORAGE_TEST_DIR", "/tmp/storage-test")
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		t.Skipf("no user home directory: %v", err)
+	}
+
+	tests := []struct {
+		name    string
+		value   string
+		windows bool
+		want    string
+	}{
+		{"posix env", "$STORAGE_TEST_DIR/data", false, "/tmp/storage-test/data"},
+		{"brace env", "${STORAGE_TEST_DIR}/data", false, "/tmp/storage-test/data"},
+		{"tilde", "~/data", false, filepath.Join(homeDir, "data")},
+		{"windows tilde", `~\data`, false, filepath.Join(homeDir, "data")},
+		{"windows percent env", "%STORAGE_TEST_DIR%/data", true, "/tmp/storage-test/data"},
+		{"percent literal off windows", "%STORAGE_TEST_DIR%/data", false, "%STORAGE_TEST_DIR%/data"},
+		{"unmatched percent", "100%/data", true, "100%/data"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := expandUserPath(tt.value, tt.windows); got != tt.want {
+				t.Errorf("expandUserPath(%q, %v) = %q, want %q", tt.value, tt.windows, got, tt.want)
+			}
+		})
 	}
 }

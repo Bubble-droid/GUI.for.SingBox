@@ -26,6 +26,16 @@ type Config struct {
 	OS            string
 	SystemPackage string
 	Dev           bool
+
+	// DataDir is an explicit data directory override from the command line.
+	// Environment variables and a leading ~ are expanded, relative paths are
+	// resolved against the working directory, and an unwritable target falls
+	// back to the normal resolution order.
+	DataDir string
+	// Portable keeps data beside the application. It ranks below the
+	// binary-directory writability check, so a read-only installation still
+	// uses per-user directories.
+	Portable bool
 }
 
 // Paths is the resolved directory layout.
@@ -51,12 +61,14 @@ func New(cfg Config) *Storage {
 
 // Init resolves the data, cache and config directories for the current
 // installation. The resolution order is:
-//  1. Installed as a system package or the app binary directory is not
+//  1. An explicit data directory was requested and is writable — keep data,
+//     config and cache together under it.
+//  2. Installed as a system package or the app binary directory is not
 //     writable — use per-user directories.
-//  2. Portable data directory exists next to the app root — stay
-//     self-contained: data under root/data, config under data/config and cache
-//     under data/.cache.
-//  3. Default — use per-user directories.
+//  3. Portable mode was requested or a portable data directory exists next to
+//     the app root — stay self-contained: data under root/data, config under
+//     data/config and cache under data/.cache.
+//  4. Default — use per-user directories.
 //
 // Platform hooks are supplied by the platform files:
 //   - portableRoot: the app root hosting portable data (macOS strips the
@@ -71,12 +83,18 @@ func (s *Storage) Init() Paths {
 	s.paths.IsSystemPackage = s.isSystemPackageBuild()
 	s.paths.IsBinaryDirWritable = s.isBinaryDirWritable()
 
+	customDataDir, customOK := s.resolveCustomDataDir()
+
 	switch {
+	case customOK:
+		s.paths.DataDir = customDataDir
+		s.paths.CacheDir = filepath.ToSlash(filepath.Join(customDataDir, ".cache"))
+		s.paths.ConfigDir = filepath.ToSlash(filepath.Join(customDataDir, "config"))
 	case !s.paths.IsBinaryDirWritable:
 		s.paths.DataDir = userDataDir()
 		s.paths.CacheDir = userCacheDir()
 		s.paths.ConfigDir = userConfigDir(s.paths.DataDir)
-	case portableDataDirExists(portableDataDir):
+	case s.cfg.Portable || portableDataDirExists(portableDataDir):
 		s.paths.DataDir = filepath.ToSlash(portableDataDir)
 		s.paths.CacheDir = ""
 		s.paths.ConfigDir = ""
@@ -206,11 +224,81 @@ func (s *Storage) isSystemPackageBuild() bool {
 	return s.cfg.SystemPackage == "true"
 }
 
-// portableDataDirExists reports whether the portable data directory exists.
-// Only the data directory itself is probed, never its contents.
-func portableDataDirExists(path string) bool {
-	info, err := os.Stat(path)
-	return err == nil && info.IsDir()
+// resolveCustomDataDir turns the explicit data directory override into an
+// absolute, symlink-resolved path. It expands environment variables and a
+// leading ~, resolves relative paths against the working directory (not the
+// binary location), and reports false when the target cannot be written so the
+// caller can fall back.
+func (s *Storage) resolveCustomDataDir() (string, bool) {
+	raw := strings.TrimSpace(s.cfg.DataDir)
+	if raw == "" {
+		return "", false
+	}
+
+	dir := expandUserPath(raw, s.cfg.OS == "windows")
+	if !filepath.IsAbs(dir) {
+		workingDir, err := os.Getwd()
+		if err != nil {
+			log.Printf("Custom data directory %q is relative but the working directory is unavailable: %v", raw, err)
+			return "", false
+		}
+		dir = filepath.Join(workingDir, dir)
+	}
+	dir = filepath.Clean(dir)
+
+	if !dirWritable(dir) {
+		log.Printf("Custom data directory %s is not writable; using the default layout", MaskUserHome(dir))
+		return "", false
+	}
+
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		log.Printf("Failed to create custom data directory %s: %v", MaskUserHome(dir), err)
+		return "", false
+	}
+
+	if realDir, err := filepath.EvalSymlinks(dir); err == nil {
+		dir = realDir
+	}
+
+	return filepath.ToSlash(dir), true
+}
+
+// expandUserPath expands environment variables and a leading ~ in a user
+// supplied path. Windows also accepts the native %VAR% form.
+func expandUserPath(value string, windows bool) string {
+	expanded := os.ExpandEnv(value)
+	if windows {
+		expanded = expandPercentEnv(expanded)
+	}
+
+	if expanded == "~" || strings.HasPrefix(expanded, "~/") || strings.HasPrefix(expanded, `~\`) {
+		if homeDir, err := os.UserHomeDir(); err == nil && homeDir != "" {
+			expanded = filepath.Join(homeDir, strings.TrimLeft(expanded[1:], `/\`))
+		}
+	}
+
+	return expanded
+}
+
+// expandPercentEnv replaces Windows-style %NAME% references with their values.
+// Unmatched percent signs are left untouched.
+func expandPercentEnv(value string) string {
+	var b strings.Builder
+	for {
+		start := strings.IndexByte(value, '%')
+		if start < 0 {
+			b.WriteString(value)
+			return b.String()
+		}
+		end := strings.IndexByte(value[start+1:], '%')
+		if end < 0 {
+			b.WriteString(value)
+			return b.String()
+		}
+		b.WriteString(value[:start])
+		b.WriteString(os.Getenv(value[start+1 : start+1+end]))
+		value = value[start+1+end+1:]
+	}
 }
 
 // dirWritable reports whether a new entry could be created at target. When the
@@ -247,6 +335,13 @@ func dirWritable(target string) bool {
 	_ = os.Remove(name)
 
 	return true
+}
+
+// portableDataDirExists reports whether the portable data directory exists.
+// Only the data directory itself is probed, never its contents.
+func portableDataDirExists(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && info.IsDir()
 }
 
 // isBinaryDirWritable reports whether the running binary may be replaced in
