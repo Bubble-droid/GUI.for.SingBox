@@ -33,6 +33,7 @@ import {
   APP_TITLE,
   getAutoStartConfiguration,
   APP_ID,
+  quoteWindowsArg,
   utf16leBase64Encode,
 } from '@/utils'
 
@@ -131,10 +132,10 @@ export const RunWithPowerShell = async (
 ) => {
   const { admin = false, hidden = false, wait = true, ...others } = options
   const psArgs: string[] = []
-  let command = `Start-Process -FilePath "${path}"`
+  const literal = (s: string) => `'${s.replace(/'/g, "''")}'`
+  let command = `Start-Process -FilePath ${literal(path)}`
   if (args.length > 0) {
-    const argList = args.map((a) => `"${a.replace(/"/g, '""')}"`).join(',')
-    command += ` -ArgumentList ${argList}`
+    command += ` -ArgumentList ${literal(args.map(quoteWindowsArg).join(' '))}`
   }
   if (admin) {
     command += ' -Verb RunAs'

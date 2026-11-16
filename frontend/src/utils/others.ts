@@ -270,6 +270,11 @@ export const transformRequestUrl = (url: string) => {
 
 const escapeXml = (s: string) => s.replace(/[&<>]/g, (c) => `&#${c.charCodeAt(0)};`)
 
+export const quoteWindowsArg = (arg: string) => {
+  if (arg && !/[\s"]/.test(arg)) return arg
+  return `"${arg.replace(/(\\*)"/g, '$1$1\\"').replace(/(\\+)$/, '$1$1')}"`
+}
+
 export const getAutoStartConfiguration = (
   os: App.OS,
   appPath: string,
