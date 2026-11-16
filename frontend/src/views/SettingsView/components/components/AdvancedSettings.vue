@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { MakeDir, OpenDir, OpenURI, ReadFile, WriteFile } from '@/bridge'
 import {
@@ -27,6 +27,8 @@ const defaultFlagsContent = `# ${APP_TITLE} persistent launch flags
 `
 
 const flagsContent = ref(defaultFlagsContent)
+
+const launchArgsText = computed(() => envStore.env.launchArgs.join(' '))
 
 const handleOpenFolder = async () => {
   await MakeDir(DataDirectory)
@@ -166,8 +168,12 @@ onMounted(loadFlags)
         </div>
       </div>
       <div class="text-12 opacity-70 leading-relaxed">{{ $t('settings.launchFlags.tips') }}</div>
-      <div class="text-12 opacity-50 break-all">{{ envStore.env.flagsFilePath }}</div>
       <CodeEditor v-model="flagsContent" lang="yaml" editable class="min-w-256" />
+
+      <div class="flex flex-col gap-4">
+        <div class="text-16 font-bold">{{ $t('settings.launchFlags.current') }}</div>
+        <CodeViewer :model-value="launchArgsText || $t('common.none')" />
+      </div>
     </div>
   </Card>
 </template>

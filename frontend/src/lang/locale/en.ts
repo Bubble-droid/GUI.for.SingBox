@@ -702,6 +702,7 @@ export default {
       tips: 'Stored in a fixed per-user file and applied on the next launch. Flags passed on the command line override these values for a single run only. Data directory flags do not migrate existing data; an unwritable data or portable directory falls back to the default location.',
       open: 'Open flags file',
       reload: 'Reload flags file',
+      current: 'Current launch arguments',
     },
     lang: {
       name: 'Language',
