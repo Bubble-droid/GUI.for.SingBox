@@ -6,7 +6,14 @@ import { ReadFile, WriteFile } from '@/bridge'
 import { ProfilesFilePath } from '@/constant/app'
 import * as Defaults from '@/constant/profile'
 import { useAppSettingsStore } from '@/stores'
-import { ignoredError, eventBus, stringifyNoFolding, migrateProfiles, sampleID } from '@/utils'
+import {
+  ignoredError,
+  eventBus,
+  stringifyNoFolding,
+  migrateProfiles,
+  restoreProfile,
+  sampleID,
+} from '@/utils'
 
 export const useProfilesStore = defineStore('profiles', () => {
   const appSettingsStore = useAppSettingsStore()
@@ -36,6 +43,13 @@ export const useProfilesStore = defineStore('profiles', () => {
       }
       throw error
     }
+  }
+
+  const importProfile = async (path: string) => {
+    const fileName = path.split(/[/\\]/).pop() || ''
+    const name = fileName.replace(/\.json$/i, '') || sampleID()
+    const config = JSON.parse(await ReadFile(path))
+    await addProfile(restoreProfile(config, name))
   }
 
   const deleteProfile = async (id: string) => {
@@ -89,6 +103,7 @@ export const useProfilesStore = defineStore('profiles', () => {
     setupProfiles,
     saveProfiles,
     addProfile,
+    importProfile,
     editProfile,
     deleteProfile,
     getProfileById,

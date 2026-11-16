@@ -1,18 +1,71 @@
 import { onUnmounted } from 'vue'
 
 import { EventsOn, WindowHide } from '@/bridge'
+import { OS } from '@/enums/app'
 import * as Stores from '@/stores'
 import { exitApp, message, modal } from '@/utils'
 
 import CommandView from '@/components/_common/CommandView.vue'
 
+const valueFlags = new Set(['--data-dir', '--window-start-state'])
+
+const fileUrlToPath = (link: string) => {
+  const url = new URL(link)
+  let path = decodeURIComponent(url.pathname)
+  if (url.hostname) {
+    path = `//${url.hostname}${path}`
+  }
+  if (Stores.useEnvStore().env.os === OS.Windows) {
+    path = path.replace(/^\/(?=[A-Za-z]:)/, '')
+  }
+  return path
+}
+
+const splitLaunchArgs = (args: string[]) => {
+  const links: string[] = []
+  const paths: string[] = []
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
+    if (!arg) continue
+
+    if (arg.startsWith('-')) {
+      if (!arg.includes('=') && valueFlags.has(arg)) i++
+      continue
+    }
+
+    if (arg.startsWith('file://')) {
+      const path = fileUrlToPath(arg)
+      if (path.toLowerCase().endsWith('.json')) {
+        paths.push(path)
+      }
+    } else if (arg.includes('://')) {
+      links.push(arg)
+    } else if (arg.toLowerCase().endsWith('.json')) {
+      paths.push(arg)
+    }
+  }
+
+  return { links, paths }
+}
+
 export const handleLaunchApp = async (args: string[]) => {
-  const links = args.filter((arg) => arg.includes('://'))
+  const { links, paths } = splitLaunchArgs(args)
 
   const subscribesStore = Stores.useSubscribesStore()
   for (const link of links) {
     try {
       await subscribesStore.importSubscribe(link)
+      message.success('common.success')
+    } catch (error) {
+      message.error(error)
+    }
+  }
+
+  const profilesStore = Stores.useProfilesStore()
+  for (const path of paths) {
+    try {
+      await profilesStore.importProfile(path)
       message.success('common.success')
     } catch (error) {
       message.error(error)
