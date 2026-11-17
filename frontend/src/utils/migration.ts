@@ -1,4 +1,5 @@
 import { DefaultPluginHubSources } from '@/constant/app'
+import { CoreDirectoryName } from '@/constant/kernel'
 import { RequestProxyMode, WindowStartState } from '@/enums/app'
 import { Inbound, TunDnsMode } from '@/enums/kernel'
 import { useEnvStore } from '@/stores'
@@ -80,6 +81,15 @@ export const migrateAppSettings = async (
     settings.systemTitleBar = false
     needSync = true
   }
+  if (settings.updateIncludePrerelease === undefined) {
+    settings.updateIncludePrerelease = false
+    needSync = true
+  }
+  // Rolling release is globally disabled
+  if (settings.rollingRelease !== false) {
+    settings.rollingRelease = false
+    needSync = true
+  }
   if (typeof settings.windowStartState === 'number') {
     settings.windowStartState =
       settings.windowStartState === 2 ? WindowStartState.Minimised : WindowStartState.Normal
@@ -88,8 +98,8 @@ export const migrateAppSettings = async (
   for (const core of [settings.kernel.main, settings.kernel.alpha]) {
     const legacy = JSON.stringify(core)
     const migrated = legacy
-      .replaceAll('$APP_BASE_PATH/$CORE_BASE_PATH', '$APP_DATA_PATH/sing-box')
-      .replaceAll('$APP_BASE_PATH/data/', '$APP_DATA_PATH/')
+      .replaceAll('$APP_BASE_PATH/$CORE_BASE_PATH', `$APP_DATA_DIR/${CoreDirectoryName}`)
+      .replaceAll('$APP_BASE_PATH/data/', '$APP_DATA_DIR/')
     if (migrated !== legacy) {
       Object.assign(core, JSON.parse(migrated))
       needSync = true

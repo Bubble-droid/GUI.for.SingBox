@@ -115,7 +115,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     multipleInstance: false,
     addPluginToMenu: false,
     addGroupToMenu: false,
-    rollingRelease: true,
+    rollingRelease: false,
     updateIncludePrerelease: false,
     debugModalSideBySide: false,
     debugOutline: false,
