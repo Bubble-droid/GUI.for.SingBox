@@ -41,12 +41,24 @@ contents:
     dst: /usr/bin/gui-for-singbox
     file_info:
       mode: 0755
-  - src: ./packaging/linux/gui-for-singbox-daemon.socket
+  - src: ./packaging/linux/systemd/gui-for-singbox-daemon.socket
     dst: /usr/lib/systemd/system/gui-for-singbox-daemon.socket
     file_info:
       mode: 0644
-  - src: ./packaging/linux/gui-for-singbox-daemon.service
+  - src: ./packaging/linux/systemd/gui-for-singbox-daemon.service
     dst: /usr/lib/systemd/system/gui-for-singbox-daemon.service
+    file_info:
+      mode: 0644
+  - src: ./packaging/linux/completions/gui-for-singbox.bash
+    dst: /usr/share/bash-completion/completions/gui-for-singbox
+    file_info:
+      mode: 0644
+  - src: ./packaging/linux/completions/_gui-for-singbox
+    dst: /usr/share/zsh/site-functions/_gui-for-singbox
+    file_info:
+      mode: 0644
+  - src: ./packaging/linux/completions/gui-for-singbox.fish
+    dst: /usr/share/fish/vendor_completions.d/gui-for-singbox.fish
     file_info:
       mode: 0644
   - src: ./packaging/linux/sysusers/gui-for-singbox.conf
