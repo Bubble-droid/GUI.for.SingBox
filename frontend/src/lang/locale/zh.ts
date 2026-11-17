@@ -680,6 +680,7 @@ export default {
       green: '绿色',
       purple: '紫色',
       custom: '自定义',
+      system: '跟随系统',
       primary: '主色',
       secondary: '辅助色',
     },

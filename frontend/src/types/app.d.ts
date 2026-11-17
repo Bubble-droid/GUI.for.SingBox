@@ -1,7 +1,7 @@
 declare namespace App {
   type OS = 'windows' | 'linux' | 'darwin'
   type Theme = 'auto' | 'light' | 'dark'
-  type Color = 'default' | 'green' | 'purple' | 'custom'
+  type Color = 'default' | 'green' | 'purple' | 'custom' | 'system'
   type View = 'grid' | 'list'
   type WindowStartState = 'normal' | 'minimised'
   type WebviewGpuPolicy =
@@ -24,6 +24,12 @@ declare namespace App {
     isSystemPackage: boolean
     isBinaryDirWritable: boolean
     flagsFilePath: string
+  }
+
+  interface SystemTheme {
+    mode: 'light' | 'dark' | 'unknown'
+    accent: string
+    source: 'portal' | 'none'
   }
 
   interface TrayContent {

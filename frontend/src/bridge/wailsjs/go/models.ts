@@ -178,6 +178,22 @@ export namespace bridge {
 	        this.MaxUploadSize = source["MaxUploadSize"];
 	    }
 	}
+	export class SystemTheme {
+	    mode: string;
+	    accent: string;
+	    source: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SystemTheme(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.mode = source["mode"];
+	        this.accent = source["accent"];
+	        this.source = source["source"];
+	    }
+	}
 	export class TrayContent {
 	    icon?: string;
 	    title?: string;

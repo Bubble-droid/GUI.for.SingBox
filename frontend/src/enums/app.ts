@@ -41,6 +41,7 @@ export enum Color {
   Green = 'green',
   Purple = 'purple',
   Custom = 'custom',
+  System = 'system',
 }
 
 export enum Branch {

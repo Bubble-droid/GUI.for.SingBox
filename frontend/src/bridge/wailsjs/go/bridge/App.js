@@ -98,6 +98,10 @@ export function GetSystemProxyBypass() {
   return window['go']['bridge']['App']['GetSystemProxyBypass']();
 }
 
+export function GetSystemTheme() {
+  return window['go']['bridge']['App']['GetSystemTheme']();
+}
+
 export function IsStartup() {
   return window['go']['bridge']['App']['IsStartup']();
 }

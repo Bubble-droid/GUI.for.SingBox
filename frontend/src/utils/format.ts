@@ -59,3 +59,27 @@ export function formatDate(timestamp: number | string, format: string) {
 export function formatProxyHost(host: string) {
   return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host
 }
+
+export function shadeColor(color: string, factor: number) {
+  const match = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(color.trim())
+  const raw = match?.[1]
+  if (!raw) return color
+
+  const hex =
+    raw.length === 3
+      ? raw
+          .split('')
+          .map((char) => char + char)
+          .join('')
+      : raw
+
+  const value = parseInt(hex, 16)
+  const channels = [(value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff]
+  return (
+    '#' +
+    channels
+      .map((channel) => Math.min(255, Math.max(0, Math.round(channel * factor))))
+      .map((channel) => channel.toString(16).padStart(2, '0'))
+      .join('')
+  )
+}

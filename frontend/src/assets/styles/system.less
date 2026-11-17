@@ -1,0 +1,107 @@
+// Accent-derived surfaces, applied only when the color setting is "system".
+// The accent comes from the XDG portal (see bridge/theme_linux.go); each
+// surface keeps its original transparency while picking up the accent hue.
+body[color-system='true'] {
+  &[theme-mode='light'] {
+    --bg-color: color-mix(in srgb, var(--primary-color) 6%, rgba(246, 246, 246, 0.85));
+
+    // Scrollbar
+    --scrollbar-track-bg: color-mix(in srgb, var(--primary-color) 14%, rgb(220, 220, 220));
+
+    // Button
+    --btn-normal-bg: color-mix(in srgb, var(--primary-color) 4%, rgb(255, 255, 255));
+    --btn-text-hover-bg: color-mix(in srgb, var(--primary-color) 12%, rgb(232, 232, 232));
+    --btn-text-active-bg: color-mix(in srgb, var(--primary-color) 18%, rgb(206, 206, 206));
+
+    // Radio
+    --radio-normal-bg: color-mix(in srgb, var(--primary-color) 4%, rgba(255, 255, 255, 1));
+
+    // Card
+    --card-bg: color-mix(in srgb, var(--primary-color) 9%, rgba(255, 255, 255, 0.6));
+    --card-hover-bg: color-mix(in srgb, var(--primary-color) 13%, rgba(255, 255, 255, 0.7));
+    --card-active-bg: color-mix(in srgb, var(--primary-color) 7%, rgba(255, 255, 255, 0.4));
+
+    // Progress
+    --progress-bg: color-mix(in srgb, var(--primary-color) 10%, rgba(0, 0, 0, 0.08));
+
+    // Dropdown / Menu
+    --dropdown-bg: color-mix(in srgb, var(--primary-color) 8%, rgba(255, 255, 255, 0.85));
+    --menu-bg: color-mix(in srgb, var(--primary-color) 8%, rgba(255, 255, 255, 0.85));
+
+    // Modal
+    --modal-bg: color-mix(in srgb, var(--primary-color) 5%, #f6f6f6);
+    --modal-mask-bg: color-mix(in srgb, var(--primary-color) 4%, rgba(255, 255, 255, 0.4));
+
+    // Switch
+    --switch-off-bg: color-mix(in srgb, var(--primary-color) 8%, rgba(0, 0, 0, 0.06));
+    --switch-off-hover-bg: color-mix(in srgb, var(--primary-color) 12%, rgba(0, 0, 0, 0.1));
+
+    // Input / Select / ColorPicker
+    --input-bg: color-mix(in srgb, var(--primary-color) 5%, rgba(255, 255, 255, 1));
+    --select-bg: color-mix(in srgb, var(--primary-color) 5%, rgba(255, 255, 255, 1));
+    --color-picker-bg: color-mix(in srgb, var(--primary-color) 5%, #fff);
+
+    // Divider
+    --divider-color: color-mix(in srgb, var(--primary-color) 22%, #eaeaea);
+
+    // Toast
+    --toast-bg: color-mix(in srgb, var(--primary-color) 6%, #fff);
+
+    // Table
+    --table-tr-odd-bg: color-mix(in srgb, var(--primary-color) 5%, rgb(247, 247, 247));
+    --table-tr-even-bg: color-mix(in srgb, var(--primary-color) 8%, rgb(238, 238, 238));
+    --table-tr-odd-hover-bg: color-mix(in srgb, var(--primary-color) 14%, rgb(202, 202, 202));
+    --table-tr-even-hover-bg: color-mix(in srgb, var(--primary-color) 14%, rgb(202, 202, 202));
+  }
+
+  &[theme-mode='dark'] {
+    --bg-color: color-mix(in srgb, var(--primary-color) 10%, rgba(0, 0, 0, 0.85));
+
+    // Scrollbar
+    --scrollbar-track-bg: color-mix(in srgb, var(--primary-color) 24%, rgb(73, 73, 73));
+
+    // Button
+    --btn-text-hover-bg: color-mix(in srgb, var(--primary-color) 24%, rgba(255, 255, 255, 0.2));
+    --btn-text-active-bg: color-mix(in srgb, var(--primary-color) 32%, rgba(255, 255, 255, 0.4));
+
+    // Radio
+    --radio-normal-bg: color-mix(in srgb, var(--primary-color) 14%, rgba(255, 255, 255, 0.06));
+
+    // Card
+    --card-bg: color-mix(in srgb, var(--primary-color) 16%, rgba(255, 255, 255, 0.06));
+    --card-hover-bg: color-mix(in srgb, var(--primary-color) 22%, rgba(255, 255, 255, 0.1));
+    --card-active-bg: color-mix(in srgb, var(--primary-color) 12%, rgba(255, 255, 255, 0.04));
+
+    // Progress
+    --progress-bg: color-mix(in srgb, var(--primary-color) 20%, rgba(221, 221, 221, 0.08));
+
+    // Dropdown / Menu
+    --dropdown-bg: color-mix(in srgb, var(--primary-color) 18%, rgba(62, 62, 62, 0.8));
+    --menu-bg: color-mix(in srgb, var(--primary-color) 18%, rgba(62, 62, 62, 0.8));
+
+    // Modal
+    --modal-bg: color-mix(in srgb, var(--primary-color) 12%, #343434);
+    --modal-mask-bg: color-mix(in srgb, var(--primary-color) 10%, rgba(0, 0, 0, 0.4));
+
+    // Switch
+    --switch-off-bg: color-mix(in srgb, var(--primary-color) 16%, rgba(255, 255, 255, 0.1));
+    --switch-off-hover-bg: color-mix(in srgb, var(--primary-color) 22%, rgba(255, 255, 255, 0.06));
+
+    // Input / Select / ColorPicker
+    --input-bg: color-mix(in srgb, var(--primary-color) 15%, rgba(255, 255, 255, 0.06));
+    --select-bg: color-mix(in srgb, var(--primary-color) 15%, rgba(255, 255, 255, 0.06));
+    --color-picker-bg: color-mix(in srgb, var(--primary-color) 15%, rgba(255, 255, 255, 0.06));
+
+    // Divider
+    --divider-color: color-mix(in srgb, var(--primary-color) 30%, #4d4d4d);
+
+    // Toast
+    --toast-bg: color-mix(in srgb, var(--primary-color) 14%, #343434);
+
+    // Table
+    --table-tr-odd-bg: color-mix(in srgb, var(--primary-color) 14%, #2e2e2e);
+    --table-tr-even-bg: color-mix(in srgb, var(--primary-color) 18%, rgb(37, 37, 37));
+    --table-tr-odd-hover-bg: color-mix(in srgb, var(--primary-color) 26%, rgb(61, 61, 61));
+    --table-tr-even-hover-bg: color-mix(in srgb, var(--primary-color) 26%, rgb(61, 61, 61));
+  }
+}

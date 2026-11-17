@@ -682,6 +682,7 @@ export default {
       green: 'Green',
       purple: 'Purple',
       custom: 'Custom',
+      system: 'System',
       primary: 'Primary',
       secondary: 'Secondary',
     },

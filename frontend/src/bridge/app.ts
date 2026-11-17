@@ -63,6 +63,15 @@ export const GetSystemProxyBypass = async () => {
   return data
 }
 
+export const GetSystemTheme = async (): Promise<App.SystemTheme> => {
+  const theme = await Bridge.GetSystemTheme()
+  return {
+    mode: theme.mode === 'light' || theme.mode === 'dark' ? theme.mode : 'unknown',
+    accent: theme.accent,
+    source: theme.source === 'portal' ? 'portal' : 'none',
+  }
+}
+
 export const GetInterfaces = async () => {
   const { flag, data } = await Bridge.GetInterfaces()
   if (!flag) {

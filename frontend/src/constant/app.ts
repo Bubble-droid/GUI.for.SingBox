@@ -69,6 +69,10 @@ export const Colors = {
     primary: '#000',
     secondary: '#000',
   },
+  [Color.System]: {
+    primary: 'rgb(0, 89, 214)',
+    secondary: 'rgb(5, 62, 142)',
+  },
 }
 
 export const LanguageOptions = [
@@ -138,6 +142,10 @@ export const ColorOptions = [
   {
     label: 'settings.color.custom',
     value: Color.Custom,
+  },
+  {
+    label: 'settings.color.system',
+    value: Color.System,
   },
 ]
 

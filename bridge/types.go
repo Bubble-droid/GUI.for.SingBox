@@ -67,6 +67,12 @@ type FlagResult struct {
 	Data string `json:"data"`
 }
 
+type SystemTheme struct {
+	Mode   string `json:"mode"`   // light / dark / unknown
+	Accent string `json:"accent"` // #rrggbb, empty when unavailable
+	Source string `json:"source"` // portal / none
+}
+
 type ServerOptions struct {
 	Cert          string
 	Key           string

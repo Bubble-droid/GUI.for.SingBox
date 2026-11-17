@@ -3,7 +3,9 @@ import { ref, watch } from 'vue'
 import { parse, stringify } from 'yaml'
 
 import {
+  EventsOn,
   GetSystemProxyBypass,
+  GetSystemTheme,
   ReadFile,
   WriteFile,
   WindowSetSystemDefaultTheme,
@@ -45,6 +47,7 @@ import {
   updateTrayAndMenus,
   ignoredError,
   deepClone,
+  shadeColor,
   message,
   migrateAppSettings,
 } from '@/utils'
@@ -128,6 +131,20 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
 
   const systemTitleBarOnStartup = ref(false)
 
+  const systemTheme = ref<App.SystemTheme>({ mode: 'unknown', accent: '', source: 'none' })
+  const updateSystemTheme = (theme: App.SystemTheme) => {
+    systemTheme.value = {
+      mode: theme.mode === 'light' || theme.mode === 'dark' ? theme.mode : 'unknown',
+      accent: theme.accent || '',
+      source: theme.source === 'portal' ? 'portal' : 'none',
+    }
+  }
+  const refreshSystemTheme = async () => {
+    const theme = await ignoredError(GetSystemTheme)
+    if (theme) updateSystemTheme(theme)
+  }
+  EventsOn('systemThemeChanged', updateSystemTheme)
+
   const saveAppSettings = debounce((config: string) => {
     WriteFile(UserFilePath, config)
   }, 500)
@@ -156,6 +173,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
 
     await migrateAppSettings(settings, () => WriteFile(UserFilePath, stringify(settings)))
 
+    await refreshSystemTheme()
     app.value = settings
     systemTitleBarOnStartup.value = settings.systemTitleBar
     latestUserSettings = stringify(app.value)
@@ -163,12 +181,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
 
   const applyAppSettings = {
     theme(theme: App.Theme) {
-      const isAuto = theme === Theme.Auto
-      if (isAuto) {
-        themeMode.value = mediaQueryList.matches ? Theme.Dark : Theme.Light
-      } else {
-        themeMode.value = theme
-      }
+      themeMode.value = theme === Theme.Auto ? resolveAutoTheme() : theme
     },
     lang(lang: string) {
       i18n.global.locale.value = lang
@@ -177,11 +190,23 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
       }
     },
     color(color: App.Color, primary: string, secondary: string) {
-      if (color !== Color.Custom) {
+      if (color === Color.System) {
+        const accent = systemTheme.value.accent
+        if (accent) {
+          primary = accent
+          secondary = shadeColor(accent, 0.7)
+        } else {
+          ;({ primary, secondary } = Colors[Color.Default])
+        }
+      } else if (color !== Color.Custom) {
         ;({ primary, secondary } = Colors[color] ?? { primary, secondary })
       }
       document.documentElement.style.setProperty('--primary-color', primary)
       document.documentElement.style.setProperty('--secondary-color', secondary)
+      document.body.setAttribute(
+        'color-system',
+        String(color === Color.System && Boolean(systemTheme.value.accent)),
+      )
     },
     feature(
       outline: boolean,
@@ -242,8 +267,13 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
   /* Apply AppTheme */
   const themeMode = ref<Extract<App.Theme, 'light' | 'dark'>>(Theme.Light)
   const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)')
+  const resolveAutoTheme = (): Extract<App.Theme, 'light' | 'dark'> => {
+    const mode = systemTheme.value.mode
+    if (mode === Theme.Light || mode === Theme.Dark) return mode
+    return mediaQueryList.matches ? Theme.Dark : Theme.Light
+  }
   mediaQueryList.addEventListener('change', ({ matches }) => {
-    if (app.value.theme === Theme.Auto) {
+    if (app.value.theme === Theme.Auto && systemTheme.value.mode === 'unknown') {
       themeMode.value = matches ? Theme.Dark : Theme.Light
     }
   })
@@ -261,6 +291,18 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     WindowSetSystemDefaultTheme()
   }
   watch(themeMode, setAppTheme, { immediate: true })
+  watch(
+    systemTheme,
+    () => {
+      if (app.value.theme === Theme.Auto) {
+        applyAppSettings.theme(Theme.Auto)
+      }
+      if (app.value.color === Color.System) {
+        applyAppSettings.color(Color.System, app.value.primaryColor, app.value.secondaryColor)
+      }
+    },
+    { deep: true },
+  )
 
   /* Apply ModalLayout */
   watch(

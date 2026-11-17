@@ -50,6 +50,8 @@ export function GetSystemProxy():Promise<bridge.FlagResult>;
 
 export function GetSystemProxyBypass():Promise<bridge.FlagResult>;
 
+export function GetSystemTheme():Promise<bridge.SystemTheme>;
+
 export function IsStartup():Promise<boolean>;
 
 export function KillProcess(arg1:number,arg2:number):Promise<bridge.FlagResult>;

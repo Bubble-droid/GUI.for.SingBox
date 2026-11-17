@@ -137,6 +137,7 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			app.Ctx = ctx
 			bridge.Startup(assets)
+			bridge.StartSystemThemeWatch(ctx)
 
 			if cmd.Action == cli.ActionQuit {
 				go func() {
