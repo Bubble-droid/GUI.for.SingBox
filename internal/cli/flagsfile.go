@@ -33,6 +33,23 @@ func (f LaunchFlags) WithOverride(r Result) LaunchFlags {
 	return f
 }
 
+// Args renders the effective launch parameters for this run: the persistent
+// flags with any command-line override applied, followed by positional
+// arguments such as deep links or file paths.
+func (f LaunchFlags) Args(positional []string) []string {
+	args := make([]string, 0, len(positional)+3)
+	if f.DataDir != "" {
+		args = append(args, "--data-dir="+f.DataDir)
+	}
+	if f.Portable {
+		args = append(args, "--portable")
+	}
+	if f.WindowStartState != "" {
+		args = append(args, "--window-start-state="+f.WindowStartState)
+	}
+	return append(args, positional...)
+}
+
 // LoadLaunchFlags reads the flags file at path. A missing file is normal and
 // yields no overrides. Invalid lines are logged and skipped so a single typo
 // does not discard the remaining flags.

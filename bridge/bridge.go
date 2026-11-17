@@ -146,6 +146,7 @@ func (a *App) GetEnv(key string) any {
 		AppVersion:   Env.AppVersion,
 		BasePath:     Env.BasePath,
 		DataDir:      Env.DataDir,
+		LaunchArgs:   Env.LaunchArgs,
 		OS:           Env.OS,
 		ARCH:         Env.ARCH,
 		IsPrivileged: Env.IsPrivileged,

@@ -27,9 +27,10 @@ type EnvResult struct {
 
 	WindowStartState WindowStartState `json:"-"`
 
-	IsSystemPackage     bool   `json:"isSystemPackage"`
-	IsBinaryDirWritable bool   `json:"isBinaryDirWritable"`
-	FlagsFilePath       string `json:"flagsFilePath"`
+	LaunchArgs          []string `json:"launchArgs"`
+	IsSystemPackage     bool     `json:"isSystemPackage"`
+	IsBinaryDirWritable bool     `json:"isBinaryDirWritable"`
+	FlagsFilePath       string   `json:"flagsFilePath"`
 }
 
 type RequestOptions struct {

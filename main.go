@@ -43,6 +43,10 @@ func main() {
 	// override them for this run and are never written back.
 	launch := cli.LoadLaunchFlags(storage.LaunchFlagsPath()).WithOverride(cmd)
 
+	// Record the effective launch parameters for this startup: persisted flags
+	// after command-line overrides, plus deep links or file paths.
+	bridge.Env.LaunchArgs = launch.Args(cmd.Positional)
+
 	app := bridge.CreateApp(bridge.LaunchOptions{
 		DataDir:          launch.DataDir,
 		Portable:         launch.Portable,

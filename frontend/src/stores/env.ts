@@ -15,6 +15,7 @@ export const useEnvStore = defineStore('env', () => {
     appVersion: '',
     basePath: '',
     dataDir: '',
+    launchArgs: [],
     appPath: '',
     os: '' as App.OS,
     arch: '',

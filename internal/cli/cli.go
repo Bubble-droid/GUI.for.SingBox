@@ -31,6 +31,9 @@ type Result struct {
 	DataDir          string
 	Portable         bool
 	WindowStartState string
+
+	// Positional holds non-flag arguments such as deep links or file paths.
+	Positional []string
 }
 
 const appDesc string = "A GUI client for sing-box"
@@ -110,6 +113,48 @@ func filterKnownFlags(args []string) []string {
 	return filtered
 }
 
+// positionalArgs returns the non-flag arguments, such as deep links or file
+// paths, skipping flags and the values they consume.
+func positionalArgs(args []string) []string {
+	positional := make([]string, 0, len(args))
+	expectValue := false
+	literal := false
+
+	for _, arg := range args {
+		if literal {
+			positional = append(positional, arg)
+			continue
+		}
+		if arg == "--" {
+			literal = true
+			continue
+		}
+
+		if expectValue {
+			expectValue = false
+			continue
+		}
+
+		if arg == "-" || !strings.HasPrefix(arg, "-") {
+			positional = append(positional, arg)
+			continue
+		}
+
+		name := strings.TrimLeft(arg, "-")
+		hasValue := false
+		if idx := strings.IndexByte(name, '='); idx >= 0 {
+			name = name[:idx]
+			hasValue = true
+		}
+
+		if _, ok := valueFlagNames[name]; ok && !hasValue {
+			expectValue = true
+		}
+	}
+
+	return positional
+}
+
 func parse(args []string, stdout, stderr io.Writer) Result {
 	if len(args) == 0 {
 		return Result{Action: ActionLaunch, ExitCode: 0}
@@ -185,6 +230,7 @@ func parse(args []string, stdout, stderr io.Writer) Result {
 		DataDir:          dataDir,
 		Portable:         portable,
 		WindowStartState: windowStartState,
+		Positional:       positionalArgs(args),
 	}
 }
 
