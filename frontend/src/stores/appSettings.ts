@@ -75,7 +75,7 @@ export const useAppSettingsStore = defineStore('app-settings', () => {
     height: 0,
     exitOnClose: true,
     closeKernelOnExit: true,
-    autoSetSystemProxy: true,
+    autoSetSystemProxy: false,
     autoSetSystemDNS: false,
     requestProxyMode: RequestProxyMode.System,
     customProxy: '',
